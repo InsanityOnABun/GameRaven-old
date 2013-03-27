@@ -10,7 +10,7 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.holoeverywhere.HoloEverywhere;
+import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
 import org.jsoup.Connection.Response;
@@ -44,14 +44,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -75,7 +73,7 @@ import com.ioabsoftware.DroidFAQs.Views.TopicView.TopicViewType;
 import com.ioabsoftware.DroidFAQs.Views.UserDetailView;
 import com.ioabsoftware.gameraven.R;
 
-public class AllInOneV2 extends org.holoeverywhere.app.Activity implements OnNavigationListener {
+public class AllInOneV2 extends Activity implements OnNavigationListener {
 	
 	private static boolean needToCheckForUpdate = true;
 	private static boolean isReleaseBuild = true;
