@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/udNameWrapper"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:id="@+id/aioHeader"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:id="@+id/aioMainWrapper"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/aioTitle"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="5dp"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
+                android:text="GameRaven"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/themedTextColor" />
+
+            <RelativeLayout
+                android:id="@+id/aioPageJumperWrapper"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/aioTitle"
+                android:visibility="visible" >
+
+                <View
+                    android:id="@+id/pjTopSep"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="3dp"
+                    android:background="#33B5E5"
+                    android:visibility="visible" />
+
+                <Button
+                    android:id="@+id/aioFirstPage"
+                    style="@style/Widget.Sherlock.ActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@+id/pjTopSep"
+                    android:enabled="false"
+                    android:minHeight="30dp"
+                    android:minWidth="46dp"
+                    android:text="&lt;&lt;"
+                    android:textColor="?attr/themedPageJumperColor" />
+
+                <View
+                    android:id="@+id/firstPrevSeperator"
+                    android:layout_width="1dp"
+                    android:layout_height="24dp"
+                    android:layout_alignBottom="@+id/aioFirstPage"
+                    android:layout_alignTop="@+id/aioFirstPage"
+                    android:layout_toRightOf="@+id/aioFirstPage"
+                    android:background="#33B5E5"
+                    android:visibility="visible" />
+
+                <Button
+                    android:id="@+id/aioPreviousPage"
+                    style="@style/Widget.Sherlock.ActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/aioFirstPage"
+                    android:layout_alignBottom="@+id/aioFirstPage"
+                    android:layout_toRightOf="@+id/firstPrevSeperator"
+                    android:enabled="false"
+                    android:minHeight="30dp"
+                    android:minWidth="46dp"
+                    android:text="&lt;"
+                    android:textColor="?attr/themedPageJumperColor" />
+
+                <Button
+                    android:id="@+id/aioLastPage"
+                    style="@style/Widget.Sherlock.ActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/aioFirstPage"
+                    android:layout_alignBottom="@+id/aioPreviousPage"
+                    android:layout_alignParentRight="true"
+                    android:enabled="false"
+                    android:minHeight="30dp"
+                    android:minWidth="46dp"
+                    android:text=">>"
+                    android:textColor="?attr/themedPageJumperColor" />
+
+                <View
+                    android:id="@+id/nextLastSeperator"
+                    android:layout_width="1dp"
+                    android:layout_height="24dp"
+                    android:layout_alignBottom="@+id/aioFirstPage"
+                    android:layout_alignTop="@+id/aioFirstPage"
+                    android:layout_toLeftOf="@+id/aioLastPage"
+                    android:background="#33B5E5"
+                    android:visibility="visible" />
+
+                <Button
+                    android:id="@+id/aioNextPage"
+                    style="@style/Widget.Sherlock.ActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/aioFirstPage"
+                    android:layout_alignBottom="@+id/aioLastPage"
+                    android:layout_toLeftOf="@+id/nextLastSeperator"
+                    android:enabled="false"
+                    android:minHeight="30dp"
+                    android:minWidth="46dp"
+                    android:text=">"
+                    android:textColor="?attr/themedPageJumperColor" />
+
+                <TextView
+                    android:id="@+id/aioPageLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/aioNextPage"
+                    android:layout_toRightOf="@+id/aioPreviousPage"
+                    android:gravity="center_horizontal"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/separator"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="3dp"
+            android:background="#33B5E5"
+            android:visibility="visible" />
+    </LinearLayout>
+
+    <com.handmark.pulltorefresh.library.PullToRefreshScrollView
+        android:id="@+id/aioScroller"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/aioPostWrapper"
+        android:layout_below="@+id/aioHeader" >
+    </com.handmark.pulltorefresh.library.PullToRefreshScrollView>
+
+    <LinearLayout
+        android:id="@+id/aioPostWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="?attr/themedPostBackground"
+        android:orientation="vertical"
+        android:padding="5dp"
+        android:visibility="visible" >
+
+        <View
+            android:id="@+id/pmdSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#33B5E5"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/aioTitleWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/aioPostTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Title"
+                android:maxLength="80" >
+
+                <requestFocus />
+            </EditText>
+
+            <TextView
+                android:id="@+id/aioTitleCounter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginBottom="10dp"
+                android:text="Small Text"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/aioPostBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Body"
+            android:inputType="textMultiLine"
+            android:lines="4" />
+
+        <TextView
+            android:id="@+id/aioBodyCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginBottom="10dp"
+            android:text="Small Text"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="10sp" />
+
+        <LinearLayout
+            android:id="@+id/aioPostButtonWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1" >
+
+            <Button
+                android:id="@+id/aioPostDo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:onClick="postDo"
+                android:text="Post" />
+
+            <Button
+                android:id="@+id/aioPostCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:onClick="postCancel"
+                android:text="Cancel" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

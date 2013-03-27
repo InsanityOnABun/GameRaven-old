@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/LinearLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/spTo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Recipient"
+        android:maxLength="20" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/spSubject"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Subject"
+        android:maxLength="100" >
+    </EditText>
+
+    <EditText
+        android:id="@+id/spMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight=".75"
+        android:ems="10"
+        android:hint="Message"
+        android:inputType="textMultiLine"
+        android:lines="3"
+        android:maxLength="1024" />
+
+    <LinearLayout
+        android:id="@+id/spFootWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:visibility="gone" >
+
+        <ProgressBar
+            android:id="@+id/spProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Sending..." />
+    </LinearLayout>
+
+</LinearLayout>

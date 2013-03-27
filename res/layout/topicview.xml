@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tvGlobalWrapper"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="2dp"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/tvRelativeWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp" >
+
+        <TextView
+            android:id="@+id/tvTC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/tvTypeIndicator"
+            android:text="Topic CreatorTC"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/tvLastPost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="12/12 12:12PM"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/tvDetailSeperator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/tvLastPost"
+            android:text=" Msgs, Last: "
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/tvMsgCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/tvDetailSeperator"
+            android:text="500"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="10sp" />
+
+        <com.ioabsoftware.DroidFAQs.FontFitTextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/tvTC"
+            android:layout_toLeftOf="@+id/tvLPSep"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:lines="2"
+            android:text="man fan died at the room shot up to 97 degrees asdf asdf asdf "
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <com.ioabsoftware.DroidFAQs.Views.LastPostView
+            android:id="@+id/tvLastPostLink"
+            style="@style/Widget.Sherlock.ActionButton"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/tvTitle"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/tvMsgCount"
+            android:text="Last Post"
+            android:textColor="?attr/themedTextColor"
+            android:textSize="12sp" />
+
+        <View
+            android:id="@+id/tvLPSep"
+            android:layout_width="1dp"
+            android:layout_height="24dp"
+            android:layout_alignBottom="@+id/tvLastPostLink"
+            android:layout_alignTop="@+id/tvLastPostLink"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="5dp"
+            android:layout_toLeftOf="@+id/tvLastPostLink"
+            android:background="#33B5E5"
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/tvTypeIndicator"
+            android:layout_width="15dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/tvTC"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignTop="@+id/tvTC"
+            android:scaleType="fitStart"
+            android:src="@drawable/ic_archived" />
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="2dp"
+        android:background="#33B5E5"
+        android:visibility="visible" />
+
+</LinearLayout>

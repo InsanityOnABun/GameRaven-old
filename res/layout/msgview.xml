@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="2dp"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/mvTopWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:clickable="true"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp" >
+
+        <LinearLayout
+            android:id="@+id/mvDetailsWrapper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/mvMessageMenu"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/mvUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:text="Username"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/black"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/mvPostNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="#50, 12/12 12:12:12PM"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/black"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/mvMessageMenuIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:src="?attr/themedPostInfoIcon" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/mvPollWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@drawable/pollborder"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/mvMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:text="Hey everyone. Since CE moves too fast, making topics purge in a couple days if there&apos;s no activity, I&apos;m gonna move the official topic over here. For those of you that don&apos;t know, GameRaven (formerly DroidFAQs) is an app currently in development that aims to enhance the GameFAQs experience on Android devices."
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="15sp" />
+
+</LinearLayout>

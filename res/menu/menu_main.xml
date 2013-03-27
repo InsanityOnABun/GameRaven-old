@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/search"
+        android:actionViewClass="com.actionbarsherlock.widget.SearchView"
+        android:icon="?attr/themedSearchIcon"
+        android:showAsAction="ifRoom|collapseActionView"
+        android:title="Search"
+        android:visible="false">
+    </item>
+    <item
+        android:id="@+id/addFav"
+        android:icon="?attr/themedAddFavIcon"
+        android:showAsAction="always"
+        android:title="Add to Favorites"
+        android:visible="false">
+    </item>
+    <item
+        android:id="@+id/remFav"
+        android:icon="?attr/themedRemFavIcon"
+        android:showAsAction="always"
+        android:title="Remove from Favorites"
+        android:visible="false">
+    </item>
+    <item
+        android:id="@+id/topiclist"
+        android:icon="?attr/themedTopicListIcon"
+        android:showAsAction="always"
+        android:title="Return to Topic List"
+        android:visible="false">
+    </item>
+    <item
+        android:id="@+id/post"
+        android:icon="?attr/themedPostIcon"
+        android:showAsAction="always"
+        android:title="Post new..."
+        android:visible="false">
+    </item>
+    <item
+        android:id="@+id/refresh"
+        android:icon="?attr/themedRefreshIcon"
+        android:showAsAction="always"
+        android:title="Refresh"
+        android:visible="false">
+    </item>
+    <item
+        android:id="@+id/openInBrowser"
+        android:title="Open Page in Browser">
+    </item>
+    <item
+        android:id="@+id/changeAccount"
+        android:title="Change Account">
+    </item>
+    <item
+        android:id="@+id/changeSettings"
+        android:title="Settings...">
+    </item>
+    <item
+        android:id="@+id/exit"
+        android:title="Exit GameRaven">
+    </item>
+
+</menu>

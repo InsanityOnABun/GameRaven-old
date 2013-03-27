@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:robobunny="http://robobunny.com"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orderingFromXml="true"
+    android:persistent="false" >
+
+    <PreferenceCategory
+        android:key="accountsCategory"
+        android:orderingFromXml="true"
+        android:persistent="false"
+        android:title="Accounts" >
+        <Preference
+            android:key="addAccount"
+            android:persistent="false"
+            android:summary="Click an account to make it default or remove it."
+            android:title="Add Account..." />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="genSettingsCategory"
+        android:orderingFromXml="true"
+        android:persistent="false"
+        android:title="General Settings" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="startAtAMP"
+            android:persistent="true"
+            android:summaryOff="New sessions will not start on the Active Messages Posted List"
+            android:summaryOn="New sessions will start on the Active Messages Posted List"
+            android:title="Start on AMP List" />
+        <CheckBoxPreference
+            android:key="reloadOnBack"
+            android:persistent="true"
+            android:summaryOff="Do not reload pages when navigating back."
+            android:summaryOn="Reload pages when navigating back."
+            android:title="Reload On Back" />
+        <CheckBoxPreference
+            android:key="reloadOnResume"
+            android:persistent="true"
+            android:summaryOff="Do not reload pages when app is resumed."
+            android:summaryOn="Reload pages when app is resumed."
+            android:title="Reload On Resume" />
+        <CheckBoxPreference
+            android:key="enablePTR"
+            android:persistent="true"
+            android:summary="Enables the option to refresh the page by pulling past the top or bottom."
+            android:title="Enable Pull-To-Refresh" />
+
+        <Preference
+            android:key="ampSortOptionDialog"
+            android:persistent="false"
+            android:summary="Select your preferred sorting style for your Active Messages list."
+            android:title="AMP Sort Options..." />
+        <Preference
+            android:key="customSig"
+            android:summary="Set a custom global signature that applies to any account that does not have its own signature set."
+            android:title="Custom Global Signature..." />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="themingCategory"
+        android:orderingFromXml="true"
+        android:persistent="false"
+        android:title="Theming Settings" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="useLightTheme"
+            android:persistent="true"
+            android:summary="Changes require restart to take effect. (Menu -> Exit GameRaven)"
+            android:title="Use Light Theme" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="devCategory"
+        android:orderingFromXml="true"
+        android:persistent="false"
+        android:title="Development Settings" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="enableJS"
+            android:persistent="true"
+            android:summary="Some ads loaded from GFAQs use javascript."
+            android:title="Enable Javascript" />
+
+        <Preference
+            android:key="backupSettings"
+            android:summary="Passwords are stored as plain text! Back up settings to sdcard/gameraven/gameraven_settings"
+            android:title="Back Up Settings" />
+        <Preference
+            android:key="restoreSettings"
+            android:summary="This will remove any previously added accounts! Restore settings from sdcard/gameraven/gameraven_settings"
+            android:title="Restore Settings" />
+        <Preference
+            android:key="aboutFeedback"
+            android:title="About &amp; Feedback" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="ampOptionKeys">
+        <item>Last Post, New to Old</item>
+        <item>Last Post, Old to New</item>
+        <item>Your Last Post, New to Old</item>
+        <item>Your Last Post, Old to New</item>
+    </string-array>
+    <string-array name="ampOptionValues">
+        <item>-1</item>
+        <item>1</item>
+        <item>0</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="navListLoggedIn">
+        <item>Jump To…</item>
+        <item>Board Jumper</item>
+        <item>AMP List</item>
+        <item>PM Inbox</item>
+    </string-array>
+    <string-array name="navListLoggedOut">
+        <item>Jump To…</item>
+        <item>Board Jumper</item>
+    </string-array>
+    <string-array name="msgMenuLoggedIn">
+        <item>Quote</item>
+        <item>Report</item>
+        <item>User Details</item>
+    </string-array>
+    <string-array name="msgMenuLoggedInAsPosterEditable">
+        <item>Quote</item>
+        <item>Edit</item>
+        <item>Delete</item>
+        <item>User Details</item>
+    </string-array>
+    <string-array name="msgMenuLoggedInAsPosterNotEditable">
+        <item>Quote</item>
+        <item>Delete</item>
+        <item>User Details</item>
+    </string-array>
+    <string-array name="msgMenuNotLoggedIn">
+        <item>User Details</item>
+    </string-array>
+    <string-array name="msgReportReasons">
+        <item>Offensive: Sexually explicit, racism, threats, pornography</item>
+        <item>Advertising: Spam, "Make Money Fast", referrer codes</item>
+        <item>Illegal Activities: Copyright violations, online game cheats</item>
+        <item>Spoiler with no Warning: Revealing critical plot details with no warning</item>
+        <item>Harassment/Privacy: Posting personal information, repeated harassment and bullying</item>
+        <item>Censor Bypassing: Not properly obscuring offensive/banned words</item>
+        <item>Trolling: Provoking other users to respond inappropriately</item>
+        <item>Flaming: Insulting other board users</item>
+        <item>Disruptive Posting: ALL CAPS, large blank posts, hard-to-read posts, mass bumping</item>
+    </string-array>
+    <string-array name="msgReportCodes">
+        <item>1</item>
+        <item>5</item>
+        <item>6</item>
+        <item>18</item>
+        <item>22</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>20</item>
+    </string-array>
+
+</resources>
