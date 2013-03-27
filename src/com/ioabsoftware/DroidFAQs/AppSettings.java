@@ -124,84 +124,18 @@ public class AppSettings extends SherlockPreferenceActivity implements HandlesNe
         
         findPreference("backupSettings").setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
-                	String state = Environment.getExternalStorageState();
-        			if (Environment.MEDIA_MOUNTED.equals(state)) {
-        				// We can read and write the media
-        				File settingsFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/gameraven",
-        						"gameraven_settings");
-
-        				try {
-        					settingsFile.delete();
-        					settingsFile.createNewFile();
-        					
-        					BufferedWriter buf = new BufferedWriter(new FileWriter(
-        							settingsFile, true));
-        					
-        					buf.append("grBackupVer=" + currentBackupVer + "\n");
-        					
-        					buf.append("[ACCOUNTS]\n");
-        					for (String s : AllInOneV2.getAccounts().getKeys()) {
-        						
-        						buf.append(s + "\n");
-            					buf.append(AllInOneV2.getAccounts().getString(s) + "\n");
-            					
-            					buf.append("[CUSTOM_SIG]\n");
-            					buf.append(settings.getString("customSig" + s, "") + '\n');
-            					buf.append("[END_CUSTOM_SIG]\n");
-        					}
-        					buf.append("[END_ACCOUNTS]\n");
-        					
-        					buf.append("[GLOBAL_SIG]\n");
-        					buf.append(settings.getString("customSig", "") + '\n');
-        					buf.append("[END_GLOBAL_SIG]\n");
-        					
-        					buf.append("defaultAccount=" + settings.getString("defaultAccount", "N/A") + '\n');
-        					
-        					if (settings.getBoolean("startAtAMP", false))
-            					buf.append("startAtAMP=true\n");
-        					else
-        						buf.append("startAtAMP=false\n");
-        					
-        					if (settings.getBoolean("reloadOnBack", false))
-            					buf.append("reloadOnBack=true\n");
-        					else
-        						buf.append("reloadOnBack=false\n");
-        					
-        					if (settings.getBoolean("reloadOnResume", false))
-            					buf.append("reloadOnResume=true\n");
-        					else
-        						buf.append("reloadOnResume=false\n");
-        					
-        					if (settings.getBoolean("enablePTR", false))
-            					buf.append("enablePTR=true\n");
-        					else
-        						buf.append("enablePTR=false\n");
-        					
-        					if (settings.getBoolean("useLightTheme", false))
-            					buf.append("useLightTheme=true\n");
-        					else
-        						buf.append("useLightTheme=false\n");
-        					
-        					if (settings.getBoolean("enableJS", true))
-            					buf.append("enableJS=true\n");
-        					else
-        						buf.append("enableJS=false\n");
-        					
-        					buf.append("ampSortOption=" + settings.getString("ampSortOption", "-1") + '\n');
-        					
-        					buf.close();
-        					Toast.makeText(AppSettings.this, "Backup done.", Toast.LENGTH_SHORT).show();
-
-        				} catch (IOException e) {
-        					// TODO Auto-generated catch block
-        					e.printStackTrace();
-        				}
-        			} else {
-        				// Something else is wrong. It may be one of many other states, but all we need
-        				//  to know is we can neither read nor write
-        				Log.e("writeToLog", "error writing to log, external storage is not writable");
-    					Toast.makeText(AppSettings.this, "Backup failed. External storage is most likely not accessible.", Toast.LENGTH_SHORT).show();
-        			}
+                	AlertDialog.Builder bb = new AlertDialog.Builder(AppSettings.this);
+                	bb.setTitle("Backup Settings");
+                	bb.setMessage("Are you sure you want to back up your settings? This will overwrite " +
+                				  "any previous backup, and passwords are stored as plain text.");
+                	bb.setPositiveButton("Yes", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+		                	backupSettings();
+						}
+					});
+                	bb.setNegativeButton("Cancel", null);
+                	bb.create().show();
                     return true;
                 }
 
@@ -209,136 +143,231 @@ public class AppSettings extends SherlockPreferenceActivity implements HandlesNe
         
         findPreference("restoreSettings").setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
-                	String state = Environment.getExternalStorageState();
-        			if (Environment.MEDIA_MOUNTED.equals(state)) {
-        				// We can read and write the media
-        				File settingsFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/gameraven",
-        						"gameraven_settings");
-
-        				if (settingsFile.exists()) {
-							try {
-								Editor editor = settings.edit();
-								BufferedReader br = new BufferedReader(new FileReader(settingsFile));
-								String line;
-								String[] splitLine;
-								ArrayList<String> users = new ArrayList<String>();
-								ArrayList<String> passwords = new ArrayList<String>();
-								ArrayList<String> keys = new ArrayList<String>();
-								ArrayList<String> values = new ArrayList<String>();
-								
-								while ((line = br.readLine()) != null) {
-									if (!line.startsWith("//")) {
-										
-										if (line.startsWith("[")) {
-											
-											if (line.equals("[ACCOUNTS]")) {
-												while (!(line = br.readLine()).equals("[END_ACCOUNTS]")) {
-													String user = line;
-													
-													users.add(user);
-													passwords.add(br.readLine());
-													
-													br.readLine();
-													String sig = "";
-													boolean isFirstLine = true;
-													while (!(line = br.readLine()).equals("[END_CUSTOM_SIG]")) {
-														if (!isFirstLine)
-															sig += '\n';
-														
-														sig += line;
-														isFirstLine = false;
-													}
-													
-													keys.add("customSig" + user);
-													values.add(sig);
-													
-												}
-											}
-											
-											else if (line.equals("[GLOBAL_SIG]")) {
-												String globalSig = "";
-												boolean isFirstLine = true;
-												while (!(line = br.readLine()).equals("[END_GLOBAL_SIG]")) {
-													if (!isFirstLine)
-														globalSig += '\n';
-													
-													globalSig += line;
-													isFirstLine = false;
-												}
-												keys.add("customSig");
-												values.add(globalSig);
-											}
-											else
-												Toast.makeText(AppSettings.this, "Line unhandled: " + line, Toast.LENGTH_LONG).show();
-										}
-										else if (line.contains("=")) {
-											splitLine = line.split("=", 2);
-											keys.add(splitLine[0]);
-											values.add(splitLine[1]);
-										}
-										else
-											Toast.makeText(AppSettings.this, "Line unhandled: " + line, Toast.LENGTH_LONG).show();
-									}
-								}
-								
-								br.close();
-								
-								// clear out the old accounts after reading to
-								// make sure we don't clear acc's just to find
-								// we can't read
-								AllInOneV2.getAccounts().clear();
-								
-								for (int a = 0; a < users.size(); a++) {
-									AllInOneV2.getAccounts().put(users.get(a), passwords.get(a));
-								}
-								
-								for (int x = 0; x < keys.size(); x++) {
-									String key = keys.get(x);
-									String val = values.get(x);
-									
-									if (ACCEPTED_KEYS.contains(key) || key.startsWith("customSig")) {
-										if (val.equals("true") || val.equals("false")) {
-											editor.putBoolean(key, Boolean.parseBoolean(val));
-										}
-										else if (isInteger(val)) {
-											if (key.equals("ampSortOption"))
-												editor.putString(key, val);
-											else
-												editor.putInt(key, Integer.parseInt(val));
-										}
-										else
-											editor.putString(key, val);
-									}
-									else
-										Toast.makeText(AppSettings.this, "Key, Val pair not recognized: " + key + ", " + val, Toast.LENGTH_LONG).show();
-								}
-								
-								editor.commit();
-								
-								Toast.makeText(AppSettings.this, "Restore done.", Toast.LENGTH_SHORT).show();
-//								AllInOneV2.setNeedToBuildCSS();
-								finish();
-								startActivity(getIntent());
-
-							} catch (IOException e) {
-								e.printStackTrace();
-								Toast.makeText(AppSettings.this, "Settings file is corrupt.", Toast.LENGTH_SHORT).show();
-							}
+                	AlertDialog.Builder rb = new AlertDialog.Builder(AppSettings.this);
+                	rb.setTitle("Restore Settings");
+                	rb.setMessage("Are you sure you want to restore your settings? This will wipe any previously added accounts.");
+                	rb.setPositiveButton("Yes", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							restoreSettings();
 						}
-        				else {
-        					Toast.makeText(AppSettings.this, "Settings file not found.", Toast.LENGTH_SHORT).show();
-        				}
-        			} 
-        			else {
-        				// Something else is wrong. It may be one of many other states, but all we need
-        				//  to know is we can neither read nor write
-        				Log.e("writeToLog", "error writing to log, external storage is not writable");
-    					Toast.makeText(AppSettings.this, "Restore failed. External storage is most likely not accessible.", Toast.LENGTH_SHORT).show();
-        			}
+					});
+                	rb.setNegativeButton("Cancel", null);
+                	rb.create().show();
                     return true;
                 }
 
         });
+	}
+	
+	private void backupSettings() {
+		String state = Environment.getExternalStorageState();
+		if (Environment.MEDIA_MOUNTED.equals(state)) {
+			// We can read and write the media
+			File settingsFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/gameraven",
+					"gameraven_settings");
+
+			try {
+				settingsFile.delete();
+				settingsFile.createNewFile();
+				
+				BufferedWriter buf = new BufferedWriter(new FileWriter(
+						settingsFile, true));
+				
+				buf.append("grBackupVer=" + currentBackupVer + "\n");
+				
+				buf.append("[ACCOUNTS]\n");
+				for (String s : AllInOneV2.getAccounts().getKeys()) {
+					
+					buf.append(s + "\n");
+					buf.append(AllInOneV2.getAccounts().getString(s) + "\n");
+					
+					buf.append("[CUSTOM_SIG]\n");
+					buf.append(settings.getString("customSig" + s, "") + '\n');
+					buf.append("[END_CUSTOM_SIG]\n");
+				}
+				buf.append("[END_ACCOUNTS]\n");
+				
+				buf.append("[GLOBAL_SIG]\n");
+				buf.append(settings.getString("customSig", "") + '\n');
+				buf.append("[END_GLOBAL_SIG]\n");
+				
+				buf.append("defaultAccount=" + settings.getString("defaultAccount", "N/A") + '\n');
+				
+				if (settings.getBoolean("startAtAMP", false))
+					buf.append("startAtAMP=true\n");
+				else
+					buf.append("startAtAMP=false\n");
+				
+				if (settings.getBoolean("reloadOnBack", false))
+					buf.append("reloadOnBack=true\n");
+				else
+					buf.append("reloadOnBack=false\n");
+				
+				if (settings.getBoolean("reloadOnResume", false))
+					buf.append("reloadOnResume=true\n");
+				else
+					buf.append("reloadOnResume=false\n");
+				
+				if (settings.getBoolean("enablePTR", false))
+					buf.append("enablePTR=true\n");
+				else
+					buf.append("enablePTR=false\n");
+				
+				if (settings.getBoolean("useLightTheme", false))
+					buf.append("useLightTheme=true\n");
+				else
+					buf.append("useLightTheme=false\n");
+				
+				if (settings.getBoolean("enableJS", true))
+					buf.append("enableJS=true\n");
+				else
+					buf.append("enableJS=false\n");
+				
+				buf.append("ampSortOption=" + settings.getString("ampSortOption", "-1") + '\n');
+				
+				buf.close();
+				Toast.makeText(this, "Backup done.", Toast.LENGTH_SHORT).show();
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			// Something else is wrong. It may be one of many other states, but all we need
+			//  to know is we can neither read nor write
+			Log.e("writeToLog", "error writing to log, external storage is not writable");
+			Toast.makeText(this, "Backup failed. External storage is most likely not accessible.", Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	private void restoreSettings() {
+		String state = Environment.getExternalStorageState();
+		if (Environment.MEDIA_MOUNTED.equals(state)) {
+			// We can read and write the media
+			File settingsFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/gameraven",
+					"gameraven_settings");
+
+			if (settingsFile.exists()) {
+				try {
+					Editor editor = settings.edit();
+					BufferedReader br = new BufferedReader(new FileReader(settingsFile));
+					String line;
+					String[] splitLine;
+					ArrayList<String> users = new ArrayList<String>();
+					ArrayList<String> passwords = new ArrayList<String>();
+					ArrayList<String> keys = new ArrayList<String>();
+					ArrayList<String> values = new ArrayList<String>();
+					
+					while ((line = br.readLine()) != null) {
+						if (!line.startsWith("//")) {
+							
+							if (line.startsWith("[")) {
+								
+								if (line.equals("[ACCOUNTS]")) {
+									while (!(line = br.readLine()).equals("[END_ACCOUNTS]")) {
+										String user = line;
+										
+										users.add(user);
+										passwords.add(br.readLine());
+										
+										br.readLine();
+										String sig = "";
+										boolean isFirstLine = true;
+										while (!(line = br.readLine()).equals("[END_CUSTOM_SIG]")) {
+											if (!isFirstLine)
+												sig += '\n';
+											
+											sig += line;
+											isFirstLine = false;
+										}
+										
+										keys.add("customSig" + user);
+										values.add(sig);
+										
+									}
+								}
+								
+								else if (line.equals("[GLOBAL_SIG]")) {
+									String globalSig = "";
+									boolean isFirstLine = true;
+									while (!(line = br.readLine()).equals("[END_GLOBAL_SIG]")) {
+										if (!isFirstLine)
+											globalSig += '\n';
+										
+										globalSig += line;
+										isFirstLine = false;
+									}
+									keys.add("customSig");
+									values.add(globalSig);
+								}
+								else
+									Toast.makeText(this, "Line unhandled: " + line, Toast.LENGTH_LONG).show();
+							}
+							else if (line.contains("=")) {
+								splitLine = line.split("=", 2);
+								keys.add(splitLine[0]);
+								values.add(splitLine[1]);
+							}
+							else
+								Toast.makeText(this, "Line unhandled: " + line, Toast.LENGTH_LONG).show();
+						}
+					}
+					
+					br.close();
+					
+					// clear out the old accounts after reading to
+					// make sure we don't clear acc's just to find
+					// we can't read
+					AllInOneV2.getAccounts().clear();
+					
+					for (int a = 0; a < users.size(); a++) {
+						AllInOneV2.getAccounts().put(users.get(a), passwords.get(a));
+					}
+					
+					for (int x = 0; x < keys.size(); x++) {
+						String key = keys.get(x);
+						String val = values.get(x);
+						
+						if (ACCEPTED_KEYS.contains(key) || key.startsWith("customSig")) {
+							if (val.equals("true") || val.equals("false")) {
+								editor.putBoolean(key, Boolean.parseBoolean(val));
+							}
+							else if (isInteger(val)) {
+								if (key.equals("ampSortOption"))
+									editor.putString(key, val);
+								else
+									editor.putInt(key, Integer.parseInt(val));
+							}
+							else
+								editor.putString(key, val);
+						}
+						else
+							Toast.makeText(this, "Key, Val pair not recognized: " + key + ", " + val, Toast.LENGTH_LONG).show();
+					}
+					
+					editor.commit();
+					
+					Toast.makeText(this, "Restore done.", Toast.LENGTH_SHORT).show();
+//					AllInOneV2.setNeedToBuildCSS();
+					finish();
+					startActivity(getIntent());
+
+				} catch (IOException e) {
+					e.printStackTrace();
+					Toast.makeText(this, "Settings file is corrupt.", Toast.LENGTH_SHORT).show();
+				}
+			}
+			else {
+				Toast.makeText(this, "Settings file not found.", Toast.LENGTH_SHORT).show();
+			}
+		} 
+		else {
+			// Something else is wrong. It may be one of many other states, but all we need
+			//  to know is we can neither read nor write
+			Log.e("writeToLog", "error writing to log, external storage is not writable");
+			Toast.makeText(this, "Restore failed. External storage is most likely not accessible.", Toast.LENGTH_SHORT).show();
+		}
 	}
 	
 	private void updateAccounts() {
