@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/udNameWrapper"
+    android:id="@+id/aioGlobalWrapper"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
@@ -134,11 +134,11 @@
         </RelativeLayout>
 
         <View
-            android:id="@+id/separator"
+            android:id="@+id/aioSeparator"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginTop="3dp"
-            android:background="#33B5E5"
+            android:background="@color/holo_blue"
             android:visibility="visible" />
     </LinearLayout>
 
@@ -155,13 +155,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="?attr/themedPostBackground"
         android:orientation="vertical"
         android:padding="5dp"
         android:visibility="visible" >
 
         <View
-            android:id="@+id/pmdSep"
+            android:id="@+id/aioPWSeparator"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="3dp"
@@ -215,6 +214,14 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textSize="10sp" />
 
+        <View
+            android:id="@+id/View01"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#33B5E5"
+            android:visibility="visible" />
+
         <LinearLayout
             android:id="@+id/aioPostButtonWrapper"
             android:layout_width="match_parent"
@@ -222,20 +229,29 @@
             android:weightSum="1" >
 
             <Button
-                android:id="@+id/aioPostDo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight=".5"
-                android:onClick="postDo"
-                android:text="Post" />
-
-            <Button
                 android:id="@+id/aioPostCancel"
+                style="@style/Widget.Sherlock.ActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
                 android:onClick="postCancel"
                 android:text="Cancel" />
+
+            <View
+                android:id="@+id/View02"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#33B5E5"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/aioPostDo"
+                style="@style/Widget.Sherlock.ActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:onClick="postDo"
+                android:text="Post" />
         </LinearLayout>
     </LinearLayout>
 
