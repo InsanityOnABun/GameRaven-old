@@ -167,6 +167,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 		return contentScroller.getScrollY();}
 	
 	private final ClickListener cl = new ClickListener();
+	
 	private static boolean usingLightTheme;
 	public static boolean getUsingLightTheme() {return usingLightTheme;}
 	
@@ -406,7 +407,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
         // Handle item selection
         switch (item.getItemId()) {
         case R.id.search:
-        	
+        	searchIcon.expandActionView();
         	return true;
         	
         case R.id.addFav:
@@ -463,7 +464,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
         	return true;
         	
         case R.id.changeSettings:
-        	startActivity(new Intent(this, AppSettings.class));
+        	startActivity(new Intent(this, SettingsMain.class));
         	return true;
         	
         case R.id.openInBrowser:
