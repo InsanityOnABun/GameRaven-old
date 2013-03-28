@@ -22,7 +22,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <View
-            android:id="@+id/pmdSep"
+            android:id="@+id/aioPWSeparator"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_gravity="center_horizontal"
@@ -43,7 +43,7 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/separator"
+        android:id="@+id/aioSeparator"
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginTop="2dp"
