@@ -63,7 +63,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 	}
 	
 	public String getUserDetailLink() {
-		return Session.ROOT + "/users/" + userContent + "/boards";
+		return Session.ROOT + "/users/" + userContent.replace(' ', '+') + "/boards";
 	}
 	
 	
