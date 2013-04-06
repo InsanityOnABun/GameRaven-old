@@ -157,6 +157,11 @@ public class Session implements HandlesNetworkResult {
 		return ROOT + path;
 	}
 	
+	public void devCheckForUpdate() {
+		new NetworkTask(this, NetDesc.DEV_UPDATE_CHECK, Method.GET, 
+				new HashMap<String, String>(), "http://freetexthost.com/zknqchrb4q", null).execute();
+	}
+	
 	/**
 	 * Sends a GET request to a specified page.
 	 * @param caller The HandlesNetworkResult making this call.
@@ -166,15 +171,11 @@ public class Session implements HandlesNetworkResult {
 	 */
 	public void get(NetDesc desc, String path, Map<String, String> data)
 	{
+		aio.wtl(buildURL(path));
 		if (data != null)
 			new NetworkTask(this, desc, Method.GET, cookies, buildURL(path), data).execute();
 		else
 			new NetworkTask(this, desc, Method.GET, cookies, buildURL(path), null).execute();
-	}
-	
-	public void devCheckForUpdate() {
-		new NetworkTask(this, NetDesc.DEV_UPDATE_CHECK, Method.GET, 
-				new HashMap<String, String>(), "http://freetexthost.com/zknqchrb4q", null).execute();
 	}
 	
 	/**
