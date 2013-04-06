@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ioabsoftware.gameraven"
     android:versionCode="1"
-    android:versionName="gamma_build_09_02" >
+    android:versionName="gamma_build_09_03" >
 
     <uses-sdk
         android:minSdkVersion="8"
