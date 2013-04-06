@@ -2235,7 +2235,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
     
     private int userLevel = 0;
     private void updateUserLevel(Document doc) {
-    	String sc = doc.getElementsByTag("script").first().html();
+    	String sc = doc.getElementsByTag("head").first().getElementsByTag("script").html();
     	int start = sc.indexOf("UserLevel','") + 12;
     	int end = sc.indexOf('\'', start + 1);
     	userLevel = Integer.parseInt(sc.substring(start, end));
