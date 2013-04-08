@@ -8,6 +8,8 @@
         android:id="@+id/aioHeader"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:orientation="vertical" >
 
         <RelativeLayout
@@ -35,10 +37,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/aioTitle"
-                android:visibility="visible" >
+                android:visibility="gone" >
 
                 <View
-                    android:id="@+id/pjTopSep"
+                    android:id="@+id/aioPJTopSep"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginBottom="3dp"
@@ -51,7 +53,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/pjTopSep"
+                    android:layout_below="@+id/aioPJTopSep"
                     android:enabled="false"
                     android:minHeight="30dp"
                     android:minWidth="46dp"
@@ -59,7 +61,7 @@
                     android:textColor="?attr/themedPageJumperColor" />
 
                 <View
-                    android:id="@+id/firstPrevSeperator"
+                    android:id="@+id/aioFirstPrevSeperator"
                     android:layout_width="1dp"
                     android:layout_height="24dp"
                     android:layout_alignBottom="@+id/aioFirstPage"
@@ -75,7 +77,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/aioFirstPage"
                     android:layout_alignBottom="@+id/aioFirstPage"
-                    android:layout_toRightOf="@+id/firstPrevSeperator"
+                    android:layout_toRightOf="@+id/aioFirstPrevSeperator"
                     android:enabled="false"
                     android:minHeight="30dp"
                     android:minWidth="46dp"
@@ -97,7 +99,7 @@
                     android:textColor="?attr/themedPageJumperColor" />
 
                 <View
-                    android:id="@+id/nextLastSeperator"
+                    android:id="@+id/aioNextLastSeperator"
                     android:layout_width="1dp"
                     android:layout_height="24dp"
                     android:layout_alignBottom="@+id/aioFirstPage"
@@ -113,7 +115,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/aioFirstPage"
                     android:layout_alignBottom="@+id/aioLastPage"
-                    android:layout_toLeftOf="@+id/nextLastSeperator"
+                    android:layout_toLeftOf="@+id/aioNextLastSeperator"
                     android:enabled="false"
                     android:minHeight="30dp"
                     android:minWidth="46dp"
@@ -134,7 +136,7 @@
         </RelativeLayout>
 
         <View
-            android:id="@+id/aioSeparator"
+            android:id="@+id/aioSep"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginTop="3dp"
@@ -179,6 +181,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Title"
+                android:lines="1"
                 android:maxLength="80" >
 
                 <requestFocus />
@@ -190,9 +193,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:layout_marginBottom="10dp"
-                android:text="Small Text"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textSize="10sp" />
+                android:textSize="12sp" />
         </LinearLayout>
 
         <EditText
@@ -210,12 +212,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:layout_marginBottom="10dp"
-            android:text="Small Text"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
 
         <View
-            android:id="@+id/View01"
+            android:id="@+id/aioPostButtonSep"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="3dp"
@@ -225,20 +226,36 @@
         <LinearLayout
             android:id="@+id/aioPostButtonWrapper"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:weightSum="1" >
+            android:layout_height="wrap_content" >
 
             <Button
                 android:id="@+id/aioPostCancel"
                 style="@style/Widget.Sherlock.ActionButton"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
                 android:onClick="postCancel"
                 android:text="Cancel" />
 
             <View
-                android:id="@+id/View02"
+                android:id="@+id/aioPollSep"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#33B5E5"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/aioPollOptions"
+                style="@style/Widget.Sherlock.ActionButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:onClick="postPollOptions"
+                android:text="Poll..."
+                android:visibility="gone" />
+
+            <View
+                android:id="@+id/aioPostSep"
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
                 android:background="#33B5E5"
@@ -247,7 +264,7 @@
             <Button
                 android:id="@+id/aioPostDo"
                 style="@style/Widget.Sherlock.ActionButton"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
                 android:onClick="postDo"
