@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/donGlobalWrapper"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context="com.ioabsoftware.DroidFAQs.SettingsMain" >
+
+    <LinearLayout
+        android:id="@+id/donWheelWrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical" >
+
+        <TextView
+            android:id="@+id/donDollarLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$"
+            android:textSize="16sp" />
+
+        <org.holoeverywhere.widget.NumberPicker
+            android:id="@+id/donDollars"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxHeight="90dp" />
+
+        <TextView
+            android:id="@+id/donCentLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="."
+            android:textSize="16sp" />
+
+        <org.holoeverywhere.widget.NumberPicker
+            android:id="@+id/donCents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxHeight="90dp" />
+    </LinearLayout>
+
+</LinearLayout>
