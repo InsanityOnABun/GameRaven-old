@@ -34,6 +34,14 @@ public class Session implements HandlesNetworkResult {
 	/** Holds all cookies for the session */
 	private Map<String, String> cookies = new LinkedHashMap<String, String>();
 	
+	private String lastAttemptedPath;
+	public String getLastAttemptedPath()
+	{return lastAttemptedPath;};
+	
+	private NetDesc lastAttemptedDesc;
+	public NetDesc getLastAttemptedDesc()
+	{return lastAttemptedDesc;};
+	
 	/** The latest page, without excess get data. */
 	private String lastPathWithoutData = null;
 	/** Get's the path of the latest page, stripped of any GET data. */
@@ -171,7 +179,8 @@ public class Session implements HandlesNetworkResult {
 	 */
 	public void get(NetDesc desc, String path, Map<String, String> data)
 	{
-		aio.wtl(buildURL(path));
+		lastAttemptedPath = path;
+		lastAttemptedDesc = desc;
 		if (data != null)
 			new NetworkTask(this, desc, Method.GET, cookies, buildURL(path), data).execute();
 		else
@@ -564,6 +573,17 @@ public class Session implements HandlesNetworkResult {
 					tpc1Data.put("post", ((desc == NetDesc.POSTTPC_S1) ? "Preview Message" : "Post without Preview"));
 					tpc1Data.put("key", tpc1Key);
 					
+					if (aio.isUsingPoll()) {
+						tpc1Data.put("poll_text", aio.getPollTitle());
+						for (int x = 0; x < 10; x++) {
+							if (aio.getPollOptions()[x].length() != 0)
+								tpc1Data.put("poll_option_" + (x + 1), aio.getPollOptions()[x]);
+							else
+								x = 11;
+						}
+						tpc1Data.put("min_level", aio.getPollMinLevel());
+					}
+					
 					Elements tpc1Error = pRes.getElementsContainingOwnText("There was an error posting your message:");
 					if (!tpc1Error.isEmpty()) {
 						aio.wtl("there was an error in post topic step 1, ending early");
@@ -572,7 +592,7 @@ public class Session implements HandlesNetworkResult {
 					}
 					else {
 						aio.wtl("finishing post topic step 1, sending step 2");
-						post(((desc == NetDesc.POSTTPC_S1) ? NetDesc.POSTTPC_S2 : NetDesc.QPOSTTPC_S3), lastPath, tpc1Data);
+						post(((desc == NetDesc.QPOSTTPC_S1) ? NetDesc.QPOSTTPC_S3 : NetDesc.POSTTPC_S2), lastPath, tpc1Data);
 					}
 					break;
 					
@@ -587,6 +607,17 @@ public class Session implements HandlesNetworkResult {
 					tpc2Data.put("key", tpc2Key);
 					tpc2Data.put("post_id", tpcPost_id);
 					tpc2Data.put("uid", tpcUid);
+					
+					if (aio.isUsingPoll()) {
+						tpc2Data.put("poll_text", aio.getPollTitle());
+						for (int x = 0; x < 10; x++) {
+							if (aio.getPollOptions()[x].length() != 0)
+								tpc2Data.put("poll_option_" + (x + 1), aio.getPollOptions()[x]);
+							else
+								x = 11;
+						}
+						tpc2Data.put("min_level", aio.getPollMinLevel());
+					}
 					
 					Elements tpc2Error = pRes.getElementsContainingOwnText("There was an error posting your message:");
 					Elements tpc2AutoFlag = pRes.getElementsContainingOwnText("There were one or more potential problems with your message:");
