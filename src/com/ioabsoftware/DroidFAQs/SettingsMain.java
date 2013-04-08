@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
+import org.holoeverywhere.widget.NumberPicker;
 import org.holoeverywhere.widget.Toast;
 
 import android.content.DialogInterface;
@@ -20,6 +21,7 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.Preference;
@@ -71,6 +73,49 @@ public class SettingsMain extends SherlockPreferenceActivity {
         ACCEPTED_KEYS.add("colorLink");
         ACCEPTED_KEYS.add("enableJS");
         ACCEPTED_KEYS.add("ampSortOption");
+        
+        findPreference("donate").setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				AlertDialog.Builder db = new AlertDialog.Builder(SettingsMain.this);
+				db.setTitle("Donate to Developer");
+				db.setMessage("Thank you for supporting us! If you'd like to donate to the developer " +
+						"of GameRaven, enter your desired amount below and click donate. Thanks again!");
+				LayoutInflater inflater = getLayoutInflater();
+				final View v = inflater.inflate(R.layout.donate, null);
+				db.setView(v);
+				final NumberPicker d = (NumberPicker) v.findViewById(R.id.donDollars);
+				d.setMinValue(1);
+				d.setMaxValue(100);
+				d.setValue(1);
+				d.setWrapSelectorWheel(false);
+				
+				final NumberPicker c = (NumberPicker) v.findViewById(R.id.donCents);
+				c.setMinValue(0);
+				c.setMaxValue(100);
+				c.setValue(0);
+				c.setWrapSelectorWheel(false);
+				
+				db.setPositiveButton("Donate", new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						String donateUrl = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=" +
+								"MB2SP64VHE7F2&lc=US&item_name=GameRaven%2c%20from%20Insanity%20On%20A%20Bun" +
+								"%20Software&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted" +
+								"&amount=" + d.getValue() + "%2e" + c.getValue();
+						Intent i = new Intent(Intent.ACTION_VIEW);
+						i.setData(Uri.parse(donateUrl));
+						startActivity(i);
+					}
+				});
+				
+				db.setNegativeButton("Cancel", null);
+				
+				db.create().show();
+//				startActivity(i);
+				return false;
+			}
+		});
         
         findPreference("manageAccounts").setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
