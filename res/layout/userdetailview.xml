@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/udGlobalWrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
@@ -33,7 +34,7 @@
             android:textSize="15sp" />
 
         <View
-            android:id="@+id/View06"
+            android:id="@+id/udIDSep"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/udID"
@@ -71,7 +72,7 @@
             android:textSize="15sp" />
 
         <View
-            android:id="@+id/View05"
+            android:id="@+id/udLevelSep"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/udLevel"
@@ -109,7 +110,7 @@
             android:textSize="15sp" />
 
         <View
-            android:id="@+id/View04"
+            android:id="@+id/udCreationSep"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/udCreation"
@@ -147,7 +148,7 @@
             android:textSize="15sp" />
 
         <View
-            android:id="@+id/View03"
+            android:id="@+id/udLVisitSep"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/udLVisit"
@@ -185,7 +186,7 @@
             android:textSize="15sp" />
 
         <View
-            android:id="@+id/View07"
+            android:id="@+id/udSigSep"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/udSig"
@@ -223,7 +224,7 @@
             android:textSize="15sp" />
 
         <View
-            android:id="@+id/View02"
+            android:id="@+id/udKarmaSep"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/udKarma"
@@ -261,7 +262,7 @@
             android:textSize="15sp" />
 
         <View
-            android:id="@+id/View01"
+            android:id="@+id/udAMPSep"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/udAMP"

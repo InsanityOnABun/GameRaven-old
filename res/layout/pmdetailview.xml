@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pmdGlobalWrapper"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="2dp"
@@ -22,7 +23,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <View
-            android:id="@+id/aioPWSeparator"
+            android:id="@+id/pmdMidSep"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_gravity="center_horizontal"
@@ -43,7 +44,7 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/aioSeparator"
+        android:id="@+id/pmdBotSep"
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginTop="2dp"

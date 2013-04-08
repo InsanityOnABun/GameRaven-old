@@ -104,7 +104,7 @@
     </RelativeLayout>
 
     <View
-        android:id="@+id/aioSeparator"
+        android:id="@+id/tvSep"
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginTop="2dp"
