@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/poGlobalWrapper"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <CheckBox
+        android:id="@+id/poUse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="Use Poll" />
+
+    <EditText
+        android:id="@+id/poTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/poUse"
+        android:ems="10"
+        android:enabled="false"
+        android:hint="Poll Title"
+        android:lines="1" >
+    </EditText>
+
+    <ScrollView
+        android:id="@+id/poScroller"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/poMinLevel"
+        android:layout_below="@+id/poTitle"
+        android:scrollbarAlwaysDrawVerticalTrack="true" >
+
+        <LinearLayout
+            android:id="@+id/poOptionsWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/po1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:hint="Option 1"
+                android:lines="1" />
+
+            <EditText
+                android:id="@+id/po2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:hint="Option 2"
+                android:lines="1" />
+
+            <EditText
+                android:id="@+id/po3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:hint="Option 3"
+                android:lines="1" />
+
+            <EditText
+                android:id="@+id/po4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:hint="Option 4"
+                android:lines="1" />
+
+            <EditText
+                android:id="@+id/po5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:hint="Option 5"
+                android:lines="1" />
+
+            <EditText
+                android:id="@+id/po6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:hint="Option 6"
+                android:lines="1" />
+
+            <EditText
+                android:id="@+id/po7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:hint="Option 7"
+                android:lines="1" />
+
+            <EditText
+                android:id="@+id/po8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:hint="Option 8"
+                android:lines="1" />
+
+            <EditText
+                android:id="@+id/po9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:hint="Option 9"
+                android:lines="1" />
+
+            <EditText
+                android:id="@+id/po10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:hint="Option 10"
+                android:lines="1" />
+        </LinearLayout>
+    </ScrollView>
+
+    <Spinner
+        android:id="@+id/poMinLevel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="5dp"
+        android:entries="@array/pollMinLevel" />
+
+</RelativeLayout>
