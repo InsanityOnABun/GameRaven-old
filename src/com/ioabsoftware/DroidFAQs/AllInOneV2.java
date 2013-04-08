@@ -13,6 +13,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
+import org.holoeverywhere.widget.Spinner;
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -42,6 +43,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -83,6 +87,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	public static final int SEND_PM_DIALOG = 102;
 	public static final int MESSAGE_ACTION_DIALOG = 103;
 	public static final int REPORT_MESSAGE_DIALOG = 104;
+	public static final int POLL_OPTIONS_DIALOG = 105;
 	
 	private static final String ACCOUNTS_PREFNAME = "com.ioabsoftware.DroidFAQs.Accounts";
 	private static final String SALT = "RIP Man fan died at the room shot up to 97 degrees";
@@ -133,6 +138,20 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	
 	private Button postButton;
 	private Button cancelButton;
+	private Button pollButton;
+	
+	private View pollSep;
+	
+	private boolean pollUse = false;
+	public boolean isUsingPoll() {return pollUse;}
+	
+	private String pollTitle = "";
+	public String getPollTitle() {return pollTitle;}
+	private String[] pollOptions = new String[10];
+	public String[] getPollOptions() {return pollOptions;}
+	private int pollMinLevel = -1;
+	public String getPollMinLevel() {return Integer.toString(pollMinLevel);}
+	
 	
 	private LinearLayout postWrapper;
 	
@@ -303,6 +322,8 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
         
         postButton = (Button) findViewById(R.id.aioPostDo);
         cancelButton = (Button) findViewById(R.id.aioPostCancel);
+        pollButton = (Button) findViewById(R.id.aioPollOptions);
+        pollSep = findViewById(R.id.aioPollSep);
         
         postWrapper = (LinearLayout) findViewById(R.id.aioPostWrapper);
 
@@ -411,27 +432,49 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
         	return true;
         	
         case R.id.addFav:
-        	String addFavUrl = session.getLastPath();
-        	if (addFavUrl.contains("remfav"))
-        		addFavUrl = addFavUrl.replace("remfav", "addfav");
-        	else if (addFavUrl.indexOf('?') != -1)
-        		addFavUrl += "&action=addfav";
-        	else
-        		addFavUrl += "?action=addfav";
+        	AlertDialog.Builder afb = new AlertDialog.Builder(this);
+        	afb.setTitle("Add Board to Favorites?");
+//        	afb.setMessage("Add Board to Favorites?");
+        	afb.setPositiveButton("Yes", new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					String addFavUrl = session.getLastPath();
+		        	if (addFavUrl.contains("remfav"))
+		        		addFavUrl = addFavUrl.replace("remfav", "addfav");
+		        	else if (addFavUrl.indexOf('?') != -1)
+		        		addFavUrl += "&action=addfav";
+		        	else
+		        		addFavUrl += "?action=addfav";
+		        	
+		        	session.get(NetDesc.BOARD, addFavUrl, null);
+				}
+			});
+        	afb.setNegativeButton("No", null);
+        	afb.create().show();
         	
-        	session.get(NetDesc.BOARD, addFavUrl, null);
         	return true;
         	
         case R.id.remFav:
-        	String remFavUrl = session.getLastPath();
-        	if (remFavUrl.contains("addfav"))
-        		remFavUrl = remFavUrl.replace("addfav", "remfav");
-        	else if (remFavUrl.indexOf('?') != -1)
-        		remFavUrl += "&action=remfav";
-        	else
-        		remFavUrl += "?action=remfav";
+        	AlertDialog.Builder rfb = new AlertDialog.Builder(this);
+        	rfb.setTitle("Remove Board from Favorites?");
+//        	rfb.setMessage("Remove Board from Favorites?");
+        	rfb.setPositiveButton("Yes", new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					String remFavUrl = session.getLastPath();
+		        	if (remFavUrl.contains("addfav"))
+		        		remFavUrl = remFavUrl.replace("addfav", "remfav");
+		        	else if (remFavUrl.indexOf('?') != -1)
+		        		remFavUrl += "&action=remfav";
+		        	else
+		        		remFavUrl += "?action=remfav";
+		        	
+		        	session.get(NetDesc.BOARD, remFavUrl, null);
+				}
+			});
+        	rfb.setNegativeButton("No", null);
+        	rfb.create().show();
         	
-        	session.get(NetDesc.BOARD, remFavUrl, null);
         	return true;
         	
         case R.id.topiclist:
@@ -550,10 +593,15 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	public void timeoutCleanup(NetDesc desc) {
 		if (desc != NetDesc.DEV_UPDATE_CHECK) {
 			String msg = "timeout msg unset";
+			String title = "timeout title unset";
+			String posButtonText = "pos button text not set";
+			boolean retrySub = false;
 			switch (desc) {
 			case LOGIN_S1:
 			case LOGIN_S2:
-				msg = "Login timed out, refresh to try again.";
+				title = "Login Timeout";
+				msg = "Login timed out, press retry to try again.";
+				posButtonText = "Retry";
 				break;
 			case POSTMSG_S1:
 			case POSTMSG_S2:
@@ -565,30 +613,40 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 			case QPOSTMSG_S3:
 			case QPOSTTPC_S1:
 			case QPOSTTPC_S3:
-				msg = "Post timed out. After refreshing, check to see if your post made it through before attempting to post again.";
+				title = "Post Timeout";
+				msg = "Post timed out. Press refresh to check if your post made it through.";
+				posButtonText = "Refresh";
 				break;
 			default:
-				msg = "Connection timed out, refresh to try again.";
+				retrySub = true;
+				title = "Timeout";
+				msg = "Connection timed out, press retry to try again.";
+				posButtonText = "Retry";
 				break;
 
 			}
+			final boolean retry = retrySub;
+			
 			AlertDialog.Builder b = new AlertDialog.Builder(this);
-			b.setTitle("Timeout");
+			b.setTitle(title);
 			b.setMessage(msg);
-			b.setPositiveButton("Refresh", new OnClickListener() {
+			b.setPositiveButton(posButtonText, new OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					refreshClicked(new View(AllInOneV2.this));
+					if (retry)
+						session.get(session.getLastAttemptedDesc(), session.getLastAttemptedPath(), null);
+					else
+						refreshClicked(new View(AllInOneV2.this));
 				}
 			});
 			b.setNegativeButton("Dismiss", new OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
+					processContent(session.getLastRes(), session.getLastDesc());
+					postExecuteCleanup(session.getLastDesc());
 				}
 			});
 			b.create().show();
-
-			uiCleanup();
 		}
 	}
 
@@ -599,6 +657,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 		if (postWrapper.getVisibility() == View.VISIBLE) {
 			postButton.setEnabled(true);
 			cancelButton.setEnabled(true);
+			pollButton.setEnabled(true);
 			if (postIcon != null)
 				postIcon.setVisible(true);
 		}
@@ -626,12 +685,16 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 				postCleanup();
 	}
 	
-	public void postCleanup() {
+	private void postCleanup() {
 		if (postWrapper.getVisibility() == View.VISIBLE) {
+			pageJumperWrapper.setVisibility(View.VISIBLE);
 			wtl("postCleanup fired --NEL");
 			postWrapper.setVisibility(View.GONE);
+			pollButton.setVisibility(View.GONE);
+			pollSep.setVisibility(View.GONE);
 			postBody.setText(null);
 			postTitle.setText(null);
+			clearPoll();
 			messageID = null;
 			postPostUrl = null;
 			content.requestFocus();
@@ -1667,6 +1730,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	
 	public void postOnTopicSetup() {
 		wtl("postOnTopicSetup fired --NEL");
+		pageJumperWrapper.setVisibility(View.GONE);
 		titleWrapper.setVisibility(View.GONE);
 		postWrapper.setVisibility(View.VISIBLE);
 		postButton.setEnabled(true);
@@ -1680,7 +1744,12 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	
 	public void postOnBoardSetup() {
 		wtl("postOnBoardSetup fired --NEL");
+		pageJumperWrapper.setVisibility(View.GONE);
 		titleWrapper.setVisibility(View.VISIBLE);
+		if (userLevel > 29) {
+			pollButton.setVisibility(View.VISIBLE);
+			pollSep.setVisibility(View.VISIBLE);
+		}
 		postWrapper.setVisibility(View.VISIBLE);
 		postButton.setEnabled(true);
 		cancelButton.setEnabled(true);
@@ -1695,86 +1764,56 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 		postCleanup();
 	}
 	
+	public void postPollOptions(View view) {
+		showDialog(POLL_OPTIONS_DIALOG);
+	}
+	
 	public void postDo(View view) {
-		int escapedTitleLength = StringEscapeUtils.escapeHtml4(postTitle.getText().toString()).length();
-		int escapedBodyLength = StringEscapeUtils.escapeHtml4(postBody.getText().toString()).length();
-		
 		wtl("postDo fired");
 		if (titleWrapper.getVisibility() == View.VISIBLE) {
 			wtl("posting on a board");
 			// posting on a board
-			if (postTitle.length() > 4) {
-				if (escapedTitleLength < 81) {
-					if (postBody.length() > 0) {
-						if (escapedBodyLength < 4097) {
-							String path = "http://m.gamefaqs.com/boards/post.php?board=" + boardID;
-							int i = path.indexOf('-');
-							path = path.substring(0, i);
-							wtl("post path: " + path);
-							savedPostBody = postBody.getText().toString();
-							wtl("saved post body: " + savedPostBody);
-							savedPostTitle = postTitle.getText().toString();
-							wtl("saved post title: " + savedPostTitle);
-							wtl("sending topic");
-							postButton.setEnabled(false);
-							cancelButton.setEnabled(false);
-							if (userLevel < 30)
-								session.get(NetDesc.POSTTPC_S1, path, null);
-							else
-								session.get(NetDesc.QPOSTTPC_S1, path, null);
-						}
-						else {
-							wtl("post body is too long");
-							Toast.makeText(this, "Post body is too long.", Toast.LENGTH_SHORT).show();
-						}
-					}
-					else {
-						wtl("post body is empty");
-						Toast.makeText(this, "Post body can't be empty.", Toast.LENGTH_SHORT).show();
-					}
-				}
-				else {
-					wtl("post title is too long");
-					Toast.makeText(this, "Topic title length must be less than 80 characters.", Toast.LENGTH_SHORT).show();
-				}
+			String path = "http://m.gamefaqs.com/boards/post.php?board=" + boardID;
+			int i = path.indexOf('-');
+			path = path.substring(0, i);
+			wtl("post path: " + path);
+			savedPostBody = postBody.getText().toString();
+			wtl("saved post body: " + savedPostBody);
+			savedPostTitle = postTitle.getText().toString();
+			wtl("saved post title: " + savedPostTitle);
+			wtl("sending topic");
+			postButton.setEnabled(false);
+			pollButton.setEnabled(false);
+			cancelButton.setEnabled(false);
+			if (pollUse) {
+				path += "&poll=1";
+				session.get(NetDesc.POSTTPC_S1, path, null);
 			}
-			else {
-				wtl("post title is too short");
-				Toast.makeText(this, "Topic title length must be greater than 4 displayed characters.", Toast.LENGTH_SHORT).show();
-			}
+			else if (userLevel < 30)
+				session.get(NetDesc.POSTTPC_S1, path, null);
+			else
+				session.get(NetDesc.QPOSTTPC_S1, path, null);
 		}
 		
 		else {
 			// posting on a topic
 			wtl("posting on a topic");
-			if (postBody.length() > 0) {
-				if (escapedBodyLength < 4097) {
-					String path = "http://m.gamefaqs.com/boards/post.php?board=" + boardID + "&topic=" + topicID;
-					if (messageID != null)
-						path += "&message=" + messageID;
-					
-					wtl("post path: " + path);
-					savedPostBody = postBody.getText().toString();
-					wtl("saved post body: " + savedPostBody);
-					wtl("sending post");
-					postButton.setEnabled(false);
-					cancelButton.setEnabled(false);
-					if (messageID != null)
-						session.get(NetDesc.QEDIT_MSG, path, null);
-					else if (userLevel < 30)
-						session.get(NetDesc.POSTMSG_S1, path, null);
-					else
-						session.get(NetDesc.QPOSTMSG_S1, path, null);
-				}
-				else {
-					wtl("post body is too long");
-					Toast.makeText(this, "Post body is too long.", Toast.LENGTH_SHORT).show();
-				}
-			}
-			else {
-				wtl("post body is empty");
-				Toast.makeText(this, "Post body can't be empty.", Toast.LENGTH_SHORT).show();
-			}
+			String path = "http://m.gamefaqs.com/boards/post.php?board=" + boardID + "&topic=" + topicID;
+			if (messageID != null)
+				path += "&message=" + messageID;
+			
+			wtl("post path: " + path);
+			savedPostBody = postBody.getText().toString();
+			wtl("saved post body: " + savedPostBody);
+			wtl("sending post");
+			postButton.setEnabled(false);
+			cancelButton.setEnabled(false);
+			if (messageID != null)
+				session.get(NetDesc.QEDIT_MSG, path, null);
+			else if (userLevel < 30)
+				session.get(NetDesc.POSTMSG_S1, path, null);
+			else
+				session.get(NetDesc.QPOSTMSG_S1, path, null);
 		}
 	}
 	
@@ -1799,104 +1838,188 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
     		break;
     		
     	case MESSAGE_ACTION_DIALOG:
-    		AlertDialog.Builder msgActionBuilder = new AlertDialog.Builder(this);
-			msgActionBuilder.setTitle("Message Actions");
-			int arrayToUse;
-			if (Session.isLoggedIn()) {
-				if (Session.getUser().toLowerCase().equals(clickedMsg.getUser().toLowerCase())) {
-					if (userLevel < 30)
-						arrayToUse = R.array.msgMenuLoggedInAsPosterNotEditable;
-					else
-						arrayToUse = R.array.msgMenuLoggedInAsPosterEditable;
-				}
-				else {
-					arrayToUse = R.array.msgMenuLoggedIn;
-				}
-			}
-			else {
-				arrayToUse = R.array.msgMenuNotLoggedIn;
-			}
-			
-			final String[] options = getResources().getStringArray(arrayToUse);
-			msgActionBuilder.setItems(options, new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					String selected = options[which];
-					if (selected.equals("Quote")) {
-						quoteSetup(clickedMsg.getUser(), clickedMsg.getMessageForQuoting());
-					}
-					else if (selected.equals("Edit")) {
-						editPostSetup(clickedMsg.getMessageForEditing(), clickedMsg.getMessageID());
-					}
-					else if (selected.equals("Delete")) {
-						session.get(NetDesc.DLTMSG_S1, clickedMsg.getMessageDetailLink(), null);
-					}
-					
-					else if (selected.equals("Report")) {
-						showDialog(REPORT_MESSAGE_DIALOG);
-					}
-					else if (selected.equals("User Details")) {
-						session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink(), null);
-					}
-					else {
-						Toast.makeText(AllInOneV2.this, "not recognized: " + selected, Toast.LENGTH_SHORT).show();
-					}
-					
-					dialog.dismiss();
-				}
-			});
-    		
-			msgActionBuilder.setNegativeButton("Cancel", new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.dismiss();
-				}
-			});
-			
-			dialog = msgActionBuilder.create();
-    		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-				public void onDismiss(DialogInterface dialog) {
-					removeDialog(MESSAGE_ACTION_DIALOG);
-				}
-			});
-    		
+    		dialog = createMessageActionDialog();
     		break;
     		
     	case REPORT_MESSAGE_DIALOG:
-    		AlertDialog.Builder reportMsgBuilder = new AlertDialog.Builder(this);
-    		reportMsgBuilder.setTitle("Report Message");
-    		
-    		final String[] reportOptions = getResources().getStringArray(R.array.msgReportReasons);
-    		reportMsgBuilder.setItems(reportOptions, new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					reportCode = getResources().getStringArray(R.array.msgReportCodes)[which];
-					session.get(NetDesc.MARKMSG_S1, clickedMsg.getMessageDetailLink(), null);
-					
-					dialog.dismiss();
-				}
-			});
-    		
-    		reportMsgBuilder.setNegativeButton("Cancel", new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.dismiss();
-				}
-			});
-			
-			dialog = reportMsgBuilder.create();
-    		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-				public void onDismiss(DialogInterface dialog) {
-					removeDialog(REPORT_MESSAGE_DIALOG);
-				}
-			});
-    		
+    		dialog = createReportMessageDialog();
     		break;
     		
+    	case POLL_OPTIONS_DIALOG:
+    		dialog = createPollOptionsDialog();
+    		break;
     	}
     	
     	return dialog;
     }
+    
+    private Dialog createPollOptionsDialog() {
+    	AlertDialog.Builder b = new AlertDialog.Builder(this);
+    	
+    	b.setTitle("Poll Options");
+    	LayoutInflater inflater = getLayoutInflater();
+		final View v = inflater.inflate(R.layout.polloptions, null);
+		b.setView(v);
+		b.setCancelable(false);
+		
+		final EditText[] options = new EditText[10];
+		
+		final CheckBox poUse = (CheckBox) v.findViewById(R.id.poUse);
+		final EditText poTitle = (EditText) v.findViewById(R.id.poTitle);
+		options[0] = (EditText) v.findViewById(R.id.po1);
+		options[1] = (EditText) v.findViewById(R.id.po2);
+		options[2] = (EditText) v.findViewById(R.id.po3);
+		options[3] = (EditText) v.findViewById(R.id.po4);
+		options[4] = (EditText) v.findViewById(R.id.po5);
+		options[5] = (EditText) v.findViewById(R.id.po6);
+		options[6] = (EditText) v.findViewById(R.id.po7);
+		options[7] = (EditText) v.findViewById(R.id.po8);
+		options[8] = (EditText) v.findViewById(R.id.po9);
+		options[9] = (EditText) v.findViewById(R.id.po10);
+		final Spinner minLevel = (Spinner) v.findViewById(R.id.poMinLevel);
+		
+		poUse.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				poTitle.setEnabled(isChecked);
+				for (int x = 0; x < 10; x++)
+					options[x].setEnabled(isChecked);
+			}
+		});
+		
+		for (int x = 0; x < 10; x++)
+			options[x].setText(pollOptions[x]);
+		
+		minLevel.setSelection(pollMinLevel);
+		poTitle.setText(pollTitle);
+		poUse.setChecked(pollUse);
+		
+		b.setPositiveButton("Save", new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				pollUse = poUse.isChecked();
+				pollTitle = poTitle.getText().toString();
+				pollMinLevel = minLevel.getSelectedItemPosition();
+				
+				for (int x = 0; x < 10; x++)
+					pollOptions[x] = (options[x].getText().toString());
+			}
+		});
+		
+		b.setNegativeButton("Cancel", null);
+		
+		b.setNeutralButton("Clear", new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				clearPoll();
+			}
+		});
+		
+    	Dialog dialog = b.create();
+		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			public void onDismiss(DialogInterface dialog) {
+				removeDialog(POLL_OPTIONS_DIALOG);
+			}
+		});
+		return dialog;
+    }
+    private void clearPoll() {pollUse = false; pollTitle = ""; for (int x = 0; x < 10; x++)pollOptions[x] = ""; pollMinLevel = -1;}
+
+    
+	private Dialog createReportMessageDialog() {
+		AlertDialog.Builder reportMsgBuilder = new AlertDialog.Builder(this);
+		reportMsgBuilder.setTitle("Report Message");
+		
+		final String[] reportOptions = getResources().getStringArray(R.array.msgReportReasons);
+		reportMsgBuilder.setItems(reportOptions, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				reportCode = getResources().getStringArray(R.array.msgReportCodes)[which];
+				session.get(NetDesc.MARKMSG_S1, clickedMsg.getMessageDetailLink(), null);
+				
+				dialog.dismiss();
+			}
+		});
+		
+		reportMsgBuilder.setNegativeButton("Cancel", new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		
+		Dialog dialog = reportMsgBuilder.create();
+		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			public void onDismiss(DialogInterface dialog) {
+				removeDialog(REPORT_MESSAGE_DIALOG);
+			}
+		});
+		return dialog;
+	}
+
+	private Dialog createMessageActionDialog() {
+		AlertDialog.Builder msgActionBuilder = new AlertDialog.Builder(this);
+		msgActionBuilder.setTitle("Message Actions");
+		int arrayToUse;
+		if (Session.isLoggedIn()) {
+			if (Session.getUser().toLowerCase().equals(clickedMsg.getUser().toLowerCase())) {
+				if (userLevel < 30)
+					arrayToUse = R.array.msgMenuLoggedInAsPosterNotEditable;
+				else
+					arrayToUse = R.array.msgMenuLoggedInAsPosterEditable;
+			}
+			else {
+				arrayToUse = R.array.msgMenuLoggedIn;
+			}
+		}
+		else {
+			arrayToUse = R.array.msgMenuNotLoggedIn;
+		}
+		
+		final String[] options = getResources().getStringArray(arrayToUse);
+		msgActionBuilder.setItems(options, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				String selected = options[which];
+				if (selected.equals("Quote")) {
+					quoteSetup(clickedMsg.getUser(), clickedMsg.getMessageForQuoting());
+				}
+				else if (selected.equals("Edit")) {
+					editPostSetup(clickedMsg.getMessageForEditing(), clickedMsg.getMessageID());
+				}
+				else if (selected.equals("Delete")) {
+					session.get(NetDesc.DLTMSG_S1, clickedMsg.getMessageDetailLink(), null);
+				}
+				
+				else if (selected.equals("Report")) {
+					showDialog(REPORT_MESSAGE_DIALOG);
+				}
+				else if (selected.equals("User Details")) {
+					session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink(), null);
+				}
+				else {
+					Toast.makeText(AllInOneV2.this, "not recognized: " + selected, Toast.LENGTH_SHORT).show();
+				}
+				
+				dialog.dismiss();
+			}
+		});
+		
+		msgActionBuilder.setNegativeButton("Cancel", new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		
+		Dialog dialog = msgActionBuilder.create();
+		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			public void onDismiss(DialogInterface dialog) {
+				removeDialog(MESSAGE_ACTION_DIALOG);
+			}
+		});
+		return dialog;
+	}
 
     private LinearLayout pmSending;
 	private Dialog createSendPMDialog() {
