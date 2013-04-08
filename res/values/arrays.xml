@@ -64,5 +64,10 @@
         <item>4</item>
         <item>20</item>
     </string-array>
+    <string-array name="pollMinLevel">
+        <item>Anybody, registered or not</item>
+        <item>Only registered users</item>
+        <item>Only registered users, only 1 vote per IP</item>
+    </string-array>
 
 </resources>
