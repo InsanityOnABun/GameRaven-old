@@ -35,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TextView.BufferType;
 import android.widget.Toast;
 
 public class MessageView extends LinearLayout implements View.OnClickListener {
@@ -73,6 +74,8 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 					   String postTimeIn, Element messageIn, String BID, String TID, String MID) {
 		super(aioIn);
 		
+		aioIn.wtl("starting mv creation");
+		
 		aio = aioIn;
         
         userContent = userIn;
@@ -80,20 +83,28 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         messageID = MID;
         topicID = TID;
         boardID = BID;
+
+		aio.wtl("stored vals");
 		
 		LayoutInflater inflater = (LayoutInflater) aio.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.msgview, this);
+
+		aio.wtl("inflated layout");
         
         ((TextView) findViewById(R.id.mvUser)).setText(userContent + userTitles);
         ((TextView) findViewById(R.id.mvUser)).setTextColor(AllInOneV2.getAccentTextColor());
         ((TextView) findViewById(R.id.mvPostNumber)).setText("#" + postNum + ", " + postTimeIn);
         ((TextView) findViewById(R.id.mvPostNumber)).setTextColor(AllInOneV2.getAccentTextColor());
+
+		aio.wtl("set text and color for user and post number");
         
         String html = null;
         if (messageContent.getElementsByClass("board_poll").isEmpty()) {
+    		aio.wtl("no poll");
         	html = messageContent.html();
 		}
         else {
+    		aio.wtl("there is a poll");
         	Element ed = messageContent.clone();
         	ed.getElementsByClass("board_poll").first().remove();
         	html = ed.html();
@@ -155,17 +166,25 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
     			pollWrapper.setVisibility(View.VISIBLE);
         	}
         }
+
+		aio.wtl("html var set");
         
         TextView message = (TextView) findViewById(R.id.mvMessage);
         message.setText(Html.fromHtml(html, null, null));
-        Linkify.addLinks(message, Linkify.WEB_URLS);
         message.setLinkTextColor(AllInOneV2.getAccentColor());
+
+		aio.wtl("set message text, linkified, set color");
         
         findViewById(R.id.mvTopWrapper).setOnClickListener(this);
         findViewById(R.id.mvTopWrapper).setBackgroundDrawable(AllInOneV2.getMsgHeadSelector().getConstantState().newDrawable());
+
+		aio.wtl("set click listener and drawable for top wrapper");
         
         if (AllInOneV2.isAccentLight())
         	((ImageView) findViewById(R.id.mvMessageMenuIcon)).setImageResource(R.drawable.ic_info_light);
+        
+
+		aio.wtl("finishing mv creation");
 	}
 
 	@Override
