@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import net.margaritov.preference.colorpicker.ColorPickerPreference;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.holoeverywhere.app.Activity;
@@ -29,6 +31,9 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -36,6 +41,7 @@ import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.StateSet;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -189,6 +195,15 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	
 	private static boolean usingLightTheme;
 	public static boolean getUsingLightTheme() {return usingLightTheme;}
+	private static int accentColor, accentTextColor;
+	public static int getAccentColor() {return accentColor;};
+	public static int getAccentTextColor() {return accentTextColor;}
+	private static StateListDrawable msgHeadSelector;
+	public static StateListDrawable getMsgHeadSelector() {return msgHeadSelector;}
+	private static StateListDrawable selector;
+	public static StateListDrawable getSelector() {return selector;}
+	private static boolean isAccentLight;
+	public static boolean isAccentLight() {return isAccentLight;}
 	
 	/**********************************************
 	 * START METHODS
@@ -223,6 +238,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
         aBar = getSupportActionBar();
         aBar.setDisplayShowHomeEnabled(false);
         aBar.setDisplayShowTitleEnabled(false);
+        aBar.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         
     	wtl("logging started from onCreate");
     	
@@ -533,6 +549,48 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 			contentPTR.setMode(Mode.BOTH);
 		else
 	        contentPTR.setMode(Mode.DISABLED);
+		
+		accentColor = settings.getInt("accentColor", (getResources().getColor(R.color.holo_blue)));
+		String colorARGB = ColorPickerPreference.convertToRGBNoPound(accentColor);
+		float[] hsv = new float[3];
+		Color.colorToHSV(accentColor, hsv);
+		if ((Integer.parseInt(colorARGB.substring(0, 2), 16) + Integer.parseInt(colorARGB.substring(2, 4), 16) + Integer.parseInt(colorARGB.substring(4, 6), 16)) > 382) {
+			// color is bright
+			hsv[2] *= 0.8f;
+			accentTextColor = Color.BLACK;
+			isAccentLight = true;
+		}
+		else {
+			// color is dark
+			if (hsv[2] > 0)
+				hsv[2] *= 1.2f;
+			else
+				hsv[2] = 0.2f;
+			
+			accentTextColor = Color.WHITE;
+			isAccentLight = false;
+		}
+		int msgSelectorColor = Color.HSVToColor(hsv);
+		
+		msgHeadSelector = new StateListDrawable();
+		msgHeadSelector.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(msgSelectorColor));
+		msgHeadSelector.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(msgSelectorColor));
+		msgHeadSelector.addState(StateSet.WILD_CARD, new ColorDrawable(accentColor));
+
+		selector = new StateListDrawable();
+		selector.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(accentColor));
+		selector.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(accentColor));
+		selector.addState(StateSet.WILD_CARD, new ColorDrawable(Color.TRANSPARENT));
+
+		findViewById(R.id.aioTopSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioPJTopSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioFirstPrevSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioNextLastSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioPWSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioPostButtonSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioPollSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioPostSep).setBackgroundColor(accentColor);
 		
 		if (session != null && settings.getBoolean("reloadOnResume", false)) {
     		wtl("session exists, reload on resume is true, refreshing page");
@@ -926,8 +984,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 							topic.setOnClickListener(cl);
 							topic.setOnLongClickListener(cl);
 
-							LastPostView lp = (LastPostView) topic
-									.findViewById(R.id.tvLastPostLink);
+							LastPostView lp = (LastPostView) topic.findViewById(R.id.tvLastPostLink);
 							lp.setUrl(lPostLink);
 							lp.setOnClickListener(cl);
 

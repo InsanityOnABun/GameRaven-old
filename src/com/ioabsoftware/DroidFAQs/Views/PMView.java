@@ -1,5 +1,6 @@
 package com.ioabsoftware.DroidFAQs.Views;
 
+import com.ioabsoftware.DroidFAQs.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 
 import android.content.Context;
@@ -25,7 +26,9 @@ public class PMView extends LinearLayout {
         
         url = urlIn;
         
-        setBackgroundResource(R.drawable.selector);
+        findViewById(R.id.pmSep).setBackgroundColor(AllInOneV2.getAccentColor());
+        
+        setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
 	}
 	
 	public String getUrl() {

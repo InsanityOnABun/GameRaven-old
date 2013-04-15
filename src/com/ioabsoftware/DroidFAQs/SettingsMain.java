@@ -8,6 +8,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.margaritov.preference.colorpicker.ColorPickerPreference;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;

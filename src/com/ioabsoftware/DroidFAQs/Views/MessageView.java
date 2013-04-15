@@ -31,6 +31,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -84,7 +85,9 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         inflater.inflate(R.layout.msgview, this);
         
         ((TextView) findViewById(R.id.mvUser)).setText(userContent + userTitles);
+        ((TextView) findViewById(R.id.mvUser)).setTextColor(AllInOneV2.getAccentTextColor());
         ((TextView) findViewById(R.id.mvPostNumber)).setText("#" + postNum + ", " + postTimeIn);
+        ((TextView) findViewById(R.id.mvPostNumber)).setTextColor(AllInOneV2.getAccentTextColor());
         
         String html = null;
         if (messageContent.getElementsByClass("board_poll").isEmpty()) {
@@ -156,9 +159,13 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         TextView message = (TextView) findViewById(R.id.mvMessage);
         message.setText(Html.fromHtml(html, null, null));
         Linkify.addLinks(message, Linkify.WEB_URLS);
+        message.setLinkTextColor(AllInOneV2.getAccentColor());
         
         findViewById(R.id.mvTopWrapper).setOnClickListener(this);
-        findViewById(R.id.mvTopWrapper).setBackgroundResource(R.drawable.msgheadselector);
+        findViewById(R.id.mvTopWrapper).setBackgroundDrawable(AllInOneV2.getMsgHeadSelector().getConstantState().newDrawable());
+        
+        if (AllInOneV2.isAccentLight())
+        	((ImageView) findViewById(R.id.mvMessageMenuIcon)).setImageResource(R.drawable.ic_info_light);
 	}
 
 	@Override

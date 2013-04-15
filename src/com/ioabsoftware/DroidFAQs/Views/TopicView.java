@@ -31,8 +31,11 @@ public class TopicView extends LinearLayout {
         ((TextView) findViewById(R.id.tvMsgCount)).setText(mCount);
         
         url = urlIn;
+
+        findViewById(R.id.tvSep).setBackgroundColor(AllInOneV2.getAccentColor());
+        findViewById(R.id.tvLPSep).setBackgroundColor(AllInOneV2.getAccentColor());
         
-        setBackgroundResource(R.drawable.selector);
+        setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
         
         switch (type) {
 		case NORMAL:

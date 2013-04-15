@@ -1,5 +1,6 @@
 package com.ioabsoftware.DroidFAQs.Views;
 
+import com.ioabsoftware.DroidFAQs.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 
 import android.content.Context;
@@ -54,7 +55,9 @@ public class BoardView extends LinearLayout {
         url = urlIn;
         type = typeIn;
         
-        setBackgroundResource(R.drawable.selector);
+        findViewById(R.id.bvSep).setBackgroundColor(AllInOneV2.getAccentColor());
+        
+        setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
 	}
 	
 	public BoardView(Context context, String platform, String name, String urlIn) {

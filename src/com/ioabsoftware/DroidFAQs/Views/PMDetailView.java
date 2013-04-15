@@ -1,5 +1,6 @@
 package com.ioabsoftware.DroidFAQs.Views;
 
+import com.ioabsoftware.DroidFAQs.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 
 import android.content.Context;
@@ -24,12 +25,16 @@ public class PMDetailView extends LinearLayout {
         
         messageView.setText(Html.fromHtml(messageIn, null, null));
         Linkify.addLinks(messageView, Linkify.WEB_URLS);
+        messageView.setLinkTextColor(AllInOneV2.getAccentColor());
         	
         
         sender = senderIn;
         title = titleIn;
         
-        setBackgroundResource(R.drawable.selector);
+        findViewById(R.id.pmdMidSep).setBackgroundColor(AllInOneV2.getAccentColor());
+        findViewById(R.id.pmdBotSep).setBackgroundColor(AllInOneV2.getAccentColor());
+        
+        setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
 	}
 	
 	public String getSender() {

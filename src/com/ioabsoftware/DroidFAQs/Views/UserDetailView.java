@@ -43,5 +43,13 @@ public class UserDetailView extends LinearLayout {
 				aio.pmSetup(name, null, null);
 			}
 		});
+
+        findViewById(R.id.udIDSep).setBackgroundColor(AllInOneV2.getAccentColor());
+        findViewById(R.id.udLevelSep).setBackgroundColor(AllInOneV2.getAccentColor());
+        findViewById(R.id.udCreationSep).setBackgroundColor(AllInOneV2.getAccentColor());
+        findViewById(R.id.udLVisitSep).setBackgroundColor(AllInOneV2.getAccentColor());
+        findViewById(R.id.udSigSep).setBackgroundColor(AllInOneV2.getAccentColor());
+        findViewById(R.id.udKarmaSep).setBackgroundColor(AllInOneV2.getAccentColor());
+        findViewById(R.id.udAMPSep).setBackgroundColor(AllInOneV2.getAccentColor());
 	}
 }
