@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
+        android:background="@color/holo_blue"
         android:clickable="true"
         android:paddingLeft="3dp"
         android:paddingRight="3dp" >
@@ -53,7 +54,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:src="?attr/themedPostInfoIcon" />
+            android:src="@drawable/ic_info" />
     </RelativeLayout>
 
     <LinearLayout
@@ -73,6 +74,7 @@
         android:layout_marginRight="3dp"
         android:text="Hey everyone. Since CE moves too fast, making topics purge in a couple days if there&apos;s no activity, I&apos;m gonna move the official topic over here. For those of you that don&apos;t know, GameRaven (formerly DroidFAQs) is an app currently in development that aims to enhance the GameFAQs experience on Android devices."
         android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textIsSelectable="true"
         android:textSize="15sp" />
 
 </LinearLayout>
