@@ -3,40 +3,24 @@ package com.ioabsoftware.DroidFAQs.Views;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.ioabsoftware.DroidFAQs.AllInOneV2;
-import com.ioabsoftware.DroidFAQs.HandlesNetworkResult.NetDesc;
-import com.ioabsoftware.DroidFAQs.Networking.Session;
-import com.ioabsoftware.gameraven.R;
-
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.text.Html;
-import android.text.Html.ImageGetter;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.TextPaint;
-import android.text.method.LinkMovementMethod;
-import android.text.method.MovementMethod;
-import android.text.style.ClickableSpan;
-import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.TextView.BufferType;
-import android.widget.Toast;
+
+import com.ioabsoftware.DroidFAQs.AllInOneV2;
+import com.ioabsoftware.DroidFAQs.HandlesNetworkResult.NetDesc;
+import com.ioabsoftware.DroidFAQs.URLImageParser;
+import com.ioabsoftware.DroidFAQs.Networking.Session;
+import com.ioabsoftware.gameraven.R;
 
 public class MessageView extends LinearLayout implements View.OnClickListener {
 
@@ -170,6 +154,9 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 		aio.wtl("html var set");
         
         TextView message = (TextView) findViewById(R.id.mvMessage);
+//        URLImageParser p = new URLImageParser(message, aio);
+//        Spanned htmlSpan = Html.fromHtml(html, p, null);
+//        message.setText(htmlSpan);
         message.setText(Html.fromHtml(html, null, null));
         message.setLinkTextColor(AllInOneV2.getAccentColor());
 
