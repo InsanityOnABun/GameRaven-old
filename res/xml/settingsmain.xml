@@ -71,12 +71,24 @@
             android:persistent="true"
             android:summary="Changes require restart to take effect. (Menu -> Exit GameRaven)"
             android:title="Use Light Theme" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="useWhiteAccentText"
+            android:persistent="true"
+            android:summary="Text over accent colors will be white. (Refresh to take complete effect)"
+            android:title="Use White Accent Text" />
 
         <net.margaritov.preference.colorpicker.ColorPickerPreference
             android:defaultValue="@color/holo_blue"
             android:key="accentColor"
-            android:summary="Set the accent color the app will use. Text will auto-adjust based on the selected color."
+            android:summary="Set the accent color. (Refresh to take complete effect)"
             android:title="Accent Color" />
+
+        <Preference
+            android:key="resetAccentColor"
+            android:persistent="false"
+            android:summary="Reset the accent color back to Holo Blue. (Refresh to take complete effect)"
+            android:title="Reset Accent Color" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="devCategory"
