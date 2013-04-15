@@ -269,13 +269,13 @@ public class Session implements HandlesNetworkResult {
 				
 				Document pRes = res.parse();
 				
-				if (!pRes.select("h1:containsOwn(403 Error)").isEmpty()) {
+				if (res.statusCode() == 403) {
 					Elements paragraphs = pRes.getElementsByTag("p");
 					aio.fourOhError(403, paragraphs.get(1).text() + "\n\n" + paragraphs.get(2).text());
 					return;
 				}
 				
-				if (!pRes.select("h1:containsOwn(401 Error)").isEmpty()) {
+				if (res.statusCode() == 401) {
 					if (lastDesc == NetDesc.LOGIN_S2) {
 						skipAIOCleanup = true;
 						get(NetDesc.BOARD_JUMPER, ROOT + "/boards", null);
@@ -316,6 +316,7 @@ public class Session implements HandlesNetworkResult {
 				case POSTTPC_S3:
 				case VERIFY_ACCOUNT_S1:
 				case VERIFY_ACCOUNT_S2:
+					aio.wtl("addToHistory = true");
 					break;
 
 				case MARKMSG_S1:
@@ -323,6 +324,7 @@ public class Session implements HandlesNetworkResult {
 				case CLOSE_TOPIC:
 				case SEND_PM_S1:
 				case SEND_PM_S2:
+					aio.wtl("addToHistory = false");
 					addToHistory = false;
 					break;
 				}
@@ -340,6 +342,7 @@ public class Session implements HandlesNetworkResult {
 						case PM_INBOX:
 						case READ_PM:
 						case UNSPECIFIED:
+							aio.wtl("beginning history addition");
 							int i = lastPath.indexOf('#');
 							String trimmedPath;
 							if (i != -1)
@@ -359,6 +362,7 @@ public class Session implements HandlesNetworkResult {
 								aio.wtl("current desc is: " + desc.name());
 								history.add(new History(trimmedPath, lastDesc, lastRes, aio.getScrollerVertLoc()));
 							}
+							aio.wtl("finished history addition");
 							break;
 							
 						case DEV_UPDATE_CHECK:
@@ -384,6 +388,7 @@ public class Session implements HandlesNetworkResult {
 						case VERIFY_ACCOUNT_S2:
 						case SEND_PM_S1:
 						case SEND_PM_S2:
+							aio.wtl("not adding to history");
 							break;
 						
 						}
@@ -417,10 +422,12 @@ public class Session implements HandlesNetworkResult {
 				case POSTTPC_S3:
 				case VERIFY_ACCOUNT_S1:
 				case VERIFY_ACCOUNT_S2:
+					aio.wtl("beginning lastDesc, lastRes, etc. setting");
 					lastDesc = desc;
 					lastRes = res;
 					lastPath = res.url().toString();
 					lastPathWithoutData = stripExtraDataFromURL(lastPath);
+					aio.wtl("finishing lastDesc, lastRes, etc. setting");
 					break;
 					
 
@@ -431,13 +438,15 @@ public class Session implements HandlesNetworkResult {
 				case DLTMSG_S2:
 				case SEND_PM_S1:
 				case SEND_PM_S2:
+					aio.wtl("not setting lastDesc, lastRes, etc.");
 					break;
 				
 				}
 				
 				// reset history flag
 				addToHistory = true;
-				
+
+				aio.wtl("adding cookies");
 				cookies.putAll(res.cookies());
 				
 				switch (desc) {
@@ -672,7 +681,7 @@ public class Session implements HandlesNetworkResult {
 					
 				case TOPIC:
 					aio.wtl("session hNR determined this is a topic");
-					if (!pRes.getElementsContainingOwnText("The topic you selected is no longer available for viewing.").isEmpty()) {
+					if (!pRes.select("p:contains(no longer available)").isEmpty()) {
 						Toast.makeText(aio, "The topic you selected is no longer available for viewing.", Toast.LENGTH_SHORT).show();
 						aio.wtl("topic is no longer available, treat response as a board");
 						aio.processContent(res, NetDesc.BOARD);
