@@ -551,17 +551,10 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	        contentPTR.setMode(Mode.DISABLED);
 		
 		accentColor = settings.getInt("accentColor", (getResources().getColor(R.color.holo_blue)));
-		String colorARGB = ColorPickerPreference.convertToRGBNoPound(accentColor);
 		float[] hsv = new float[3];
 		Color.colorToHSV(accentColor, hsv);
-		if ((Integer.parseInt(colorARGB.substring(0, 2), 16) + Integer.parseInt(colorARGB.substring(2, 4), 16) + Integer.parseInt(colorARGB.substring(4, 6), 16)) > 382) {
-			// color is bright
-			hsv[2] *= 0.8f;
-			accentTextColor = Color.BLACK;
-			isAccentLight = true;
-		}
-		else {
-			// color is dark
+		if (settings.getBoolean("useWhiteAccentText", false)) {
+			// color is probably dark
 			if (hsv[2] > 0)
 				hsv[2] *= 1.2f;
 			else
@@ -570,6 +563,13 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 			accentTextColor = Color.WHITE;
 			isAccentLight = false;
 		}
+		else {
+			// color is probably bright
+			hsv[2] *= 0.8f;
+			accentTextColor = Color.BLACK;
+			isAccentLight = true;
+		}
+		
 		int msgSelectorColor = Color.HSVToColor(hsv);
 		
 		msgHeadSelector = new StateListDrawable();
@@ -1206,6 +1206,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 						
 						message = new MessageView(this, user, userTitles, postNum, postTime,
 												  rows.get(x), boardID, topicID, mID);
+						
 						message.setOnClickListener(cl);
 						
 						content.addView(message);
@@ -1474,7 +1475,6 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 					adBuilder.append(e.outerHtml());
 				}
 				adBuilder.append("</body></html>");
-				wtl(adBuilder.toString());
 				adView.loadDataWithBaseURL(session.getLastPath(), adBuilder.toString(), "text/html", "iso-8859-1", null);
 
 				if (settings.getBoolean("enablePTR", false))
