@@ -4,6 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+    <View
+        android:id="@+id/aioTopSep"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#33B5E5"
+        android:visibility="visible" />
+
     <LinearLayout
         android:id="@+id/aioHeader"
         android:layout_width="fill_parent"
@@ -37,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/aioTitle"
-                android:visibility="gone" >
+                android:visibility="visible" >
 
                 <View
                     android:id="@+id/aioPJTopSep"
@@ -61,7 +68,7 @@
                     android:textColor="?attr/themedPageJumperColor" />
 
                 <View
-                    android:id="@+id/aioFirstPrevSeperator"
+                    android:id="@+id/aioFirstPrevSep"
                     android:layout_width="1dp"
                     android:layout_height="24dp"
                     android:layout_alignBottom="@+id/aioFirstPage"
@@ -77,7 +84,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/aioFirstPage"
                     android:layout_alignBottom="@+id/aioFirstPage"
-                    android:layout_toRightOf="@+id/aioFirstPrevSeperator"
+                    android:layout_toRightOf="@+id/aioFirstPrevSep"
                     android:enabled="false"
                     android:minHeight="30dp"
                     android:minWidth="46dp"
@@ -99,7 +106,7 @@
                     android:textColor="?attr/themedPageJumperColor" />
 
                 <View
-                    android:id="@+id/aioNextLastSeperator"
+                    android:id="@+id/aioNextLastSep"
                     android:layout_width="1dp"
                     android:layout_height="24dp"
                     android:layout_alignBottom="@+id/aioFirstPage"
@@ -115,7 +122,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/aioFirstPage"
                     android:layout_alignBottom="@+id/aioLastPage"
-                    android:layout_toLeftOf="@+id/aioNextLastSeperator"
+                    android:layout_toLeftOf="@+id/aioNextLastSep"
                     android:enabled="false"
                     android:minHeight="30dp"
                     android:minWidth="46dp"
@@ -162,7 +169,7 @@
         android:visibility="visible" >
 
         <View
-            android:id="@+id/aioPWSeparator"
+            android:id="@+id/aioPWSep"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="3dp"
