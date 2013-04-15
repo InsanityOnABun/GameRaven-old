@@ -23,6 +23,7 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -67,12 +68,8 @@ public class SettingsMain extends SherlockPreferenceActivity {
         ACCEPTED_KEYS.add("grBackupVer");
         ACCEPTED_KEYS.add("startAtAMP");
         ACCEPTED_KEYS.add("useLightTheme");
-        ACCEPTED_KEYS.add("enableCustomTheming");
-        ACCEPTED_KEYS.add("colorBack");
-        ACCEPTED_KEYS.add("colorBackAlt");
-        ACCEPTED_KEYS.add("colorText");
-        ACCEPTED_KEYS.add("colorTextAlt");
-        ACCEPTED_KEYS.add("colorLink");
+        ACCEPTED_KEYS.add("useWhiteAccentText");
+        ACCEPTED_KEYS.add("accentColor");
         ACCEPTED_KEYS.add("enableJS");
         ACCEPTED_KEYS.add("ampSortOption");
         
@@ -140,19 +137,16 @@ public class SettingsMain extends SherlockPreferenceActivity {
                 }
         });
         
-//        findPreference("manageTheming").setOnPreferenceClickListener(new OnPreferenceClickListener() {
-//                public boolean onPreferenceClick(Preference preference) {
-//                	startActivity(new Intent(SettingsMain.this, SettingsTheming.class));
-//                    return true;
-//                }
-//        });
-        
-        findPreference("aboutFeedback").setOnPreferenceClickListener(new OnPreferenceClickListener() {
-                public boolean onPreferenceClick(Preference preference) {
-                	startActivity(new Intent(SettingsMain.this, About.class));
-                    return true;
-                }
-        });
+        findPreference("resetAccentColor").setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				settings.edit().putInt("accentColor", getResources().getColor(R.color.holo_blue)).commit();
+				Toast.makeText(SettingsMain.this, "Accent color reset.", Toast.LENGTH_SHORT).show();
+				finish();
+				startActivity(getIntent());
+				return false;
+			}
+		});
         
         findPreference("backupSettings").setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
@@ -185,6 +179,13 @@ public class SettingsMain extends SherlockPreferenceActivity {
 					});
                 	rb.setNegativeButton("Cancel", null);
                 	rb.create().show();
+                    return true;
+                }
+        });
+        
+        findPreference("aboutFeedback").setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                public boolean onPreferenceClick(Preference preference) {
+                	startActivity(new Intent(SettingsMain.this, About.class));
                     return true;
                 }
         });
@@ -248,6 +249,13 @@ public class SettingsMain extends SherlockPreferenceActivity {
 					buf.append("useLightTheme=true\n");
 				else
 					buf.append("useLightTheme=false\n");
+				
+				if (settings.getBoolean("useWhiteAccentText", false))
+					buf.append("useWhiteAccentText=true\n");
+				else
+					buf.append("useWhiteAccentText=false\n");
+				
+				buf.append("accentColor=" + settings.getInt("accentColor", getResources().getColor(R.color.holo_blue)) + '\n');
 				
 				if (settings.getBoolean("enableJS", true))
 					buf.append("enableJS=true\n");
@@ -346,9 +354,7 @@ public class SettingsMain extends SherlockPreferenceActivity {
 					
 					br.close();
 					
-					// clear out the old accounts after reading to
-					// make sure we don't clear acc's just to find
-					// we can't read
+					// clear accs before adding in restored ones
 					AllInOneV2.getAccounts().clear();
 					
 					for (int a = 0; a < users.size(); a++) {
@@ -379,7 +385,6 @@ public class SettingsMain extends SherlockPreferenceActivity {
 					editor.commit();
 					
 					Toast.makeText(this, "Restore done.", Toast.LENGTH_SHORT).show();
-//					AllInOneV2.setNeedToBuildCSS();
 					finish();
 					startActivity(getIntent());
 
