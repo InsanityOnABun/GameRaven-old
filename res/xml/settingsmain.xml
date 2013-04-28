@@ -21,6 +21,26 @@
             android:title="Manage Accounts" />
     </PreferenceCategory>
     <PreferenceCategory
+        android:key="NotifCategory"
+        android:orderingFromXml="true"
+        android:title="Notification Settings" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:disableDependentsState="false"
+            android:key="notifsEnable"
+            android:persistent="true"
+            android:summary="Periodically check for new posts in the AMP list for the default account."
+            android:title="Enable Notifications" />
+
+        <ListPreference
+            android:dependency="notifsEnable"
+            android:entries="@array/notifsFrequencyNames"
+            android:entryValues="@array/notifsFrequencyMinutes"
+            android:key="notifsFrequency"
+            android:summary="Default is every hour. High frequency checking can drain battery."
+            android:title="Notification Frequency" />
+    </PreferenceCategory>
+    <PreferenceCategory
         android:key="genSettingsCategory"
         android:orderingFromXml="true"
         android:persistent="false"
