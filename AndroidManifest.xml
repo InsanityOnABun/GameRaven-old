@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ioabsoftware.gameraven"
     android:versionCode="1"
-    android:versionName="gamma_build_11" >
+    android:versionName="gamma_build_12_dev2" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -36,6 +36,12 @@
         </activity>
         <activity android:name="com.ioabsoftware.DroidFAQs.About" >
         </activity>
+
+        <service
+            android:name="com.ioabsoftware.DroidFAQs.NotifierService"
+            android:exported="false"
+            android:label="Notifier Service" >
+        </service>
     </application>
 
 </manifest>
