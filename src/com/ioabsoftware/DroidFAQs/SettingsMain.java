@@ -16,6 +16,9 @@ import org.holoeverywhere.app.Dialog;
 import org.holoeverywhere.widget.NumberPicker;
 import org.holoeverywhere.widget.Toast;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
@@ -27,7 +30,10 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -122,6 +128,41 @@ public class SettingsMain extends SherlockPreferenceActivity {
                     return true;
                 }
         });
+        
+        findPreference("notifsEnable").setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				String username = settings.getString("defaultAccount", "N/A");
+
+				Intent i = new Intent(SettingsMain.this, NotifierService.class);
+				i.putExtra("username", username);
+				i.putExtra("password", AllInOneV2.getAccounts().getString(username));
+				PendingIntent pi = PendingIntent.getService(SettingsMain.this, 0, i, 0);
+				
+				AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+				
+				if ((Boolean) newValue == true) {
+					// enabling notifications
+					if (username.equals("N/A")) {
+						Toast.makeText(SettingsMain.this, "You have no default account set!", Toast.LENGTH_SHORT).show();
+						return false;
+					}
+					else {
+						long millis = 60000 * Integer.parseInt(settings.getString("notifsFrequency", "60"));
+						long firstAlarm = SystemClock.elapsedRealtime() + millis;
+						alarm.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstAlarm, millis, pi);
+						settings.edit().putLong("notifsLastPost", 0).commit();
+						Toast.makeText(SettingsMain.this, "You should go to the AMP list on the " +
+								"default account to initialize the latest post time.", Toast.LENGTH_LONG).show();
+					}
+				}
+				else {
+					// disabling notifications
+					alarm.cancel(pi);
+				}
+				return true;
+			}
+		});
         
         findPreference("customSig").setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
