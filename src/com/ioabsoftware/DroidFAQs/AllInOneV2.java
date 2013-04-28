@@ -86,7 +86,7 @@ import com.ioabsoftware.gameraven.R;
 public class AllInOneV2 extends Activity implements OnNavigationListener {
 	
 	private static boolean needToCheckForUpdate = true;
-	private static boolean isReleaseBuild = true;
+	private static boolean isReleaseBuild = false;
 	
 	public static final int CHANGE_LOGGED_IN_DIALOG = 100;
 	public static final int NEW_VERSION_DIALOG = 101;
@@ -964,6 +964,21 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 								 Integer.toString(pNums[1]), nextPage, lastPage, NetDesc.AMP_LIST);
 					
 					if (!tbody.children().isEmpty()) {
+						if (settings.getBoolean("notifsEnable", false) && 
+								Session.getUser().equals(settings.getString("defaultAccount", "N/A"))) {
+							Element lPost = pRes.select("td.lastpost").first();
+							if (lPost != null) {
+								String lTime = lPost.text();
+								Date newDate;
+								if (lTime.contains("AM") || lTime.contains("PM"))
+									newDate = new SimpleDateFormat("MM'/'dd hh':'mmaa", Locale.US).parse(lTime);
+								else
+									newDate = new SimpleDateFormat("MM'/'dd'/'yyyy", Locale.US).parse(lTime);
+								
+								settings.edit().putLong("notifsLastPost", newDate.getTime());
+							}
+						}
+						
 						for (Element row : tbody.children()) {
 							// [board] [title] [msg] [last post] [your last post]
 							Elements cells = row.children();
