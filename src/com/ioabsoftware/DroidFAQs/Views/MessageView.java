@@ -2,11 +2,17 @@ package com.ioabsoftware.DroidFAQs.Views;
 
 import java.util.HashMap;
 
+import net.margaritov.preference.colorpicker.ColorPickerPreference;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.Shape;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.LayoutInflater;
@@ -94,9 +100,20 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         	html = ed.html();
 
     		LinearLayout pollWrapper = (LinearLayout) findViewById(R.id.mvPollWrapper);
-    		pollWrapper.setPadding(5, 0, 5, 5);
+    		LinearLayout innerPollWrapper = new LinearLayout(aio);
+    		
+    		ShapeDrawable s = new ShapeDrawable();
+    		Paint p = s.getPaint();
+    		p.setStyle(Paint.Style.STROKE);
+    		p.setStrokeWidth(10);
+    		p.setColor(Color.parseColor(ColorPickerPreference.convertToARGB(AllInOneV2.getAccentColor())));
+    		
+    		pollWrapper.setBackgroundDrawable(s);
 			pollWrapper.addView(new HeaderView(aio, messageContent.getElementsByClass("poll_head").first().text()));
-        	
+			pollWrapper.addView(innerPollWrapper);
+
+    		innerPollWrapper.setPadding(15, 0, 15, 15);
+    		innerPollWrapper.setOrientation(VERTICAL);
         	if (messageContent.getElementsByTag("form").isEmpty()) {
         		// poll_foot_left
         		TextView t;
@@ -104,14 +121,14 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         			Elements c = e.children();
         			t = new TextView(aio);
         			t.setText(c.get(0).text() + ": " + c.get(1).text() + ", " + c.get(3).text() + " votes");
-        			pollWrapper.addView(t);
+        			innerPollWrapper.addView(t);
         		}
         		
         		String foot = messageContent.getElementsByClass("poll_foot_left").text();
         		if (foot.length() > 0) {
         			t = new TextView(aio);
         			t.setText(foot);
-        			pollWrapper.addView(t);
+        			innerPollWrapper.addView(t);
         		}
         		
         	}
@@ -134,7 +151,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
     						aio.getSession().post(NetDesc.TOPIC, action, data);
     					}
     				});
-    				pollWrapper.addView(b);
+    				innerPollWrapper.addView(b);
     			}
     			
     			Button b = new Button(aio);
@@ -145,9 +162,9 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 						aio.getSession().get(NetDesc.TOPIC, action + "?results=1", null);
 					}
 				});
-				pollWrapper.addView(b);
+    			innerPollWrapper.addView(b);
     			
-    			pollWrapper.setVisibility(View.VISIBLE);
+    			innerPollWrapper.setVisibility(View.VISIBLE);
         	}
         }
 
