@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ioabsoftware.gameraven"
+    android:installLocation="internalOnly"
     android:versionCode="1"
-    android:versionName="gamma_build_12_dev2" >
+    android:versionName="gamma_build_12" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -10,6 +11,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name="org.holoeverywhere.app.Application"
@@ -42,6 +44,12 @@
             android:exported="false"
             android:label="Notifier Service" >
         </service>
+
+        <receiver android:name="com.ioabsoftware.DroidFAQs.NotifierStartupReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
