@@ -12,7 +12,9 @@ import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
 
+import android.app.PendingIntent;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
@@ -191,6 +193,7 @@ public class SettingsAccount extends SherlockPreferenceActivity implements Handl
 				}
 				else {
 					settings.edit().putString("defaultAccount", "N/A").commit();
+					settings.edit().putLong("notifsLastPost", 0).commit();
 					Toast.makeText(SettingsAccount.this, "Default account removed.", Toast.LENGTH_SHORT).show();
 				}
 			}
