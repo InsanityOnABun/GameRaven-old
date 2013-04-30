@@ -70,7 +70,6 @@
         <item>Only registered users, only 1 vote per IP</item>
     </string-array>
     <string-array name="notifsFrequencyNames">
-        <item>1 Minute (Dev setting)</item>
         <item>15 Minutes</item>
         <item>30 Minutes</item>
         <item>45 Minutes</item>
@@ -82,7 +81,6 @@
         <item>24 Hours</item>
     </string-array>
     <string-array name="notifsFrequencyMinutes">
-        <item>1</item>
         <item>15</item>
         <item>30</item>
         <item>45</item>
