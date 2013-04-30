@@ -466,7 +466,7 @@ public class Session implements HandlesNetworkResult {
 					break;
 					
 				case LOGIN_S2:
-					if (AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false))
+					if (AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false) || aio.consumeForceAMP())
 						get(NetDesc.AMP_LIST, AllInOneV2.buildAMPLink(), null);
 					else
 						get(NetDesc.BOARD_JUMPER, ROOT + "/boards", null);
