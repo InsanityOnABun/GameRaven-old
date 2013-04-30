@@ -95,8 +95,8 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	public static final int REPORT_MESSAGE_DIALOG = 104;
 	public static final int POLL_OPTIONS_DIALOG = 105;
 	
-	private static final String ACCOUNTS_PREFNAME = "com.ioabsoftware.DroidFAQs.Accounts";
-	private static final String SALT = "RIP Man fan died at the room shot up to 97 degrees";
+	protected static final String ACCOUNTS_PREFNAME = "com.ioabsoftware.DroidFAQs.Accounts";
+	protected static final String SALT = "RIP Man fan died at the room shot up to 97 degrees";
 	
 	public static String defaultSig;
 	
@@ -204,13 +204,23 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	public static StateListDrawable getSelector() {return selector;}
 	private static boolean isAccentLight;
 	public static boolean isAccentLight() {return isAccentLight;}
+
+	private boolean forceAMP = false;
+	public boolean consumeForceAMP() {
+		if (forceAMP) {
+			forceAMP = false;
+			return true;
+		}
+		else
+			return false;
+	}
 	
 	/**********************************************
 	 * START METHODS
 	 **********************************************/
 	
 
-	
+
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -356,6 +366,15 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
     	wtl("setting check for update flag");
     	needToCheckForUpdate = true;
 		
+    	if (getIntent().hasExtra("forceAMP")) {
+    		if (getIntent().getExtras().getBoolean("forceAMP")) {
+    			forceAMP = true;
+    			Log.d("forceAMP", "true");
+    		}
+    	}
+    	else
+    		Log.d("forceAMP", "false");
+    	
 		wtl("onCreate finishing");
     }
 	
