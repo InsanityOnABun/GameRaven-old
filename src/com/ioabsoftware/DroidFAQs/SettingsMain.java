@@ -8,8 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import net.margaritov.preference.colorpicker.ColorPickerPreference;
-
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
@@ -26,12 +24,10 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
-import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -54,6 +50,8 @@ public class SettingsMain extends SherlockPreferenceActivity {
 	private int currentBackupVer = 2;
 	final ArrayList<String> ACCEPTED_KEYS = new ArrayList<String>();
 	
+	private PendingIntent notifPendingIntent;
+	
 	SharedPreferences settings;
 	
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +64,12 @@ public class SettingsMain extends SherlockPreferenceActivity {
 		super.onCreate(savedInstanceState);
         
         addPreferencesFromResource(R.xml.settingsmain);
-        
+
+		Intent notifierIntent = new Intent(this, NotifierService.class);
+		notifPendingIntent = PendingIntent.getService(this, 0, notifierIntent, 0);
+
+        ACCEPTED_KEYS.add("notifsEnable");
+        ACCEPTED_KEYS.add("notifsFrequency");
         ACCEPTED_KEYS.add("reloadOnBack");
         ACCEPTED_KEYS.add("reloadOnResume");
         ACCEPTED_KEYS.add("enablePTR");
@@ -132,34 +135,29 @@ public class SettingsMain extends SherlockPreferenceActivity {
         findPreference("notifsEnable").setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
-				String username = settings.getString("defaultAccount", "N/A");
-
-				Intent i = new Intent(SettingsMain.this, NotifierService.class);
-				i.putExtra("username", username);
-				i.putExtra("password", AllInOneV2.getAccounts().getString(username));
-				PendingIntent pi = PendingIntent.getService(SettingsMain.this, 0, i, 0);
-				
-				AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-				
 				if ((Boolean) newValue == true) {
 					// enabling notifications
-					if (username.equals("N/A")) {
+					if (settings.getString("defaultAccount", "N/A").equals("N/A")) {
 						Toast.makeText(SettingsMain.this, "You have no default account set!", Toast.LENGTH_SHORT).show();
 						return false;
 					}
 					else {
-						long millis = 60000 * Integer.parseInt(settings.getString("notifsFrequency", "60"));
-						long firstAlarm = SystemClock.elapsedRealtime() + millis;
-						alarm.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstAlarm, millis, pi);
-						settings.edit().putLong("notifsLastPost", 0).commit();
-						Toast.makeText(SettingsMain.this, "You should go to the AMP list on the " +
-								"default account to initialize the latest post time.", Toast.LENGTH_LONG).show();
+						enableNotifs(settings.getString("notifsFrequency", "60"));
 					}
 				}
 				else {
 					// disabling notifications
-					alarm.cancel(pi);
+					disableNotifs();
 				}
+				return true;
+			}
+		});
+        
+        findPreference("notifsFrequency").setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				disableNotifs();
+				enableNotifs((String) newValue);
 				return true;
 			}
 		});
@@ -231,6 +229,18 @@ public class SettingsMain extends SherlockPreferenceActivity {
                 }
         });
 	}
+
+	private void enableNotifs(String freq) {
+		long millis = 60000 * Integer.parseInt(freq);
+		long firstAlarm = SystemClock.elapsedRealtime() + millis;
+		((AlarmManager)getSystemService(Context.ALARM_SERVICE))
+					.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstAlarm, millis, notifPendingIntent);
+		settings.edit().putLong("notifsLastPost", 0).commit();
+	}
+
+	private void disableNotifs() {
+		((AlarmManager)getSystemService(Context.ALARM_SERVICE)).cancel(notifPendingIntent);
+	}
 	
 	private void backupSettings() {
 		String state = Environment.getExternalStorageState();
@@ -265,6 +275,13 @@ public class SettingsMain extends SherlockPreferenceActivity {
 				buf.append("[END_GLOBAL_SIG]\n");
 				
 				buf.append("defaultAccount=" + settings.getString("defaultAccount", "N/A") + '\n');
+				
+				if (settings.getBoolean("notifsEnable", false))
+					buf.append("notifsEnable=true\n");
+				else
+					buf.append("notifsEnable=false\n");
+
+				buf.append("notifsFrequency=" + settings.getString("notifsFrequency", "60") + '\n');
 				
 				if (settings.getBoolean("startAtAMP", false))
 					buf.append("startAtAMP=true\n");
