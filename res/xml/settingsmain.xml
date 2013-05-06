@@ -79,6 +79,19 @@
             android:key="customSig"
             android:summary="Set a custom global signature that applies to any account that does not have its own signature set."
             android:title="Custom Global Signature..." />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="confirmPostCancel"
+            android:persistent="true"
+            android:summary="A confirmation dialog will show when cancelling a post."
+            android:title="Confirm Post Cancel" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="confirmPostSubmit"
+            android:persistent="true"
+            android:summary="A confirmation dialog will show when submitting a post."
+            android:title="Confirm Post Submission" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="themingCategory"
