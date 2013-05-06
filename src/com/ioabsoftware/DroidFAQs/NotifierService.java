@@ -106,7 +106,7 @@ public class NotifierService extends IntentService {
 
 						long newTime = newDate.getTime();
 						long oldTime = prefs.getLong("notifsLastPost", 0);
-						if (newDate.getTime() > oldTime) {
+						if (newTime > oldTime) {
 							Log.d("notif", "time is newer");
 							prefs.edit().putLong("notifsLastPost", newTime)
 									.commit();
