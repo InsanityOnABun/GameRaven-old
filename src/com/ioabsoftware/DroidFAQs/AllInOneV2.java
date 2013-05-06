@@ -994,7 +994,12 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 								else
 									newDate = new SimpleDateFormat("MM'/'dd'/'yyyy", Locale.US).parse(lTime);
 								
-								settings.edit().putLong("notifsLastPost", newDate.getTime());
+								long newTime = newDate.getTime();
+								long oldTime = settings.getLong("notifsLastPost", 0);
+								if (newTime > oldTime) {
+									wtl("time is newer");
+									settings.edit().putLong("notifsLastPost", newTime).commit();
+								}
 							}
 						}
 						
@@ -1852,7 +1857,20 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	
 	public void postCancel(View view) {
 		wtl("postCancel fired --NEL");
-		postCleanup();
+		if (settings.getBoolean("confirmPostCancel", false)) {
+			AlertDialog.Builder b = new AlertDialog.Builder(this);
+			b.setMessage("Cancel this post?");
+			b.setPositiveButton("Yes", new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					postCleanup();
+				}
+			});
+			b.setNegativeButton("No", null);
+			b.create().show();
+		}
+		else
+			postCleanup();
 	}
 	
 	public void postPollOptions(View view) {
@@ -1861,6 +1879,23 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	
 	public void postDo(View view) {
 		wtl("postDo fired");
+		if (settings.getBoolean("confirmPostSubmit", false)) {
+			AlertDialog.Builder b = new AlertDialog.Builder(this);
+			b.setMessage("Submit this post?");
+			b.setPositiveButton("Yes", new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					postSubmit();
+				}
+			});
+			b.setNegativeButton("No", null);
+			b.create().show();
+		}
+		else
+			postSubmit();
+	}
+	
+	private void postSubmit() {
 		if (titleWrapper.getVisibility() == View.VISIBLE) {
 			wtl("posting on a board");
 			// posting on a board
