@@ -18,8 +18,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.widget.Toast;
 
 import com.ioabsoftware.DroidFAQs.AllInOneV2;
-import com.ioabsoftware.DroidFAQs.HandlesNetworkResult;
-import com.ioabsoftware.DroidFAQs.HandlesNetworkResult.NetDesc;
+import com.ioabsoftware.DroidFAQs.Networking.HandlesNetworkResult.NetDesc;
 
 /**
  * Session is used to establish and maintain GFAQs sessions, and to send GET and POST requests.

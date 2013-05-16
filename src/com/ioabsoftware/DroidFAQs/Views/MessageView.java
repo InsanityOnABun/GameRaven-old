@@ -23,9 +23,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ioabsoftware.DroidFAQs.AllInOneV2;
-import com.ioabsoftware.DroidFAQs.HandlesNetworkResult.NetDesc;
 import com.ioabsoftware.DroidFAQs.URLImageParser;
 import com.ioabsoftware.DroidFAQs.Networking.Session;
+import com.ioabsoftware.DroidFAQs.Networking.HandlesNetworkResult.NetDesc;
 import com.ioabsoftware.gameraven.R;
 
 public class MessageView extends LinearLayout implements View.OnClickListener {

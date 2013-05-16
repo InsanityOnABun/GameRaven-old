@@ -2,7 +2,6 @@ package com.ioabsoftware.DroidFAQs.Networking;
 
 import org.jsoup.Connection.Response;
 
-import com.ioabsoftware.DroidFAQs.HandlesNetworkResult;
 
 public class History {
 

@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.ioabsoftware.DroidFAQs.Networking.HandlesNetworkResult;
 import com.ioabsoftware.DroidFAQs.Networking.NetworkTask;
 import com.ioabsoftware.DroidFAQs.Networking.Session;
 import com.ioabsoftware.gameraven.R;

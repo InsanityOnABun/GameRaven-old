@@ -1,4 +1,4 @@
-package com.ioabsoftware.DroidFAQs;
+package com.ioabsoftware.DroidFAQs.Networking;
 
 import org.jsoup.Connection.Response;
 

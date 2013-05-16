@@ -7,7 +7,6 @@ import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 
-import com.ioabsoftware.DroidFAQs.HandlesNetworkResult;
 
 import android.os.AsyncTask;
 
