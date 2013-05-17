@@ -42,6 +42,8 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.ioabsoftware.gameraven.R;
 
+import de.devmil.common.ui.color.ColorSelectorDialog;
+
 public class SettingsMain extends SherlockPreferenceActivity {
 	
 	public static final int MODIFY_SIG_DIALOG = 200;
@@ -82,12 +84,26 @@ public class SettingsMain extends SherlockPreferenceActivity {
         ACCEPTED_KEYS.add("enableJS");
         ACCEPTED_KEYS.add("ampSortOption");
         
+        findPreference("showNewColorPicker").setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                public boolean onPreferenceClick(Preference preference) {
+                	new ColorSelectorDialog(SettingsMain.this, null, 0).show();
+                	return true;
+                }
+        });
+        
+        findPreference("manageHighlightedUsers").setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            public boolean onPreferenceClick(Preference preference) {
+            	startActivity(new Intent(SettingsMain.this, SettingsHighlightedUsers.class));
+            	return true;
+            }
+        });
+        
         findPreference("donate").setOnPreferenceClickListener(new OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
 				AlertDialog.Builder db = new AlertDialog.Builder(SettingsMain.this);
 				db.setTitle("Donate to Developer");
-				db.setMessage("Thank you for supporting us! If you'd like to donate to the developer " +
+				db.setMessage("Thank you for your support! If you'd like to donate to the developer " +
 						"of GameRaven, enter your desired amount below and click donate. Thanks again!");
 				LayoutInflater inflater = getLayoutInflater();
 				final View v = inflater.inflate(R.layout.donate, null);
@@ -100,7 +116,7 @@ public class SettingsMain extends SherlockPreferenceActivity {
 				
 				final NumberPicker c = (NumberPicker) v.findViewById(R.id.donCents);
 				c.setMinValue(0);
-				c.setMaxValue(100);
+				c.setMaxValue(99);
 				c.setValue(0);
 				c.setWrapSelectorWheel(false);
 				
@@ -120,7 +136,6 @@ public class SettingsMain extends SherlockPreferenceActivity {
 				db.setNegativeButton("Cancel", null);
 				
 				db.create().show();
-//				startActivity(i);
 				return false;
 			}
 		});
