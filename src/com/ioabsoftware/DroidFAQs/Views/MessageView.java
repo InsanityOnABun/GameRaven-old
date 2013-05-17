@@ -11,10 +11,13 @@ import org.jsoup.select.Elements;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.Shape;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.StateSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -61,7 +64,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 	
 	
 	public MessageView(final AllInOneV2 aioIn, String userIn, String userTitles, String postNum,
-					   String postTimeIn, Element messageIn, String BID, String TID, String MID) {
+					   String postTimeIn, Element messageIn, String BID, String TID, String MID, int hlColor) {
 		super(aioIn);
 		
 		aioIn.wtl("starting mv creation");
@@ -180,7 +183,35 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 		aio.wtl("set message text, linkified, set color");
         
         findViewById(R.id.mvTopWrapper).setOnClickListener(this);
-        findViewById(R.id.mvTopWrapper).setBackgroundDrawable(AllInOneV2.getMsgHeadSelector().getConstantState().newDrawable());
+        if (hlColor == 0)
+        	findViewById(R.id.mvTopWrapper).setBackgroundDrawable(AllInOneV2.getMsgHeadSelector().getConstantState().newDrawable());
+        else {
+        	float[] hsv = new float[3];
+    		Color.colorToHSV(hlColor, hsv);
+//        	if (settings.getBoolean("useWhiteAccentText", false)) {
+//    			// color is probably dark
+//    			if (hsv[2] > 0)
+//    				hsv[2] *= 1.2f;
+//    			else
+//    				hsv[2] = 0.2f;
+//    			
+//    			accentTextColor = Color.WHITE;
+//    			isAccentLight = false;
+//    		}
+//    		else {
+    			// color is probably bright
+    			hsv[2] *= 0.8f;
+//    		}
+    		
+    		int msgSelectorColor = Color.HSVToColor(hsv);
+    		
+    		StateListDrawable hlSelector = new StateListDrawable();
+    		hlSelector.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(msgSelectorColor));
+    		hlSelector.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(msgSelectorColor));
+    		hlSelector.addState(StateSet.WILD_CARD, new ColorDrawable(hlColor));
+    		
+    		findViewById(R.id.mvTopWrapper).setBackgroundDrawable(hlSelector.getConstantState().newDrawable());
+        }
 
 		aio.wtl("set click listener and drawable for top wrapper");
         
