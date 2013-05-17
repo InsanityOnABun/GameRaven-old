@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import net.margaritov.preference.colorpicker.ColorPickerPreference;
 
@@ -81,6 +82,8 @@ import com.ioabsoftware.DroidFAQs.Views.PMView;
 import com.ioabsoftware.DroidFAQs.Views.TopicView;
 import com.ioabsoftware.DroidFAQs.Views.TopicView.TopicViewType;
 import com.ioabsoftware.DroidFAQs.Views.UserDetailView;
+import com.ioabsoftware.DroidFAQs.db.HighlightListDBHelper;
+import com.ioabsoftware.DroidFAQs.db.HighlightedUser;
 import com.ioabsoftware.gameraven.R;
 
 public class AllInOneV2 extends Activity implements OnNavigationListener {
@@ -214,6 +217,8 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 		else
 			return false;
 	}
+	
+	private HighlightListDBHelper hlDB;
 	
 	/**********************************************
 	 * START METHODS
@@ -354,7 +359,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
         postWrapper = (LinearLayout) findViewById(R.id.aioPostWrapper);
 
     	wtl("creating default sig");
-		defaultSig = "This post made using GameRaven *grver*\n<i>Insanity On A Bun Software - Pushing the bounds of software sanity</i>";
+		defaultSig = "Posted with GameRaven *grver*";
 
     	wtl("getting css directory");
 		File cssDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/gameraven");
@@ -362,6 +367,9 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
         	wtl("css directory does not exist, creating");
     		cssDirectory.mkdir();
     	}
+    	
+    	wtl("starting db creation");
+    	hlDB = new HighlightListDBHelper(this);
     	
     	wtl("setting check for update flag");
     	needToCheckForUpdate = true;
@@ -1203,6 +1211,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 					int rowCount = rows.size();
 					
 					MessageView message = null;
+					Set<String> hlUsers = hlDB.getHighlightedUsers().keySet();
 					for (int x = 0; x < rowCount; x++) {
 						List<TextNode> textNodes = rows.get(x).child(0).child(0).textNodes();
 						Elements elements = rows.get(x).child(0).child(0).children();
@@ -1243,8 +1252,15 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 						
 						x++;
 						
+						int hlColor = 0;
+						if (hlUsers.contains(user.toLowerCase(Locale.US))) {
+							HighlightedUser hUser = hlDB.getHighlightedUsers().get(user.toLowerCase(Locale.US));
+							hlColor = hUser.getColor();
+							userTitles += " (" + hUser.getLabel() + ")";
+						}
+						
 						message = new MessageView(this, user, userTitles, postNum, postTime,
-												  rows.get(x), boardID, topicID, mID);
+												  rows.get(x), boardID, topicID, mID, hlColor);
 						
 						message.setOnClickListener(cl);
 						
