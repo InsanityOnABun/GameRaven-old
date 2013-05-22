@@ -1,4 +1,4 @@
-package com.ioabsoftware.DroidFAQs;
+package com.ioabsoftware.gameraven;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -34,10 +34,10 @@ import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
-import com.ioabsoftware.DroidFAQs.Networking.HandlesNetworkResult;
-import com.ioabsoftware.DroidFAQs.Networking.NetworkTask;
-import com.ioabsoftware.DroidFAQs.Networking.Session;
 import com.ioabsoftware.gameraven.R;
+import com.ioabsoftware.gameraven.networking.HandlesNetworkResult;
+import com.ioabsoftware.gameraven.networking.NetworkTask;
+import com.ioabsoftware.gameraven.networking.Session;
 
 public class SettingsAccount extends SherlockPreferenceActivity implements HandlesNetworkResult {
 

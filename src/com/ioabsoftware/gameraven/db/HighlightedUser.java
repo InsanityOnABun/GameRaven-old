@@ -1,4 +1,4 @@
-package com.ioabsoftware.DroidFAQs.db;
+package com.ioabsoftware.gameraven.db;
 
 import java.util.Locale;
 
@@ -6,6 +6,7 @@ public class HighlightedUser {
 
 	private String name;
 	public String getName() {return name;}
+	public String getNameToLower() {return name.toLowerCase(Locale.US);}
 	public void setName(String nameIn) {name = nameIn;}
 	
 	private String label;
@@ -21,14 +22,14 @@ public class HighlightedUser {
 	public void setColor(int colorIn) {color = colorIn;}
 	
 	public HighlightedUser(String nameIn, String labelIn, int colorIn) {
-		name = nameIn.toLowerCase(Locale.US);
+		name = nameIn;
 		label = labelIn;
 		color = colorIn;
 	}
 	
 	public HighlightedUser(int idIn, String nameIn, String labelIn, int colorIn) {
 		id = idIn;
-		name = nameIn.toLowerCase(Locale.US);
+		name = nameIn;
 		label = labelIn;
 		color = colorIn;
 	}

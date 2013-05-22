@@ -1,10 +1,14 @@
-package com.ioabsoftware.DroidFAQs.Views;
+package com.ioabsoftware.gameraven.views;
 
-import com.ioabsoftware.DroidFAQs.AllInOneV2;
+import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.util.AttributeSet;
+import android.util.StateSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,7 +23,8 @@ public class TopicView extends LinearLayout {
 
 	private String url;
 	
-	public TopicView(Context context, String titleIn, String tcIn, String lastPostIn, String mCount, String urlIn, TopicViewType type) {
+	public TopicView(Context context, String titleIn, String tcIn, 
+			String lastPostIn, String mCount, String urlIn, TopicViewType type, int hlColor) {
 		super(context);
 		
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -34,6 +39,10 @@ public class TopicView extends LinearLayout {
 
         findViewById(R.id.tvSep).setBackgroundColor(AllInOneV2.getAccentColor());
         findViewById(R.id.tvLPSep).setBackgroundColor(AllInOneV2.getAccentColor());
+        
+        if (hlColor != 0) {
+        	((TextView) findViewById(R.id.tvTC)).setTextColor(hlColor);
+        }
         
         setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
         

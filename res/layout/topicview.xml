@@ -66,7 +66,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="13sp" />
 
-        <com.ioabsoftware.DroidFAQs.Views.LastPostView
+        <com.ioabsoftware.gameraven.views.LastPostView
             android:id="@+id/tvLastPostLink"
             style="@style/Widget.Sherlock.ActionButton"
             android:layout_width="50dp"

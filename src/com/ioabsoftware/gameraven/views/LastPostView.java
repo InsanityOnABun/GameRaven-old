@@ -1,6 +1,6 @@
-package com.ioabsoftware.DroidFAQs.Views;
+package com.ioabsoftware.gameraven.views;
 
-import com.ioabsoftware.DroidFAQs.AllInOneV2;
+import com.ioabsoftware.gameraven.AllInOneV2;
 
 import android.content.Context;
 import android.util.AttributeSet;

@@ -1,4 +1,4 @@
-package com.ioabsoftware.DroidFAQs;
+package com.ioabsoftware.gameraven;
 
 
 import android.app.AlarmManager;

@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context="com.ioabsoftware.DroidFAQs.SettingsMain" >
+    tools:context="com.ioabsoftware.gameraven.SettingsMain" >
 
     <LinearLayout
         android:id="@+id/donWheelWrapper"

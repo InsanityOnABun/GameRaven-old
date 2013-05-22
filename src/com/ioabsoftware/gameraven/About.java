@@ -1,4 +1,4 @@
-package com.ioabsoftware.DroidFAQs;
+package com.ioabsoftware.gameraven;
 
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;

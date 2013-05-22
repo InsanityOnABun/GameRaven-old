@@ -1,4 +1,4 @@
-package com.ioabsoftware.DroidFAQs;
+package com.ioabsoftware.gameraven;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,8 +24,8 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.ioabsoftware.DroidFAQs.Networking.Session;
 import com.ioabsoftware.gameraven.R;
+import com.ioabsoftware.gameraven.networking.Session;
 
 public class NotifierService extends IntentService {
 	

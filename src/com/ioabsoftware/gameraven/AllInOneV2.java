@@ -1,4 +1,4 @@
-package com.ioabsoftware.DroidFAQs;
+package com.ioabsoftware.gameraven;
 
 import java.io.File;
 import java.net.URLDecoder;
@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-
-import net.margaritov.preference.colorpicker.ColorPickerPreference;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -70,26 +68,26 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshScrollView;
-import com.ioabsoftware.DroidFAQs.Networking.Session;
-import com.ioabsoftware.DroidFAQs.Networking.HandlesNetworkResult.NetDesc;
-import com.ioabsoftware.DroidFAQs.Views.BoardView;
-import com.ioabsoftware.DroidFAQs.Views.BoardView.BoardViewType;
-import com.ioabsoftware.DroidFAQs.Views.HeaderView;
-import com.ioabsoftware.DroidFAQs.Views.LastPostView;
-import com.ioabsoftware.DroidFAQs.Views.MessageView;
-import com.ioabsoftware.DroidFAQs.Views.PMDetailView;
-import com.ioabsoftware.DroidFAQs.Views.PMView;
-import com.ioabsoftware.DroidFAQs.Views.TopicView;
-import com.ioabsoftware.DroidFAQs.Views.TopicView.TopicViewType;
-import com.ioabsoftware.DroidFAQs.Views.UserDetailView;
-import com.ioabsoftware.DroidFAQs.db.HighlightListDBHelper;
-import com.ioabsoftware.DroidFAQs.db.HighlightedUser;
 import com.ioabsoftware.gameraven.R;
+import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
+import com.ioabsoftware.gameraven.db.HighlightedUser;
+import com.ioabsoftware.gameraven.networking.Session;
+import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
+import com.ioabsoftware.gameraven.views.BoardView;
+import com.ioabsoftware.gameraven.views.HeaderView;
+import com.ioabsoftware.gameraven.views.LastPostView;
+import com.ioabsoftware.gameraven.views.MessageView;
+import com.ioabsoftware.gameraven.views.PMDetailView;
+import com.ioabsoftware.gameraven.views.PMView;
+import com.ioabsoftware.gameraven.views.TopicView;
+import com.ioabsoftware.gameraven.views.UserDetailView;
+import com.ioabsoftware.gameraven.views.BoardView.BoardViewType;
+import com.ioabsoftware.gameraven.views.TopicView.TopicViewType;
 
 public class AllInOneV2 extends Activity implements OnNavigationListener {
 	
 	private static boolean needToCheckForUpdate = true;
-	private static boolean isReleaseBuild = false;
+	private static boolean isReleaseBuild = true;
 	
 	public static final int CHANGE_LOGGED_IN_DIALOG = 100;
 	public static final int NEW_VERSION_DIALOG = 101;
@@ -218,7 +216,8 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 			return false;
 	}
 	
-	private HighlightListDBHelper hlDB;
+	private static HighlightListDBHelper hlDB;
+	public static HighlightListDBHelper getHLDB() {return hlDB;}
 	
 	/**********************************************
 	 * START METHODS
@@ -1026,7 +1025,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 							String lPostLink = lPostLinkElem.attr("href");
 
 							TopicView topic = new TopicView(this, title, board,
-									lPost, mCount, link, TopicViewType.NORMAL);
+									lPost, mCount, link, TopicViewType.NORMAL, 0);
 
 							topic.setOnClickListener(cl);
 							topic.setOnLongClickListener(cl);
@@ -1130,6 +1129,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 							
 							wtl("board row parsing start");
 							boolean skipFirst = true;
+							Set<String> hlUsers = hlDB.getHighlightedUsers().keySet();
 							for (Element row : table.getElementsByTag("tr")) {
 								if (!skipFirst) {
 									Elements cells = row.getElementsByTag("td");
@@ -1156,7 +1156,14 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 											type = TopicViewType.PINNED;
 									}
 									
-									TopicView topic = new TopicView(this, title, tc, lastPost, mCount, tUrl, type);
+									int hlColor = 0;
+									if (hlUsers.contains(tc.toLowerCase(Locale.US))) {
+										HighlightedUser hUser = hlDB.getHighlightedUsers().get(tc.toLowerCase(Locale.US));
+										hlColor = hUser.getColor();
+										tc += " (" + hUser.getLabel() + ")";
+									}
+									
+									TopicView topic = new TopicView(this, title, tc, lastPost, mCount, tUrl, type, hlColor);
 									topic.setOnClickListener(cl);
 									LastPostView lp = (LastPostView) topic.findViewById(R.id.tvLastPostLink);
 									lp.setUrl(lpUrl);

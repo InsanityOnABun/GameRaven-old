@@ -1,4 +1,4 @@
-package com.ioabsoftware.DroidFAQs;
+package com.ioabsoftware.gameraven;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -42,8 +42,6 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.ioabsoftware.gameraven.R;
 
-import de.devmil.common.ui.color.ColorSelectorDialog;
-
 public class SettingsMain extends SherlockPreferenceActivity {
 	
 	public static final int MODIFY_SIG_DIALOG = 200;
@@ -83,20 +81,8 @@ public class SettingsMain extends SherlockPreferenceActivity {
         ACCEPTED_KEYS.add("accentColor");
         ACCEPTED_KEYS.add("enableJS");
         ACCEPTED_KEYS.add("ampSortOption");
-        
-        findPreference("showNewColorPicker").setOnPreferenceClickListener(new OnPreferenceClickListener() {
-                public boolean onPreferenceClick(Preference preference) {
-                	new ColorSelectorDialog(SettingsMain.this, null, 0).show();
-                	return true;
-                }
-        });
-        
-        findPreference("manageHighlightedUsers").setOnPreferenceClickListener(new OnPreferenceClickListener() {
-            public boolean onPreferenceClick(Preference preference) {
-            	startActivity(new Intent(SettingsMain.this, SettingsHighlightedUsers.class));
-            	return true;
-            }
-        });
+        ACCEPTED_KEYS.add("confirmPostCancel");
+        ACCEPTED_KEYS.add("confirmPostSubmit");
         
         findPreference("donate").setOnPreferenceClickListener(new OnPreferenceClickListener() {
 			@Override
@@ -189,6 +175,13 @@ public class SettingsMain extends SherlockPreferenceActivity {
                     showDialog(MODIFY_AMPSORT_DIALOG);
                     return true;
                 }
+        });
+        
+        findPreference("manageHighlightedUsers").setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            public boolean onPreferenceClick(Preference preference) {
+            	startActivity(new Intent(SettingsMain.this, SettingsHighlightedUsers.class));
+            	return true;
+            }
         });
         
         findPreference("resetAccentColor").setOnPreferenceClickListener(new OnPreferenceClickListener() {
@@ -336,6 +329,16 @@ public class SettingsMain extends SherlockPreferenceActivity {
 					buf.append("enableJS=false\n");
 				
 				buf.append("ampSortOption=" + settings.getString("ampSortOption", "-1") + '\n');
+				
+				if (settings.getBoolean("confirmPostCancel", false))
+					buf.append("confirmPostCancel=true\n");
+				else
+					buf.append("confirmPostCancel=false\n");
+				
+				if (settings.getBoolean("confirmPostSubmit", false))
+					buf.append("confirmPostSubmit=true\n");
+				else
+					buf.append("confirmPostSubmit=false\n");
 				
 				buf.close();
 				Toast.makeText(this, "Backup done.", Toast.LENGTH_SHORT).show();

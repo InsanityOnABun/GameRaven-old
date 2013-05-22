@@ -1,4 +1,4 @@
-package com.ioabsoftware.DroidFAQs.Networking;
+package com.ioabsoftware.gameraven.networking;
 
 import java.io.IOException;
 import java.util.Map;

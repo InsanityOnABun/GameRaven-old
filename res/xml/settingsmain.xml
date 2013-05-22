@@ -98,6 +98,11 @@
         android:orderingFromXml="true"
         android:persistent="false"
         android:title="Theming Settings" >
+        <Preference
+            android:key="manageHighlightedUsers"
+            android:summary="Add, edit, and remove highlighted users."
+            android:title="Manage Highlighted Users" />
+
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="useLightTheme"
@@ -146,13 +151,6 @@
         <Preference
             android:key="aboutFeedback"
             android:title="About &amp; Feedback" />
-        <Preference
-            android:key="showNewColorPicker"
-            android:title="New Color Picker" />
-        <Preference
-            android:key="manageHighlightedUsers"
-            android:summary="Add, edit, and remove highlighted users."
-            android:title="Manage Highlighted Users" />
     </PreferenceCategory>
 
 </PreferenceScreen>

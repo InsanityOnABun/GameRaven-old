@@ -1,4 +1,4 @@
-package com.ioabsoftware.DroidFAQs.Networking;
+package com.ioabsoftware.gameraven.networking;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -17,8 +17,8 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.widget.Toast;
 
-import com.ioabsoftware.DroidFAQs.AllInOneV2;
-import com.ioabsoftware.DroidFAQs.Networking.HandlesNetworkResult.NetDesc;
+import com.ioabsoftware.gameraven.AllInOneV2;
+import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 
 /**
  * Session is used to establish and maintain GFAQs sessions, and to send GET and POST requests.

@@ -1,4 +1,4 @@
-package com.ioabsoftware.DroidFAQs.Views;
+package com.ioabsoftware.gameraven.views;
 
 import java.util.HashMap;
 
@@ -25,11 +25,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.ioabsoftware.DroidFAQs.AllInOneV2;
-import com.ioabsoftware.DroidFAQs.URLImageParser;
-import com.ioabsoftware.DroidFAQs.Networking.Session;
-import com.ioabsoftware.DroidFAQs.Networking.HandlesNetworkResult.NetDesc;
+import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
+import com.ioabsoftware.gameraven.URLImageParser;
+import com.ioabsoftware.gameraven.networking.Session;
+import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 
 public class MessageView extends LinearLayout implements View.OnClickListener {
 
@@ -188,20 +188,17 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         else {
         	float[] hsv = new float[3];
     		Color.colorToHSV(hlColor, hsv);
-//        	if (settings.getBoolean("useWhiteAccentText", false)) {
-//    			// color is probably dark
-//    			if (hsv[2] > 0)
-//    				hsv[2] *= 1.2f;
-//    			else
-//    				hsv[2] = 0.2f;
-//    			
-//    			accentTextColor = Color.WHITE;
-//    			isAccentLight = false;
-//    		}
-//    		else {
+        	if (AllInOneV2.getSettingsPref().getBoolean("useWhiteAccentText", false)) {
+    			// color is probably dark
+    			if (hsv[2] > 0)
+    				hsv[2] *= 1.2f;
+    			else
+    				hsv[2] = 0.2f;
+    		}
+    		else {
     			// color is probably bright
     			hsv[2] *= 0.8f;
-//    		}
+    		}
     		
     		int msgSelectorColor = Color.HSVToColor(hsv);
     		
