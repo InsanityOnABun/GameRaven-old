@@ -2111,7 +2111,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 		msgActionBuilder.setTitle("Message Actions");
 		int arrayToUse;
 		if (Session.isLoggedIn()) {
-			if (Session.getUser().toLowerCase().equals(clickedMsg.getUser().toLowerCase())) {
+			if (Session.getUser().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase())) {
 				if (userLevel < 30)
 					arrayToUse = R.array.msgMenuLoggedInAsPosterNotEditable;
 				else
@@ -2146,6 +2146,11 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 				else if (selected.equals("User Details")) {
 					session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink(), null);
 				}
+				else if (selected.equals("Highlight User")) {
+					//TODO: Highlight User dialog
+					HighlightedUser user = hlDB.getHighlightedUsers().get(clickedMsg.getUser().toLowerCase(Locale.US));
+					HighlightListDBHelper.showHighlightUserDialog(AllInOneV2.this, user, clickedMsg.getUser(), null);
+				}
 				else {
 					Toast.makeText(AllInOneV2.this, "not recognized: " + selected, Toast.LENGTH_SHORT).show();
 				}
@@ -2154,12 +2159,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 			}
 		});
 		
-		msgActionBuilder.setNegativeButton("Cancel", new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
+		msgActionBuilder.setNegativeButton("Cancel", null);
 		
 		Dialog dialog = msgActionBuilder.create();
 		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
