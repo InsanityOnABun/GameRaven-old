@@ -9,6 +9,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import android.app.AlertDialog;
@@ -28,30 +29,31 @@ import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 public class Session implements HandlesNetworkResult {
 	
 	/** The root of GFAQs. */
-	public static final String ROOT = "http://m.gamefaqs.com";
+	public static final String ROOT = "http://www.gamefaqs.com";
 	
 	/** Holds all cookies for the session */
 	private Map<String, String> cookies = new LinkedHashMap<String, String>();
 	
 	private String lastAttemptedPath;
 	public String getLastAttemptedPath()
-	{return lastAttemptedPath;};
+	{return lastAttemptedPath;}
 	
 	private NetDesc lastAttemptedDesc;
 	public NetDesc getLastAttemptedDesc()
-	{return lastAttemptedDesc;};
-	
-	/** The latest page, without excess get data. */
-	private String lastPathWithoutData = null;
-	/** Get's the path of the latest page, stripped of any GET data. */
-	public String getLastPathWithoutData()
-	{return lastPathWithoutData;}
+	{return lastAttemptedDesc;}
 	
 	/** The latest page, with excess get data. */
 	private String lastPath = null;
 	/** Get's the path of the latest page. */
 	public String getLastPath()
 	{return lastPath;}
+	/** Get's the path of the latest page, stripped of any GET data. */
+	public String getLastPathWithoutData() {
+		String s = lastPath;
+		if (s.contains("?"))
+			s = s.substring(0, s.indexOf('?'));
+		return s;
+	}
 	
 	/** The latest description. */
 	private NetDesc lastDesc = null;
@@ -85,7 +87,6 @@ public class Session implements HandlesNetworkResult {
     private boolean addToHistory = true;
 	private LinkedList<History> history;
 	
-	private String key = null;
 	private boolean needToSetNavList = true;
     
 	
@@ -128,17 +129,15 @@ public class Session implements HandlesNetworkResult {
 		
         history = new LinkedList<History>();
 		
-		String path = ROOT + "/boards";
-		
 		if (userIn == null) {
 			user = null;
 			password = null;
-			get(NetDesc.BOARD_JUMPER, path, null);
+			get(NetDesc.BOARD_JUMPER, ROOT + "/boards", null);
 		}
 		else {
 			user = userIn;
 			password = passwordIn;
-			get(NetDesc.LOGIN_S1, path, null);
+			get(NetDesc.LOGIN_S1, ROOT + "/boards", null);
 		}
 	}
 	
@@ -195,14 +194,6 @@ public class Session implements HandlesNetworkResult {
 	 */
 	public void post(NetDesc desc, String path, Map<String, String> data)
 	{
-		if (data.containsKey("key")) {
-			if (key == null) {
-				key = data.get("key");
-				aio.wtl("setting key: " + key);
-			}
-			else
-				aio.wtl("saved / new key: " + key + " / " + data.get("key"));
-		}
 		new NetworkTask(this, desc, Method.POST, cookies, buildURL(path), data).execute();
 	}
 	
@@ -268,22 +259,35 @@ public class Session implements HandlesNetworkResult {
 				
 				Document pRes = res.parse();
 				
-				if (res.statusCode() == 403) {
-					Elements paragraphs = pRes.getElementsByTag("p");
-					aio.fourOhError(403, paragraphs.get(1).text() + "\n\n" + paragraphs.get(2).text());
-					return;
-				}
-				
-				if (res.statusCode() == 401) {
-					if (lastDesc == NetDesc.LOGIN_S2) {
-						skipAIOCleanup = true;
-						get(NetDesc.BOARD_JUMPER, ROOT + "/boards", null);
-					}
-					else {
+				aio.wtl("status: " + res.statusCode() + ", " + res.statusMessage());
+				Element err = pRes.select("h1.page-title").first();
+				if (err != null && err.text().contains("Error")) {
+					if (err.text().contains("404 Error")) {
+						aio.wtl("status code 404");
 						Elements paragraphs = pRes.getElementsByTag("p");
-						aio.fourOhError(401, paragraphs.get(1).text() + "\n\n" + paragraphs.get(2).text());
+						aio.fourOhError(404, paragraphs.get(1).text() + "\n\n"
+								+ paragraphs.get(2).text());
+						return;
 					}
-					return;
+					else if (err.text().contains("403 Error")) {
+						aio.wtl("status code 403");
+						Elements paragraphs = pRes.getElementsByTag("p");
+						aio.fourOhError(403, paragraphs.get(1).text() + "\n\n"
+								+ paragraphs.get(2).text());
+						return;
+					}
+					else if (err.text().contains("401 Error")) {
+						aio.wtl("status code 401");
+						if (lastDesc == NetDesc.LOGIN_S2) {
+							skipAIOCleanup = true;
+							get(NetDesc.BOARD_JUMPER, "/boards", null);
+						} else {
+							Elements paragraphs = pRes.getElementsByTag("p");
+							aio.fourOhError(401, paragraphs.get(1).text()
+									+ "\n\n" + paragraphs.get(2).text());
+						}
+						return;
+					}
 				}
 				
 				switch (desc) {
@@ -425,7 +429,6 @@ public class Session implements HandlesNetworkResult {
 					lastDesc = desc;
 					lastRes = res;
 					lastPath = res.url().toString();
-					lastPathWithoutData = stripExtraDataFromURL(lastPath);
 					aio.wtl("finishing lastDesc, lastRes, etc. setting");
 					break;
 					
@@ -468,7 +471,7 @@ public class Session implements HandlesNetworkResult {
 					if (AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false) || aio.consumeForceAMP())
 						get(NetDesc.AMP_LIST, AllInOneV2.buildAMPLink(), null);
 					else
-						get(NetDesc.BOARD_JUMPER, ROOT + "/boards", null);
+						get(NetDesc.BOARD_JUMPER, "/boards", null);
 					
 					break;
 					
@@ -712,7 +715,7 @@ public class Session implements HandlesNetworkResult {
 					delData.put("YES", "Delete this Post");
 					delData.put("key", delKey);
 
-					post(NetDesc.DLTMSG_S2, res.url().toString() + "?action=delete", delData);
+					post(NetDesc.DLTMSG_S2, res.url() + "?action=delete", delData);
 					break;
 					
 				case DLTMSG_S2:
@@ -735,7 +738,7 @@ public class Session implements HandlesNetworkResult {
 					pmData.put("message", aio.savedMessage);
 					pmData.put("submit", "Send Message");
 					
-					post(NetDesc.SEND_PM_S2, "http://m.gamefaqs.com/pm/new", pmData);
+					post(NetDesc.SEND_PM_S2, "/pm/new", pmData);
 					break;
 					
 				case SEND_PM_S2:
@@ -829,12 +832,6 @@ public class Session implements HandlesNetworkResult {
 		}
 		
 		skipAIOCleanup = false;
-	}
-	
-	public static String stripExtraDataFromURL(String s) {
-		if (s.contains("?"))
-			s = s.substring(0, s.indexOf('?'));
-		return s;
 	}
 	
 	public boolean canGoBack() {

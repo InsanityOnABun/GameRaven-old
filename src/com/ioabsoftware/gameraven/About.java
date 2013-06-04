@@ -13,7 +13,7 @@ import com.ioabsoftware.gameraven.R;
 public class About extends SherlockActivity {
 
 	public void onCreate(Bundle savedInstanceState) {
-		if (AllInOneV2.getSettingsPref().getBoolean("useLightTheme", false)) {
+		if (AllInOneV2.getUsingLightTheme()) {
         	setTheme(R.style.MyThemes_LightTheme);
         }
     	

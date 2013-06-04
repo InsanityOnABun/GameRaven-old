@@ -42,6 +42,7 @@ public class TopicView extends LinearLayout {
         
         if (hlColor != 0) {
         	((TextView) findViewById(R.id.tvTC)).setTextColor(hlColor);
+        	((TextView) findViewById(R.id.tvTitle)).setTextColor(hlColor);
         }
         
         setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());

@@ -56,7 +56,7 @@ public class SettingsAccount extends SherlockPreferenceActivity implements Handl
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		settings = AllInOneV2.getSettingsPref();
-		if (AllInOneV2.getSettingsPref().getBoolean("useLightTheme", false)) {
+		if (AllInOneV2.getUsingLightTheme()) {
         	setTheme(R.style.MyThemes_LightTheme);
         }
 		
