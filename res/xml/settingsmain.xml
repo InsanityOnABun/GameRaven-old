@@ -117,7 +117,6 @@
             android:title="Use White Accent Text" />
 
         <net.margaritov.preference.colorpicker.ColorPickerPreference
-            hexValue="true"
             android:defaultValue="@color/holo_blue"
             android:key="accentColor"
             android:summary="Set the accent color. (Refresh to take complete effect)"
