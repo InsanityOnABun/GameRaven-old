@@ -9,11 +9,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import net.simonvt.menudrawer.MenuDrawer;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.holoeverywhere.ArrayAdapter;
 import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
+import org.holoeverywhere.widget.AdapterView;
+import org.holoeverywhere.widget.AdapterView.OnItemSelectedListener;
 import org.holoeverywhere.widget.Spinner;
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
@@ -42,11 +47,11 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.util.StateSet;
 import android.view.HapticFeedbackConstants;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -58,7 +63,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -68,28 +72,26 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshScrollView;
-import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
-import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
+import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.views.BoardView;
+import com.ioabsoftware.gameraven.views.BoardView.BoardViewType;
 import com.ioabsoftware.gameraven.views.HeaderView;
 import com.ioabsoftware.gameraven.views.LastPostView;
 import com.ioabsoftware.gameraven.views.MessageView;
 import com.ioabsoftware.gameraven.views.PMDetailView;
 import com.ioabsoftware.gameraven.views.PMView;
 import com.ioabsoftware.gameraven.views.TopicView;
-import com.ioabsoftware.gameraven.views.UserDetailView;
-import com.ioabsoftware.gameraven.views.BoardView.BoardViewType;
 import com.ioabsoftware.gameraven.views.TopicView.TopicViewType;
+import com.ioabsoftware.gameraven.views.UserDetailView;
 
-public class AllInOneV2 extends Activity implements OnNavigationListener {
+public class AllInOneV2 extends Activity {
 	
 	private static boolean needToCheckForUpdate = true;
 	private static boolean isReleaseBuild = true;
 	
-	public static final int CHANGE_LOGGED_IN_DIALOG = 100;
 	public static final int NEW_VERSION_DIALOG = 101;
 	public static final int SEND_PM_DIALOG = 102;
 	public static final int MESSAGE_ACTION_DIALOG = 103;
@@ -174,7 +176,6 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	private MenuItem remFavIcon;
 	private MenuItem searchIcon;
 	private MenuItem topicListIcon;
-    private String[] navList;
 
     private String tlUrl;
     
@@ -219,12 +220,16 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	private static HighlightListDBHelper hlDB;
 	public static HighlightListDBHelper getHLDB() {return hlDB;}
 	
+	private MenuDrawer drawer;
+	private boolean shouldDoLoginChangeListener = true;
+	
+	
+	
 	/**********************************************
 	 * START METHODS
 	 **********************************************/
 	
-
-
+	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -238,10 +243,107 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
     	
     	requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         
-//        getSherlock().setProgressBarIndeterminateVisibility(false);
         addonSherlock().setProgressBarIndeterminateVisibility(false);
     	
         setContentView(R.layout.allinonev2);
+    	
+    	drawer = MenuDrawer.attach(this, MenuDrawer.MENU_DRAG_CONTENT);
+        drawer.setContentView(R.layout.allinonev2);
+        drawer.setMenuView(R.layout.drawer);
+        
+        if (usingLightTheme)
+        	drawer.findViewById(R.id.dwrScroller).setBackgroundResource(android.R.drawable.screen_background_light_transparent);
+        else
+        	drawer.findViewById(R.id.dwrScroller).setBackgroundResource(android.R.drawable.screen_background_dark_transparent);
+
+        
+        ((Spinner) drawer.findViewById(R.id.dwrChangeAcc)).setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view,
+					int pos, long id) {
+				if (shouldDoLoginChangeListener) {
+					if (pos == 0 && Session.getUser() != null) {
+						session = new Session(AllInOneV2.this);
+						drawer.closeMenu();
+					}
+
+					else {
+						String selUser = parent.getItemAtPosition(pos).toString();
+						if (!selUser.equals(Session.getUser())) {
+							session = new Session(AllInOneV2.this, selUser, accounts.getString(selUser));
+							drawer.closeMenu();
+						}
+					}
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {}
+		});
+        
+        ((Button) drawer.findViewById(R.id.dwrBoardJumper)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				drawer.closeMenu();
+				session.get(NetDesc.BOARD_JUMPER, "/boards", null);
+			}
+		});
+        
+        ((Button) drawer.findViewById(R.id.dwrAMPList)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				drawer.closeMenu();
+				session.get(NetDesc.AMP_LIST, buildAMPLink(), null);
+			}
+		});
+        
+        ((Button) drawer.findViewById(R.id.dwrPMInbox)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				drawer.closeMenu();
+				session.get(NetDesc.PM_INBOX, "/pm/", null);
+			}
+		});
+        
+        ((Button) drawer.findViewById(R.id.dwrOpenInBrowser)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				drawer.closeMenu(false);
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(session.getLastPath()));
+				startActivity(browserIntent);
+			}
+		});
+        
+        ((Button) drawer.findViewById(R.id.dwrHighlightList)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				drawer.closeMenu(false);
+				startActivity(new Intent(AllInOneV2.this, SettingsHighlightedUsers.class));
+			}
+		});
+        
+        ((Button) drawer.findViewById(R.id.dwrSettings)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				drawer.closeMenu(false);
+	        	startActivity(new Intent(AllInOneV2.this, SettingsMain.class));
+			}
+		});
+        
+        ((Button) drawer.findViewById(R.id.dwrExit)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				AllInOneV2.this.finish();
+			}
+		});
+        
+        // The drawable that replaces the up indicator in the action bar
+        if (usingLightTheme)
+        	drawer.setSlideDrawable(R.drawable.ic_drawer_light);
+        else
+        	drawer.setSlideDrawable(R.drawable.ic_drawer);
+        // Whether the previous drawable should be shown
+        drawer.setDrawerIndicatorEnabled(true);
         
         String nSlashA = settings.getString("defaultAccount", "N/A");
         settings.edit().putString("defaultAccount", nSlashA).commit();
@@ -250,7 +352,8 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
         settings.edit().putBoolean("enablePTR", enablePTR).commit();
         
         aBar = getSupportActionBar();
-        aBar.setDisplayShowHomeEnabled(false);
+//        aBar.setDisplayShowHomeEnabled(false);
+        aBar.setDisplayHomeAsUpEnabled(true);
         aBar.setDisplayShowTitleEnabled(false);
         aBar.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         
@@ -386,27 +489,15 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
     }
 	
 	public void disableNavList() {
-		aBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		drawer.findViewById(R.id.dwrNavWrapper).setVisibility(View.GONE);
 	}
 	
 	public void setNavList(boolean isLoggedIn) {
-		if (isLoggedIn)
-			navList = getResources().getStringArray(R.array.navListLoggedIn);
-		else
-			navList = getResources().getStringArray(R.array.navListLoggedOut);
-
-        Context context = aBar.getThemedContext();
-        ArrayAdapter<CharSequence> list;
-        
-        if (isLoggedIn)
-        	list = ArrayAdapter.createFromResource(context, R.array.navListLoggedIn, R.layout.sherlock_spinner_item);
-        else
-        	list = ArrayAdapter.createFromResource(context, R.array.navListLoggedOut, R.layout.sherlock_spinner_item);
-        
-        list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
-        
-        aBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        aBar.setListNavigationCallbacks(list, this);
+		drawer.findViewById(R.id.dwrNavWrapper).setVisibility(View.VISIBLE);
+		if (isLoggedIn) 
+			drawer.findViewById(R.id.dwrLoggedInNav).setVisibility(View.VISIBLE);
+		else 
+			drawer.findViewById(R.id.dwrLoggedInNav).setVisibility(View.GONE);
 	}
 	
 	@Override
@@ -415,6 +506,15 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
     		searchIcon.expandActionView();
 		return false;
     }
+	
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+	    if (keyCode == KeyEvent.KEYCODE_MENU) {
+	        drawer.toggleMenu();
+	        return true;
+	    } else {
+	        return super.onKeyUp(keyCode, event);
+	    }
+	}
 	
 	/** Adds menu items */
     @Override
@@ -469,6 +569,11 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
+        case android.R.id.home:
+        	wtl("toggling drawer");
+        	drawer.toggleMenu();
+        	return true;
+        	
         case R.id.search:
         	searchIcon.expandActionView();
         	return true;
@@ -544,23 +649,6 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
     			session.refresh();
         	return true;
         	
-        case R.id.changeAccount:
-        	showDialog(CHANGE_LOGGED_IN_DIALOG);
-        	return true;
-        	
-        case R.id.changeSettings:
-        	startActivity(new Intent(this, SettingsMain.class));
-        	return true;
-        	
-        case R.id.openInBrowser:
-        	Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(session.getLastPath()));
-			startActivity(browserIntent);
-        	return true;
-        	
-        case R.id.exit:
-        	finish();
-        	return true;
-        	
         default:
             return super.onOptionsItemSelected(item);
         }
@@ -631,6 +719,27 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
     		else
     			session = new Session(this);
     	}
+    	
+    	String[] keys = accounts.getKeys();
+		
+		final String[] usernames = new String[keys.length + 1];
+		usernames[0] = "Log Out";
+		for (int i = 1; i < usernames.length; i++)
+			usernames[i] = keys[i - 1].toString();
+		
+		int selected = 0;
+		for (int x = 1; x < usernames.length; x++)
+		{
+			if (usernames[x].equals(Session.getUser())) 
+				selected = x;
+		}
+		
+		((Spinner) drawer.findViewById(R.id.dwrChangeAcc)).
+			setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, usernames));
+		
+		shouldDoLoginChangeListener = false;
+		((Spinner) drawer.findViewById(R.id.dwrChangeAcc)).setSelection(selected);
+		shouldDoLoginChangeListener = true;
 		
 		if (needToCheckForUpdate && isReleaseBuild) {
 			needToCheckForUpdate = false;
@@ -883,19 +992,18 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 					headerTitle = Session.getUser() + "'s PM Inbox";
 					
 					if (tbody != null) {
-						pj = tbody.parent().nextElementSibling();
+						pj = pRes.select("ul.paginate").first();
 						
-						if (pj != null && pj.hasClass("foot")) {
-							String pjText = pj.text();
-							//Page 1 of 4  Next Page »
-							int currPageStart = pjText.indexOf("Page ") + 5;
+						if (pj != null) {
+							String pjText = pj.child(0).text();
+							if (pjText.contains("Previous"))
+								pjText = pj.child(1).text();
+							//Page 1 of 5
+							int currPageStart = 5;
 							int ofIndex = pjText.indexOf(" of ");
 							currPage = pjText.substring(currPageStart, ofIndex);
-							int pageCountEnd = pjText.indexOf('\u00A0', ofIndex);
-							if (pageCountEnd == -1)
-								pageCountEnd = pjText.length();
+							int pageCountEnd = pjText.length();
 							pageCount = pjText.substring(ofIndex + 4, pageCountEnd);
-							pageCount.trim();
 							int currPageNum = Integer.parseInt(currPage);
 							int pageCountNum = Integer.parseInt(pageCount);
 							
@@ -948,16 +1056,16 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 					if (!pmTitle.startsWith("Re: "))
 						pmTitle = "Re: " + pmTitle;
 
-					String pmMessage = pRes.select("div.message").first().outerHtml();
+					String pmMessage = pRes.select("div.body").first().outerHtml();
 					
 					Element foot = pRes.select("div.foot").first();
-					foot.getElementsByTag("div").get(1).remove();
+					foot.child(1).remove();
 					String pmFoot = foot.outerHtml();
 					
-					//Sent by Barihhl to Corrupt_Power
+					//Sent by: P4wn4g3 on 6/1/2013 2:15:55 PM
 					String footText = foot.text();
-					String sender = footText.substring(8, footText.toLowerCase(Locale.US).indexOf
-													(" to " + Session.getUser().toLowerCase(Locale.US)));
+					
+					String sender = footText.substring(9, footText.indexOf(" on "));
 					
 					updateHeaderNoJumper(pmTitle, NetDesc.READ_PM);
 					
@@ -972,22 +1080,37 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 					tbody = pRes.getElementsByTag("tbody").first();
 					
 					headerTitle = Session.getUser() + "'s Active Messages";
-					pj = pRes.getElementsByClass("pages").first();
+					pj = pRes.select("ul.paginate").get(1);
 					
-					pNums = getPageNums(pRes, pj, usingUserPanel);
-					String amp = buildAMPLink();
-					
-					if (pNums[0] > 1) {
-						firstPage = amp;
-						prevPage = amp + "&page=" + (pNums[0] - 2);
+					if (pj != null && !pj.hasClass("user") && !pj.hasClass("tsort")) {
+						int x = 0;
+						String pjText = pj.child(x).text();
+						while (pjText.contains("First") || pjText.contains("Previous")) {
+							x++;
+							pjText = pj.child(x).text();
+						}
+						// Page 2 of 3
+						int currPageStart = 5;
+						int ofIndex = pjText.indexOf(" of ");
+						currPage = pjText.substring(currPageStart, ofIndex);
+						int pageCountEnd = pjText.length();
+						pageCount = pjText.substring(ofIndex + 4, pageCountEnd);
+						int currPageNum = Integer.parseInt(currPage);
+						int pageCountNum = Integer.parseInt(pageCount);
+						
+						String amp = buildAMPLink();
+						if (currPageNum > 1) {
+							firstPage = amp;
+							prevPage = amp + "&page=" + (currPageNum - 2);
+						}
+						if (currPageNum != pageCountNum) {
+							nextPage =  amp + "&page=" + currPageNum;
+							lastPage =  amp + "&page=" + (pageCountNum - 1);
+						}
 					}
-					if (pNums[0] != pNums[1]) {
-						nextPage =  amp + "&page=" + pNums[0];
-						lastPage =  amp + "&page=" + (pNums[1] - 1);
-					}
 					
-					updateHeader(headerTitle, firstPage, prevPage, Integer.toString(pNums[0]), 
-								 Integer.toString(pNums[1]), nextPage, lastPage, NetDesc.AMP_LIST);
+					updateHeader(headerTitle, firstPage, prevPage, currPage, 
+							pageCount, nextPage, lastPage, NetDesc.AMP_LIST);
 					
 					if (!tbody.children().isEmpty()) {
 						if (settings.getBoolean("notifsEnable", false) && 
@@ -1018,9 +1141,8 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 									.first();
 							String title = titleLinkElem.text();
 							String link = titleLinkElem.attr("href");
-							String mCount = cells.get(2).text();
-							Element lPostLinkElem = cells.get(3).children()
-									.first();
+							String mCount = cells.get(2).textNodes().get(0).text().trim();
+							Element lPostLinkElem = cells.get(3).children().get(1);
 							String lPost = lPostLinkElem.text();
 							String lPostLink = lPostLinkElem.attr("href");
 
@@ -1055,7 +1177,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 						if (pRes.getElementsByTag("th").first().text().equals("Board Title")) {
 							wtl("is actually a split board list");
 							
-							updateHeaderNoJumper(pRes.getElementsByClass("head").first().text(), NetDesc.BOARD);
+							updateHeaderNoJumper(pRes.select("h1.page-title").first().text(), NetDesc.BOARD);
 							
 							processBoards(pRes, false);
 							
@@ -1079,34 +1201,55 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 						}
 						
 						if (searchQuery.equals("")) {
-							headerTitle = pRes.getElementsByClass("head").first().text();
+							headerTitle = pRes.getElementsByClass("page-title").first().text();
 						}
 						else {
-							headerTitle = pRes.getElementsByClass("head").first().text() + " (search: " + searchQuery + ")";
+							headerTitle = pRes.getElementsByClass("page-title").first().text() + " (search: " + searchQuery + ")";
 						}
 						
-						pNums = getPageNums(pRes, pj, usingUserPanel);
-						
-						if (pNums[0] > 1) {
-							firstPage = "boards/" + boardID+ "?page=0" + searchPJAddition;
-							prevPage = "boards/" + boardID + "?page=" + (pNums[0] - 2) + searchPJAddition;
+						pj = pRes.select("ul.paginate").get(1);
+						if (pj != null && !pj.hasClass("user")) {
+							int x = 0;
+							String pjText = pj.child(x).text();
+							while (pjText.contains("First") || pjText.contains("Previous")) {
+								x++;
+								pjText = pj.child(x).text();
+							}
+							// Page [dropdown] of 3
+							// Page 1 of 3
+							int ofIndex = pjText.indexOf(" of ");
+							int currPageStart = 5;
+							if (pj.getElementsByTag("select").isEmpty())
+								currPage = pjText.substring(currPageStart, ofIndex);
+							else
+								currPage = pj.select("option[selected=selected]").first().text();
+							
+							int pageCountEnd = pjText.length();
+							pageCount = pjText.substring(ofIndex + 4, pageCountEnd);
+							int currPageNum = Integer.parseInt(currPage);
+							int pageCountNum = Integer.parseInt(pageCount);
+							
+							if (currPageNum > 1) {
+								firstPage = "boards/" + boardID + "?page=0" + searchPJAddition;
+								prevPage = "boards/" + boardID + "?page=" + (currPageNum - 2) + searchPJAddition;
+							}
+							if (currPageNum != pageCountNum) {
+								nextPage =  "boards/" + boardID + "?page=" + currPageNum + searchPJAddition;
+								lastPage =  "boards/" + boardID + "?page=" + (pageCountNum - 1) + searchPJAddition;
+							}
 						}
-						if (pNums[0] != pNums[1]) {
-							nextPage =  "boards/" + boardID + "?page=" + pNums[0] + searchPJAddition;
-							lastPage =  "boards/" + boardID + "?page=" + (pNums[1] - 1) + searchPJAddition;
-						}
 						
-						updateHeader(headerTitle, firstPage, prevPage, Integer.toString(pNums[0]), 
-								Integer.toString(pNums[1]), nextPage, lastPage, NetDesc.BOARD);
+						updateHeader(headerTitle, firstPage, prevPage, currPage, 
+								pageCount, nextPage, lastPage, NetDesc.BOARD);
 						
 						searchIcon.setVisible(true);
 						
 						if (Session.isLoggedIn()) {
 							String favtext;
 							if (usingUserPanel) 
-								favtext = pRes.getElementsByClass("links").first().text().toLowerCase();
+								favtext = pRes.getElementsByClass("links").first().text().toLowerCase(Locale.US);
 							else 
-								favtext = pRes.getElementsByClass("user").first().text().toLowerCase();
+								favtext = pRes.getElementsByClass("user").first().text().toLowerCase(Locale.US);
 							
 							if (favtext.contains("add to favorites"))
 								addFavIcon.setVisible(true);
@@ -1134,7 +1277,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 								if (!skipFirst) {
 									Elements cells = row.getElementsByTag("td");
 									// cells = [image] [title] [author] [post count] [last post]
-									String tImg = cells.get(0).child(0).attr("src");
+									String tImg = cells.get(0).child(0).className();
 									Element titleLinkElem = cells.get(1).child(0);
 									String title = titleLinkElem.text();
 									String tUrl = titleLinkElem.attr("href");
@@ -1145,14 +1288,14 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 									String mCount = cells.get(3).text();
 									
 									TopicViewType type = TopicViewType.NORMAL;
-									if (!tImg.endsWith("topic.gif")) {
-										if (tImg.endsWith("closed.gif"))
+									if (!tImg.endsWith("topic")) {
+										if (tImg.endsWith("closed"))
 											type = TopicViewType.LOCKED;
-										else if (tImg.endsWith("archived.gif"))
+										else if (tImg.endsWith("archived"))
 											type = TopicViewType.ARCHIVED;
-										else if (tImg.endsWith("poll.gif"))
+										else if (tImg.endsWith("poll"))
 											type = TopicViewType.POLL;
-										else if (tImg.endsWith("sticky.gif"))
+										else if (tImg.endsWith("sticky"))
 											type = TopicViewType.PINNED;
 									}
 									
@@ -1194,19 +1337,40 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 					
 					headerTitle = pRes.getElementsByClass("title").first().text();
 
-					pNums = getPageNums(pRes, pj, usingUserPanel);
-					
-					if (pNums[0] > 1) {
-						firstPage = "boards/" + boardID + "/" + topicID;
-						prevPage = "boards/" + boardID + "/" + topicID + "?page=" + (pNums[0] - 2);
+					pj = pRes.select("ul.paginate").get(1);
+					if (pj != null && !pj.hasClass("user")) {
+						int x = 0;
+						String pjText = pj.child(x).text();
+						while (pjText.contains("First") || pjText.contains("Previous")) {
+							x++;
+							pjText = pj.child(x).text();
+						}
+						// Page [dropdown] of 3
+						// Page 1 of 3
+						int ofIndex = pjText.indexOf(" of ");
+						int currPageStart = 5;
+						if (pj.getElementsByTag("select").isEmpty())
+							currPage = pjText.substring(currPageStart, ofIndex);
+						else
+							currPage = pj.select("option[selected=selected]").first().text();
+						
+						int pageCountEnd = pjText.length();
+						pageCount = pjText.substring(ofIndex + 4, pageCountEnd);
+						int currPageNum = Integer.parseInt(currPage);
+						int pageCountNum = Integer.parseInt(pageCount);
+						
+						if (currPageNum > 1) {
+							firstPage = "boards/" + boardID + "/" + topicID;
+							prevPage = "boards/" + boardID + "/" + topicID + "?page=" + (currPageNum - 2);
+						}
+						if (currPageNum != pageCountNum) {
+							nextPage =  "boards/" + boardID + "/" + topicID + "?page=" + currPageNum;
+							lastPage =  "boards/" + boardID + "/" + topicID + "?page=" + (pageCountNum - 1);
+						}
 					}
-					if (pNums[0] != pNums[1]) {
-						nextPage =  "boards/" + boardID + "/" + topicID + "?page=" + pNums[0];
-						lastPage =  "boards/" + boardID + "/" + topicID + "?page=" + (pNums[1] - 1);
-					}
 					
-					updateHeader(headerTitle, firstPage, prevPage, Integer.toString(pNums[0]), 
-							Integer.toString(pNums[1]), nextPage, lastPage, NetDesc.TOPIC);
+					updateHeader(headerTitle, firstPage, prevPage, currPage, 
+							pageCount, nextPage, lastPage, NetDesc.TOPIC);
 					
 					if (Session.isLoggedIn()) {
 						updatePostingRights(pRes, true, usingUserPanel);
@@ -1220,57 +1384,92 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 					MessageView message = null;
 					Set<String> hlUsers = hlDB.getHighlightedUsers().keySet();
 					for (int x = 0; x < rowCount; x++) {
-						List<TextNode> textNodes = rows.get(x).child(0).child(0).textNodes();
-						Elements elements = rows.get(x).child(0).child(0).children();
-						
-						String userTitles = "";
-						String postTimeText = "";
-						
-						int textNodesSize = textNodes.size();
-						for (int y = 0; y < textNodesSize; y++) {
-							String text = textNodes.get(y).text();
-							if (text.startsWith("Posted"))
-								postTimeText = text;
-							else if (text.contains("(")) {
-								userTitles += " (" + text.substring(text.indexOf('(') + 1, text.lastIndexOf(')')) + ")";
-							}
-						}
+						Element row = rows.get(x);
 						
 						String user = null;
 						String postNum = null;
 						String mID = null;
-						int elementsSize = elements.size();
-						for (int y = 0; y < elementsSize; y++) {
-							if (y == 0)
-								user = elements.get(y).text();
-							else if (y == 1)
-								postNum = elements.get(y).attr("name");
-							else if (elements.get(y).text().equals("message detail")) {
-								String detailLink = elements.get(y).attr("href");
-								int z = detailLink.lastIndexOf('/') + 1;
-								mID = detailLink.substring(z);
+						String userTitles = "";
+						String postTimeText = "";
+						String postTime = "";
+						Element msgBody = null;
+						
+						if (row.hasClass("left")) {
+							// message poster display set to left of message
+							Elements authorData = row.getElementsByClass("author_data");
+							user = authorData.get(1).text();
+							postNum = row.getElementsByTag("a").first().attr("name");
+							
+							for (int i = 2; i < authorData.size(); i++) {
+								Element e = authorData.get(i);
+								String t = e.text();
+								if (t.equals("message detail")) {
+									String detailLink = e.attr("href");
+									int z = detailLink.lastIndexOf('/') + 1;
+									mID = detailLink.substring(z);
+								}
+								else if (t.startsWith("("))
+									userTitles += " " + t;
+								else if (t.startsWith("Posted"))
+									postTime = t;
+								else if (e.hasClass("tag"))
+									userTitles += " (tagged as " + t + ")";
 							}
+							
+							msgBody = row.child(1);
 						}
-						
-						//Posted 11/15/2012 11:20:27&nbsp;AM | 
-						int endPoint = postTimeText.indexOf('|') - 1;
-						if (endPoint < 0) endPoint = postTimeText.length();
-						String postTime = postTimeText.substring(7, endPoint);
-						
-						x++;
+						else {
+							// message poster display set to above message
+							
+							List<TextNode> textNodes = row.child(0).child(0).textNodes();
+							Elements elements = row.child(0).child(0).children();
+							
+							int textNodesSize = textNodes.size();
+							for (int y = 0; y < textNodesSize; y++) {
+								String text = textNodes.get(y).text();
+								if (text.startsWith("Posted"))
+									postTimeText = text;
+								else if (text.contains("(")) {
+									userTitles += " " + text.substring(text.indexOf('('), text.lastIndexOf(')') + 1);
+								}
+							}
+							
+							user = elements.get(0).text();
+							postNum = row.getElementsByTag("a").get(1).attr("name");
+							int elementsSize = elements.size();
+							for (int y = 0; y < elementsSize; y++) {
+								Element e = elements.get(y);
+								if (e.text().equals("message detail")) {
+									String detailLink = elements.get(y).attr("href");
+									int z = detailLink.lastIndexOf('/') + 1;
+									mID = detailLink.substring(z);
+								}
+								else if (e.hasClass("tag"))
+									userTitles += " (tagged as " + e.text() + ")";
+							}
+							//Posted 11/15/2012 11:20:27&nbsp;AM | 
+							int endPoint = postTimeText.indexOf('|') - 1;
+							if (endPoint < 0)
+								endPoint = postTimeText.length();
+							postTime = postTimeText.substring(0, endPoint);
+							
+							x++;
+							msgBody = rows.get(x).child(0);
+						}
 						
 						int hlColor = 0;
 						if (hlUsers.contains(user.toLowerCase(Locale.US))) {
-							HighlightedUser hUser = hlDB.getHighlightedUsers().get(user.toLowerCase(Locale.US));
+							HighlightedUser hUser = hlDB
+									.getHighlightedUsers().get(
+											user.toLowerCase(Locale.US));
 							hlColor = hUser.getColor();
 							userTitles += " (" + hUser.getLabel() + ")";
 						}
 						
-						message = new MessageView(this, user, userTitles, postNum, postTime,
-												  rows.get(x), boardID, topicID, mID, hlColor);
-						
+						message = new MessageView(this, user, userTitles,
+								postNum, postTime, msgBody, boardID,
+								topicID, mID, hlColor);
 						message.setOnClickListener(cl);
-						
 						content.addView(message);
 					}
 					
@@ -1922,7 +2121,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 		if (titleWrapper.getVisibility() == View.VISIBLE) {
 			wtl("posting on a board");
 			// posting on a board
-			String path = "http://m.gamefaqs.com/boards/post.php?board=" + boardID;
+			String path = Session.ROOT + "/boards/post.php?board=" + boardID;
 			int i = path.indexOf('-');
 			path = path.substring(0, i);
 			wtl("post path: " + path);
@@ -1947,7 +2146,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 		else {
 			// posting on a topic
 			wtl("posting on a topic");
-			String path = "http://m.gamefaqs.com/boards/post.php?board=" + boardID + "&topic=" + topicID;
+			String path = Session.ROOT + "/boards/post.php?board=" + boardID + "&topic=" + topicID;
 			if (messageID != null)
 				path += "&message=" + messageID;
 			
@@ -1974,9 +2173,6 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
     	Dialog dialog = null;
     	
     	switch (id) {
-    	case CHANGE_LOGGED_IN_DIALOG:
-    		dialog = createChangeLoggedInDialog();
-    		break;
     		
     	case NEW_VERSION_DIALOG:
     		dialog = createNewVerDialog();
@@ -2252,61 +2448,6 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 		});
 		return newVersion.create();
 	}
-
-	private Dialog createChangeLoggedInDialog() {
-		AlertDialog.Builder accountChanger = new AlertDialog.Builder(this);
-		
-		String[] keys = accounts.getKeys();
-		
-		final String[] usernames = new String[keys.length + 1];
-		usernames[0] = "Log Out";
-		for (int i = 1; i < usernames.length; i++)
-			usernames[i] = keys[i - 1].toString();
-		
-		final String currUser = Session.getUser();
-		int selected = 0;
-		
-		for (int x = 1; x < usernames.length; x++)
-		{
-			if (usernames[x].equals(currUser)) 
-				selected = x;
-		}
-		
-		accountChanger.setTitle("Pick an Account");
-		accountChanger.setSingleChoiceItems(usernames, selected, new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int item) {
-		    	if (item == 0)
-		    		session = new Session(AllInOneV2.this);
-		    	
-		    	else
-		    	{
-			        String selUser = usernames[item].toString();
-			    	if (!selUser.equals(currUser))
-			        {
-			        	session = new Session(AllInOneV2.this, selUser, accounts.getString(selUser));
-			        }
-			    }
-
-		    	dismissDialog(CHANGE_LOGGED_IN_DIALOG);
-		    }
-		});
-		
-		accountChanger.setNegativeButton("Cancel", new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
-		
-		
-		Dialog d = accountChanger.create();
-		d.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			public void onDismiss(DialogInterface dialog) {
-				removeDialog(CHANGE_LOGGED_IN_DIALOG);
-			}
-		});
-		return d;
-	}
 	
 	public String savedTo, savedSubject, savedMessage;
     public void pmSetup(String toIn, String subjectIn, String messageIn) {
@@ -2389,27 +2530,6 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 			Log.d("logger", msg);
 		}
     }
-    
-
-
-	@Override
-	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-		String jumpingTo = navList[itemPosition];
-		if (jumpingTo.equals("Jump To…"))
-			wtl("resetting nav jumper");
-		else if (jumpingTo.equals("Board Jumper"))
-			session.get(NetDesc.BOARD_JUMPER, "/boards", null);
-		else if (jumpingTo.equals("AMP List"))
-			session.get(NetDesc.AMP_LIST, buildAMPLink(), null);
-		else if (jumpingTo.equals("PM Inbox"))
-			session.get(NetDesc.PM_INBOX, "/pm/", null);
-		else
-			Toast.makeText(this, "jump id not recognized: " + jumpingTo, Toast.LENGTH_SHORT).show();
-		
-		aBar.setSelectedNavigationItem(0);
-		
-		return true;
-	}
 	
 	public void tryCaught(String url, String stacktrace, String source) {
 		final String emailMsg = "\n\nURL:\n" + url + "\n\nStack trace:\n" + stacktrace + "\n\nPage source:\n" + source;
@@ -2455,7 +2575,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	private void getBoardID(String url) {
 		wtl("getBoardID fired");
 		// board example: http://m.gamefaqs.com/boards/400-current-events
-		String boardUrl = url.substring(29);
+		String boardUrl = url.substring(Session.ROOT.length() + 8);
 		
 		int i = boardUrl.indexOf('/');
 		if (i != -1) {
@@ -2482,7 +2602,7 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	private void getTopicID(String url) {
 		wtl("getTopicID fired");
 		// topic example: http://m.gamefaqs.com/boards/400-current-events/64300205
-		String topicUrl = url.substring(url.indexOf('/', 29) + 1);
+		String topicUrl = url.substring(url.indexOf('/', Session.ROOT.length() + 8) + 1);
 		int i = topicUrl.indexOf('/');
 		if (i != -1) {
 			String replacer = topicUrl.substring(i);
@@ -2519,6 +2639,9 @@ public class AllInOneV2 extends Activity implements OnNavigationListener {
 	public void onBackPressed() {
     	if (searchIcon.isActionViewExpanded()) {
     		searchIcon.collapseActionView();
+    	}
+    	else if (drawer.isMenuVisible()) {
+    		drawer.closeMenu();
     	}
     	else if (postWrapper.getVisibility() == View.VISIBLE) {
     		postCleanup();

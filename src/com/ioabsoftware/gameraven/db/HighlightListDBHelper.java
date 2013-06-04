@@ -13,6 +13,7 @@ import org.holoeverywhere.widget.Toast;
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -134,12 +135,12 @@ public class HighlightListDBHelper extends SQLiteOpenHelper {
 	
 	/**
 	 * Shows a dialog used to add or update user highlighting.
-	 * @param c Used as a Context and as a HoloActivity for getLayoutInflator
+	 * @param c Activity used as a Context and for getLayoutInflator
 	 * @param user HighlightedUser object. If null or ID equals -1, this is a new user being highlighted.
 	 * @param username Optional username to set. Does nothing if this isn't a new user being highlighted.
 	 * @param listener Optional listener to be fired just before the dialog gets dismissed on successful save.
 	 */
-	public static void showHighlightUserDialog(final _HoloActivity c, final HighlightedUser user, 
+	public static void showHighlightUserDialog(final Activity c, final HighlightedUser user, 
 											   String username, final HlUDDismissListener listener) {
 		boolean isNewCheck = false;
 		if (user == null || user.getID() == -1)

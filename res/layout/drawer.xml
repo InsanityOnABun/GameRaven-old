@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dwrScroller"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:verticalScrollbarPosition="left" >
+
+    <LinearLayout
+        android:id="@+id/dwrGlobalWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/dwrChangeAccHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="6dp"
+            android:text="Logged In As..."
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <View
+            android:id="@+id/dwrCAHSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#33B5E5"
+            android:visibility="visible" />
+
+        <org.holoeverywhere.widget.Spinner
+            android:id="@+id/dwrChangeAcc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:id="@+id/dwrChangeAccSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#555555"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/dwrNavWrapper"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/dwrNavHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="6dp"
+                android:text="Navigation"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <View
+                android:id="@+id/dwrNavSep"
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="3dp"
+                android:background="#33B5E5"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/dwrBoardJumper"
+                style="@style/Widget.Sherlock.ActionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:text="Board Jumper" />
+
+            <View
+                android:id="@+id/dwrBJSep"
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="3dp"
+                android:background="#555555"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/dwrLoggedInNav"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/dwrAMPList"
+                    style="@style/Widget.Sherlock.ActionButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical"
+                    android:text="AMP List" />
+
+                <View
+                    android:id="@+id/dwrAMPSep"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="3dp"
+                    android:background="#555555"
+                    android:visibility="visible" />
+
+                <Button
+                    android:id="@+id/dwrPMInbox"
+                    style="@style/Widget.Sherlock.ActionButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical"
+                    android:text="PM Inbox" />
+
+                <View
+                    android:id="@+id/dwrPMSep"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="3dp"
+                    android:background="#555555"
+                    android:visibility="visible" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/dwrFuncHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="6dp"
+            android:text="Functions"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <View
+            android:id="@+id/dwrFuncSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#33B5E5"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/dwrOpenInBrowser"
+            style="@style/Widget.Sherlock.ActionButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:text="Open Current Page in Browser" />
+
+        <View
+            android:id="@+id/dwrOPiBSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#555555"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/dwrHighlightList"
+            style="@style/Widget.Sherlock.ActionButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:text="Manage Highlight List" />
+
+        <View
+            android:id="@+id/dwrHLSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#555555"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/dwrSettings"
+            style="@style/Widget.Sherlock.ActionButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:text="Settings" />
+
+        <View
+            android:id="@+id/dwrSettingsSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#555555"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/dwrExit"
+            style="@style/Widget.Sherlock.ActionButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:text="Exit GameRaven" />
+
+        <View
+            android:id="@+id/dwrExitSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#555555"
+            android:visibility="visible" />
+    </LinearLayout>
+
+</ScrollView>

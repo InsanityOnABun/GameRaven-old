@@ -3,7 +3,7 @@
     package="com.ioabsoftware.gameraven"
     android:installLocation="internalOnly"
     android:versionCode="1"
-    android:versionName="gamma_build_13_01" >
+    android:versionName="gamma_build_14" >
 
     <uses-sdk
         android:minSdkVersion="8"

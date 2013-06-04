@@ -5,7 +5,7 @@
         android:id="@+id/search"
         android:actionViewClass="com.actionbarsherlock.widget.SearchView"
         android:icon="?attr/themedSearchIcon"
-        android:showAsAction="ifRoom|collapseActionView"
+        android:showAsAction="always|collapseActionView"
         android:title="Search"
         android:visible="false">
     </item>
@@ -42,23 +42,7 @@
         android:icon="?attr/themedRefreshIcon"
         android:showAsAction="always"
         android:title="Refresh"
-        android:visible="false">
-    </item>
-    <item
-        android:id="@+id/openInBrowser"
-        android:title="Open Page in Browser">
-    </item>
-    <item
-        android:id="@+id/changeAccount"
-        android:title="Change Account">
-    </item>
-    <item
-        android:id="@+id/changeSettings"
-        android:title="Settings...">
-    </item>
-    <item
-        android:id="@+id/exit"
-        android:title="Exit GameRaven">
+        android:visible="true">
     </item>
 
 </menu>

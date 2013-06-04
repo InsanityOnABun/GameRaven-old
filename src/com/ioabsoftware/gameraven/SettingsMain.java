@@ -57,7 +57,7 @@ public class SettingsMain extends SherlockPreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		settings = AllInOneV2.getSettingsPref();
         
-        if (settings.getBoolean("useLightTheme", false)) {
+        if (AllInOneV2.getUsingLightTheme()) {
         	setTheme(R.style.MyThemes_LightTheme);
         }
 		
@@ -446,7 +446,7 @@ public class SettingsMain extends SherlockPreferenceActivity {
 								editor.putBoolean(key, Boolean.parseBoolean(val));
 							}
 							else if (isInteger(val)) {
-								if (key.equals("ampSortOption"))
+								if (key.equals("ampSortOption") || key.equals("notifsFrequency"))
 									editor.putString(key, val);
 								else
 									editor.putInt(key, Integer.parseInt(val));
