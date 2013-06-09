@@ -90,7 +90,7 @@ import com.ioabsoftware.gameraven.views.UserDetailView;
 public class AllInOneV2 extends Activity {
 	
 	private static boolean needToCheckForUpdate = true;
-	private static boolean isReleaseBuild = true;
+	private static boolean isReleaseBuild = false;
 	
 	public static final int NEW_VERSION_DIALOG = 101;
 	public static final int SEND_PM_DIALOG = 102;
@@ -1396,6 +1396,8 @@ public class AllInOneV2 extends Activity {
 						
 						if (row.hasClass("left")) {
 							// message poster display set to left of message
+//							boolean isArchived = pRes.select("ul.paginate").select(".user").text().contains("Topic Archived");
+							
 							Elements authorData = row.getElementsByClass("author_data");
 							user = authorData.get(1).text();
 							postNum = row.getElementsByTag("a").first().attr("name");
@@ -1435,7 +1437,8 @@ public class AllInOneV2 extends Activity {
 							}
 							
 							user = elements.get(0).text();
-							postNum = row.getElementsByTag("a").get(1).attr("name");
+							int anchorCount = row.getElementsByTag("a").size();
+							postNum = row.getElementsByTag("a").get((anchorCount > 1 ? 1 : 0)).attr("name");
 							int elementsSize = elements.size();
 							for (int y = 0; y < elementsSize; y++) {
 								Element e = elements.get(y);

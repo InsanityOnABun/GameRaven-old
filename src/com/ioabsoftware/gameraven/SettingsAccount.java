@@ -311,7 +311,7 @@ public class SettingsAccount extends SherlockPreferenceActivity implements Handl
 								+ "/user/login.html", loginData).execute();
 			}
 			else if (desc == NetDesc.VERIFY_ACCOUNT_S2) {
-				if (!pRes.getElementsContainingOwnText("Welcome, " + verifyUser).isEmpty()) {
+				if (!res.url().toString().equals(Session.ROOT + "/user/login.html")) {
 					AllInOneV2.getAccounts().put(verifyUser, verifyPass);
 		    		dismissDialog(VERIFY_ACCOUNT_DIALOG);
 					removeDialog(ADD_ACCOUNT_DIALOG);

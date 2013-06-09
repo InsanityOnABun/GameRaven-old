@@ -177,6 +177,7 @@ public class Session implements HandlesNetworkResult {
 	 */
 	public void get(NetDesc desc, String path, Map<String, String> data)
 	{
+		
 		lastAttemptedPath = path;
 		lastAttemptedDesc = desc;
 		if (data != null)
@@ -448,9 +449,13 @@ public class Session implements HandlesNetworkResult {
 				// reset history flag
 				addToHistory = true;
 
-				aio.wtl("adding cookies");
-				cookies.putAll(res.cookies());
-				
+				aio.wtl("attempting cookie addition");
+				try {
+					cookies.putAll(res.cookies());
+					aio.wtl("cookies added");
+				} catch (Exception e) {
+					aio.wtl("cookie addition failed");
+				}
 				switch (desc) {
 				case LOGIN_S1:
 					aio.wtl("session hNR determined this is login step 1");
@@ -468,10 +473,15 @@ public class Session implements HandlesNetworkResult {
 					break;
 					
 				case LOGIN_S2:
-					if (AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false) || aio.consumeForceAMP())
+					aio.wtl("session hNR determined this is login step 2");
+					if (AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false) || aio.consumeForceAMP()) {
+						aio.wtl("loading AMP");
 						get(NetDesc.AMP_LIST, AllInOneV2.buildAMPLink(), null);
-					else
+					}
+					else {
+						aio.wtl("loading board jumper");
 						get(NetDesc.BOARD_JUMPER, "/boards", null);
+					}
 					
 					break;
 					

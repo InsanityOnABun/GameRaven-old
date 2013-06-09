@@ -11,12 +11,21 @@ import org.jsoup.select.Elements;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.Shape;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.method.MovementMethod;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ClickableSpan;
+import android.text.style.StyleSpan;
 import android.util.StateSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -173,14 +182,60 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 
 		aio.wtl("html var set");
         
-        TextView message = (TextView) findViewById(R.id.mvMessage);
+        final TextView message = (TextView) findViewById(R.id.mvMessage);
 //        URLImageParser p = new URLImageParser(message, aio);
 //        Spanned htmlSpan = Html.fromHtml(html, p, null);
 //        message.setText(htmlSpan);
-        message.setText(Html.fromHtml(html, null, null));
+//        message.setText(Html.fromHtml(html, null, null));
+        
+        SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false));
+        while (ssb.toString().contains("<b>")) {
+        	int start = ssb.toString().indexOf("<b>");
+        	ssb.delete(start, start + 3);
+        	int end = ssb.toString().indexOf("</b>", start);
+        	ssb.delete(end, end + 4);
+        	ssb.setSpan(new StyleSpan(Typeface.BOLD), start, end, 0);
+        }
+        while (ssb.toString().contains("<i>")) {
+        	int start = ssb.toString().indexOf("<i>");
+        	ssb.delete(start, start + 3);
+        	int end = ssb.toString().indexOf("</i>", start);
+        	ssb.delete(end, end + 4);
+        	ssb.setSpan(new StyleSpan(Typeface.ITALIC), start, end, 0);
+        }
+        
+        final int defTextColor = message.getTextColors().getDefaultColor();
+        final int color;
+		if (AllInOneV2.getUsingLightTheme())
+			color = Color.WHITE;
+		else
+			color = Color.BLACK;
+        while (ssb.toString().contains("<spoiler>")) {
+        	final int start = ssb.toString().indexOf("<spoiler>");
+        	ssb.delete(start, start + 9);
+        	final int end = ssb.toString().indexOf("</spoiler>", start);
+        	ssb.delete(end, end + 10);
+        	ssb.setSpan(new BackgroundColorSpan(defTextColor), start, end, 0);
+        	ssb.setSpan(new ClickableSpan() {
+				@Override
+				public void onClick(View widget) {
+					((Spannable) message.getText()).setSpan(new BackgroundColorSpan(color), start, end, 0);
+				}
+				
+				@Override
+				public void updateDrawState(TextPaint ds) {
+					ds.setColor(defTextColor);
+					ds.setUnderlineText(false);
+				}
+			}, start, end, 0);
+        	
+        }
+        
+        message.setText(ssb);
+        
         message.setLinkTextColor(AllInOneV2.getAccentColor());
 
-		aio.wtl("set message text, linkified, set color");
+		aio.wtl("set message text, color");
         
         findViewById(R.id.mvTopWrapper).setOnClickListener(this);
         if (hlColor == 0)
@@ -251,9 +306,12 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 		while (finalBody.contains("<a href")) {
 			int start = finalBody.indexOf("<a href");
 			int end = finalBody.indexOf(">", start) + 1;
-			finalBody = finalBody.replace(finalBody.substring(start, end), "");
+			finalBody = finalBody.replace(finalBody.substring(start, end),
+					"");
 		}
+		
 		finalBody = finalBody.replace("</a>", "");
+		
 		if (finalBody.endsWith("<br />"))
 			finalBody = finalBody.substring(0, finalBody.length() - 6);
 		finalBody = finalBody.replace("\n", "");

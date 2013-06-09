@@ -46,12 +46,7 @@ public class NetworkTask extends AsyncTask<Void, Void, Response> {
     	if (method.equals(Method.POST))
     		r = post(path, data);
     	else
-    	{
-    		if (data == null)
-    			r = get(path);
-    		else
-    			r = get(path, data);
-    	}
+    		r = get(path, data);
     	return r;
     }
 	
@@ -65,43 +60,33 @@ public class NetworkTask extends AsyncTask<Void, Void, Response> {
     /**
 	 * Pass a GET request to the specified page, with the specified data.
 	 * @param path The path to send the request to.
-	 * @param data The extra data to send.
+	 * @param data The extra data to send, or null if none.
 	 * @return A Document object for the page.
 	 * @throws IOException
 	 */
 	public Response get(String path, Map<String, String> data)
 	{
 		try {
-			Response r = Jsoup
+			Response r;
+			if (data != null) {
+			r = Jsoup
 					.connect(path)
 					.method(Method.GET)
 					.cookies(cookies)
 					.data(data)
 					.timeout(10000)
+					.ignoreHttpErrors(true)
 					.execute();
-			
-			return r;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	/**
-	 * Pass a GET request to the specified page.
-	 * @param path The path to send the request to.
-	 * @return A Document object for the page.
-	 * @throws IOException
-	 */
-	public Response get(String path)
-	{
-		try {
-			Response r = Jsoup
+			}
+			else {
+				r = Jsoup
 					.connect(path)
 					.method(Method.GET)
 					.cookies(cookies)
 					.timeout(10000)
+					.ignoreHttpErrors(true)
 					.execute();
+			}
 			
 			return r;
 		} catch (IOException e) {
@@ -126,6 +111,7 @@ public class NetworkTask extends AsyncTask<Void, Void, Response> {
 					.cookies(cookies)
 					.data(data)
 					.timeout(10000)
+					.ignoreHttpErrors(true)
 					.execute();
 			
 			return r;
