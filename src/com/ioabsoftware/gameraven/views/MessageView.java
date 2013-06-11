@@ -210,8 +210,8 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         	int opener;
         	int innerStartPoint = start;
         	do {
-        		opener = ssb.toString().indexOf("<blockquote>", innerStartPoint + "<blockquote>".length());
-        		closer = ssb.toString().indexOf("</blockquote>", innerStartPoint + "<blockquote>".length());
+        		opener = ssb.toString().indexOf("<blockquote>", innerStartPoint + 1);
+        		closer = ssb.toString().indexOf("</blockquote>", innerStartPoint + 1);
         		if (opener != -1 && opener < closer) {
         			// found a nested quote
         			stackCount++;
@@ -261,6 +261,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         	
         }
         
+        ssb.append('\n');
         message.setText(ssb);
         
         
