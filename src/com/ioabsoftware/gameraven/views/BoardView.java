@@ -40,7 +40,7 @@ public class BoardView extends LinearLayout {
     	switch (typeIn) {
 		case NORMAL:
             lastPost.setText("Last Post: " + lastPostIn);
-            tpcMsgDetails.setText("Tpcs: " + tCount + " // Msgs: " + mCount);
+            tpcMsgDetails.setText("Tpcs: " + tCount + "; Msgs: " + mCount);
 			break;
 		case SPLIT:
 			lastPost.setText("--Split List--");

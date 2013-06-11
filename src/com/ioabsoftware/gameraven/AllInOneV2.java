@@ -90,7 +90,7 @@ import com.ioabsoftware.gameraven.views.UserDetailView;
 public class AllInOneV2 extends Activity {
 	
 	private static boolean needToCheckForUpdate = true;
-	private static boolean isReleaseBuild = false;
+	private static boolean isReleaseBuild = true;
 	
 	public static final int NEW_VERSION_DIALOG = 101;
 	public static final int SEND_PM_DIALOG = 102;
@@ -1796,12 +1796,13 @@ public class AllInOneV2 extends Activity {
 				else {
 					// [title + link] [topics] [msgs] [last post]
 					Elements cells = row.children();
+					Element titleCell = cells.get(0);
 					
-					String title = cells.get(0).children().first().text();
+					String title = titleCell.child(0).text();
 					
 					String boardDesc = null;
-					if (!cells.get(0).textNodes().isEmpty())
-						boardDesc = cells.get(0).textNodes().get(0).text();
+					if (titleCell.children().size() > 2)
+						boardDesc = titleCell.child(2).text();
 					
 					String link = cells.get(0).children().first().attr("href");
 					
@@ -1837,10 +1838,10 @@ public class AllInOneV2 extends Activity {
 			for (Element row : homeTables.get(1).getElementsByTag("tr")) {
 				rowX++;
 				if (rowX > 2) {
-					Element cell = row.children().get(0);
-					String title = cell.children().first().text();
-					String boardDesc = cell.textNodes().get(0).text();
-					String link = cell.children().first().attr("href");
+					Element cell = row.child(0);
+					String title = cell.child(0).text();
+					String link = cell.child(0).attr("href");
+					String boardDesc = cell.child(2).text();
 					BoardView board = new BoardView(this, title, boardDesc,
 							null, null, null, link, BoardViewType.LIST);
 					board.setOnClickListener(cl);

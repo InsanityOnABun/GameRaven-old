@@ -197,12 +197,13 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         addSpan(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
         addSpan(ssb, "<i>", "</i>", new StyleSpan(Typeface.ITALIC));
         addSpan(ssb, "<code>", "</code>", new TypefaceSpan("monospace"));
-        addSpan(ssb, "<cite>", "</cite>", new UnderlineSpan());
+        addSpan(ssb, "<cite>", "</cite>", new UnderlineSpan(), new StyleSpan(Typeface.ITALIC));
         
         // quotes don't use CharacterStyles, so do it manually
         while (ssb.toString().contains("<blockquote>")) {
         	int start = ssb.toString().indexOf("<blockquote>");
-        	ssb.delete(start, start + "<blockquote>".length());
+        	ssb.replace(start, start + "<blockquote>".length(), "\n");
+        	start++;
         	
         	int stackCount = 1;
         	int closer;
@@ -224,7 +225,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         	} while (stackCount > 0);
         	
         	
-        	ssb.delete(closer, closer + "</blockquote>".length());
+        	ssb.replace(closer, closer + "</blockquote>".length(), "\n");
         	aio.wtl("quote being added to post " + postNum + ": " + ssb.subSequence(start, closer));
         	ssb.setSpan(new GRQuoteSpan(), start, closer, 0);
         }
