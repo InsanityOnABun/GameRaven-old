@@ -1405,12 +1405,7 @@ public class AllInOneV2 extends Activity {
 							for (int i = 2; i < authorData.size(); i++) {
 								Element e = authorData.get(i);
 								String t = e.text();
-								if (t.equals("message detail")) {
-									String detailLink = e.attr("href");
-									int z = detailLink.lastIndexOf('/') + 1;
-									mID = detailLink.substring(z);
-								}
-								else if (t.startsWith("("))
+								if (t.startsWith("("))
 									userTitles += " " + t;
 								else if (t.startsWith("Posted"))
 									postTime = t;
@@ -1442,12 +1437,7 @@ public class AllInOneV2 extends Activity {
 							int elementsSize = elements.size();
 							for (int y = 0; y < elementsSize; y++) {
 								Element e = elements.get(y);
-								if (e.text().equals("message detail")) {
-									String detailLink = elements.get(y).attr("href");
-									int z = detailLink.lastIndexOf('/') + 1;
-									mID = detailLink.substring(z);
-								}
-								else if (e.hasClass("tag"))
+								if (e.hasClass("tag"))
 									userTitles += " (tagged as " + e.text() + ")";
 							}
 							//Posted 11/15/2012 11:20:27&nbsp;AM | 
@@ -1459,6 +1449,8 @@ public class AllInOneV2 extends Activity {
 							x++;
 							msgBody = rows.get(x).child(0);
 						}
+						
+						mID = msgBody.child(0).attr("name");
 						
 						int hlColor = 0;
 						if (hlUsers.contains(user.toLowerCase(Locale.US))) {
