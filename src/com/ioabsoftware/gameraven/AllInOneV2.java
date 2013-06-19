@@ -87,6 +87,7 @@ import com.ioabsoftware.gameraven.views.TopicView;
 import com.ioabsoftware.gameraven.views.TopicView.TopicViewType;
 import com.ioabsoftware.gameraven.views.UserDetailView;
 
+@SuppressWarnings("deprecation")
 public class AllInOneV2 extends Activity {
 	
 	private static boolean needToCheckForUpdate = true;
@@ -961,7 +962,6 @@ public class AllInOneV2 extends Activity {
 				
 				boolean usingUserPanel;
 				usingUserPanel = !pRes.getElementsByClass("user_panel").isEmpty();
-				int[] pNums;
 				
 				Element pmInboxLink = pRes.select("a[href=/pm/]").first();
 				if (pmInboxLink != null) {
@@ -1119,6 +1119,7 @@ public class AllInOneV2 extends Activity {
 							if (lPost != null) {
 								String lTime = lPost.text();
 								Date newDate;
+								lTime = lTime.replace("Last:", "");
 								if (lTime.contains("AM") || lTime.contains("PM"))
 									newDate = new SimpleDateFormat("MM'/'dd hh':'mmaa", Locale.US).parse(lTime);
 								else
@@ -1335,7 +1336,11 @@ public class AllInOneV2 extends Activity {
 					wtl(tlUrl);
 					topicListIcon.setVisible(true);
 					
-					headerTitle = pRes.getElementsByClass("title").first().text();
+					Element headerElem = pRes.getElementsByClass("title").first();
+					if (headerElem != null)
+						headerTitle = headerElem.text();
+					else
+						headerTitle = "GFAQs Cache Error, Title Not Found";
 
 					pj = pRes.select("ul.paginate").get(1);
 					if (pj != null && !pj.hasClass("user")) {
@@ -1491,7 +1496,7 @@ public class AllInOneV2 extends Activity {
 					String karma = null;
 					String AMP = null;
 					for (Element row : udRows) {
-						String label = row.child(0).text().toLowerCase();
+						String label = row.child(0).text().toLowerCase(Locale.US);
 						if (label.equals("user name"))
 							name = row.child(1).text();
 						else if (label.equals("user id"))
@@ -1846,42 +1851,6 @@ public class AllInOneV2 extends Activity {
 				}
 			}
 		}
-	}
-	
-	private int[] getPageNums(Document pRes, Element pj, boolean usingUserPanel) {
-		int[] nums = {1, 1};
-		
-		if (usingUserPanel)
-			pj = pRes.getElementsByClass("u_pagenav").first();
-		else
-			pj = pRes.getElementsByClass("pages").first();
-		
-		if (pj != null) {
-			String pjText = pj.text();
-			//Page 1 of 3 | Next | Last
-			//First | Page 2 of 3 | Last
-			//First | Previous | Page 3 of 3
-			int ofIndex = pjText.indexOf(" of ");
-			int currPageStart = pjText.indexOf(" | Page ");
-			int currOffset = 8;
-			
-			if (currPageStart == -1) {
-				currPageStart = pjText.indexOf("Page ");
-				currOffset = 5;
-			}
-			
-			String currPage = pjText.substring(currPageStart + currOffset, ofIndex);
-			
-			int pageCountEnd = pjText.indexOf(' ', ofIndex + 4);
-			if (pageCountEnd == -1)
-				pageCountEnd = pjText.length();
-			String pageCount = pjText.substring(ofIndex + 4, pageCountEnd);
-			pageCount.trim();
-			nums[0] = Integer.parseInt(currPage);
-			nums[1] = Integer.parseInt(pageCount);
-		}
-		
-		return nums;
 	}
 	
 	private void updatePostingRights(Document pRes, boolean onTopic, boolean usingUserPanel) {
@@ -2277,17 +2246,10 @@ public class AllInOneV2 extends Activity {
 			public void onClick(DialogInterface dialog, int which) {
 				reportCode = getResources().getStringArray(R.array.msgReportCodes)[which];
 				session.get(NetDesc.MARKMSG_S1, clickedMsg.getMessageDetailLink(), null);
-				
-				dialog.dismiss();
 			}
 		});
 		
-		reportMsgBuilder.setNegativeButton("Cancel", new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
+		reportMsgBuilder.setNegativeButton("Cancel", null);
 		
 		Dialog dialog = reportMsgBuilder.create();
 		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -2303,7 +2265,7 @@ public class AllInOneV2 extends Activity {
 		msgActionBuilder.setTitle("Message Actions");
 		int arrayToUse;
 		if (Session.isLoggedIn()) {
-			if (Session.getUser().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase())) {
+			if (Session.getUser().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
 				if (userLevel < 30)
 					arrayToUse = R.array.msgMenuLoggedInAsPosterNotEditable;
 				else
@@ -2339,7 +2301,6 @@ public class AllInOneV2 extends Activity {
 					session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink(), null);
 				}
 				else if (selected.equals("Highlight User")) {
-					//TODO: Highlight User dialog
 					HighlightedUser user = hlDB.getHighlightedUsers().get(clickedMsg.getUser().toLowerCase(Locale.US));
 					HighlightListDBHelper.showHighlightUserDialog(AllInOneV2.this, user, clickedMsg.getUser(), null);
 				}
@@ -2528,7 +2489,16 @@ public class AllInOneV2 extends Activity {
     }
 	
 	public void tryCaught(String url, String stacktrace, String source) {
-		final String emailMsg = "\n\nURL:\n" + url + "\n\nStack trace:\n" + stacktrace + "\n\nPage source:\n" + source;
+		String ver;
+		try {
+			ver = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+		} catch (NameNotFoundException e) {
+			ver = "version not set";
+		}
+		final String emailMsg = "\n\nVersion:\n" + ver + 
+								"\n\nURL:\n" + url + 
+								"\n\nStack trace:\n" + stacktrace + 
+								"\n\nPage source:\n" + source;
 		
     	AlertDialog.Builder b = new AlertDialog.Builder(this);
     	b.setTitle("Error");
@@ -2553,9 +2523,7 @@ public class AllInOneV2 extends Activity {
     	b.setPositiveButton("Email to dev", new Dialog.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				Intent i = new Intent(Intent.ACTION_SEND);
-				i.setType("message/rfc822");
-				i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"ioabsoftware@gmail.com"});
+				Intent i = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "ioabsoftware@gmail.com", null));
 				i.putExtra(Intent.EXTRA_SUBJECT, "GameRaven Error Report");
 				i.putExtra(Intent.EXTRA_TEXT   , "Comment:\n" + input.getText() + emailMsg);
 				try {

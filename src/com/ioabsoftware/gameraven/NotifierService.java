@@ -95,6 +95,7 @@ public class NotifierService extends IntentService {
 						// 4/25 8:23PM
 						// 1/24/2012
 						String lTime = lPost.text();
+						lTime = lTime.replace("Last:", "");
 						Log.d("notif", "time is " + lTime);
 						Date newDate;
 						if (lTime.contains("AM") || lTime.contains("PM"))

@@ -707,7 +707,7 @@ public class Session implements HandlesNetworkResult {
 				case MARKMSG_S1:
 					HashMap<String, String> markData = new HashMap<String, String>();
 					markData.put("reason", aio.getReportCode());
-					markData.put("key", pRes.getElementsByAttributeValue("name", "key").first().attr("value"));
+					markData.put("key", pRes.select("input[name=key]").first().attr("value"));
 					post(NetDesc.MARKMSG_S2, res.url() + "?action=mod", markData);
 					break;
 					
