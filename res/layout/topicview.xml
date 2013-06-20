@@ -26,8 +26,8 @@
             android:id="@+id/tvLastPost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/tvLPSep"
             android:text="12/12 12:12PM"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textSize="10sp" />
@@ -73,7 +73,6 @@
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/tvTitle"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/tvMsgCount"
             android:text="Last Post"
             android:textColor="?attr/themedTextColor"
             android:textSize="12sp" />
@@ -81,12 +80,12 @@
         <View
             android:id="@+id/tvLPSep"
             android:layout_width="1dp"
-            android:layout_height="24dp"
+            android:layout_height="match_parent"
             android:layout_alignBottom="@+id/tvLastPostLink"
             android:layout_alignTop="@+id/tvLastPostLink"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="3dp"
             android:layout_marginLeft="3dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="3dp"
             android:layout_toLeftOf="@+id/tvLastPostLink"
             android:background="#33B5E5"
             android:visibility="visible" />
