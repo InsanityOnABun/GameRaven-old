@@ -13,7 +13,7 @@
 
         <TextView
             android:id="@+id/dwrChangeAccHeader"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:layout_marginLeft="2dp"
@@ -32,7 +32,7 @@
         <org.holoeverywhere.widget.Spinner
             android:id="@+id/dwrChangeAcc"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="?android:attr/listPreferredItemHeight" />
 
         <View
             android:id="@+id/dwrChangeAccSep"
@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
                 android:layout_marginLeft="2dp"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="9dp"
                 android:text="Navigation"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -70,7 +70,7 @@
                 android:id="@+id/dwrBoardJumper"
                 style="@style/Widget.Sherlock.ActionButton"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="?android:attr/listPreferredItemHeight"
                 android:gravity="left|center_vertical"
                 android:text="Board Jumper" />
 
@@ -92,7 +92,7 @@
                     android:id="@+id/dwrAMPList"
                     style="@style/Widget.Sherlock.ActionButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="?android:attr/listPreferredItemHeight"
                     android:gravity="left|center_vertical"
                     android:text="AMP List" />
 
@@ -108,7 +108,7 @@
                     android:id="@+id/dwrPMInbox"
                     style="@style/Widget.Sherlock.ActionButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="?android:attr/listPreferredItemHeight"
                     android:gravity="left|center_vertical"
                     android:text="PM Inbox" />
 
@@ -128,7 +128,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:layout_marginLeft="2dp"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="9dp"
             android:text="Functions"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -144,7 +144,7 @@
             android:id="@+id/dwrOpenInBrowser"
             style="@style/Widget.Sherlock.ActionButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
             android:text="Open Current Page in Browser" />
 
@@ -160,7 +160,7 @@
             android:id="@+id/dwrHighlightList"
             style="@style/Widget.Sherlock.ActionButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
             android:text="Manage Highlight List" />
 
@@ -176,7 +176,7 @@
             android:id="@+id/dwrSettings"
             style="@style/Widget.Sherlock.ActionButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
             android:text="Settings" />
 
@@ -192,7 +192,7 @@
             android:id="@+id/dwrExit"
             style="@style/Widget.Sherlock.ActionButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
             android:text="Exit GameRaven" />
 

@@ -13,12 +13,12 @@ import net.simonvt.menudrawer.MenuDrawer;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.holoeverywhere.ArrayAdapter;
 import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
 import org.holoeverywhere.widget.AdapterView;
 import org.holoeverywhere.widget.AdapterView.OnItemSelectedListener;
+import org.holoeverywhere.widget.ArrayAdapter;
 import org.holoeverywhere.widget.Spinner;
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
@@ -222,7 +222,6 @@ public class AllInOneV2 extends Activity {
 	public static HighlightListDBHelper getHLDB() {return hlDB;}
 	
 	private MenuDrawer drawer;
-	private boolean shouldDoLoginChangeListener = true;
 	
 	
 	
@@ -248,12 +247,12 @@ public class AllInOneV2 extends Activity {
     	
         setContentView(R.layout.allinonev2);
     	
-    	drawer = MenuDrawer.attach(this, MenuDrawer.MENU_DRAG_CONTENT);
+    	drawer = MenuDrawer.attach(this);
         drawer.setContentView(R.layout.allinonev2);
         drawer.setMenuView(R.layout.drawer);
         
         if (usingLightTheme)
-        	drawer.findViewById(R.id.dwrScroller).setBackgroundResource(android.R.drawable.screen_background_light_transparent);
+        	drawer.findViewById(R.id.dwrScroller).setBackgroundResource(android.R.drawable.screen_background_light);
         else
         	drawer.findViewById(R.id.dwrScroller).setBackgroundResource(android.R.drawable.screen_background_dark_transparent);
 
@@ -262,8 +261,9 @@ public class AllInOneV2 extends Activity {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view,
 					int pos, long id) {
-				if (shouldDoLoginChangeListener) {
+				if (drawer.isMenuVisible()) {
 					if (pos == 0 && Session.getUser() != null) {
+						wtl("starting new session from onItemSelected, no login");
 						session = new Session(AllInOneV2.this);
 						drawer.closeMenu();
 					}
@@ -271,6 +271,7 @@ public class AllInOneV2 extends Activity {
 					else {
 						String selUser = parent.getItemAtPosition(pos).toString();
 						if (!selUser.equals(Session.getUser())) {
+							wtl("starting new session from onItemSelected, logged in");
 							session = new Session(AllInOneV2.this, selUser, accounts.getString(selUser));
 							drawer.closeMenu();
 						}
@@ -641,10 +642,14 @@ public class AllInOneV2 extends Activity {
         	
         case R.id.refresh:
         	if (session.getLastPath() == null) {
-    			if (Session.isLoggedIn())
+    			if (Session.isLoggedIn()) {
+					wtl("starting new session from case R.id.refresh, logged in");
     				session = new Session(this, Session.getUser(), accounts.getString(Session.getUser()));
-    	    	else
+    			}
+    	    	else {
+					wtl("starting new session from R.id.refresh, no login");
     	    		session = new Session(this);
+    	    	}
     		}
     		else
     			session.refresh();
@@ -713,12 +718,15 @@ public class AllInOneV2 extends Activity {
     	}
     	
     	if (session == null) {
-    		wtl("creating a new session");
     		String defaultAccount = settings.getString("defaultAccount", "");
-    		if (accounts.containsKey(defaultAccount))
+    		if (accounts.containsKey(defaultAccount)) {
+				wtl("starting new session from onResume, logged in");
     			session = new Session(this, defaultAccount, accounts.getString(defaultAccount));
-    		else
+    		}
+    		else {
+				wtl("starting new session from onResume, no login");
     			session = new Session(this);
+    		}
     	}
     	
     	String[] keys = accounts.getKeys();
@@ -736,11 +744,9 @@ public class AllInOneV2 extends Activity {
 		}
 		
 		((Spinner) drawer.findViewById(R.id.dwrChangeAcc)).
-			setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, usernames));
+			setAdapter(new ArrayAdapter<String>(this, R.layout.dropdown_item, usernames));
 		
-		shouldDoLoginChangeListener = false;
 		((Spinner) drawer.findViewById(R.id.dwrChangeAcc)).setSelection(selected);
-		shouldDoLoginChangeListener = true;
 		
 		if (needToCheckForUpdate && isReleaseBuild) {
 			needToCheckForUpdate = false;
@@ -2446,10 +2452,14 @@ public class AllInOneV2 extends Activity {
 		wtl("refreshClicked fired --NEL");
 		view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 		if (session.getLastPath() == null) {
-			if (Session.isLoggedIn())
+			if (Session.isLoggedIn()) {
+				wtl("starting new session from refreshClicked, logged in");
 				session = new Session(this, Session.getUser(), accounts.getString(Session.getUser()));
-	    	else
+			}
+	    	else {
+				wtl("starting new session from refreshClicked, no login");
 	    		session = new Session(this);
+	    	}
 		}
 		else
 			session.refresh();

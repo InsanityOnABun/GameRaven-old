@@ -16,6 +16,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
@@ -125,16 +126,19 @@ public class Session implements HandlesNetworkResult {
 	private void finalConstructor(AllInOneV2 aioIn, String userIn, String passwordIn)
 	{
 		aio = aioIn;
+		aio.wtl("NEW SESSION");
 		aio.disableNavList();
 		
         history = new LinkedList<History>();
 		
 		if (userIn == null) {
+			aio.wtl("session constructor, user is null, starting logged out session");
 			user = null;
 			password = null;
 			get(NetDesc.BOARD_JUMPER, ROOT + "/boards", null);
 		}
 		else {
+			aio.wtl("session constructor, user is not null, starting logged in session");
 			user = userIn;
 			password = passwordIn;
 			get(NetDesc.LOGIN_S1, ROOT + "/boards", null);
@@ -175,15 +179,10 @@ public class Session implements HandlesNetworkResult {
 	 * @param path The path to send the request to.
 	 * @param data The extra data to send along, pass null if no extra data.
 	 */
-	public void get(NetDesc desc, String path, Map<String, String> data)
-	{
-		
+	public void get(NetDesc desc, String path, Map<String, String> data) {
 		lastAttemptedPath = path;
 		lastAttemptedDesc = desc;
-		if (data != null)
-			new NetworkTask(this, desc, Method.GET, cookies, buildURL(path), data).execute();
-		else
-			new NetworkTask(this, desc, Method.GET, cookies, buildURL(path), null).execute();
+		new NetworkTask(this, desc, Method.GET, cookies, buildURL(path), data).execute();
 	}
 	
 	/**
@@ -193,8 +192,7 @@ public class Session implements HandlesNetworkResult {
 	 * @param path The path to send the request to.
 	 * @param data The extra data to send along.
 	 */
-	public void post(NetDesc desc, String path, Map<String, String> data)
-	{
+	public void post(NetDesc desc, String path, Map<String, String> data) {
 		new NetworkTask(this, desc, Method.POST, cookies, buildURL(path), data).execute();
 	}
 	
