@@ -45,6 +45,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 
 	private String userContent, messageID, boardID, topicID;
 	private Element messageContent, messageContentNoPoll;
+	private TextView message;
 	private AllInOneV2 aio;
 	
 	private static int quoteBackColor = Color.argb(255, 100, 100, 100);
@@ -96,6 +97,8 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 
 		aio.wtl("inflated layout");
         
+		message = (TextView) findViewById(R.id.mvMessage);
+		
         ((TextView) findViewById(R.id.mvUser)).setText(userContent + userTitles);
         ((TextView) findViewById(R.id.mvUser)).setTextColor(AllInOneV2.getAccentTextColor());
         ((TextView) findViewById(R.id.mvPostNumber)).setText("#" + postNum + ", " + postTimeIn);
@@ -114,6 +117,8 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
     		messageContentNoPoll = messageContent.clone();
     		messageContentNoPoll.getElementsByClass("board_poll").first().remove();
         	html = messageContentNoPoll.html();
+        	
+        	Element pollElem = messageContent.getElementsByClass("board_poll").first();
 
     		LinearLayout pollWrapper = (LinearLayout) findViewById(R.id.mvPollWrapper);
     		LinearLayout innerPollWrapper = new LinearLayout(aio);
@@ -125,22 +130,23 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
     		p.setColor(Color.parseColor(ColorPickerPreference.convertToARGB(AllInOneV2.getAccentColor())));
     		
     		pollWrapper.setBackgroundDrawable(s);
-			pollWrapper.addView(new HeaderView(aio, messageContent.getElementsByClass("poll_head").first().text()));
+			pollWrapper.addView(new HeaderView(aio, pollElem.getElementsByClass("poll_head").first().text()));
 			pollWrapper.addView(innerPollWrapper);
 
     		innerPollWrapper.setPadding(15, 0, 15, 15);
     		innerPollWrapper.setOrientation(VERTICAL);
-        	if (messageContent.getElementsByTag("form").isEmpty()) {
+        	if (pollElem.getElementsByTag("form").isEmpty()) {
+        		// poll has been voted in
         		// poll_foot_left
         		TextView t;
-        		for (Element e : messageContent.getElementsByClass("table_row")) {
+        		for (Element e : pollElem.select("div.row")) {
         			Elements c = e.children();
         			t = new TextView(aio);
-        			t.setText(c.get(0).text() + ": " + c.get(1).text() + ", " + c.get(3).text() + " votes");
+        			t.setText(c.get(0).text() + ": " + c.get(1).text());
         			innerPollWrapper.addView(t);
         		}
         		
-        		String foot = messageContent.getElementsByClass("poll_foot_left").text();
+        		String foot = pollElem.getElementsByClass("poll_foot_left").text();
         		if (foot.length() > 0) {
         			t = new TextView(aio);
         			t.setText(foot);
@@ -149,11 +155,12 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         		
         	}
         	else {
+        		// poll has not been voted in
             	final String action = "/boards/" + boardID + "/" + topicID;
-    			String key = messageContent.getElementsByAttributeValue("name", "key").attr("value");
+    			String key = pollElem.getElementsByAttributeValue("name", "key").attr("value");
     			
     			int x = 0;
-    			for (Element e : messageContent.getElementsByAttributeValue("name", "poll_vote")) {
+    			for (Element e : pollElem.getElementsByAttributeValue("name", "poll_vote")) {
     				x++;
     				Button b = new Button(aio);
     				b.setText(e.nextElementSibling().text());
@@ -186,7 +193,6 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 
 		aio.wtl("html var set");
         
-        final TextView message = (TextView) findViewById(R.id.mvMessage);
 //        URLImageParser p = new URLImageParser(message, aio);
 //        Spanned htmlSpan = Html.fromHtml(html, p, null);
 //        message.setText(htmlSpan);
@@ -266,6 +272,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         
         
         message.setLinkTextColor(AllInOneV2.getAccentColor());
+        aio.registerForContextMenu(message);
 
 		aio.wtl("set message text, color");
         
@@ -323,7 +330,10 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 	}
 	
 	public String getMessageForQuoting() {
-		return processContent(true);
+		if (message.hasSelection())
+			return message.getText().subSequence(message.getSelectionStart(), message.getSelectionEnd()).toString();
+		else
+			return processContent(true);
 	}
 	
 	public String getMessageForEditing() {

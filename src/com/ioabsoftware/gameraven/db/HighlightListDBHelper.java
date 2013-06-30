@@ -75,6 +75,10 @@ public class HighlightListDBHelper extends SQLiteOpenHelper {
 
 	}
 	
+	public boolean hasUser(String user) {
+		return highlightedUsers.containsKey(user.toLowerCase(Locale.US));
+	}
+	
 	public HashMap<String, HighlightedUser> addUser(String name, String label, int color) {
 		SQLiteDatabase db = getWritableDatabase();
 		
@@ -107,6 +111,13 @@ public class HighlightListDBHelper extends SQLiteOpenHelper {
 		db.close();
 		
 		return highlightedUsers;
+	}
+	
+	public HashMap<String, HighlightedUser> deleteUser(String user) {
+		if (hasUser(user))
+			return deleteUser(highlightedUsers.get(user.toLowerCase(Locale.US)));
+		else
+			return highlightedUsers;
 	}
 	
 	public HashMap<String, HighlightedUser> deleteUser(HighlightedUser user) {

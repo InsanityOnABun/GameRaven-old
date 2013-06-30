@@ -248,7 +248,7 @@ public class Session implements HandlesNetworkResult {
 	public void handleNetworkResult(Response res, NetDesc desc) {
 		aio.wtl("session hNR fired, desc: " + desc.name());
 		try {
-			if (res != null) {
+			if (res != null && !res.body().equals("")) {
 				
 				if (desc == NetDesc.DEV_UPDATE_CHECK) {
 					aio.wtl("session hNR has determined this is an update check");

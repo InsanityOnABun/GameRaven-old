@@ -41,6 +41,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.ioabsoftware.gameraven.R;
+import com.ioabsoftware.gameraven.db.HighlightedUser;
 
 public class SettingsMain extends SherlockPreferenceActivity {
 	
@@ -282,6 +283,14 @@ public class SettingsMain extends SherlockPreferenceActivity {
 				buf.append(settings.getString("customSig", "") + '\n');
 				buf.append("[END_GLOBAL_SIG]\n");
 				
+				buf.append("[HIGHLIGHT_LIST]\n");
+				for (HighlightedUser user : AllInOneV2.getHLDB().getHighlightedUsers().values()) {
+					buf.append(user.getName() + "\n");
+					buf.append(user.getLabel() + "\n");
+					buf.append(user.getColor() + "\n");
+				}
+				buf.append("[END_HIGHLIGHT_LIST]\n");
+				
 				buf.append("defaultAccount=" + settings.getString("defaultAccount", "N/A") + '\n');
 				
 				if (settings.getBoolean("notifsEnable", false))
@@ -414,6 +423,18 @@ public class SettingsMain extends SherlockPreferenceActivity {
 									}
 									keys.add("customSig");
 									values.add(globalSig);
+								}
+								
+								else if (line.equals("[HIGHLIGHT_LIST]")) {
+									while (!(line = br.readLine()).equals("[END_HIGHLIGHT_LIST]")) {
+										String user = line;
+										String label = br.readLine();
+										String color = br.readLine();
+										if (AllInOneV2.getHLDB().hasUser(user))
+											AllInOneV2.getHLDB().deleteUser(user);
+										
+										AllInOneV2.getHLDB().addUser(user, label, Integer.parseInt(color));
+									}
 								}
 								else
 									Toast.makeText(this, "Line unhandled: " + line, Toast.LENGTH_LONG).show();
