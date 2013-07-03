@@ -79,7 +79,7 @@ public class SettingsAccount extends SherlockPreferenceActivity implements Handl
 	private void updateAccountList() {
 		accounts.removeAll();
 		
-		String def = settings.getString("defaultAccount", "N/A");
+		String def = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
 		
 		for (String s : AllInOneV2.getAccounts().getKeys()) {
         	Preference pref = new Preference(this);
@@ -180,7 +180,7 @@ public class SettingsAccount extends SherlockPreferenceActivity implements Handl
     	final EditText sigContent = (EditText) v.findViewById(R.id.modaccSigContent);
     	final TextView sigCounter = (TextView) v.findViewById(R.id.modaccSigCounter);
     	
-		if (clickedAccount.getTitle().toString().equals(settings.getString("defaultAccount", "N/A")))
+		if (clickedAccount.getTitle().toString().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)))
 			defaultAcc.setChecked(true);
 		else
 			defaultAcc.setChecked(false);
@@ -193,7 +193,7 @@ public class SettingsAccount extends SherlockPreferenceActivity implements Handl
 					Toast.makeText(SettingsAccount.this, "Default account saved.", Toast.LENGTH_SHORT).show();
 				}
 				else {
-					settings.edit().putString("defaultAccount", "N/A").commit();
+					settings.edit().putString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT).commit();
 					settings.edit().putLong("notifsLastPost", 0).commit();
 					Toast.makeText(SettingsAccount.this, "Default account removed.", Toast.LENGTH_SHORT).show();
 				}
@@ -203,8 +203,8 @@ public class SettingsAccount extends SherlockPreferenceActivity implements Handl
     	deleteAcc.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (clickedAccount.getTitle().toString().equals(settings.getString("defaultAccount", "N/A")))
-					settings.edit().putString("defaultAccount", "N/A").commit();
+				if (clickedAccount.getTitle().toString().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)))
+					settings.edit().putString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT).commit();
 
 				settings.edit().remove("customSig" + clickedAccount.getTitle().toString()).commit();
 				

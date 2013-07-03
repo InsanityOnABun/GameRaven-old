@@ -79,12 +79,14 @@ import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.views.BoardView;
 import com.ioabsoftware.gameraven.views.BoardView.BoardViewType;
 import com.ioabsoftware.gameraven.views.HeaderView;
-import com.ioabsoftware.gameraven.views.LastPostView;
+import com.ioabsoftware.gameraven.views.LinkButtonView;
+import com.ioabsoftware.gameraven.views.LinkButtonView.Type;
 import com.ioabsoftware.gameraven.views.MessageView;
 import com.ioabsoftware.gameraven.views.PMDetailView;
 import com.ioabsoftware.gameraven.views.PMView;
 import com.ioabsoftware.gameraven.views.TopicView;
 import com.ioabsoftware.gameraven.views.TopicView.TopicViewType;
+import com.ioabsoftware.gameraven.views.TrackedTopicView;
 import com.ioabsoftware.gameraven.views.UserDetailView;
 
 @SuppressWarnings("deprecation")
@@ -101,6 +103,8 @@ public class AllInOneV2 extends Activity {
 	
 	protected static final String ACCOUNTS_PREFNAME = "com.ioabsoftware.DroidFAQs.Accounts";
 	protected static final String SALT = "RIP Man fan died at the room shot up to 97 degrees";
+	
+	public static final String EMPTY_STRING = "";
 	
 	public static String defaultSig;
 	
@@ -155,7 +159,7 @@ public class AllInOneV2 extends Activity {
 	private boolean pollUse = false;
 	public boolean isUsingPoll() {return pollUse;}
 	
-	private String pollTitle = "";
+	private String pollTitle = EMPTY_STRING;
 	public String getPollTitle() {return pollTitle;}
 	private String[] pollOptions = new String[10];
 	public String[] getPollOptions() {return pollOptions;}
@@ -182,6 +186,9 @@ public class AllInOneV2 extends Activity {
     
 	private enum PostMode {ON_BOARD, ON_TOPIC, NEW_PM};
 	private PostMode pMode;
+	
+	private enum FavMode {ON_BOARD, ON_TOPIC};
+	private FavMode fMode;
     
     private TextView title;
     private Button firstPage, prevPage, nextPage, lastPage;
@@ -217,6 +224,26 @@ public class AllInOneV2 extends Activity {
 		else
 			return false;
 	}
+
+	private boolean forceTT = false;
+	public boolean consumeForceTT() {
+		if (forceTT) {
+			forceTT = false;
+			return true;
+		}
+		else
+			return false;
+	}
+
+	private boolean forcePM = false;
+	public boolean consumeForcePM() {
+		if (forcePM) {
+			forcePM = false;
+			return true;
+		}
+		else
+			return false;
+	}
 	
 	private static HighlightListDBHelper hlDB;
 	public static HighlightListDBHelper getHLDB() {return hlDB;}
@@ -229,6 +256,18 @@ public class AllInOneV2 extends Activity {
 	 * START METHODS
 	 **********************************************/
 	
+	
+	@Override
+	protected void onNewIntent(Intent intent) {
+		if (intent.getExtras() != null) {
+			if (intent.getExtras().getBoolean("forceAMP"))
+				forceAMP = true;
+			else if (intent.getExtras().getBoolean("forcePM"))
+				forcePM = true;
+			else if (intent.getExtras().getBoolean("forceTT"))
+				forceTT = true;
+		}
+	}
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -299,6 +338,14 @@ public class AllInOneV2 extends Activity {
 			}
 		});
         
+        ((Button) drawer.findViewById(R.id.dwrTrackedTopics)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				drawer.closeMenu();
+				session.get(NetDesc.TRACKED_TOPICS, "/boards/tracked", null);
+			}
+		});
+        
         ((Button) drawer.findViewById(R.id.dwrPMInbox)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -347,14 +394,13 @@ public class AllInOneV2 extends Activity {
         // Whether the previous drawable should be shown
         drawer.setDrawerIndicatorEnabled(true);
         
-        String nSlashA = settings.getString("defaultAccount", "N/A");
-        settings.edit().putString("defaultAccount", nSlashA).commit();
+        if (!settings.contains("defaultAccount"))
+        	PreferenceManager.setDefaultValues(this, R.xml.settingsmain, false);
         
-        boolean enablePTR = settings.getBoolean("enablePTR", false);
-        settings.edit().putBoolean("enablePTR", enablePTR).commit();
+        String defAccInit = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
+        settings.edit().putString("defaultAccount", defAccInit).commit();
         
         aBar = getSupportActionBar();
-//        aBar.setDisplayShowHomeEnabled(false);
         aBar.setDisplayHomeAsUpEnabled(true);
         aBar.setDisplayShowTitleEnabled(false);
         aBar.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -477,15 +523,6 @@ public class AllInOneV2 extends Activity {
     	
     	wtl("setting check for update flag");
     	needToCheckForUpdate = true;
-		
-    	if (getIntent().hasExtra("forceAMP")) {
-    		if (getIntent().getExtras().getBoolean("forceAMP")) {
-    			forceAMP = true;
-    			Log.d("forceAMP", "true");
-    		}
-    	}
-    	else
-    		Log.d("forceAMP", "false");
     	
 		wtl("onCreate finishing");
     }
@@ -524,9 +561,9 @@ public class AllInOneV2 extends Activity {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         searchIcon = menu.getItem(0);
-        addFavIcon = menu.getItem(1);
-        remFavIcon = menu.getItem(2);
-        topicListIcon = menu.getItem(3);
+        topicListIcon = menu.getItem(1);
+        addFavIcon = menu.getItem(2);
+        remFavIcon = menu.getItem(3);
         postIcon = menu.getItem(4);
         refreshIcon = menu.getItem(5);
         
@@ -582,46 +619,98 @@ public class AllInOneV2 extends Activity {
         	
         case R.id.addFav:
         	AlertDialog.Builder afb = new AlertDialog.Builder(this);
-        	afb.setTitle("Add Board to Favorites?");
-//        	afb.setMessage("Add Board to Favorites?");
-        	afb.setPositiveButton("Yes", new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					String addFavUrl = session.getLastPath();
-		        	if (addFavUrl.contains("remfav"))
-		        		addFavUrl = addFavUrl.replace("remfav", "addfav");
-		        	else if (addFavUrl.indexOf('?') != -1)
-		        		addFavUrl += "&action=addfav";
-		        	else
-		        		addFavUrl += "?action=addfav";
-		        	
-		        	session.get(NetDesc.BOARD, addFavUrl, null);
-				}
-			});
         	afb.setNegativeButton("No", null);
+        	
+        	switch (fMode) {
+			case ON_BOARD:
+				afb.setTitle("Add Board to Favorites?");
+	        	afb.setPositiveButton("Yes", new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						String addFavUrl = session.getLastPath();
+			        	if (addFavUrl.contains("remfav"))
+			        		addFavUrl = addFavUrl.replace("remfav", "addfav");
+			        	else if (addFavUrl.indexOf('?') != -1)
+			        		addFavUrl += "&action=addfav";
+			        	else
+			        		addFavUrl += "?action=addfav";
+			        	
+			        	session.get(NetDesc.BOARD, addFavUrl, null);
+					}
+				});
+				break;
+			case ON_TOPIC:
+				afb.setTitle("Track Topic?");
+	        	afb.setPositiveButton("Yes", new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						String addFavUrl = session.getLastPath();
+						int x = addFavUrl.indexOf('#');
+						if (x != -1)
+							addFavUrl = addFavUrl.substring(0, x);
+						
+			        	if (addFavUrl.contains("stoptrack"))
+			        		addFavUrl = addFavUrl.replace("stoptrack", "tracktopic");
+			        	else if (addFavUrl.indexOf('?') != -1)
+			        		addFavUrl += "&action=tracktopic";
+			        	else
+			        		addFavUrl += "?action=tracktopic";
+			        	
+			        	session.get(NetDesc.TOPIC, addFavUrl, null);
+					}
+				});
+				break;
+        	}
+        	
         	afb.create().show();
         	
         	return true;
         	
         case R.id.remFav:
         	AlertDialog.Builder rfb = new AlertDialog.Builder(this);
-        	rfb.setTitle("Remove Board from Favorites?");
-//        	rfb.setMessage("Remove Board from Favorites?");
-        	rfb.setPositiveButton("Yes", new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					String remFavUrl = session.getLastPath();
-		        	if (remFavUrl.contains("addfav"))
-		        		remFavUrl = remFavUrl.replace("addfav", "remfav");
-		        	else if (remFavUrl.indexOf('?') != -1)
-		        		remFavUrl += "&action=remfav";
-		        	else
-		        		remFavUrl += "?action=remfav";
-		        	
-		        	session.get(NetDesc.BOARD, remFavUrl, null);
-				}
-			});
         	rfb.setNegativeButton("No", null);
+        	
+        	switch (fMode) {
+			case ON_BOARD:
+				rfb.setTitle("Remove Board from Favorites?");
+	        	rfb.setPositiveButton("Yes", new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						String remFavUrl = session.getLastPath();
+			        	if (remFavUrl.contains("addfav"))
+			        		remFavUrl = remFavUrl.replace("addfav", "remfav");
+			        	else if (remFavUrl.indexOf('?') != -1)
+			        		remFavUrl += "&action=remfav";
+			        	else
+			        		remFavUrl += "?action=remfav";
+			        	
+			        	session.get(NetDesc.BOARD, remFavUrl, null);
+					}
+				});
+				break;
+			case ON_TOPIC:
+				rfb.setTitle("Stop Tracking Topic?");
+				rfb.setPositiveButton("Yes", new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						String remFavUrl = session.getLastPath();
+						int x = remFavUrl.indexOf('#');
+						if (x != -1)
+							remFavUrl = remFavUrl.substring(0, x);
+						
+			        	if (remFavUrl.contains("tracktopic"))
+			        		remFavUrl = remFavUrl.replace("tracktopic", "stoptrack");
+			        	else if (remFavUrl.indexOf('?') != -1)
+			        		remFavUrl += "&action=stoptrack";
+			        	else
+			        		remFavUrl += "?action=stoptrack";
+			        	
+			        	session.get(NetDesc.TOPIC, remFavUrl, null);
+					}
+				});
+				break;
+        	}
+        	
         	rfb.create().show();
         	
         	return true;
@@ -636,7 +725,7 @@ public class AllInOneV2 extends Activity {
         	else if (pMode == PostMode.ON_TOPIC)
             	postOnTopicSetup();
         	else if (pMode == PostMode.NEW_PM)
-        		pmSetup("", "", "");
+        		pmSetup(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
         	
         	return true;
         	
@@ -712,13 +801,51 @@ public class AllInOneV2 extends Activity {
 		findViewById(R.id.aioPollSep).setBackgroundColor(accentColor);
 		findViewById(R.id.aioPostSep).setBackgroundColor(accentColor);
 		
-		if (session != null && settings.getBoolean("reloadOnResume", false)) {
-    		wtl("session exists, reload on resume is true, refreshing page");
-    		session.refresh();
+		if (session != null) {
+			String defaultAccount = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
+			if (forceAMP) {
+				if (Session.isLoggedIn() && Session.getUser().equals(defaultAccount)) {
+					forceAMP = false;
+					session.get(NetDesc.AMP_LIST, buildAMPLink(), null);
+				}
+				else {
+		    		if (accounts.containsKey(defaultAccount)) {
+						wtl("starting new session from onResume, logged in");
+		    			session = new Session(this, defaultAccount, accounts.getString(defaultAccount));
+		    		}
+				}
+			}
+			else if (forcePM) {
+				if (Session.isLoggedIn() && Session.getUser().equals(defaultAccount)) {
+					forcePM = false;
+					session.get(NetDesc.PM_INBOX, "/pm/", null);
+				}
+				else {
+		    		if (accounts.containsKey(defaultAccount)) {
+						wtl("starting new session from onResume, logged in");
+		    			session = new Session(this, defaultAccount, accounts.getString(defaultAccount));
+		    		}
+				}
+			}
+			else if (forceTT) {
+				if (Session.isLoggedIn() && Session.getUser().equals(defaultAccount)) {
+					forceTT = false;
+					session.get(NetDesc.TRACKED_TOPICS, "/boards/tracked", null);
+				}
+				else {
+		    		if (accounts.containsKey(defaultAccount)) {
+						wtl("starting new session from onResume, logged in");
+		    			session = new Session(this, defaultAccount, accounts.getString(defaultAccount));
+		    		}
+				}
+			}
+			else if (settings.getBoolean("reloadOnResume", false)) {
+				wtl("session exists, reload on resume is true, refreshing page");
+	    		session.refresh();
+			}
     	}
-    	
-    	if (session == null) {
-    		String defaultAccount = settings.getString("defaultAccount", "");
+		else {
+    		String defaultAccount = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
     		if (accounts.containsKey(defaultAccount)) {
 				wtl("starting new session from onResume, logged in");
     			session = new Session(this, defaultAccount, accounts.getString(defaultAccount));
@@ -755,7 +882,8 @@ public class AllInOneV2 extends Activity {
 		}
 		
 		title.setSelected(true);
-        
+		
+		NotifierService.dismissNotif(this);
 		wtl("onResume finishing");
     }
 	
@@ -966,13 +1094,17 @@ public class AllInOneV2 extends Activity {
 				String nextPage = null;
 				String lastPage = null;
 				
-				boolean usingUserPanel;
-				usingUserPanel = !pRes.getElementsByClass("user_panel").isEmpty();
-				
 				Element pmInboxLink = pRes.select("a[href=/pm/]").first();
-				if (pmInboxLink != null) {
+				if (pmInboxLink != null && desc != NetDesc.PM_INBOX) {
 					if (!pmInboxLink.text().equals("Inbox")) {
 						Toast.makeText(this, "You have unread PM(s)", Toast.LENGTH_SHORT).show();
+					}
+				}
+				
+				Element trackedLink = pRes.select("a[href=/boards/tracked]").first();
+				if (trackedLink != null && desc != NetDesc.TRACKED_TOPICS) {
+					if (!trackedLink.text().equals("Topics")) {
+						Toast.makeText(this, "You have unread tracked topic(s)", Toast.LENGTH_SHORT).show();
 					}
 				}
 				
@@ -1030,7 +1162,7 @@ public class AllInOneV2 extends Activity {
 							Elements cells = row.children();
 							// [icon] [sender] [subject] [time] [check]
 							boolean isOld = true;
-							if (cells.get(0).children().first().attr("alt").equals("New"))
+							if (cells.get(0).children().first().hasClass("icon-circle"))
 								isOld = false;
 							String sender = cells.get(1).text();
 							Element subjectLinkElem = cells.get(2).children().first();
@@ -1086,46 +1218,50 @@ public class AllInOneV2 extends Activity {
 					tbody = pRes.getElementsByTag("tbody").first();
 					
 					headerTitle = Session.getUser() + "'s Active Messages";
-					pj = pRes.select("ul.paginate").get(1);
 					
-					if (pj != null && !pj.hasClass("user") && !pj.hasClass("tsort")) {
-						int x = 0;
-						String pjText = pj.child(x).text();
-						while (pjText.contains("First") || pjText.contains("Previous")) {
-							x++;
-							pjText = pj.child(x).text();
-						}
-						// Page 2 of 3
-						int currPageStart = 5;
-						int ofIndex = pjText.indexOf(" of ");
-						currPage = pjText.substring(currPageStart, ofIndex);
-						int pageCountEnd = pjText.length();
-						pageCount = pjText.substring(ofIndex + 4, pageCountEnd);
-						int currPageNum = Integer.parseInt(currPage);
-						int pageCountNum = Integer.parseInt(pageCount);
-						
-						String amp = buildAMPLink();
-						if (currPageNum > 1) {
-							firstPage = amp;
-							prevPage = amp + "&page=" + (currPageNum - 2);
-						}
-						if (currPageNum != pageCountNum) {
-							nextPage =  amp + "&page=" + currPageNum;
-							lastPage =  amp + "&page=" + (pageCountNum - 1);
+					if (pRes.select("ul.paginate").size() > 1) {
+						pj = pRes.select("ul.paginate").get(1);
+						if (pj != null && !pj.hasClass("user")
+								&& !pj.hasClass("tsort")) {
+							int x = 0;
+							String pjText = pj.child(x).text();
+							while (pjText.contains("First")
+									|| pjText.contains("Previous")) {
+								x++;
+								pjText = pj.child(x).text();
+							}
+							// Page 2 of 3
+							int currPageStart = 5;
+							int ofIndex = pjText.indexOf(" of ");
+							currPage = pjText.substring(currPageStart, ofIndex);
+							int pageCountEnd = pjText.length();
+							pageCount = pjText.substring(ofIndex + 4,
+									pageCountEnd);
+							int currPageNum = Integer.parseInt(currPage);
+							int pageCountNum = Integer.parseInt(pageCount);
+
+							String amp = buildAMPLink();
+							if (currPageNum > 1) {
+								firstPage = amp;
+								prevPage = amp + "&page=" + (currPageNum - 2);
+							}
+							if (currPageNum != pageCountNum) {
+								nextPage = amp + "&page=" + currPageNum;
+								lastPage = amp + "&page=" + (pageCountNum - 1);
+							}
 						}
 					}
-					
 					updateHeader(headerTitle, firstPage, prevPage, currPage, 
 							pageCount, nextPage, lastPage, NetDesc.AMP_LIST);
 					
 					if (!tbody.children().isEmpty()) {
 						if (settings.getBoolean("notifsEnable", false) && 
-								Session.getUser().equals(settings.getString("defaultAccount", "N/A"))) {
+								Session.getUser().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT))) {
 							Element lPost = pRes.select("td.lastpost").first();
 							if (lPost != null) {
 								String lTime = lPost.text();
 								Date newDate;
-								lTime = lTime.replace("Last:", "");
+								lTime = lTime.replace("Last:", EMPTY_STRING);
 								if (lTime.contains("AM") || lTime.contains("PM"))
 									newDate = new SimpleDateFormat("MM'/'dd hh':'mmaa", Locale.US).parse(lTime);
 								else
@@ -1159,8 +1295,8 @@ public class AllInOneV2 extends Activity {
 							topic.setOnClickListener(cl);
 							topic.setOnLongClickListener(cl);
 
-							LastPostView lp = (LastPostView) topic.findViewById(R.id.tvLastPostLink);
-							lp.setUrl(lPostLink);
+							LinkButtonView lp = (LinkButtonView) topic.findViewById(R.id.tvLastPostLink);
+							lp.setUrlAndType(lPostLink, Type.LAST_POST);
 							lp.setOnClickListener(cl);
 
 							content.addView(topic);
@@ -1171,6 +1307,49 @@ public class AllInOneV2 extends Activity {
 					}
 					
 					wtl("amp response block finished");
+					break;
+					
+				case TRACKED_TOPICS:
+					headerTitle = Session.getUser() + "'s Tracked Topics";
+					updateHeaderNoJumper(headerTitle, desc);
+					tbody = pRes.getElementsByTag("tbody").first();
+					
+					if (tbody != null) {
+						for (Element row : tbody.children()) {
+							// [remove] [title] [board name] [msgs] [last [pst]
+							Elements cells = row.children();
+							String removeLink = cells.get(0).child(0)
+									.attr("href");
+							String topicLink = cells.get(1).child(0)
+									.attr("href");
+							String topicText = cells.get(1).text();
+							String board = cells.get(2).text();
+							String msgs = cells.get(3).text();
+							String lPostLink = cells.get(4).child(0)
+									.attr("href");
+							String lPostText = cells.get(4).text();
+
+							TrackedTopicView tt = new TrackedTopicView(this,
+									board, topicText, lPostText, msgs,
+									topicLink);
+							tt.setOnClickListener(cl);
+
+							LinkButtonView st = (LinkButtonView) tt
+									.findViewById(R.id.ttStopTracking);
+							st.setUrlAndType(removeLink, Type.STOP_TRACK);
+							st.setOnClickListener(cl);
+
+							LinkButtonView lp = (LinkButtonView) tt
+									.findViewById(R.id.ttLastPostLink);
+							lp.setUrlAndType(lPostLink, Type.LAST_POST);
+							lp.setOnClickListener(cl);
+
+							content.addView(tt);
+						}
+					}
+					else {
+						content.addView(new HeaderView(this, "You have no tracked topics at this time."));
+					}
 					break;
 					
 				case BOARD:
@@ -1194,76 +1373,89 @@ public class AllInOneV2 extends Activity {
 					
 					if (!isSplitList) {
 						String url = res.url().toString();
-						String searchQuery = "";
-						String searchPJAddition = "";
+						String searchQuery = EMPTY_STRING;
+						String searchPJAddition = EMPTY_STRING;
 						if (url.contains("search=")) {
 							wtl("board search url: " + url);
 							searchQuery = url.substring(url.indexOf("search=") + 7);
 							int i = searchQuery.indexOf('&');
 							if (i != -1)
-								searchQuery.replace(searchQuery.substring(i), "");
+								searchQuery.replace(searchQuery.substring(i), EMPTY_STRING);
 							
 							searchPJAddition = "&search=" + searchQuery;
 							searchQuery = URLDecoder.decode(searchQuery);
 						}
 						
-						if (searchQuery.equals("")) {
-							headerTitle = pRes.getElementsByClass("page-title").first().text();
-						}
-						else {
-							headerTitle = pRes.getElementsByClass("page-title").first().text() + " (search: " + searchQuery + ")";
-						}
+						Element headerElem = pRes.getElementsByClass("page-title").first();
+						if (headerElem != null)
+							headerTitle = headerElem.text();
+						else
+							headerTitle = "GFAQs Cache Error, Board Title Not Found";
 						
-						pj = pRes.select("ul.paginate").get(1);
-						if (pj != null && !pj.hasClass("user")) {
-							int x = 0;
-							String pjText = pj.child(x).text();
-							while (pjText.contains("First") || pjText.contains("Previous")) {
-								x++;
-								pjText = pj.child(x).text();
-							}
-							// Page [dropdown] of 3
-							// Page 1 of 3
-							int ofIndex = pjText.indexOf(" of ");
-							int currPageStart = 5;
-							if (pj.getElementsByTag("select").isEmpty())
-								currPage = pjText.substring(currPageStart, ofIndex);
-							else
-								currPage = pj.select("option[selected=selected]").first().text();
-							
-							int pageCountEnd = pjText.length();
-							pageCount = pjText.substring(ofIndex + 4, pageCountEnd);
-							int currPageNum = Integer.parseInt(currPage);
-							int pageCountNum = Integer.parseInt(pageCount);
-							
-							if (currPageNum > 1) {
-								firstPage = "boards/" + boardID + "?page=0" + searchPJAddition;
-								prevPage = "boards/" + boardID + "?page=" + (currPageNum - 2) + searchPJAddition;
-							}
-							if (currPageNum != pageCountNum) {
-								nextPage =  "boards/" + boardID + "?page=" + currPageNum + searchPJAddition;
-								lastPage =  "boards/" + boardID + "?page=" + (pageCountNum - 1) + searchPJAddition;
+						if (searchQuery.length() > 0) 
+							headerTitle += " (search: " + searchQuery + ")";
+						
+						if (pRes.select("ul.paginate").size() > 1) {
+							pj = pRes.select("ul.paginate").get(1);
+							if (pj != null && !pj.hasClass("user")) {
+								int x = 0;
+								String pjText = pj.child(x).text();
+								while (pjText.contains("First")
+										|| pjText.contains("Previous")) {
+									x++;
+									pjText = pj.child(x).text();
+								}
+								// Page [dropdown] of 3
+								// Page 1 of 3
+								int ofIndex = pjText.indexOf(" of ");
+								int currPageStart = 5;
+								if (pj.getElementsByTag("select").isEmpty())
+									currPage = pjText.substring(currPageStart,
+											ofIndex);
+								else
+									currPage = pj
+											.select("option[selected=selected]")
+											.first().text();
+
+								int pageCountEnd = pjText.length();
+								pageCount = pjText.substring(ofIndex + 4,
+										pageCountEnd);
+								int currPageNum = Integer.parseInt(currPage);
+								int pageCountNum = Integer.parseInt(pageCount);
+
+								if (currPageNum > 1) {
+									firstPage = "boards/" + boardID + "?page=0"
+											+ searchPJAddition;
+									prevPage = "boards/" + boardID + "?page="
+											+ (currPageNum - 2)
+											+ searchPJAddition;
+								}
+								if (currPageNum != pageCountNum) {
+									nextPage = "boards/" + boardID + "?page="
+											+ currPageNum + searchPJAddition;
+									lastPage = "boards/" + boardID + "?page="
+											+ (pageCountNum - 1)
+											+ searchPJAddition;
+								}
 							}
 						}
-						
 						updateHeader(headerTitle, firstPage, prevPage, currPage, 
 								pageCount, nextPage, lastPage, NetDesc.BOARD);
 						
 						searchIcon.setVisible(true);
 						
 						if (Session.isLoggedIn()) {
-							String favtext;
-							if (usingUserPanel) 
-								favtext = pRes.getElementsByClass("links").first().text().toLowerCase(Locale.US);
-							else 
-								favtext = pRes.getElementsByClass("user").first().text().toLowerCase(Locale.US);
-							
-							if (favtext.contains("add to favorites"))
+							String favtext = pRes.getElementsByClass("user").first().text().toLowerCase(Locale.US);
+							if (favtext.contains("add to favorites")) {
 								addFavIcon.setVisible(true);
-							else if (favtext.contains("remove favorite"))
+								fMode = FavMode.ON_BOARD;
+							}
+							else if (favtext.contains("remove favorite")) {
 								remFavIcon.setVisible(true);
+								fMode = FavMode.ON_BOARD;
+							}
 
-							updatePostingRights(pRes, false, usingUserPanel);
+							updatePostingRights(pRes, false);
 						}
 
 						wtl("updating user level");
@@ -1315,8 +1507,8 @@ public class AllInOneV2 extends Activity {
 									
 									TopicView topic = new TopicView(this, title, tc, lastPost, mCount, tUrl, type, hlColor);
 									topic.setOnClickListener(cl);
-									LastPostView lp = (LastPostView) topic.findViewById(R.id.tvLastPostLink);
-									lp.setUrl(lpUrl);
+									LinkButtonView lp = (LinkButtonView) topic.findViewById(R.id.tvLastPostLink);
+									lp.setUrlAndType(lpUrl, Type.LAST_POST);
 									lp.setOnClickListener(cl);
 									
 									content.addView(topic);
@@ -1348,43 +1540,62 @@ public class AllInOneV2 extends Activity {
 					else
 						headerTitle = "GFAQs Cache Error, Title Not Found";
 
-					pj = pRes.select("ul.paginate").get(1);
-					if (pj != null && !pj.hasClass("user")) {
-						int x = 0;
-						String pjText = pj.child(x).text();
-						while (pjText.contains("First") || pjText.contains("Previous")) {
-							x++;
-							pjText = pj.child(x).text();
-						}
-						// Page [dropdown] of 3
-						// Page 1 of 3
-						int ofIndex = pjText.indexOf(" of ");
-						int currPageStart = 5;
-						if (pj.getElementsByTag("select").isEmpty())
-							currPage = pjText.substring(currPageStart, ofIndex);
-						else
-							currPage = pj.select("option[selected=selected]").first().text();
-						
-						int pageCountEnd = pjText.length();
-						pageCount = pjText.substring(ofIndex + 4, pageCountEnd);
-						int currPageNum = Integer.parseInt(currPage);
-						int pageCountNum = Integer.parseInt(pageCount);
-						
-						if (currPageNum > 1) {
-							firstPage = "boards/" + boardID + "/" + topicID;
-							prevPage = "boards/" + boardID + "/" + topicID + "?page=" + (currPageNum - 2);
-						}
-						if (currPageNum != pageCountNum) {
-							nextPage =  "boards/" + boardID + "/" + topicID + "?page=" + currPageNum;
-							lastPage =  "boards/" + boardID + "/" + topicID + "?page=" + (pageCountNum - 1);
+					if (pRes.select("ul.paginate").size() > 1) {
+						pj = pRes.select("ul.paginate").get(1);
+						if (pj != null && !pj.hasClass("user")) {
+							int x = 0;
+							String pjText = pj.child(x).text();
+							while (pjText.contains("First")
+									|| pjText.contains("Previous")) {
+								x++;
+								pjText = pj.child(x).text();
+							}
+							// Page [dropdown] of 3
+							// Page 1 of 3
+							int ofIndex = pjText.indexOf(" of ");
+							int currPageStart = 5;
+							if (pj.getElementsByTag("select").isEmpty())
+								currPage = pjText.substring(currPageStart,
+										ofIndex);
+							else
+								currPage = pj
+										.select("option[selected=selected]")
+										.first().text();
+
+							int pageCountEnd = pjText.length();
+							pageCount = pjText.substring(ofIndex + 4,
+									pageCountEnd);
+							int currPageNum = Integer.parseInt(currPage);
+							int pageCountNum = Integer.parseInt(pageCount);
+
+							if (currPageNum > 1) {
+								firstPage = "boards/" + boardID + "/" + topicID;
+								prevPage = "boards/" + boardID + "/" + topicID
+										+ "?page=" + (currPageNum - 2);
+							}
+							if (currPageNum != pageCountNum) {
+								nextPage = "boards/" + boardID + "/" + topicID
+										+ "?page=" + currPageNum;
+								lastPage = "boards/" + boardID + "/" + topicID
+										+ "?page=" + (pageCountNum - 1);
+							}
 						}
 					}
-					
 					updateHeader(headerTitle, firstPage, prevPage, currPage, 
 							pageCount, nextPage, lastPage, NetDesc.TOPIC);
 					
 					if (Session.isLoggedIn()) {
-						updatePostingRights(pRes, true, usingUserPanel);
+						String favtext = pRes.getElementsByClass("user").first().text().toLowerCase(Locale.US);
+						if (favtext.contains("track topic")) {
+							addFavIcon.setVisible(true);
+							fMode = FavMode.ON_TOPIC;
+						}
+						else if (favtext.contains("stop tracking")) {
+							remFavIcon.setVisible(true);
+							fMode = FavMode.ON_TOPIC;
+						}
+						
+						updatePostingRights(pRes, true);
 					}
 					
 					updateUserLevel(pRes);
@@ -1400,9 +1611,9 @@ public class AllInOneV2 extends Activity {
 						String user = null;
 						String postNum = null;
 						String mID = null;
-						String userTitles = "";
-						String postTimeText = "";
-						String postTime = "";
+						String userTitles = EMPTY_STRING;
+						String postTimeText = EMPTY_STRING;
+						String postTime = EMPTY_STRING;
 						Element msgBody = null;
 						
 						if (row.hasClass("left")) {
@@ -1616,12 +1827,12 @@ public class AllInOneV2 extends Activity {
 //					while (finalBody.contains("<a href")) {
 //						int start = finalBody.indexOf("<a href");
 //						int end = finalBody.indexOf(">", start) + 1;
-//						finalBody = finalBody.replace(finalBody.substring(start, end), "");
+//						finalBody = finalBody.replace(finalBody.substring(start, end), EMPTY_STRING);
 //					}
-//					finalBody = finalBody.replace("</a>", "");
+//					finalBody = finalBody.replace("</a>", EMPTY_STRING);
 //					if (finalBody.endsWith("<br />"))
 //						finalBody = finalBody.substring(0, finalBody.length() - 6);
-//					finalBody = finalBody.replace("\n", "");
+//					finalBody = finalBody.replace("\n", EMPTY_STRING);
 //					finalBody = finalBody.replace("<br />", "\n");
 //					
 //					finalBody = StringEscapeUtils.unescapeHtml4(finalBody);
@@ -1639,14 +1850,14 @@ public class AllInOneV2 extends Activity {
 					String searchQuery = url.substring(url.indexOf("game=") + 5);
 					int i = searchQuery.indexOf("&");
 					if (i != -1)
-						searchQuery = searchQuery.replace(searchQuery.substring(i), "");
+						searchQuery = searchQuery.replace(searchQuery.substring(i), EMPTY_STRING);
 					
 					int pageIndex = url.indexOf("page=");
 					if (pageIndex != -1) {
 						currPage = url.substring(pageIndex + 5);
 						i = currPage.indexOf("&");
 						if (i != -1)
-							currPage = currPage.replace(currPage.substring(i), "");
+							currPage = currPage.replace(currPage.substring(i), EMPTY_STRING);
 					}
 					else {
 						currPage = "0";
@@ -1668,7 +1879,7 @@ public class AllInOneV2 extends Activity {
 						firstPage = "/search/index.html?game=" + searchQuery + "&page=0";
 					}
 					
-					headerTitle = "Searching games: " + URLDecoder.decode(searchQuery) + "";
+					headerTitle = "Searching games: " + URLDecoder.decode(searchQuery) + EMPTY_STRING;
 					
 					updateHeader(headerTitle, firstPage, prevPage, Integer.toString(currPageNum + 1), 
 								 pageCount, nextPage, lastPage, NetDesc.GAME_SEARCH);
@@ -1686,7 +1897,7 @@ public class AllInOneV2 extends Activity {
 							else
 								content.addView(new HeaderView(this, "Good Matches"));
 							
-							String prevPlatform = "";
+							String prevPlatform = EMPTY_STRING;
 							
 							wtl("board row parsing start");
 							for (Element row : table.getElementsByTag("tr")) {
@@ -1859,33 +2070,17 @@ public class AllInOneV2 extends Activity {
 		}
 	}
 	
-	private void updatePostingRights(Document pRes, boolean onTopic, boolean usingUserPanel) {
+	private void updatePostingRights(Document pRes, boolean onTopic) {
 		if (onTopic) {
-			if (usingUserPanel) {
-				if (pRes.getElementsByClass("links").first().text().contains("Post new message")) {
-					postIcon.setVisible(true);
-					pMode = PostMode.ON_TOPIC;
-				}
-			}
-			else {
-				if (pRes.getElementsByClass("user").first().text().contains("Post New Message")) {
-					postIcon.setVisible(true);
-					pMode = PostMode.ON_TOPIC;
-				}
+			if (pRes.getElementsByClass("user").first().text().contains("Post New Message")) {
+				postIcon.setVisible(true);
+				pMode = PostMode.ON_TOPIC;
 			}
 		}
 		else {
-			if (usingUserPanel) {
-				if (pRes.getElementsByClass("links").first().text().contains("Post a new topic")) {
-					postIcon.setVisible(true);
-					pMode = PostMode.ON_BOARD;
-				}
-			}
-			else {
-				if (pRes.getElementsByClass("user").first().text().contains("New Topic")) {
-					postIcon.setVisible(true);
-					pMode = PostMode.ON_BOARD;
-				}
+			if (pRes.getElementsByClass("user").first().text().contains("New Topic")) {
+				postIcon.setVisible(true);
+				pMode = PostMode.ON_BOARD;
 			}
 		}
 	}
@@ -1916,15 +2111,24 @@ public class AllInOneV2 extends Activity {
 				goToLastPost = false;
 				session.get(NetDesc.TOPIC, ((TopicView)v).getUrl(), null);
 			}
-			else if (LastPostView.class.isInstance(v)) {
-				goToLastPost = true;
-				session.get(NetDesc.TOPIC, ((LastPostView)v).getUrl(), null);
+			else if (TrackedTopicView.class.isInstance(v)) {
+				goToLastPost = false;
+				session.get(NetDesc.TOPIC, ((TrackedTopicView)v).getUrl(), null);
+			}
+			else if (LinkButtonView.class.isInstance(v)) {
+				if (((LinkButtonView) v).getType() == Type.LAST_POST) {
+					goToLastPost = true;
+					session.get(NetDesc.TOPIC, ((LinkButtonView) v).getUrl(), null);
+				}
+				else if (((LinkButtonView) v).getType() == Type.STOP_TRACK) {
+					session.get(NetDesc.TRACKED_TOPICS, ((LinkButtonView) v).getUrl(), null);
+				}
 			}
 			else if (PMView.class.isInstance(v)) {
 				session.get(NetDesc.READ_PM, ((PMView)v).getUrl(), null);
 			}
 			else if (PMDetailView.class.isInstance(v)) {
-				pmSetup(((PMDetailView)v).getSender(), ((PMDetailView)v).getTitle(), "");
+				pmSetup(((PMDetailView)v).getSender(), ((PMDetailView)v).getTitle(), EMPTY_STRING);
 			}
 		}
 
@@ -2239,7 +2443,7 @@ public class AllInOneV2 extends Activity {
 		});
 		return dialog;
     }
-    private void clearPoll() {pollUse = false; pollTitle = ""; for (int x = 0; x < 10; x++)pollOptions[x] = ""; pollMinLevel = -1;}
+    private void clearPoll() {pollUse = false; pollTitle = EMPTY_STRING; for (int x = 0; x < 10; x++)pollOptions[x] = EMPTY_STRING; pollMinLevel = -1;}
 
     
 	private Dialog createReportMessageDialog() {
@@ -2361,9 +2565,9 @@ public class AllInOneV2 extends Activity {
 						String subjectContent = subject.getText().toString();
 						String messageContent = message.getText().toString();
 						
-						if (!toContent.equals("")) {
-							if (!subjectContent.equals("")) {
-								if (!messageContent.equals("")) {
+						if (toContent.length() > 0) {
+							if (subjectContent.length() > 0) {
+								if (messageContent.length() > 0) {
 									savedTo = toContent;
 									savedSubject = subjectContent;
 									savedMessage = messageContent;
@@ -2417,17 +2621,17 @@ public class AllInOneV2 extends Activity {
     	if (toIn != null && !toIn.equals("null"))
     		savedTo = toIn;
     	else
-    		savedTo = "";
+    		savedTo = EMPTY_STRING;
     	
     	if (subjectIn != null && !subjectIn.equals("null"))
     		savedSubject = subjectIn;
     	else
-    		savedSubject = "";
+    		savedSubject = EMPTY_STRING;
     	
     	if (messageIn != null && !messageIn.equals("null"))
     		savedMessage = messageIn;
     	else
-    		savedMessage = "";
+    		savedMessage = EMPTY_STRING;
     	
     	savedTo = URLDecoder.decode(savedTo);
     	savedSubject = URLDecoder.decode(savedSubject);
@@ -2466,23 +2670,23 @@ public class AllInOneV2 extends Activity {
 	}
 	
 	public String getSig() {
-    	String sig = "";
+    	String sig = EMPTY_STRING;
     	
     	if (session != null) {
 			if (Session.isLoggedIn())
-				sig = settings.getString("customSig" + Session.getUser(), "");
+				sig = settings.getString("customSig" + Session.getUser(), EMPTY_STRING);
 		}
     	
-    	if (sig.equals(""))
-    		sig = settings.getString("customSig", "");
+    	if (sig.length() == 0)
+    		sig = settings.getString("customSig", EMPTY_STRING);
     	
-		if (sig.equals(""))
+		if (sig.length() == 0)
     		sig = defaultSig;
 		
 		try {
 			sig = sig.replace("*grver*", this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName);
 		} catch (NameNotFoundException e) {
-			sig = sig.replace("*grver*", "");
+			sig = sig.replace("*grver*", EMPTY_STRING);
 			e.printStackTrace();
 		}
 		
@@ -2554,18 +2758,18 @@ public class AllInOneV2 extends Activity {
 		int i = boardUrl.indexOf('/');
 		if (i != -1) {
 			String replacer = boardUrl.substring(i);
-			boardUrl = boardUrl.replace(replacer, "");
+			boardUrl = boardUrl.replace(replacer, EMPTY_STRING);
 		}
 		
 		i = boardUrl.indexOf('?');
 		if (i != -1) {
 			String replacer = boardUrl.substring(i);
-			boardUrl = boardUrl.replace(replacer, "");
+			boardUrl = boardUrl.replace(replacer, EMPTY_STRING);
 		}
 		i = boardUrl.indexOf('#');
 		if (i != -1) {
 			String replacer = boardUrl.substring(i);
-			boardUrl = boardUrl.replace(replacer, "");
+			boardUrl = boardUrl.replace(replacer, EMPTY_STRING);
 		}
 		
 		boardID = boardUrl;
@@ -2580,17 +2784,17 @@ public class AllInOneV2 extends Activity {
 		int i = topicUrl.indexOf('/');
 		if (i != -1) {
 			String replacer = topicUrl.substring(i);
-			topicUrl = topicUrl.replace(replacer, "");
+			topicUrl = topicUrl.replace(replacer, EMPTY_STRING);
 		}
 		i = topicUrl.indexOf('?');
 		if (i != -1) {
 			String replacer = topicUrl.substring(i);
-			topicUrl = topicUrl.replace(replacer, "");
+			topicUrl = topicUrl.replace(replacer, EMPTY_STRING);
 		}
 		i = topicUrl.indexOf('#');
 		if (i != -1) {
 			String replacer = topicUrl.substring(i);
-			topicUrl = topicUrl.replace(replacer, "");
+			topicUrl = topicUrl.replace(replacer, EMPTY_STRING);
 		}
 		topicID = topicUrl;
 		wtl("topicID: " + topicID);

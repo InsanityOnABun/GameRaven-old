@@ -10,6 +10,13 @@
         android:visible="false">
     </item>
     <item
+        android:id="@+id/topiclist"
+        android:icon="?attr/themedTopicListIcon"
+        android:showAsAction="always"
+        android:title="Return to Topic List"
+        android:visible="false">
+    </item>
+    <item
         android:id="@+id/addFav"
         android:icon="?attr/themedAddFavIcon"
         android:showAsAction="always"
@@ -21,13 +28,6 @@
         android:icon="?attr/themedRemFavIcon"
         android:showAsAction="always"
         android:title="Remove from Favorites"
-        android:visible="false">
-    </item>
-    <item
-        android:id="@+id/topiclist"
-        android:icon="?attr/themedTopicListIcon"
-        android:showAsAction="always"
-        android:title="Return to Topic List"
         android:visible="false">
     </item>
     <item

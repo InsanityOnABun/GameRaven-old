@@ -26,10 +26,13 @@ import android.widget.Toast;
 
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.Session;
+import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 
 public class NotifierService extends IntentService {
 	
-	private static final int NOTIF_ID = 1;
+	public static final int NOTIF_ID = 1;
+	public static final String NOTIF_TAG = "GR_NOTIF";
+	
 	
 	public NotifierService() {
 		super("GameRavenNotifierWorker");
@@ -87,60 +90,94 @@ public class NotifierService extends IntentService {
 				Log.d("notif", "third connection finished");
 
 				if (r.statusCode() != 401) {
+					boolean amp = false, tt = false , pm = false;
 					Log.d("notif", "status is good");
 					pRes = r.parse();
 					Log.d("notif", pRes.title());
-					Element lPost = pRes.select("td.lastpost").first();
-					if (lPost != null) {
-						// 4/25 8:23PM
-						// 1/24/2012
-						String lTime = lPost.text();
-						lTime = lTime.replace("Last:", "");
-						Log.d("notif", "time is " + lTime);
-						Date newDate;
-						if (lTime.contains("AM") || lTime.contains("PM"))
-							newDate = new SimpleDateFormat("MM'/'dd hh':'mmaa",
-									Locale.US).parse(lTime);
-						else
-							newDate = new SimpleDateFormat("MM'/'dd'/'yyyy",
-									Locale.US).parse(lTime);
+					
+					if (prefs.getBoolean("notifsAMPEnable", false)) {
+						Element lPost = pRes.select("td.lastpost").first();
+						if (lPost != null) {
+							// 4/25 8:23PM
+							// 1/24/2012
+							String lTime = lPost.text();
+							lTime = lTime.replace("Last:", "");
+							Log.d("notif", "time is " + lTime);
+							Date newDate;
+							if (lTime.contains("AM") || lTime.contains("PM"))
+								newDate = new SimpleDateFormat(
+										"MM'/'dd hh':'mmaa", Locale.US)
+										.parse(lTime);
+							else
+								newDate = new SimpleDateFormat(
+										"MM'/'dd'/'yyyy", Locale.US)
+										.parse(lTime);
 
-						long newTime = newDate.getTime();
-						long oldTime = prefs.getLong("notifsLastPost", 0);
-						if (newTime > oldTime) {
-							Log.d("notif", "time is newer");
-							prefs.edit().putLong("notifsLastPost", newTime)
-									.commit();
-
-							NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(
-									this)
-									.setSmallIcon(R.drawable.ic_notif_small)
-									.setContentTitle("GameRaven")
-									.setContentText("New posts found, click to view");
-
-							Intent ampCheck = new Intent(this, AllInOneV2.class);
-							ampCheck.putExtra("forceAMP", true);
-
-							// The stack builder object will contain an artificial back stack for the started Activity.
-							// This ensures that navigating backward from the Activity leads out of
-							// your application to the Home screen.
-							TaskStackBuilder stackBuilder = TaskStackBuilder
-									.create(this);
-							// Adds the back stack for the Intent (but not the Intent itself)
-							stackBuilder.addParentStack(AllInOneV2.class);
-							// Adds the Intent that starts the Activity to the top of the stack
-							stackBuilder.addNextIntent(ampCheck);
-
-							PendingIntent pendingAMPCheck = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-							notifBuilder.setContentIntent(pendingAMPCheck);
-							notifBuilder.setAutoCancel(true);
-							notifBuilder.setDefaults(Notification.DEFAULT_ALL);
-
-							NotificationManager notifManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-							// mId allows you to update the notification later on.
-							notifManager.notify(NOTIF_ID, notifBuilder.build());
+							long newTime = newDate.getTime();
+							long oldTime = prefs.getLong("notifsLastPost", 0);
+							if (newTime > oldTime) {
+								amp = true;
+								Log.d("notif", "time is newer");
+								prefs.edit().putLong("notifsLastPost", newTime)
+										.commit();
+							}
 						}
+					}
+					
+					if (prefs.getBoolean("notifsPMEnable", false)) {
+						Element pmInboxLink = pRes.select("a[href=/pm/]")
+								.first();
+						if (pmInboxLink != null) {
+							if (!pmInboxLink.text().equals("Inbox")) {
+								pm = true;
+							}
+						}
+					}
+					
+					if (prefs.getBoolean("notifsTTEnable", false)) {
+						Element trackedLink = pRes.select(
+								"a[href=/boards/tracked]").first();
+						if (trackedLink != null) {
+							if (!trackedLink.text().equals("Topics")) {
+								tt = true;
+							}
+						}
+					}
+					
+					if (amp || pm || tt) {
+						StringBuilder notifText = new StringBuilder("New ");
+						
+						if (pm) {
+							if (amp || tt)
+								notifText.append("PM(s), ");
+							else
+								notifText.append("PM(s)");
+						}
+						if (amp || tt) {
+							notifText.append("post(s) in ");
+							if (amp && tt)
+								notifText.append("AMP list & tracked topics");
+							else if (amp)
+								notifText.append("AMP list");
+							else if (tt)
+								notifText.append("tracked topics");
+						}
+						
+						notifText.append(" found");
+						
+						NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(
+								this)
+								.setSmallIcon(R.drawable.ic_notif_small)
+								.setContentTitle("GameRaven")
+								.setContentText(notifText.toString());
+						Intent notifIntent = new Intent(this, AllInOneV2.class);
+						PendingIntent pendingNotif = PendingIntent.getActivity(this, 0, notifIntent, PendingIntent.FLAG_ONE_SHOT);
+						notifBuilder.setContentIntent(pendingNotif);
+						notifBuilder.setAutoCancel(true);
+						notifBuilder.setDefaults(Notification.DEFAULT_ALL);
+						NotificationManager notifManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+						// mId allows you to update the notification later on.
+						notifManager.notify(NOTIF_TAG, NOTIF_ID, notifBuilder.build());
 					}
 				}
 
@@ -153,6 +190,11 @@ public class NotifierService extends IntentService {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public static void dismissNotif(Context c) {
+		NotificationManager notifManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+		notifManager.cancel(NOTIF_TAG, NOTIF_ID);
 	}
 
 }

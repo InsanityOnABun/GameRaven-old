@@ -105,6 +105,22 @@
                     android:visibility="visible" />
 
                 <Button
+                    android:id="@+id/dwrTrackedTopics"
+                    style="@style/Widget.Sherlock.ActionButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="?android:attr/listPreferredItemHeight"
+                    android:gravity="left|center_vertical"
+                    android:text="Tracked Topics" />
+
+                <View
+                    android:id="@+id/dwrTTSep"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="3dp"
+                    android:background="#555555"
+                    android:visibility="visible" />
+
+                <Button
                     android:id="@+id/dwrPMInbox"
                     style="@style/Widget.Sherlock.ActionButton"
                     android:layout_width="match_parent"

@@ -29,10 +29,32 @@
             android:disableDependentsState="false"
             android:key="notifsEnable"
             android:persistent="true"
-            android:summary="You should view the AMP list for the default account once after enabling."
-            android:title="Enable Notifications" />
+            android:summary="Enable or disable notifications entirely."
+            android:title="Enable Notifications (Default Account Only)" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:dependency="notifsEnable"
+            android:key="notifsAMPEnable"
+            android:persistent="true"
+            android:summary="Enable notifications for new AMP posts."
+            android:title="AMP List Notifications" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:dependency="notifsEnable"
+            android:key="notifsTTEnable"
+            android:persistent="true"
+            android:summary="Enable notifications for new posts in tracked topics."
+            android:title="Tracked Topic Notifications" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:dependency="notifsEnable"
+            android:key="notifsPMEnable"
+            android:persistent="true"
+            android:summary="Enable notifications for new private messages."
+            android:title="PM Notifications" />
 
         <ListPreference
+            android:defaultValue="60"
             android:dependency="notifsEnable"
             android:entries="@array/notifsFrequencyNames"
             android:entryValues="@array/notifsFrequencyMinutes"
@@ -53,18 +75,21 @@
             android:summaryOn="New sessions will start on the Active Messages Posted List"
             android:title="Start on AMP List" />
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="reloadOnBack"
             android:persistent="true"
             android:summaryOff="Do not reload pages when navigating back."
             android:summaryOn="Reload pages when navigating back."
             android:title="Reload On Back" />
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="reloadOnResume"
             android:persistent="true"
             android:summaryOff="Do not reload pages when app is resumed."
             android:summaryOn="Reload pages when app is resumed."
             android:title="Reload On Resume" />
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="enablePTR"
             android:persistent="true"
             android:summary="Enables the option to refresh the page by pulling past the top or bottom."

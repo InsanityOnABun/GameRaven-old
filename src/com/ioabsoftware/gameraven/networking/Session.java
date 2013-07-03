@@ -16,7 +16,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
@@ -205,6 +204,7 @@ public class Session implements HandlesNetworkResult {
 	public void preExecuteSetup(NetDesc desc) {
 		switch (desc) {
 		case AMP_LIST:
+		case TRACKED_TOPICS:
 		case BOARD:
 		case BOARD_JUMPER:
 		case TOPIC:
@@ -248,7 +248,7 @@ public class Session implements HandlesNetworkResult {
 	public void handleNetworkResult(Response res, NetDesc desc) {
 		aio.wtl("session hNR fired, desc: " + desc.name());
 		try {
-			if (res != null && !res.body().equals("")) {
+			if (res != null && !res.body().equals(AllInOneV2.EMPTY_STRING)) {
 				
 				if (desc == NetDesc.DEV_UPDATE_CHECK) {
 					aio.wtl("session hNR has determined this is an update check");
@@ -291,6 +291,7 @@ public class Session implements HandlesNetworkResult {
 				
 				switch (desc) {
 				case AMP_LIST:
+				case TRACKED_TOPICS:
 				case BOARD:
 				case BOARD_JUMPER:
 				case TOPIC:
@@ -335,6 +336,7 @@ public class Session implements HandlesNetworkResult {
 					if (lastPath != null) {
 						switch (lastDesc) {
 						case AMP_LIST:
+						case TRACKED_TOPICS:
 						case BOARD:
 						case BOARD_JUMPER:
 						case TOPIC:
@@ -399,6 +401,7 @@ public class Session implements HandlesNetworkResult {
 				
 				switch (desc) {
 				case AMP_LIST:
+				case TRACKED_TOPICS:
 				case BOARD:
 				case BOARD_JUMPER:
 				case TOPIC:
@@ -472,7 +475,11 @@ public class Session implements HandlesNetworkResult {
 					
 				case LOGIN_S2:
 					aio.wtl("session hNR determined this is login step 2");
-					if (AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false) || aio.consumeForceAMP()) {
+					if (aio.consumeForcePM())
+						get(NetDesc.PM_INBOX, "/pm/", null);
+					else if (aio.consumeForceTT())
+						get(NetDesc.TRACKED_TOPICS, "/boards/tracked", null);
+					else if (AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false) || aio.consumeForceAMP()) {
 						aio.wtl("loading AMP");
 						get(NetDesc.AMP_LIST, AllInOneV2.buildAMPLink(), null);
 					}
@@ -492,7 +499,7 @@ public class Session implements HandlesNetworkResult {
 					
 					String sig;
 					if (desc == NetDesc.QEDIT_MSG)
-						sig = "";
+						sig = AllInOneV2.EMPTY_STRING;
 					else
 						sig = aio.getSig();
 					
@@ -691,7 +698,7 @@ public class Session implements HandlesNetworkResult {
 					
 				case TOPIC:
 					aio.wtl("session hNR determined this is a topic");
-					if (!pRes.select("p:contains(no longer available)").isEmpty()) {
+					if (!pRes.select("p:contains(no longer available for viewing)").isEmpty()) {
 						Toast.makeText(aio, "The topic you selected is no longer available for viewing.", Toast.LENGTH_SHORT).show();
 						aio.wtl("topic is no longer available, treat response as a board");
 						aio.processContent(res, NetDesc.BOARD);
@@ -763,6 +770,7 @@ public class Session implements HandlesNetworkResult {
 				case GAME_SEARCH:
 				case BOARD_LIST:
 				case AMP_LIST:
+				case TRACKED_TOPICS:
 				case BOARD:
 				case BOARD_JUMPER:
 				case UNSPECIFIED:
@@ -799,6 +807,7 @@ public class Session implements HandlesNetworkResult {
 	public void postExecuteCleanup(NetDesc desc) {
 		switch (desc) {
 		case AMP_LIST:
+		case TRACKED_TOPICS:
 		case BOARD:
 		case BOARD_JUMPER:
 		case TOPIC:

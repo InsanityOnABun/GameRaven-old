@@ -45,6 +45,8 @@ import com.ioabsoftware.gameraven.db.HighlightedUser;
 
 public class SettingsMain extends SherlockPreferenceActivity {
 	
+	public static final String NO_DEFAULT_ACCOUNT = "N/A";
+	
 	public static final int MODIFY_SIG_DIALOG = 200;
 	public static final int MODIFY_AMPSORT_DIALOG = 201;
 	
@@ -139,7 +141,7 @@ public class SettingsMain extends SherlockPreferenceActivity {
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				if ((Boolean) newValue == true) {
 					// enabling notifications
-					if (settings.getString("defaultAccount", "N/A").equals("N/A")) {
+					if (settings.getString("defaultAccount", NO_DEFAULT_ACCOUNT).equals(NO_DEFAULT_ACCOUNT)) {
 						Toast.makeText(SettingsMain.this, "You have no default account set!", Toast.LENGTH_SHORT).show();
 						return false;
 					}
@@ -291,7 +293,7 @@ public class SettingsMain extends SherlockPreferenceActivity {
 				}
 				buf.append("[END_HIGHLIGHT_LIST]\n");
 				
-				buf.append("defaultAccount=" + settings.getString("defaultAccount", "N/A") + '\n');
+				buf.append("defaultAccount=" + settings.getString("defaultAccount", NO_DEFAULT_ACCOUNT) + '\n');
 				
 				if (settings.getBoolean("notifsEnable", false))
 					buf.append("notifsEnable=true\n");

@@ -3,7 +3,7 @@
     package="com.ioabsoftware.gameraven"
     android:installLocation="internalOnly"
     android:versionCode="1"
-    android:versionName="0.3.18" >
+    android:versionName="0.3.19" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -21,6 +21,7 @@
         <activity
             android:name="com.ioabsoftware.gameraven.AllInOneV2"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="stateHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
