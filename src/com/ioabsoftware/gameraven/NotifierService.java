@@ -125,8 +125,7 @@ public class NotifierService extends IntentService {
 					}
 					
 					if (prefs.getBoolean("notifsPMEnable", false)) {
-						Element pmInboxLink = pRes.select("a[href=/pm/]")
-								.first();
+						Element pmInboxLink = pRes.select("div.masthead_user").first().select("a[href=/pm/]").first();
 						if (pmInboxLink != null) {
 							if (!pmInboxLink.text().equals("Inbox")) {
 								pm = true;
@@ -135,8 +134,7 @@ public class NotifierService extends IntentService {
 					}
 					
 					if (prefs.getBoolean("notifsTTEnable", false)) {
-						Element trackedLink = pRes.select(
-								"a[href=/boards/tracked]").first();
+						Element trackedLink = pRes.select("div.masthead_user").first().select("a[href=/boards/tracked]").first();
 						if (trackedLink != null) {
 							if (!trackedLink.text().equals("Topics")) {
 								tt = true;

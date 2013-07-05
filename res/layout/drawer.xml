@@ -88,21 +88,26 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" >
 
-                <Button
-                    android:id="@+id/dwrAMPList"
-                    style="@style/Widget.Sherlock.ActionButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="?android:attr/listPreferredItemHeight"
-                    android:gravity="left|center_vertical"
-                    android:text="AMP List" />
-
-                <View
-                    android:id="@+id/dwrAMPSep"
+                <LinearLayout
+                    android:id="@+id/dwrAMPWrapper"
                     android:layout_width="fill_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginBottom="3dp"
-                    android:background="#555555"
-                    android:visibility="visible" />
+                    android:layout_height="wrap_content" android:orientation="vertical">
+                    <Button
+                        android:id="@+id/dwrAMPList"
+                        style="@style/Widget.Sherlock.ActionButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="?android:attr/listPreferredItemHeight"
+                        android:gravity="left|center_vertical"
+                        android:text="AMP List" />
+    
+                    <View
+                        android:id="@+id/dwrAMPSep"
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="3dp"
+                        android:background="#555555"
+                        android:visibility="visible" />
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/dwrTrackedTopics"

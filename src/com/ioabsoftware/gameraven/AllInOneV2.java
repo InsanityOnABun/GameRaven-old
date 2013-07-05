@@ -214,36 +214,6 @@ public class AllInOneV2 extends Activity {
 	public static StateListDrawable getSelector() {return selector;}
 	private static boolean isAccentLight;
 	public static boolean isAccentLight() {return isAccentLight;}
-
-	private boolean forceAMP = false;
-	public boolean consumeForceAMP() {
-		if (forceAMP) {
-			forceAMP = false;
-			return true;
-		}
-		else
-			return false;
-	}
-
-	private boolean forceTT = false;
-	public boolean consumeForceTT() {
-		if (forceTT) {
-			forceTT = false;
-			return true;
-		}
-		else
-			return false;
-	}
-
-	private boolean forcePM = false;
-	public boolean consumeForcePM() {
-		if (forcePM) {
-			forcePM = false;
-			return true;
-		}
-		else
-			return false;
-	}
 	
 	private static HighlightListDBHelper hlDB;
 	public static HighlightListDBHelper getHLDB() {return hlDB;}
@@ -255,19 +225,6 @@ public class AllInOneV2 extends Activity {
 	/**********************************************
 	 * START METHODS
 	 **********************************************/
-	
-	
-	@Override
-	protected void onNewIntent(Intent intent) {
-		if (intent.getExtras() != null) {
-			if (intent.getExtras().getBoolean("forceAMP"))
-				forceAMP = true;
-			else if (intent.getExtras().getBoolean("forcePM"))
-				forcePM = true;
-			else if (intent.getExtras().getBoolean("forceTT"))
-				forceTT = true;
-		}
-	}
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -802,44 +759,7 @@ public class AllInOneV2 extends Activity {
 		findViewById(R.id.aioPostSep).setBackgroundColor(accentColor);
 		
 		if (session != null) {
-			String defaultAccount = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
-			if (forceAMP) {
-				if (Session.isLoggedIn() && Session.getUser().equals(defaultAccount)) {
-					forceAMP = false;
-					session.get(NetDesc.AMP_LIST, buildAMPLink(), null);
-				}
-				else {
-		    		if (accounts.containsKey(defaultAccount)) {
-						wtl("starting new session from onResume, logged in");
-		    			session = new Session(this, defaultAccount, accounts.getString(defaultAccount));
-		    		}
-				}
-			}
-			else if (forcePM) {
-				if (Session.isLoggedIn() && Session.getUser().equals(defaultAccount)) {
-					forcePM = false;
-					session.get(NetDesc.PM_INBOX, "/pm/", null);
-				}
-				else {
-		    		if (accounts.containsKey(defaultAccount)) {
-						wtl("starting new session from onResume, logged in");
-		    			session = new Session(this, defaultAccount, accounts.getString(defaultAccount));
-		    		}
-				}
-			}
-			else if (forceTT) {
-				if (Session.isLoggedIn() && Session.getUser().equals(defaultAccount)) {
-					forceTT = false;
-					session.get(NetDesc.TRACKED_TOPICS, "/boards/tracked", null);
-				}
-				else {
-		    		if (accounts.containsKey(defaultAccount)) {
-						wtl("starting new session from onResume, logged in");
-		    			session = new Session(this, defaultAccount, accounts.getString(defaultAccount));
-		    		}
-				}
-			}
-			else if (settings.getBoolean("reloadOnResume", false)) {
+			if (settings.getBoolean("reloadOnResume", false)) {
 				wtl("session exists, reload on resume is true, refreshing page");
 	    		session.refresh();
 			}
@@ -1032,6 +952,13 @@ public class AllInOneV2 extends Activity {
 		}
 	}
 	
+	public void setAMPLinkVisible(boolean visible) {
+		if (visible)
+			findViewById(R.id.dwrAMPWrapper).setVisibility(View.VISIBLE);
+		else
+			findViewById(R.id.dwrAMPWrapper).setVisibility(View.GONE);
+	}
+	
 	/********************************************
 	 * START HNR
 	 * ******************************************/
@@ -1094,14 +1021,14 @@ public class AllInOneV2 extends Activity {
 				String nextPage = null;
 				String lastPage = null;
 				
-				Element pmInboxLink = pRes.select("a[href=/pm/]").first();
+				Element pmInboxLink = pRes.select("div.masthead_user").first().select("a[href=/pm/]").first();
 				if (pmInboxLink != null && desc != NetDesc.PM_INBOX) {
 					if (!pmInboxLink.text().equals("Inbox")) {
 						Toast.makeText(this, "You have unread PM(s)", Toast.LENGTH_SHORT).show();
 					}
 				}
 				
-				Element trackedLink = pRes.select("a[href=/boards/tracked]").first();
+				Element trackedLink = pRes.select("div.masthead_user").first().select("a[href=/boards/tracked]").first();
 				if (trackedLink != null && desc != NetDesc.TRACKED_TOPICS) {
 					if (!trackedLink.text().equals("Topics")) {
 						Toast.makeText(this, "You have unread tracked topic(s)", Toast.LENGTH_SHORT).show();
@@ -1457,9 +1384,6 @@ public class AllInOneV2 extends Activity {
 
 							updatePostingRights(pRes, false);
 						}
-
-						wtl("updating user level");
-						updateUserLevel(pRes);
 						
 						Element table = pRes.getElementsByTag("table").first();
 						if (table != null) {
@@ -1597,8 +1521,6 @@ public class AllInOneV2 extends Activity {
 						
 						updatePostingRights(pRes, true);
 					}
-					
-					updateUserLevel(pRes);
 					
 					Elements rows = pRes.getElementsByTag("table").first().getElementsByTag("tr");
 					int rowCount = rows.size();
@@ -2239,7 +2161,7 @@ public class AllInOneV2 extends Activity {
 		wtl("postOnBoardSetup fired --NEL");
 		pageJumperWrapper.setVisibility(View.GONE);
 		titleWrapper.setVisibility(View.VISIBLE);
-		if (userLevel > 29) {
+		if (Session.getUserLevel() > 29) {
 			pollButton.setVisibility(View.VISIBLE);
 			pollSep.setVisibility(View.VISIBLE);
 		}
@@ -2312,7 +2234,7 @@ public class AllInOneV2 extends Activity {
 				path += "&poll=1";
 				session.get(NetDesc.POSTTPC_S1, path, null);
 			}
-			else if (userLevel < 30)
+			else if (Session.getUserLevel() < 30)
 				session.get(NetDesc.POSTTPC_S1, path, null);
 			else
 				session.get(NetDesc.QPOSTTPC_S1, path, null);
@@ -2333,7 +2255,7 @@ public class AllInOneV2 extends Activity {
 			cancelButton.setEnabled(false);
 			if (messageID != null)
 				session.get(NetDesc.QEDIT_MSG, path, null);
-			else if (userLevel < 30)
+			else if (Session.getUserLevel() < 30)
 				session.get(NetDesc.POSTMSG_S1, path, null);
 			else
 				session.get(NetDesc.QPOSTMSG_S1, path, null);
@@ -2476,7 +2398,7 @@ public class AllInOneV2 extends Activity {
 		int arrayToUse;
 		if (Session.isLoggedIn()) {
 			if (Session.getUser().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
-				if (userLevel < 30)
+				if (Session.getUserLevel() < 30)
 					arrayToUse = R.array.msgMenuLoggedInAsPosterNotEditable;
 				else
 					arrayToUse = R.array.msgMenuLoggedInAsPosterEditable;
@@ -2801,17 +2723,6 @@ public class AllInOneV2 extends Activity {
 		wtl("getTopicID finishing");
 	}
 	
-
-    
-    private int userLevel = 0;
-    private void updateUserLevel(Document doc) {
-    	String sc = doc.getElementsByTag("head").first().getElementsByTag("script").html();
-    	int start = sc.indexOf("UserLevel','") + 12;
-    	int end = sc.indexOf('\'', start + 1);
-    	userLevel = Integer.parseInt(sc.substring(start, end));
-    	
-		wtl("user level: " + userLevel);
-    }
     
     @Override
 	public void onBackPressed() {

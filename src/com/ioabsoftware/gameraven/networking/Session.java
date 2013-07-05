@@ -72,8 +72,13 @@ public class Session implements HandlesNetworkResult {
 	/** Get's the name of the session user. */
 	public static String getUser()
 	{return user;}
+	
 	public static boolean isLoggedIn()
 	{return user != null;}
+
+	private static int userLevel = 0;
+	public static int getUserLevel()
+	{return userLevel;}
 	
 	public static boolean applySavedScroll;
 	public static int savedScrollVal;
@@ -289,6 +294,8 @@ public class Session implements HandlesNetworkResult {
 					}
 				}
 				
+				updateUserLevel(pRes);
+				
 				switch (desc) {
 				case AMP_LIST:
 				case TRACKED_TOPICS:
@@ -475,11 +482,9 @@ public class Session implements HandlesNetworkResult {
 					
 				case LOGIN_S2:
 					aio.wtl("session hNR determined this is login step 2");
-					if (aio.consumeForcePM())
-						get(NetDesc.PM_INBOX, "/pm/", null);
-					else if (aio.consumeForceTT())
-						get(NetDesc.TRACKED_TOPICS, "/boards/tracked", null);
-					else if (AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false) || aio.consumeForceAMP()) {
+					aio.setAMPLinkVisible(userLevel > 19);
+					
+					if (AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false) && userLevel > 19) {
 						aio.wtl("loading AMP");
 						get(NetDesc.AMP_LIST, AllInOneV2.buildAMPLink(), null);
 					}
@@ -919,4 +924,12 @@ public class Session implements HandlesNetworkResult {
 		d.show();
 	}
 	
+    private void updateUserLevel(Document doc) {
+    	String sc = doc.getElementsByTag("head").first().getElementsByTag("script").html();
+    	int start = sc.indexOf("UserLevel','") + 12;
+    	int end = sc.indexOf('\'', start + 1);
+    	userLevel = Integer.parseInt(sc.substring(start, end));
+    	
+		aio.wtl("user level: " + userLevel);
+    }
 }
