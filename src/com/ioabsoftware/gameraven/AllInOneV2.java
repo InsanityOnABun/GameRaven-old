@@ -7,7 +7,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import net.simonvt.menudrawer.MenuDrawer;
 
@@ -102,7 +104,8 @@ public class AllInOneV2 extends Activity {
 	public static final int POLL_OPTIONS_DIALOG = 105;
 	
 	protected static final String ACCOUNTS_PREFNAME = "com.ioabsoftware.DroidFAQs.Accounts";
-	protected static final String SALT = "RIP Man fan died at the room shot up to 97 degrees";
+	protected static final String SALT_FALLBACK = "RIP Man fan died at the room shot up to 97 degrees";
+	protected static String secureSalt;
 	
 	public static final String EMPTY_STRING = "";
 	
@@ -139,8 +142,8 @@ public class AllInOneV2 extends Activity {
 	{return settings;}
 	
 	/** list of accounts (username, password) */
-	private static AccountPreferences accounts = null;
-	public static AccountPreferences getAccounts()
+	private static SecurePreferences accounts = null;
+	public static SecurePreferences getAccounts()
 	{return accounts;}
 	
 	private LinearLayout titleWrapper;
@@ -353,6 +356,23 @@ public class AllInOneV2 extends Activity {
         
         if (!settings.contains("defaultAccount"))
         	PreferenceManager.setDefaultValues(this, R.xml.settingsmain, false);
+        else {
+        	if (!settings.contains("accsDoNotNeedConversion")) {
+        		// accs need conversion from static SALT to UUID system
+        		HashMap<String, String> accs = new HashMap<String, String>();
+        		SecurePreferences oldAccs = new SecurePreferences(getApplicationContext(), ACCOUNTS_PREFNAME, SALT_FALLBACK, false);
+        		for (String s : oldAccs.getKeys()) {
+        			accs.put(s, oldAccs.getString(s));
+        		}
+        		secureSalt = UUID.randomUUID().toString();
+        		settings.edit().putString("secureSalt", secureSalt).commit();
+        		SecurePreferences newAccs = new SecurePreferences(getApplicationContext(), ACCOUNTS_PREFNAME, secureSalt, false);
+        		for (Map.Entry<String, String> e : accs.entrySet()) {
+        			newAccs.put(e.getKey(), e.getValue());
+        		}
+        	}
+        }
+        settings.edit().putBoolean("accsDoNotNeedConversion", true);
         
         String defAccInit = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
         settings.edit().putString("defaultAccount", defAccInit).commit();
@@ -365,7 +385,14 @@ public class AllInOneV2 extends Activity {
     	wtl("logging started from onCreate");
     	
     	wtl("getting accounts");
-        accounts = new AccountPreferences(getApplicationContext(), ACCOUNTS_PREFNAME, SALT, false);
+    	
+    	if (settings.contains("secureSalt"))
+    		secureSalt = settings.getString("secureSalt", null);
+    	else {
+    		secureSalt = UUID.randomUUID().toString();
+    		settings.edit().putString("secureSalt", secureSalt).commit();
+    	}
+        accounts = new SecurePreferences(getApplicationContext(), ACCOUNTS_PREFNAME, secureSalt, false);
 
     	wtl("getting all the views");
         

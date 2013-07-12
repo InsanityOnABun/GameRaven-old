@@ -44,12 +44,12 @@ public class NotifierService extends IntentService {
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		
-		String username = prefs.getString("defaultAccount", "N/A");
+		String username = prefs.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
 		
-	    if (!username.equals("N/A")) {
+	    if (!username.equals(SettingsMain.NO_DEFAULT_ACCOUNT)) {
 			HashMap<String, String> cookies = new HashMap<String, String>();
-			String password = new AccountPreferences(getApplicationContext(), AllInOneV2.ACCOUNTS_PREFNAME, 
-													 AllInOneV2.SALT, false).getString(username);;
+			String password = new SecurePreferences(getApplicationContext(), AllInOneV2.ACCOUNTS_PREFNAME, 
+													 AllInOneV2.secureSalt, false).getString(username);;
 			Log.d("notif", username);
 			String basePath = Session.ROOT + "/boards";
 			String loginPath = Session.ROOT + "/user/login.html";
