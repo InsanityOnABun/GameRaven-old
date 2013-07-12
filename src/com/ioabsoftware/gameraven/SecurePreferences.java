@@ -41,7 +41,7 @@ import android.util.Base64;
 import com.ioabsoftware.gameraven.R;
 
 
-public class AccountPreferences {
+public class SecurePreferences {
 
 	@SuppressWarnings("serial")
 	public static class SecurePreferencesException extends RuntimeException {
@@ -74,7 +74,7 @@ public class AccountPreferences {
 	 * the plaintext value of the value which can be used to decipher the value.
 	 * @throws SecurePreferencesException
 	 */
-	public AccountPreferences(Context context, String preferenceName, String secureKey, boolean encryptKeys) throws SecurePreferencesException {
+	public SecurePreferences(Context context, String preferenceName, String secureKey, boolean encryptKeys) throws SecurePreferencesException {
 		try {
 			this.writer = Cipher.getInstance(TRANSFORMATION);
 			this.reader = Cipher.getInstance(TRANSFORMATION);
