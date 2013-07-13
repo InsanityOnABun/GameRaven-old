@@ -72,7 +72,9 @@ public class BoardView extends LinearLayout {
 		url = urlIn;
 		type = BoardViewType.NORMAL;
 		
-		setBackgroundResource(R.drawable.selector);
+		findViewById(R.id.gsSep).setBackgroundColor(AllInOneV2.getAccentColor());
+        
+        setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
 	}
 	
 	public String getUrl() {
