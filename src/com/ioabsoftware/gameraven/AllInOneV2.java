@@ -372,7 +372,7 @@ public class AllInOneV2 extends Activity {
         		}
         	}
         }
-        settings.edit().putBoolean("accsDoNotNeedConversion", true);
+        settings.edit().putBoolean("accsDoNotNeedConversion", true).commit();
         
         String defAccInit = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
         settings.edit().putString("defaultAccount", defAccInit).commit();
@@ -1410,6 +1410,16 @@ public class AllInOneV2 extends Activity {
 							}
 
 							updatePostingRights(pRes, false);
+						}
+						
+						Element splitList = pRes.select("p:contains(this is a split board)").first();
+						if (splitList != null) {
+							String splitListLink = splitList.child(0).attr("href");
+							BoardView b = new BoardView(this, "This is a Split Board.", 
+									"Click here to return to the Split List.", 
+									null, null, null, splitListLink, BoardViewType.SPLIT);
+							b.setOnClickListener(cl);
+							content.addView(b);
 						}
 						
 						Element table = pRes.getElementsByTag("table").first();
