@@ -3,8 +3,10 @@ package com.ioabsoftware.gameraven;
 import java.io.File;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -799,6 +801,9 @@ public class AllInOneV2 extends Activity {
 		findViewById(R.id.aioPostButtonSep).setBackgroundColor(accentColor);
 		findViewById(R.id.aioPollSep).setBackgroundColor(accentColor);
 		findViewById(R.id.aioPostSep).setBackgroundColor(accentColor);
+		drawer.findViewById(R.id.dwrCAHSep).setBackgroundColor(accentColor);
+		drawer.findViewById(R.id.dwrNavSep).setBackgroundColor(accentColor);
+		drawer.findViewById(R.id.dwrFuncSep).setBackgroundColor(accentColor);
 		
 		if (session != null) {
 			if (settings.getBoolean("reloadOnResume", false)) {
@@ -1325,7 +1330,7 @@ public class AllInOneV2 extends Activity {
 					wtl("GRAIO hNR determined this is a board response");
 					
 					wtl("setting board id");
-					getBoardID(res.url().toString());
+					boardID = parseBoardID(res.url().toString());
 					
 					boolean isSplitList = false;
 					if (pRes.getElementsByTag("th").first() != null) {
@@ -1503,8 +1508,8 @@ public class AllInOneV2 extends Activity {
 					break;
 					
 				case TOPIC:
-					getBoardID(res.url().toString());
-					getTopicID(res.url().toString());
+					boardID = parseBoardID(res.url().toString());
+					topicID = parseTopicID(res.url().toString());
 
 					tlUrl = "boards/" + boardID;
 					wtl(tlUrl);
@@ -1592,21 +1597,25 @@ public class AllInOneV2 extends Activity {
 						
 						if (row.hasClass("left")) {
 							// message poster display set to left of message
-//							boolean isArchived = pRes.select("ul.paginate").select(".user").text().contains("Topic Archived");
 							
 							Elements authorData = row.getElementsByClass("author_data");
-							user = authorData.get(1).text();
+							user = row.getElementsByTag("b").first().text();
 							postNum = row.getElementsByTag("a").first().attr("name");
 							
-							for (int i = 2; i < authorData.size(); i++) {
+							for (int i = 1; i < authorData.size(); i++) {
 								Element e = authorData.get(i);
 								String t = e.text();
 								if (t.startsWith("("))
 									userTitles += " " + t;
-								else if (t.startsWith("Posted"))
-									postTime = t;
+								
 								else if (e.hasClass("tag"))
 									userTitles += " (tagged as " + t + ")";
+								
+								else if (t.startsWith("Posted"))
+									postTime = t;
+								
+								else if (t.equals("message detail"))
+									mID = parseMessageID(e.child(0).attr("href"));
 							}
 							
 							msgBody = row.child(1);
@@ -1635,6 +1644,9 @@ public class AllInOneV2 extends Activity {
 								Element e = elements.get(y);
 								if (e.hasClass("tag"))
 									userTitles += " (tagged as " + e.text() + ")";
+								
+								else if (e.text().equals("message detail"))
+									mID = parseMessageID(e.attr("href"));
 							}
 							//Posted 11/15/2012 11:20:27&nbsp;AM | 
 							int endPoint = postTimeText.indexOf('|') - 1;
@@ -1645,8 +1657,6 @@ public class AllInOneV2 extends Activity {
 							x++;
 							msgBody = rows.get(x).child(0);
 						}
-						
-						mID = msgBody.child(0).attr("name");
 						
 						int hlColor = 0;
 						if (hlUsers.contains(user.toLowerCase(Locale.US))) {
@@ -2447,23 +2457,27 @@ public class AllInOneV2 extends Activity {
 	private Dialog createMessageActionDialog() {
 		AlertDialog.Builder msgActionBuilder = new AlertDialog.Builder(this);
 		msgActionBuilder.setTitle("Message Actions");
-		int arrayToUse;
-		if (Session.isLoggedIn()) {
-			if (Session.getUser().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
-				if (Session.getUserLevel() < 30)
-					arrayToUse = R.array.msgMenuLoggedInAsPosterNotEditable;
-				else
-					arrayToUse = R.array.msgMenuLoggedInAsPosterEditable;
-			}
-			else {
-				arrayToUse = R.array.msgMenuLoggedIn;
-			}
-		}
-		else {
-			arrayToUse = R.array.msgMenuNotLoggedIn;
-		}
 		
-		final String[] options = getResources().getStringArray(arrayToUse);
+		ArrayList<String> listBuilder = new ArrayList<String>();
+		if (Session.isLoggedIn()) {
+			if (postIcon.isVisible())
+				listBuilder.add("Quote");
+			if (Session.getUser().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
+				//TODO: add logic to decide if edit should be added or not based on time
+				if (Session.getUserLevel() > 29 && clickedMsg.getMessageID() != null)
+					listBuilder.add("Edit");
+				if (clickedMsg.getMessageID() != null)
+					listBuilder.add("Delete");
+			}
+			else
+				listBuilder.add("Report");
+		}
+			
+		listBuilder.add("Highlight User");
+		listBuilder.add("User Details");
+		
+		final String[] options = new String[listBuilder.size()];
+		listBuilder.toArray(options);
 		msgActionBuilder.setItems(options, new OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -2481,12 +2495,12 @@ public class AllInOneV2 extends Activity {
 				else if (selected.equals("Report")) {
 					showDialog(REPORT_MESSAGE_DIALOG);
 				}
-				else if (selected.equals("User Details")) {
-					session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink(), null);
-				}
 				else if (selected.equals("Highlight User")) {
 					HighlightedUser user = hlDB.getHighlightedUsers().get(clickedMsg.getUser().toLowerCase(Locale.US));
 					HighlightListDBHelper.showHighlightUserDialog(AllInOneV2.this, user, clickedMsg.getUser(), null);
+				}
+				else if (selected.equals("User Details")) {
+					session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink(), null);
 				}
 				else {
 					Toast.makeText(AllInOneV2.this, "not recognized: " + selected, Toast.LENGTH_SHORT).show();
@@ -2716,30 +2730,41 @@ public class AllInOneV2 extends Activity {
     	input.setHint("Enter comment here...");
     	b.setView(input);
     	
-    	b.setNegativeButton("Cancel", new Dialog.OnClickListener() {
+    	b.setNegativeButton("Cancel", null);
+    	b.setPositiveButton("Email to dev", null);
+    	
+    	final AlertDialog d = b.create();
+    	d.setOnShowListener(new OnShowListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
+			public void onShow(DialogInterface dialog) {
+				d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+
+		            @Override
+		            public void onClick(View view) {
+		            	if (!input.getText().toString().equals(EMPTY_STRING)) {
+			            	Intent i = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "ioabsoftware@gmail.com", null));
+							i.putExtra(Intent.EXTRA_SUBJECT, "GameRaven Error Report");
+							i.putExtra(Intent.EXTRA_TEXT   , "Comment:\n" + input.getText() + emailMsg);
+							try {
+							    startActivity(Intent.createChooser(i, "Send mail..."));
+							} catch (android.content.ActivityNotFoundException ex) {
+							    Toast.makeText(AllInOneV2.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+							}
+		            	}
+		            	else {
+		            		input.requestFocus();
+		            		Toast.makeText(AllInOneV2.this, "Please include a brief comment in provided text box.", Toast.LENGTH_SHORT).show();
+		            	}
+		            }
+		        });
 			}
 		});
-    	b.setPositiveButton("Email to dev", new Dialog.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				Intent i = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "ioabsoftware@gmail.com", null));
-				i.putExtra(Intent.EXTRA_SUBJECT, "GameRaven Error Report");
-				i.putExtra(Intent.EXTRA_TEXT   , "Comment:\n" + input.getText() + emailMsg);
-				try {
-				    startActivity(Intent.createChooser(i, "Send mail..."));
-				} catch (android.content.ActivityNotFoundException ex) {
-				    Toast.makeText(AllInOneV2.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
-    	b.create().show();
+    	
+    	d.show();
     }
 	
-	private void getBoardID(String url) {
-		wtl("getBoardID fired");
+	private String parseBoardID(String url) {
+		wtl("parseBoardID fired");
 		// board example: http://m.gamefaqs.com/boards/400-current-events
 		String boardUrl = url.substring(Session.ROOT.length() + 8);
 		
@@ -2759,14 +2784,13 @@ public class AllInOneV2 extends Activity {
 			String replacer = boardUrl.substring(i);
 			boardUrl = boardUrl.replace(replacer, EMPTY_STRING);
 		}
-		
-		boardID = boardUrl;
-		wtl("boardID: " + boardID);
-		wtl("getBoardID finishing");
+
+		wtl("boardID: " + boardUrl);
+		return boardUrl;
 	}
 	
-	private void getTopicID(String url) {
-		wtl("getTopicID fired");
+	private String parseTopicID(String url) {
+		wtl("parseTopicID fired");
 		// topic example: http://m.gamefaqs.com/boards/400-current-events/64300205
 		String topicUrl = url.substring(url.indexOf('/', Session.ROOT.length() + 8) + 1);
 		int i = topicUrl.indexOf('/');
@@ -2784,9 +2808,15 @@ public class AllInOneV2 extends Activity {
 			String replacer = topicUrl.substring(i);
 			topicUrl = topicUrl.replace(replacer, EMPTY_STRING);
 		}
-		topicID = topicUrl;
-		wtl("topicID: " + topicID);
-		wtl("getTopicID finishing");
+		wtl("topicID: " + topicUrl);
+		return topicUrl;
+	}
+	
+	private String parseMessageID(String url) {
+		wtl("parseMessageID fired");
+		String msgID = url.substring(url.lastIndexOf('/') + 1);
+		wtl("topicID: " + msgID);
+		return msgID;
 	}
 	
     

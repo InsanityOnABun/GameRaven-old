@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.DialogInterface.OnShowListener;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
@@ -143,28 +144,36 @@ public class SettingsAccount extends SherlockPreferenceActivity implements Handl
 			}
 		});
     	
-    	b.setPositiveButton("OK", new OnClickListener() {
+    	b.setPositiveButton("OK", null);
+    	
+    	final AlertDialog d = b.create();
+    	d.setOnShowListener(new OnShowListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				verifyUser = ((TextView) v.findViewById(R.id.addaccUser)).getText().toString();
-				verifyPass = ((TextView) v.findViewById(R.id.addaccPassword)).getText().toString();
-				
-				if (verifyUser.indexOf('@') == -1) {
-					showDialog(VERIFY_ACCOUNT_DIALOG);
-					new NetworkTask(SettingsAccount.this,
-							NetDesc.VERIFY_ACCOUNT_S1, Method.GET,
-							new HashMap<String, String>(), Session.ROOT, null)
-							.execute();
-				}
-				else {
-					Toast.makeText(SettingsAccount.this, 
-							"Please use your username, not your email address.", 
-							Toast.LENGTH_SHORT).show();
-				}
+			public void onShow(DialogInterface dialog) {
+				d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+
+		            @Override
+		            public void onClick(View view) {
+						verifyUser = ((TextView) v.findViewById(R.id.addaccUser)).getText().toString();
+						verifyPass = ((TextView) v.findViewById(R.id.addaccPassword)).getText().toString();
+						
+						if (verifyUser.indexOf('@') == -1) {
+							showDialog(VERIFY_ACCOUNT_DIALOG);
+							new NetworkTask(SettingsAccount.this,
+									NetDesc.VERIFY_ACCOUNT_S1, Method.GET,
+									new HashMap<String, String>(), Session.ROOT, null)
+									.execute();
+						}
+						else {
+							Toast.makeText(SettingsAccount.this, 
+									"Please use your username, not your email address.", 
+									Toast.LENGTH_SHORT).show();
+						}
+					}
+		        });
 			}
 		});
-    	
-    	Dialog d = b.create();
+				
     	return d;
     }
     
@@ -274,7 +283,7 @@ public class SettingsAccount extends SherlockPreferenceActivity implements Handl
     	
     	b.setNegativeButton("Close", null);
     	
-    	Dialog d = b.create();
+    	AlertDialog d = b.create();
     	
     	d.setOnDismissListener(new OnDismissListener() {
 			@Override

@@ -507,6 +507,10 @@ public class SettingsMain extends SherlockPreferenceActivity {
 					
 					editor.commit();
 					
+					disableNotifs();
+					if (settings.getBoolean("notifsEnable", false))
+						enableNotifs(settings.getString("notifsFrequency", "60"));
+					
 					Toast.makeText(this, "Restore done.", Toast.LENGTH_SHORT).show();
 					finish();
 					startActivity(getIntent());

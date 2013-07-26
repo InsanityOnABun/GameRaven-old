@@ -13,27 +13,6 @@
         <item>0</item>
         <item>2</item>
     </string-array>
-    <string-array name="msgMenuLoggedIn">
-        <item>Quote</item>
-        <item>Report</item>
-        <item>Highlight User</item>
-        <item>User Details</item>
-    </string-array>
-    <string-array name="msgMenuLoggedInAsPosterEditable">
-        <item>Quote</item>
-        <item>Edit</item>
-        <item>Delete</item>
-        <item>User Details</item>
-    </string-array>
-    <string-array name="msgMenuLoggedInAsPosterNotEditable">
-        <item>Quote</item>
-        <item>Delete</item>
-        <item>User Details</item>
-    </string-array>
-    <string-array name="msgMenuNotLoggedIn">
-        <item>Highlight User</item>
-        <item>User Details</item>
-    </string-array>
     <string-array name="msgReportReasons">
         <item>Offensive: Sexually explicit, racism, threats, pornography</item>
         <item>Advertising: Spam, "Make Money Fast", referrer codes</item>
