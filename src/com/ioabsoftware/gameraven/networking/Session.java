@@ -34,11 +34,11 @@ public class Session implements HandlesNetworkResult {
 	/** Holds all cookies for the session */
 	private Map<String, String> cookies = new LinkedHashMap<String, String>();
 	
-	private String lastAttemptedPath;
+	private String lastAttemptedPath = "not set";
 	public String getLastAttemptedPath()
 	{return lastAttemptedPath;}
 	
-	private NetDesc lastAttemptedDesc;
+	private NetDesc lastAttemptedDesc = NetDesc.UNSPECIFIED;
 	public NetDesc getLastAttemptedDesc()
 	{return lastAttemptedDesc;}
 	
@@ -801,7 +801,7 @@ public class Session implements HandlesNetworkResult {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			aio.tryCaught(res.url().toString(), ExceptionUtils.getStackTrace(e), res.body());
+			aio.tryCaught(res.url().toString(), desc.toString(), ExceptionUtils.getStackTrace(e), res.body());
 		}
 
 		aio.wtl("session hNR finishing, desc: " + desc.name());

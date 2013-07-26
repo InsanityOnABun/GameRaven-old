@@ -23,14 +23,14 @@
     <PreferenceCategory
         android:key="notifsCategory"
         android:orderingFromXml="true"
-        android:title="Notification Settings" >
+        android:title="Notification Settings (Default Account Only)">
         <CheckBoxPreference
             android:defaultValue="false"
             android:disableDependentsState="false"
             android:key="notifsEnable"
             android:persistent="true"
             android:summary="Enable or disable notifications entirely."
-            android:title="Enable Notifications (Default Account Only)" />
+            android:title="Enable Notifications" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:dependency="notifsEnable"
@@ -117,6 +117,7 @@
             android:persistent="true"
             android:summary="A confirmation dialog will show when submitting a post."
             android:title="Confirm Post Submission" />
+        <CheckBoxPreference android:persistent="true" android:defaultValue="true" android:key="autoCensorEnable" android:summary="Automatically censors banned words." android:title="Enable AutoCensor"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:key="themingCategory"

@@ -18,8 +18,10 @@
             android:layout_marginBottom="2dp"
             android:layout_marginLeft="2dp"
             android:layout_marginTop="6dp"
-            android:text="Logged In As..."
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:text="Logged In As"
+            android:textAllCaps="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?attr/themedDrawerHeaderColor" />
 
         <View
             android:id="@+id/dwrCAHSep"
@@ -56,7 +58,9 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="9dp"
                 android:text="Navigation"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAllCaps="true"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/themedDrawerHeaderColor" />
 
             <View
                 android:id="@+id/dwrNavSep"
@@ -91,7 +95,9 @@
                 <LinearLayout
                     android:id="@+id/dwrAMPWrapper"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content" android:orientation="vertical">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" >
+
                     <Button
                         android:id="@+id/dwrAMPList"
                         style="@style/Widget.Sherlock.ActionButton"
@@ -99,7 +105,7 @@
                         android:layout_height="?android:attr/listPreferredItemHeight"
                         android:gravity="left|center_vertical"
                         android:text="AMP List" />
-    
+
                     <View
                         android:id="@+id/dwrAMPSep"
                         android:layout_width="fill_parent"
@@ -151,7 +157,9 @@
             android:layout_marginLeft="2dp"
             android:layout_marginTop="9dp"
             android:text="Functions"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAllCaps="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?attr/themedDrawerHeaderColor" />
 
         <View
             android:id="@+id/dwrFuncSep"
@@ -167,7 +175,7 @@
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
-            android:text="Open Current Page in Browser" />
+            android:text="Open in Browser" />
 
         <View
             android:id="@+id/dwrOPiBSep"
@@ -203,6 +211,22 @@
 
         <View
             android:id="@+id/dwrSettingsSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#555555"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/dwrODBugRep"
+            style="@style/Widget.Sherlock.ActionButton"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:gravity="left|center_vertical"
+            android:text="Bug Report" />
+
+        <View
+            android:id="@+id/dwrODBugRepSep"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="3dp"

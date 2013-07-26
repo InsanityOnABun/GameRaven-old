@@ -130,11 +130,19 @@ public class AllInOneV2 extends Activity {
 	{return postPostUrl;}
 	
 	private String savedPostBody;
-	public String getSavedPostBody()
-	{return savedPostBody;}
+	public String getSavedPostBody() {
+		if (settings.getBoolean("autoCensorEnable", true))
+			return autoCensor(savedPostBody);
+		else
+			return savedPostBody;
+	}
 	private String savedPostTitle;
-	public String getSavedPostTitle()
-	{return savedPostTitle;}
+	public String getSavedPostTitle() {
+		if (settings.getBoolean("autoCensorEnable", true))
+			return autoCensor(savedPostTitle);
+		else
+			return savedPostTitle;
+	}
 	
 	/** preference object for global settings */
 	private static SharedPreferences settings = null;
@@ -336,6 +344,13 @@ public class AllInOneV2 extends Activity {
 			public void onClick(View v) {
 				drawer.closeMenu(false);
 	        	startActivity(new Intent(AllInOneV2.this, SettingsMain.class));
+			}
+		});
+        
+        ((Button) drawer.findViewById(R.id.dwrODBugRep)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onDemandBugReport();
 			}
 		});
         
@@ -1936,13 +1951,13 @@ public class AllInOneV2 extends Activity {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			tryCaught(res.url().toString(), ExceptionUtils.getStackTrace(e), res.body());
+			tryCaught(res.url().toString(), desc.toString(), ExceptionUtils.getStackTrace(e), res.body());
 			if (session.canGoBack())
 				session.goBack(false);
 		}
 		catch (StackOverflowError e) {
 			e.printStackTrace();
-			tryCaught(res.url().toString(), ExceptionUtils.getStackTrace(e), res.body());
+			tryCaught(res.url().toString(), desc.toString(), ExceptionUtils.getStackTrace(e), res.body());
 			if (session.canGoBack())
 				session.goBack(false);
 		}
@@ -2660,8 +2675,16 @@ public class AllInOneV2 extends Activity {
 			Log.d("logger", msg);
 		}
     }
+    
+    private static final String ON_DEMAND_BUG_REPORT = "On Demand";
+    public void onDemandBugReport() {
+    	tryCaught(session.getLastPath() + "\nLast Attempted:\n" + session.getLastAttemptedPath(),
+    	    	session.getLastDesc() + "\nLast Attempted:\n" + session.getLastAttemptedDesc(),
+    			ON_DEMAND_BUG_REPORT,
+    			(session.getLastRes() != null ? session.getLastRes().body() : "res is null"));
+    }
 	
-	public void tryCaught(String url, String stacktrace, String source) {
+	public void tryCaught(String url, String desc, String stacktrace, String source) {
 		String ver;
 		try {
 			ver = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
@@ -2670,12 +2693,18 @@ public class AllInOneV2 extends Activity {
 		}
 		final String emailMsg = "\n\nVersion:\n" + ver + 
 								"\n\nURL:\n" + url + 
+								"\n\nDesc:\n" + desc +
 								"\n\nStack trace:\n" + stacktrace + 
 								"\n\nPage source:\n" + source;
 		
     	AlertDialog.Builder b = new AlertDialog.Builder(this);
-    	b.setTitle("Error");
-    	b.setMessage("You've run into a bug! Would you like to email debug information to the developer? The email will contain " + 
+    	b.setTitle("Send Bug Report");
+    	if (stacktrace.equals(ON_DEMAND_BUG_REPORT))
+    		b.setMessage("NOTICE! Please include a comment on why you are sending this bug report in the text box " +
+    				"below! On demand bug reports do not include any crash information, so we can't determine the " +
+    				"bug without your input! Thanks!");
+    	else
+    		b.setMessage("You've run into a bug! Would you like to email debug information to the developer? The email will contain " + 
     				 "details on the crash itself, the url the server responded with, and the source for the page. " +
     				 "If so, please include a brief comment below on what you were trying to do.");
     	
@@ -2792,4 +2821,85 @@ public class AllInOneV2 extends Activity {
 	public static String buildAMPLink() {
 		return "/boards/myposts.php?lp=" + settings.getString("ampSortOption", "-1");
 	}
+	
+	private String autoCensor(String text) {
+		StringBuilder builder = new StringBuilder(text);
+		String textLower = text.toLowerCase(Locale.US);
+		for (String word : bannedList)
+			censorWord(builder, textLower, word.toLowerCase(Locale.US));
+		
+		return builder.toString();
+	}
+	
+	private void censorWord(StringBuilder builder, String textLower, String word) {
+		int length = word.length();
+		String replacement = "";
+		
+		for (int x = 0; x < length - 1; x++)
+			replacement += '*';
+		
+		while (textLower.contains(word)) {
+			int start = textLower.indexOf(word);
+			int end = start + length;
+			builder.replace(start + 1, end, replacement);
+			textLower = textLower.replaceFirst(word, replacement + '*');
+		}
+	}
+	
+	private static final String[] bannedList = {
+		"***hole",
+		"68.13.103",
+		"Arse Hole",
+		"Arse-hole",
+		"Ass hole",
+		"Ass****",
+		"Ass-hole",
+		"Asshole",
+		"‹^›",
+		"Bitch",
+		"Bukkake",
+		"Cheat Code Central",
+		"CheatCC",
+		"Clit",
+		"Cunt",
+		"Dave Allison",
+		"David Allison",
+		"Dildo",
+		"Echo J",
+		"Fag",
+		"Format C:",
+		"FreeFlatScreens.com",
+		"FreeIPods.com",
+		"Fuck",
+		"GFNostalgia",
+		"Gook",
+		"Jism",
+		"Jizm",
+		"Jizz",
+		"KingOfChaos",
+		"Lesbo",
+		"LUE2.tk",
+		"Mod Files",
+		"Mod Pics",
+		"ModFiles",
+		"ModPics",
+		"Nigga",
+		"Nigger",
+		"Offiz.bei.t-online.de",
+		"OutPimp",
+		"OutWar.com",
+		"PornStarGuru",
+		"Pussies",
+		"Pussy",
+		"RavenBlack.net",
+		"Shit",
+		"Shiz",
+		"SuprNova",
+		"Tits",
+		"Titties",
+		"Titty",
+		"UrbanDictionary",
+		"Wigga",
+		"Wigger",
+		"YouDontKnowWhoIAm"};
 }

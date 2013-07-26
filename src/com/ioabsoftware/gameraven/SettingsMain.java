@@ -72,6 +72,9 @@ public class SettingsMain extends SherlockPreferenceActivity {
 		notifPendingIntent = PendingIntent.getService(this, 0, notifierIntent, 0);
 
         ACCEPTED_KEYS.add("notifsEnable");
+        ACCEPTED_KEYS.add("notifsAMPEnable");
+        ACCEPTED_KEYS.add("notifsTTEnable");
+        ACCEPTED_KEYS.add("notifsPMEnable");
         ACCEPTED_KEYS.add("notifsFrequency");
         ACCEPTED_KEYS.add("reloadOnBack");
         ACCEPTED_KEYS.add("reloadOnResume");
@@ -86,6 +89,7 @@ public class SettingsMain extends SherlockPreferenceActivity {
         ACCEPTED_KEYS.add("ampSortOption");
         ACCEPTED_KEYS.add("confirmPostCancel");
         ACCEPTED_KEYS.add("confirmPostSubmit");
+        ACCEPTED_KEYS.add("autoCensorEnable");
         
         findPreference("donate").setOnPreferenceClickListener(new OnPreferenceClickListener() {
 			@Override
@@ -299,6 +303,21 @@ public class SettingsMain extends SherlockPreferenceActivity {
 					buf.append("notifsEnable=true\n");
 				else
 					buf.append("notifsEnable=false\n");
+				
+				if (settings.getBoolean("notifsAMPEnable", false))
+					buf.append("notifsAMPEnable=true\n");
+				else
+					buf.append("notifsAMPEnable=false\n");
+				
+				if (settings.getBoolean("notifsTTEnable", false))
+					buf.append("notifsTTEnable=true\n");
+				else
+					buf.append("notifsTTEnable=false\n");
+				
+				if (settings.getBoolean("notifsPMEnable", false))
+					buf.append("notifsPMEnable=true\n");
+				else
+					buf.append("notifsPMEnable=false\n");
 
 				buf.append("notifsFrequency=" + settings.getString("notifsFrequency", "60") + '\n');
 				
@@ -350,6 +369,11 @@ public class SettingsMain extends SherlockPreferenceActivity {
 					buf.append("confirmPostSubmit=true\n");
 				else
 					buf.append("confirmPostSubmit=false\n");
+				
+				if (settings.getBoolean("autoCensorEnable", true))
+					buf.append("autoCensorEnable=true\n");
+				else
+					buf.append("autoCensorEnable=false\n");
 				
 				buf.close();
 				Toast.makeText(this, "Backup done.", Toast.LENGTH_SHORT).show();

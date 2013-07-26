@@ -12,6 +12,7 @@
         <attr name="themedRefreshIcon" format="reference" />
         <attr name="themedPostInfoIcon" format="reference" />
         <attr name="themedPostBackground" format="reference" />
+        <attr name="themedDrawerHeaderColor" format="reference" />
     </declare-styleable>
 
 </resources>
