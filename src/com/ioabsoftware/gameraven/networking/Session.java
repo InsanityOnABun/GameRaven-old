@@ -19,7 +19,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.widget.Toast;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
-import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 
 /**
  * Session is used to establish and maintain GFAQs sessions, and to send GET and POST requests.
@@ -215,6 +214,7 @@ public class Session implements HandlesNetworkResult {
 		case TOPIC:
 		case GAME_SEARCH:
 		case BOARD_LIST:
+		case MESSAGE_DETAIL:
 		case USER_DETAIL:
 		case PM_INBOX:
 		case READ_PM:
@@ -304,6 +304,7 @@ public class Session implements HandlesNetworkResult {
 				case TOPIC:
 				case GAME_SEARCH:
 				case BOARD_LIST:
+				case MESSAGE_DETAIL:
 				case USER_DETAIL:
 				case PM_INBOX:
 				case READ_PM:
@@ -349,6 +350,7 @@ public class Session implements HandlesNetworkResult {
 						case TOPIC:
 						case GAME_SEARCH:
 						case BOARD_LIST:
+						case MESSAGE_DETAIL:
 						case USER_DETAIL:
 						case PM_INBOX:
 						case READ_PM:
@@ -414,6 +416,7 @@ public class Session implements HandlesNetworkResult {
 				case TOPIC:
 				case GAME_SEARCH:
 				case BOARD_LIST:
+				case MESSAGE_DETAIL:
 				case USER_DETAIL:
 				case PM_INBOX:
 				case READ_PM:
@@ -774,6 +777,7 @@ public class Session implements HandlesNetworkResult {
 				case DEV_UPDATE_CHECK:
 				case GAME_SEARCH:
 				case BOARD_LIST:
+				case MESSAGE_DETAIL:
 				case AMP_LIST:
 				case TRACKED_TOPICS:
 				case BOARD:
@@ -816,6 +820,7 @@ public class Session implements HandlesNetworkResult {
 		case BOARD:
 		case BOARD_JUMPER:
 		case TOPIC:
+		case MESSAGE_DETAIL:
 		case USER_DETAIL:
 		case PM_INBOX:
 		case READ_PM:

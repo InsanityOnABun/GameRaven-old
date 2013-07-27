@@ -43,7 +43,7 @@ import com.ioabsoftware.gameraven.networking.Session;
 
 public class MessageView extends LinearLayout implements View.OnClickListener {
 
-	private String userContent, messageID, boardID, topicID;
+	private String username, userTitles, messageID, boardID, topicID;
 	private Element messageContent, messageContentNoPoll;
 	private TextView message;
 	private AllInOneV2 aio;
@@ -51,7 +51,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 	private static int quoteBackColor = Color.argb(255, 100, 100, 100);
 	
 	public String getUser() {
-		return userContent;
+		return username;
 	}
 	
 	public String getMessageID() {
@@ -71,12 +71,30 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 	}
 	
 	public String getUserDetailLink() {
-		return Session.ROOT + "/users/" + userContent.replace(' ', '+') + "/boards";
+		return Session.ROOT + "/users/" + username.replace(' ', '+') + "/boards";
 	}
 	
+	public boolean isEdited() {
+		if (userTitles != null && userTitles.contains("(edited)"))
+			return true;
+		else
+			return false;
+	}
 	
-	
-	public MessageView(final AllInOneV2 aioIn, String userIn, String userTitles, String postNum,
+	/**
+	 * 
+	 * @param aioIn 
+	 * @param userIn 
+	 * @param userTitlesIn nullable
+	 * @param postNum nullable
+	 * @param postTimeIn
+	 * @param messageIn
+	 * @param BID
+	 * @param TID
+	 * @param MID
+	 * @param hlColor
+	 */
+	public MessageView(final AllInOneV2 aioIn, String userIn, String userTitlesIn, String postNum,
 					   String postTimeIn, Element messageIn, String BID, String TID, String MID, int hlColor) {
 		super(aioIn);
 		
@@ -84,7 +102,8 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 		
 		aio = aioIn;
         
-        userContent = userIn;
+        username = userIn;
+        userTitles = userTitlesIn;
         messageContent = messageIn;
         messageID = MID;
         topicID = TID;
@@ -99,24 +118,21 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         
 		message = (TextView) findViewById(R.id.mvMessage);
 		
-        ((TextView) findViewById(R.id.mvUser)).setText(userContent + userTitles);
+        ((TextView) findViewById(R.id.mvUser)).setText((userTitles != null ? username + userTitles : username));
         ((TextView) findViewById(R.id.mvUser)).setTextColor(AllInOneV2.getAccentTextColor());
-        ((TextView) findViewById(R.id.mvPostNumber)).setText("#" + postNum + ", " + postTimeIn);
+        ((TextView) findViewById(R.id.mvPostNumber)).setText((postNum != null ? "#" + postNum + ", " + postTimeIn : postTimeIn));
         ((TextView) findViewById(R.id.mvPostNumber)).setTextColor(AllInOneV2.getAccentTextColor());
 
 		aio.wtl("set text and color for user and post number");
         
-        String html = null;
         if (messageContent.getElementsByClass("board_poll").isEmpty()) {
     		aio.wtl("no poll");
     		messageContentNoPoll = messageContent.clone();
-        	html = messageContentNoPoll.html();
 		}
         else {
     		aio.wtl("there is a poll");
     		messageContentNoPoll = messageContent.clone();
     		messageContentNoPoll.getElementsByClass("board_poll").first().remove();
-        	html = messageContentNoPoll.html();
         	
         	Element pollElem = messageContent.getElementsByClass("board_poll").first();
 
@@ -232,7 +248,6 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         	
         	
         	ssb.replace(closer, closer + "</blockquote>".length(), "\n");
-        	aio.wtl("quote being added to post " + postNum + ": " + ssb.subSequence(start, closer));
         	ssb.setSpan(new GRQuoteSpan(), start, closer, 0);
         }
         
@@ -341,7 +356,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 	}
 
 	private String processContent(boolean removeSig) {
-		String finalBody = messageContentNoPoll.getElementsByClass("msg_body").first().html();
+		String finalBody = messageContentNoPoll.html();
 		
 		finalBody = finalBody.replace("<span class=\"fspoiler\">", "<spoiler>").replace("</span>", "</spoiler>");
 		
@@ -367,6 +382,11 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 		
 		finalBody = StringEscapeUtils.unescapeHtml4(finalBody);
 		return finalBody;
+	}
+	
+	public void disableTopClick() {
+		findViewById(R.id.mvTopWrapper).setClickable(false);
+		findViewById(R.id.mvMessageMenuIcon).setVisibility(View.INVISIBLE);
 	}
 	
 	

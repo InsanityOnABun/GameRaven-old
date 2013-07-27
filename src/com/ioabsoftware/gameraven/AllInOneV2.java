@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -14,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import net.simonvt.menudrawer.MenuDrawer;
+import net.simonvt.menudrawer.MenuDrawer.OnDrawerStateChangeListener;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -260,6 +260,20 @@ public class AllInOneV2 extends Activity {
         drawer.setContentView(R.layout.allinonev2);
         drawer.setMenuView(R.layout.drawer);
         
+        drawer.setOnDrawerStateChangeListener(new OnDrawerStateChangeListener() {
+			
+			@Override
+			public void onDrawerStateChange(int oldState, int newState) {
+				if (newState == MenuDrawer.STATE_CLOSED)
+					drawer.findViewById(R.id.dwrScroller).scrollTo(0, 0);
+			}
+			
+			@Override
+			public void onDrawerSlide(float openRatio, int offsetPixels) {
+				// not needed
+			}
+		});
+        
         if (usingLightTheme)
         	drawer.findViewById(R.id.dwrScroller).setBackgroundResource(android.R.drawable.screen_background_light);
         else
@@ -274,7 +288,7 @@ public class AllInOneV2 extends Activity {
 					if (pos == 0 && Session.getUser() != null) {
 						wtl("starting new session from onItemSelected, no login");
 						session = new Session(AllInOneV2.this);
-						drawer.closeMenu();
+						drawer.closeMenu(true);
 					}
 
 					else {
@@ -282,7 +296,7 @@ public class AllInOneV2 extends Activity {
 						if (!selUser.equals(Session.getUser())) {
 							wtl("starting new session from onItemSelected, logged in");
 							session = new Session(AllInOneV2.this, selUser, accounts.getString(selUser));
-							drawer.closeMenu();
+							drawer.closeMenu(true);
 						}
 					}
 				}
@@ -295,7 +309,7 @@ public class AllInOneV2 extends Activity {
         ((Button) drawer.findViewById(R.id.dwrBoardJumper)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				drawer.closeMenu();
+				drawer.closeMenu(true);
 				session.get(NetDesc.BOARD_JUMPER, "/boards", null);
 			}
 		});
@@ -303,7 +317,7 @@ public class AllInOneV2 extends Activity {
         ((Button) drawer.findViewById(R.id.dwrAMPList)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				drawer.closeMenu();
+				drawer.closeMenu(true);
 				session.get(NetDesc.AMP_LIST, buildAMPLink(), null);
 			}
 		});
@@ -311,7 +325,7 @@ public class AllInOneV2 extends Activity {
         ((Button) drawer.findViewById(R.id.dwrTrackedTopics)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				drawer.closeMenu();
+				drawer.closeMenu(true);
 				session.get(NetDesc.TRACKED_TOPICS, "/boards/tracked", null);
 			}
 		});
@@ -319,7 +333,7 @@ public class AllInOneV2 extends Activity {
         ((Button) drawer.findViewById(R.id.dwrPMInbox)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				drawer.closeMenu();
+				drawer.closeMenu(true);
 				session.get(NetDesc.PM_INBOX, "/pm/", null);
 			}
 		});
@@ -1035,6 +1049,7 @@ public class AllInOneV2 extends Activity {
 
 				wtl("parsing res");
 				Document pRes = res.parse();
+				String resUrl = res.url().toString();
 				
 				if (desc == NetDesc.DEV_UPDATE_CHECK) {
 					wtl("GRAIO hNR determined this is update check response");
@@ -1330,7 +1345,7 @@ public class AllInOneV2 extends Activity {
 					wtl("GRAIO hNR determined this is a board response");
 					
 					wtl("setting board id");
-					boardID = parseBoardID(res.url().toString());
+					boardID = parseBoardID(resUrl);
 					
 					boolean isSplitList = false;
 					if (pRes.getElementsByTag("th").first() != null) {
@@ -1346,7 +1361,7 @@ public class AllInOneV2 extends Activity {
 					}
 					
 					if (!isSplitList) {
-						String url = res.url().toString();
+						String url = resUrl;
 						String searchQuery = EMPTY_STRING;
 						String searchPJAddition = EMPTY_STRING;
 						if (url.contains("search=")) {
@@ -1508,8 +1523,8 @@ public class AllInOneV2 extends Activity {
 					break;
 					
 				case TOPIC:
-					boardID = parseBoardID(res.url().toString());
-					topicID = parseTopicID(res.url().toString());
+					boardID = parseBoardID(resUrl);
+					topicID = parseTopicID(resUrl);
 
 					tlUrl = "boards/" + boardID;
 					wtl(tlUrl);
@@ -1589,7 +1604,6 @@ public class AllInOneV2 extends Activity {
 						
 						String user = null;
 						String postNum = null;
-						String mID = null;
 						String userTitles = EMPTY_STRING;
 						String postTimeText = EMPTY_STRING;
 						String postTime = EMPTY_STRING;
@@ -1615,10 +1629,10 @@ public class AllInOneV2 extends Activity {
 									postTime = t;
 								
 								else if (t.equals("message detail"))
-									mID = parseMessageID(e.child(0).attr("href"));
+									messageID = parseMessageID(e.child(0).attr("href"));
 							}
 							
-							msgBody = row.child(1);
+							msgBody = row.child(1).child(0);
 						}
 						else {
 							// message poster display set to above message
@@ -1646,16 +1660,19 @@ public class AllInOneV2 extends Activity {
 									userTitles += " (tagged as " + e.text() + ")";
 								
 								else if (e.text().equals("message detail"))
-									mID = parseMessageID(e.attr("href"));
+									messageID = parseMessageID(e.attr("href"));
 							}
-							//Posted 11/15/2012 11:20:27&nbsp;AM | 
+							//Posted 11/15/2012 11:20:27&nbsp;AM | (edited) [if archived]
+							if (postTimeText.contains("(edited)"))
+								userTitles +=  " (edited)";
+							
 							int endPoint = postTimeText.indexOf('|') - 1;
 							if (endPoint < 0)
 								endPoint = postTimeText.length();
 							postTime = postTimeText.substring(0, endPoint);
 							
 							x++;
-							msgBody = rows.get(x).child(0);
+							msgBody = rows.get(x).child(0).child(0);
 						}
 						
 						int hlColor = 0;
@@ -1669,8 +1686,7 @@ public class AllInOneV2 extends Activity {
 						
 						message = new MessageView(this, user, userTitles,
 								postNum, postTime, msgBody, boardID,
-								topicID, mID, hlColor);
-						message.setOnClickListener(cl);
+								topicID, messageID, hlColor);
 						content.addView(message);
 					}
 					
@@ -1682,6 +1698,40 @@ public class AllInOneV2 extends Activity {
 					        	contentPTR.getRefreshableView().smoothScrollTo(0, lastMessage.getTop());
 					        }
 					    });
+					}
+					
+					break;
+					
+				case MESSAGE_DETAIL:
+					updateHeaderNoJumper("Message Detail", NetDesc.MESSAGE_DETAIL);
+					
+					boardID = parseBoardID(resUrl);
+					topicID = parseTopicID(resUrl);
+					messageID = parseMessageID(resUrl);
+					
+					Elements msgDRows = pRes.getElementsByTag("tr");
+					
+					String user = msgDRows.first().child(0).child(0).text();
+					
+					content.addView(new HeaderView(this, "Current Version"));
+					
+					for (int x = 0; x < msgDRows.size(); x++) {
+						if (x == 1)
+							content.addView(new HeaderView(this, "Previous Version(s)"));
+						else {
+							Element currRow = msgDRows.get(x);
+							
+							String postTime;
+							if (currRow.child(0).textNodes().size() > 1)
+								postTime = currRow.child(0).textNodes().get(1).text();
+							else
+								postTime = currRow.child(0).textNodes().get(0).text();
+							
+							Element body = currRow.child(1);
+							MessageView msg = new MessageView(this, user, null, null, postTime, body, boardID, topicID, messageID, 0);
+							msg.disableTopClick();
+							content.addView(msg);
+						}
 					}
 					
 					break;
@@ -1721,114 +1771,11 @@ public class AllInOneV2 extends Activity {
 					UserDetailView userDetail = new UserDetailView(this, name, ID, level, creation, lVisit, sig, karma, AMP);
 					content.addView(userDetail);
 					break;
-//					
-//				case MSG_DETAIL:
-//					//aBar.setTitle("Message Detail");
-//					abTitle.setText("Message Detail");
-//					
-//					getBoardID(res.url().toString());
-//					getTopicID(res.url().toString());
-//					getMessageID(res.url().toString());
-//					
-//					String key = pRes.getElementsByAttributeValue("name", "key").first().attr("value");
-//					
-//					data.append(pRes.getElementsByClass("body").get(1).outerHtml());
-//					
-//					data.append("<table class=\"gameraven_table\">");
-//					
-//					if (!pRes.select("h2:containsOwn(Edit this Message)").isEmpty()) {
-//						data.append("<tr><td><p>You can edit your message within one hour of posting to fix any errors or add additional " +
-//								"information.</p><a href=\"GAMERAVEN_EDIT_POST\">Edit post</a></td></tr>");
-//					}
-//
-//					if (!pRes.select("h2:containsOwn(Delete this Message)").isEmpty()) {
-//						data.append("<tr><td><p>You can delete your message from the boards, however, bear in mind that a record of your " +
-//								"deletion will be kept in the database. You can either delete your entire topic, if yours is the first and " +
-//								"only post, or simply overwrite your message with a note saying that you chose to delete the message.</p>" +
-//								"<a href=\"GAMERAVEN_DELETE_POST" + key + "\">Delete post</a></td></tr>");
-//					}
-//
-//					if (!pRes.select("h2:containsOwn(Close this Topic)").isEmpty()) {
-//						data.append("<tr><td><p>As nobody has posted in this topic for the past 5 minutes, you have the option of closing " +
-//								"it, making it impossible to post any additional messages.</p><a href=\"GAMERAVEN_CLOSE_TOPIC" + key + 
-//								"\">Close topic</a></td></tr>");
-//					}
-//					
-//					if (!pRes.getElementsContainingText(
-//							"Report This Message to the Moderators").isEmpty()) {
-//						data.append("<tr><th>You have the ability to report messages to the moderators as abusive. This function allows you " + 
-//								"to report Terms of Use violations and Board Etiquette issues to the moderators, who then will take " +
-//								"appropriate action on it as they reach this message in the queue. The reporting function is anonymous; " +
-//								"only the moderators will see who has marked this message, and that information is deleted when the " +
-//								"moderator takes action. Please note that abuse of this form could result in karma loss or termination " +
-//								"of your account.");
-//						data.append("</th></tr><tr><td>");
-//						data.append("<a href=\"GAMERAVEN_MARK_POST" + "1?" + key + 
-//								"\">Report Offensive: Sexually explicit, racism, threats, pornography</a>");
-//						data.append("</td></tr><tr><td>");
-//						data.append("<a href=\"GAMERAVEN_MARK_POST" + "5?" + key +
-//								"\">Report Advertising: Spam, \"Make Money Fast\", referrer codes</a>");
-//						data.append("</td></tr><tr><td>");
-//						data.append("<a href=\"GAMERAVEN_MARK_POST" + "6?" + key +
-//								"\">Report Illegal Activities: Copyright violations, online game cheats</a>");
-//						data.append("</td></tr><tr><td>");
-//						data.append("<a href=\"GAMERAVEN_MARK_POST" + "18?" + key +
-//								"\">Report Spoiler with no Warning: Revealing critical plot details with no warning</a>");
-//						data.append("</td></tr><tr><td>");
-//						data.append("<a href=\"GAMERAVEN_MARK_POST" + "22?" + key +
-//								"\">Report Harassment/Privacy: Posting personal information, repeated harassment and bullying</a>");
-//						data.append("</td></tr><tr><td>");
-//						data.append("<a href=\"GAMERAVEN_MARK_POST" + "2?" + key +
-//								"\">Report Censor Bypassing: Not properly obscuring offensive/banned words</a>");
-//						data.append("</td></tr><tr><td>");
-//						data.append("<a href=\"GAMERAVEN_MARK_POST" + "3?" + key +
-//								"\">Report Trolling: Provoking other users to respond inappropriately</a>");
-//						data.append("</td></tr><tr><td>");
-//						data.append("<a href=\"GAMERAVEN_MARK_POST" + "4?" + key +
-//								"\">Report Flaming: Insulting other board users</a>");
-//						data.append("</td></tr><tr><td>");
-//						data.append("<a href=\"GAMERAVEN_MARK_POST" + "20?" + key +
-//								"\">Report Disruptive Posting: ALL CAPS, large blank posts, hard-to-read posts, mass bumping</a>");
-//						data.append("</td></tr></table>");
-//					}
-//					
-//					Element postBody = pRes.getElementsByClass("author").get(1).nextElementSibling();
-//					
-//					wtl("cloning body");
-//					Element clonedBody = postBody.clone();
-//					wtl("body cloned finished, checking for poll to remove");
-//					if (!clonedBody.getElementsByClass("board_poll").isEmpty()) {
-//						wtl("post has a poll, removing");
-//						clonedBody.getElementsByClass("board_poll").first().remove();
-//					}
-//
-//					wtl("poll check finished, getting html");
-//					String finalBody = clonedBody.html();
-//
-//					wtl("get html finished, finding sig seperator");
-//					finalBody = finalBody.replace("<span class=\"fspoiler\">", "<spoiler>").replace("</span>", "</spoiler>");
-//					
-//					while (finalBody.contains("<a href")) {
-//						int start = finalBody.indexOf("<a href");
-//						int end = finalBody.indexOf(">", start) + 1;
-//						finalBody = finalBody.replace(finalBody.substring(start, end), EMPTY_STRING);
-//					}
-//					finalBody = finalBody.replace("</a>", EMPTY_STRING);
-//					if (finalBody.endsWith("<br />"))
-//						finalBody = finalBody.substring(0, finalBody.length() - 6);
-//					finalBody = finalBody.replace("\n", EMPTY_STRING);
-//					finalBody = finalBody.replace("<br />", "\n");
-//					
-//					finalBody = StringEscapeUtils.unescapeHtml4(finalBody);
-//					
-//					quoteBodies.add(finalBody);
-//					
-//					break;
-//					
+					
 				case GAME_SEARCH:
 					wtl("GRAIO hNR determined this is a game search response");
 
-					String url = res.url().toString();
+					String url = resUrl;
 					wtl("game search url: " + url);
 					
 					String searchQuery = url.substring(url.indexOf("game=") + 5);
@@ -1915,8 +1862,7 @@ public class AllInOneV2 extends Activity {
 					
 				default:
 					wtl("GRAIO hNR determined response type is unhandled");
-					//aBar.setTitle("Page unhandled - " + res.url().toString());
-					title.setText("Page unhandled - " + res.url().toString());
+					title.setText("Page unhandled - " + resUrl);
 					break;
 				}
 				
@@ -2459,6 +2405,10 @@ public class AllInOneV2 extends Activity {
 		msgActionBuilder.setTitle("Message Actions");
 		
 		ArrayList<String> listBuilder = new ArrayList<String>();
+		
+		if (clickedMsg.isEdited() && clickedMsg.getMessageID() != null)
+			listBuilder.add("View Previous Version(s)");
+		
 		if (Session.isLoggedIn()) {
 			if (postIcon.isVisible())
 				listBuilder.add("Quote");
@@ -2482,7 +2432,10 @@ public class AllInOneV2 extends Activity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				String selected = options[which];
-				if (selected.equals("Quote")) {
+				if (selected.equals("View Previous Version(s)")) {
+					session.get(NetDesc.MESSAGE_DETAIL, clickedMsg.getMessageDetailLink(), null);
+				}
+				else if (selected.equals("Quote")) {
 					quoteSetup(clickedMsg.getUser(), clickedMsg.getMessageForQuoting());
 				}
 				else if (selected.equals("Edit")) {
@@ -2765,7 +2718,7 @@ public class AllInOneV2 extends Activity {
 	
 	private String parseBoardID(String url) {
 		wtl("parseBoardID fired");
-		// board example: http://m.gamefaqs.com/boards/400-current-events
+		// board example: http://www.gamefaqs.com/boards/400-current-events
 		String boardUrl = url.substring(Session.ROOT.length() + 8);
 		
 		int i = boardUrl.indexOf('/');
@@ -2791,7 +2744,7 @@ public class AllInOneV2 extends Activity {
 	
 	private String parseTopicID(String url) {
 		wtl("parseTopicID fired");
-		// topic example: http://m.gamefaqs.com/boards/400-current-events/64300205
+		// topic example: http://www.gamefaqs.com/boards/400-current-events/64300205
 		String topicUrl = url.substring(url.indexOf('/', Session.ROOT.length() + 8) + 1);
 		int i = topicUrl.indexOf('/');
 		if (i != -1) {
@@ -2815,7 +2768,7 @@ public class AllInOneV2 extends Activity {
 	private String parseMessageID(String url) {
 		wtl("parseMessageID fired");
 		String msgID = url.substring(url.lastIndexOf('/') + 1);
-		wtl("topicID: " + msgID);
+		wtl("messageID: " + msgID);
 		return msgID;
 	}
 	
@@ -2826,7 +2779,7 @@ public class AllInOneV2 extends Activity {
     		searchIcon.collapseActionView();
     	}
     	else if (drawer.isMenuVisible()) {
-    		drawer.closeMenu();
+    		drawer.closeMenu(true);
     	}
     	else if (postWrapper.getVisibility() == View.VISIBLE) {
     		postCleanup();
