@@ -15,8 +15,15 @@ import org.jsoup.select.Elements;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.webkit.WebView;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
+import android.widget.TableLayout.LayoutParams;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
 
@@ -48,10 +55,10 @@ public class Session implements HandlesNetworkResult {
 	{return lastPath;}
 	/** Get's the path of the latest page, stripped of any GET data. */
 	public String getLastPathWithoutData() {
-		String s = lastPath;
-		if (s.contains("?"))
-			s = s.substring(0, s.indexOf('?'));
-		return s;
+		if (lastPath.contains("?"))
+			return lastPath.substring(0, lastPath.indexOf('?'));
+		else
+			return lastPath;
 	}
 	
 	/** The latest description. */
@@ -124,7 +131,6 @@ public class Session implements HandlesNetworkResult {
 	 * @param activity The current activity
 	 * @param userIn Username, or null if no user
 	 * @param passwordIn Password, or null if no user
-	 * @param path The final page to end at, or null if ROOT
 	 */
 	private void finalConstructor(AllInOneV2 aioIn, String userIn, String passwordIn)
 	{
@@ -261,7 +267,73 @@ public class Session implements HandlesNetworkResult {
 					return;
 				}
 				
+				if (!res.url().toString().startsWith(ROOT)) {
+					AlertDialog.Builder b = new AlertDialog.Builder(aio);
+					b.setTitle("Redirected");
+					b.setMessage("The request was redirected somewhere away from GameFAQs. " +
+							"This usually happens if you're connected to a network that requires a login, " +
+							"such as a  paid-for wifi service. Click below to open the page in your browser.");
+					
+					final String path = res.url().toString();
+					b.setPositiveButton("Open Page In Browser", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(path));
+							aio.startActivity(browserIntent);
+							aio.finish();
+						}
+					});
+					
+					b.create().show();
+					return;
+				}
+				
 				Document pRes = res.parse();
+				
+				if (!pRes.select("header.page_header:contains(CAPTCHA)").isEmpty()) {
+					
+					String captcha = pRes.select("iframe").outerHtml();
+					final String key = pRes.getElementsByAttributeValue("name", "key").attr("value");
+					
+					AlertDialog.Builder b = new AlertDialog.Builder(aio);
+					b.setTitle("CAPTCHA Required");
+					
+					LinearLayout wrapper = new LinearLayout(aio);
+					wrapper.setOrientation(LinearLayout.VERTICAL);
+					
+					WebView web = new WebView(aio);
+					web.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+					web.loadDataWithBaseURL(res.url().toString(), 
+							"<p>There have been multiple unsuccessful login attempts!</p>" + captcha, 
+							"text/html", 
+							null, null);
+					wrapper.addView(web);
+					
+					final EditText form = new EditText(aio);
+					form.setHint("Enter confirmation code (NOT CAPTCHA!!!) here");
+					wrapper.addView(form);
+					
+					b.setView(wrapper);
+					
+					b.setPositiveButton("Login", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							HashMap<String, String> loginData = new HashMap<String, String>();
+							// "EMAILADDR", user, "PASSWORD", password, "path", lastPath, "key", key
+							loginData.put("EMAILADDR", user);
+							loginData.put("PASSWORD", password);
+							loginData.put("path", ROOT);
+							loginData.put("key", key);
+							loginData.put("recaptcha_challenge_field", form.getText().toString());
+							loginData.put("recaptcha_response_field", "manual_challenge");
+							
+							post(NetDesc.LOGIN_S2, "/user/login_captcha.html", loginData);
+						}
+					});
+					
+					b.create().show();
+					return;
+				}
 				
 				aio.wtl("status: " + res.statusCode() + ", " + res.statusMessage());
 				Element err = pRes.select("h1.page-title").first();
@@ -718,10 +790,15 @@ public class Session implements HandlesNetworkResult {
 					break;
 					
 				case MARKMSG_S1:
-					HashMap<String, String> markData = new HashMap<String, String>();
-					markData.put("reason", aio.getReportCode());
-					markData.put("key", pRes.select("input[name=key]").first().attr("value"));
-					post(NetDesc.MARKMSG_S2, res.url() + "?action=mod", markData);
+					if (pRes.select("p:contains(you selected is no longer available for viewing.)").isEmpty()) {
+						HashMap<String, String> markData = new HashMap<String, String>();
+						markData.put("reason", aio.getReportCode());
+						markData.put("key", pRes.select("input[name=key]").first().attr("value"));
+						post(NetDesc.MARKMSG_S2, res.url() + "?action=mod", markData);
+					}
+					else
+						Toast.makeText(aio, "The topic has already been removed!", Toast.LENGTH_SHORT).show();
+					
 					break;
 					
 				case MARKMSG_S2:

@@ -124,9 +124,9 @@ public class AllInOneV2 extends Activity {
 	private String topicID;
 	public String getTopicID()
 	{return topicID;}
-	private String messageID;
+	private String messageIDForEditing;
 	public String getMessageID()
-	{return messageID;}
+	{return messageIDForEditing;}
 	private String postPostUrl;
 	public String getPostPostUrl()
 	{return postPostUrl;}
@@ -1004,7 +1004,7 @@ public class AllInOneV2 extends Activity {
 			postBody.setText(null);
 			postTitle.setText(null);
 			clearPoll();
-			messageID = null;
+			messageIDForEditing = null;
 			postPostUrl = null;
 			content.requestFocus();
 			
@@ -1069,7 +1069,7 @@ public class AllInOneV2 extends Activity {
 				wtl("setting board, topic, message id to null");
 				boardID = null;
 				topicID = null;
-				messageID = null;
+				messageIDForEditing = null;
 				
 				content.removeAllViews();
 				
@@ -1604,6 +1604,7 @@ public class AllInOneV2 extends Activity {
 						
 						String user = null;
 						String postNum = null;
+						String mID = null;
 						String userTitles = EMPTY_STRING;
 						String postTimeText = EMPTY_STRING;
 						String postTime = EMPTY_STRING;
@@ -1629,7 +1630,7 @@ public class AllInOneV2 extends Activity {
 									postTime = t;
 								
 								else if (t.equals("message detail"))
-									messageID = parseMessageID(e.child(0).attr("href"));
+									mID = parseMessageID(e.child(0).attr("href"));
 							}
 							
 							msgBody = row.child(1).child(0);
@@ -1660,7 +1661,7 @@ public class AllInOneV2 extends Activity {
 									userTitles += " (tagged as " + e.text() + ")";
 								
 								else if (e.text().equals("message detail"))
-									messageID = parseMessageID(e.attr("href"));
+									mID = parseMessageID(e.attr("href"));
 							}
 							//Posted 11/15/2012 11:20:27&nbsp;AM | (edited) [if archived]
 							if (postTimeText.contains("(edited)"))
@@ -1686,7 +1687,7 @@ public class AllInOneV2 extends Activity {
 						
 						message = new MessageView(this, user, userTitles,
 								postNum, postTime, msgBody, boardID,
-								topicID, messageID, hlColor);
+								topicID, mID, hlColor);
 						content.addView(message);
 					}
 					
@@ -1707,7 +1708,6 @@ public class AllInOneV2 extends Activity {
 					
 					boardID = parseBoardID(resUrl);
 					topicID = parseTopicID(resUrl);
-					messageID = parseMessageID(resUrl);
 					
 					Elements msgDRows = pRes.getElementsByTag("tr");
 					
@@ -1715,20 +1715,22 @@ public class AllInOneV2 extends Activity {
 					
 					content.addView(new HeaderView(this, "Current Version"));
 					
+					Element currRow;
+					String postTime;
+					String mID = parseMessageID(resUrl);
 					for (int x = 0; x < msgDRows.size(); x++) {
 						if (x == 1)
 							content.addView(new HeaderView(this, "Previous Version(s)"));
 						else {
-							Element currRow = msgDRows.get(x);
+							currRow = msgDRows.get(x);
 							
-							String postTime;
 							if (currRow.child(0).textNodes().size() > 1)
 								postTime = currRow.child(0).textNodes().get(1).text();
 							else
 								postTime = currRow.child(0).textNodes().get(0).text();
 							
 							Element body = currRow.child(1);
-							MessageView msg = new MessageView(this, user, null, null, postTime, body, boardID, topicID, messageID, 0);
+							MessageView msg = new MessageView(this, user, null, null, postTime, body, boardID, topicID, mID, 0);
 							msg.disableTopClick();
 							content.addView(msg);
 						}
@@ -2131,7 +2133,7 @@ public class AllInOneV2 extends Activity {
 	
 	public void editPostSetup(String msg, String msgID) {
 		postBody.setText(msg);
-		messageID = msgID;
+		messageIDForEditing = msgID;
 		postOnTopicSetup();
 	}
 	
@@ -2252,8 +2254,8 @@ public class AllInOneV2 extends Activity {
 			// posting on a topic
 			wtl("posting on a topic");
 			String path = Session.ROOT + "/boards/post.php?board=" + boardID + "&topic=" + topicID;
-			if (messageID != null)
-				path += "&message=" + messageID;
+			if (messageIDForEditing != null)
+				path += "&message=" + messageIDForEditing;
 			
 			wtl("post path: " + path);
 			savedPostBody = postBody.getText().toString();
@@ -2261,7 +2263,7 @@ public class AllInOneV2 extends Activity {
 			wtl("sending post");
 			postButton.setEnabled(false);
 			cancelButton.setEnabled(false);
-			if (messageID != null)
+			if (messageIDForEditing != null)
 				session.get(NetDesc.QEDIT_MSG, path, null);
 			else if (Session.getUserLevel() < 30)
 				session.get(NetDesc.POSTMSG_S1, path, null);
@@ -2768,7 +2770,7 @@ public class AllInOneV2 extends Activity {
 	private String parseMessageID(String url) {
 		wtl("parseMessageID fired");
 		String msgID = url.substring(url.lastIndexOf('/') + 1);
-		wtl("messageID: " + msgID);
+		wtl("messageIDForEditing: " + msgID);
 		return msgID;
 	}
 	

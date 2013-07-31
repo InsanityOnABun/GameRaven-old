@@ -188,8 +188,10 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Title"
+                android:inputType="textCapSentences|textShortMessage"
                 android:lines="1"
-                android:maxLength="80" >
+                android:maxLength="80"
+                android:maxLines="1" >
 
                 <requestFocus />
             </EditText>
@@ -210,7 +212,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Body"
-            android:inputType="textMultiLine"
+            android:inputType="textCapSentences|textMultiLine|textLongMessage"
             android:lines="4" />
 
         <TextView

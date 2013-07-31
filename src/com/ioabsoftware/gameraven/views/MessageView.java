@@ -6,6 +6,7 @@ import net.margaritov.preference.colorpicker.ColorPickerPreference;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
 
 import android.content.Context;
@@ -24,6 +25,7 @@ import android.text.TextPaint;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.CharacterStyle;
 import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.QuoteSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
@@ -158,7 +160,16 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         		for (Element e : pollElem.select("div.row")) {
         			Elements c = e.children();
         			t = new TextView(aio);
-        			t.setText(c.get(0).text() + ": " + c.get(1).text());
+        			String text = c.get(0).text() + ": " + c.get(1).text();
+        			if (!c.get(0).children().isEmpty()) {
+        				SpannableStringBuilder votedFor = new SpannableStringBuilder(text);
+        				votedFor.setSpan(new StyleSpan(Typeface.BOLD), 0, text.length(), 0);
+        				votedFor.setSpan(new ForegroundColorSpan(AllInOneV2.getAccentColor()), 0, text.length(), 0);
+        				t.setText(votedFor);
+        			}
+        			else
+            			t.setText(text);
+        			
         			innerPollWrapper.addView(t);
         		}
         		
