@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -243,6 +244,22 @@ public class SettingsMain extends SherlockPreferenceActivity {
                     return true;
                 }
         });
+        
+        // remove first notifsFrequency setting (1 min dev) if release build
+        if (AllInOneV2.isReleaseBuild) {
+        	ListPreference p = (ListPreference) findPreference("notifsFrequency");
+        	
+        	int size = p.getEntries().length;
+        	CharSequence[] entries = new String[size - 1];
+        	CharSequence[] vals = new String[size - 1];
+        	for (int x = 1; x < size; x++) {
+        		entries[x - 1] = p.getEntries()[x];
+        		vals[x - 1] = p.getEntryValues()[x];
+        	}
+        	
+        	p.setEntries(entries);
+        	p.setEntryValues(vals);
+        }
 	}
 
 	private void enableNotifs(String freq) {

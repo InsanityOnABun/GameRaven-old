@@ -97,7 +97,7 @@ import com.ioabsoftware.gameraven.views.UserDetailView;
 public class AllInOneV2 extends Activity {
 	
 	private static boolean needToCheckForUpdate = true;
-	private static boolean isReleaseBuild = true;
+	public static boolean isReleaseBuild = true;
 	
 	public static final int NEW_VERSION_DIALOG = 101;
 	public static final int SEND_PM_DIALOG = 102;
@@ -2517,7 +2517,7 @@ public class AllInOneV2 extends Activity {
 									
 									pmSending.setVisibility(View.VISIBLE);
 									
-									session.get(NetDesc.SEND_PM_S1, "http://m.gamefaqs.com/pm/new", null);
+									session.get(NetDesc.SEND_PM_S1, "/pm/new", null);
 									
 								}
 								else

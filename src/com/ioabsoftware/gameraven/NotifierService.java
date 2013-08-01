@@ -46,10 +46,11 @@ public class NotifierService extends IntentService {
 		
 		String username = prefs.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
 		
-	    if (!username.equals(SettingsMain.NO_DEFAULT_ACCOUNT)) {
+		// service does nothing if there is no default account set or there is no generated salt
+	    if (!username.equals(SettingsMain.NO_DEFAULT_ACCOUNT) && prefs.getString("secureSalt", null) != null) {
 			HashMap<String, String> cookies = new HashMap<String, String>();
 			String password = new SecurePreferences(getApplicationContext(), AllInOneV2.ACCOUNTS_PREFNAME, 
-													 AllInOneV2.secureSalt, false).getString(username);;
+													prefs.getString("secureSalt", null), false).getString(username);;
 			Log.d("notif", username);
 			String basePath = Session.ROOT + "/boards";
 			String loginPath = Session.ROOT + "/user/login.html";
