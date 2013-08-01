@@ -1,12 +1,16 @@
 package com.ioabsoftware.gameraven.views;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 import net.margaritov.preference.colorpicker.ColorPickerPreference;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.holoeverywhere.widget.Toast;
 import org.jsoup.nodes.Element;
-import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
 
 import android.content.Context;
@@ -22,6 +26,8 @@ import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
+import android.text.format.DateUtils;
+import android.text.format.Time;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.CharacterStyle;
 import android.text.style.ClickableSpan;
@@ -45,7 +51,7 @@ import com.ioabsoftware.gameraven.networking.Session;
 
 public class MessageView extends LinearLayout implements View.OnClickListener {
 
-	private String username, userTitles, messageID, boardID, topicID;
+	private String username, userTitles, postTime, messageID, boardID, topicID;
 	private Element messageContent, messageContentNoPoll;
 	private TextView message;
 	private AllInOneV2 aio;
@@ -83,6 +89,28 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 			return false;
 	}
 	
+	public boolean isEditable() {
+		// Posted 8/1/2013 1:40:38 AM
+		// Posted 8/1/2013 1:02:05 AM
+		// Posted 3/18/2007 11:42:33 PM
+		try {
+			Date then;
+			then = new SimpleDateFormat("'Posted 'M/d/yyyy h:mm:ss a", Locale.US).parse(postTime);
+
+			Time now = new Time();
+			now.setToNow();
+			
+			if (messageID != null && (now.toMillis(false) - then.getTime()) < DateUtils.HOUR_IN_MILLIS)
+				return true;
+			else
+				return false;
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
 	/**
 	 * 
 	 * @param aioIn 
@@ -106,6 +134,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         
         username = userIn;
         userTitles = userTitlesIn;
+        postTime = postTimeIn.replace('\u00A0', ' ');
         messageContent = messageIn;
         messageID = MID;
         topicID = TID;
@@ -122,7 +151,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 		
         ((TextView) findViewById(R.id.mvUser)).setText((userTitles != null ? username + userTitles : username));
         ((TextView) findViewById(R.id.mvUser)).setTextColor(AllInOneV2.getAccentTextColor());
-        ((TextView) findViewById(R.id.mvPostNumber)).setText((postNum != null ? "#" + postNum + ", " + postTimeIn : postTimeIn));
+        ((TextView) findViewById(R.id.mvPostNumber)).setText((postNum != null ? "#" + postNum + ", " + postTime : postTime));
         ((TextView) findViewById(R.id.mvPostNumber)).setTextColor(AllInOneV2.getAccentTextColor());
 
 		aio.wtl("set text and color for user and post number");

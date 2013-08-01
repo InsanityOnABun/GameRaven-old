@@ -2403,6 +2403,7 @@ public class AllInOneV2 extends Activity {
 	}
 
 	private Dialog createMessageActionDialog() {
+		clickedMsg.isEditable();
 		AlertDialog.Builder msgActionBuilder = new AlertDialog.Builder(this);
 		msgActionBuilder.setTitle("Message Actions");
 		
@@ -2416,7 +2417,7 @@ public class AllInOneV2 extends Activity {
 				listBuilder.add("Quote");
 			if (Session.getUser().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
 				//TODO: add logic to decide if edit should be added or not based on time
-				if (Session.getUserLevel() > 29 && clickedMsg.getMessageID() != null)
+				if (Session.getUserLevel() > 29 && clickedMsg.isEditable())
 					listBuilder.add("Edit");
 				if (clickedMsg.getMessageID() != null)
 					listBuilder.add("Delete");
