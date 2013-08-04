@@ -807,6 +807,8 @@ public class Session implements HandlesNetworkResult {
 						Toast.makeText(aio, "Message marked successfully.", Toast.LENGTH_SHORT).show();
 					else
 						Toast.makeText(aio, "There was an error marking the message.", Toast.LENGTH_SHORT).show();
+					
+					refresh();
 					break;
 					
 				case DLTMSG_S1:
@@ -901,7 +903,6 @@ public class Session implements HandlesNetworkResult {
 		case USER_DETAIL:
 		case PM_INBOX:
 		case READ_PM:
-		case MARKMSG_S2:
 		case CLOSE_TOPIC:
 		case GAME_SEARCH:
 		case BOARD_LIST:
@@ -915,6 +916,7 @@ public class Session implements HandlesNetworkResult {
 		case LOGIN_S1:
 		case LOGIN_S2:
 		case MARKMSG_S1:
+		case MARKMSG_S2:
 		case DLTMSG_S1:
 		case DLTMSG_S2:
 		case QEDIT_MSG:

@@ -19,6 +19,14 @@
             android:persistent="false"
             android:summary="Add new accounts and modify existing ones."
             android:title="Manage Accounts" />
+
+        <ListPreference
+            android:entries="@array/timezones"
+            android:entryValues="@array/timezones"
+            android:key="timezone"
+            android:persistent="true"
+            android:summary="Match this time zone to the one you use on GameFAQs."
+            android:title="Time Zone" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="notifsCategory"
@@ -59,6 +67,7 @@
             android:entries="@array/notifsFrequencyNames"
             android:entryValues="@array/notifsFrequencyMinutes"
             android:key="notifsFrequency"
+            android:persistent="true"
             android:summary="Default is every hour. High frequency checking can affect battery life."
             android:title="Notification Frequency" />
     </PreferenceCategory>
@@ -95,13 +104,18 @@
             android:summary="Enables the option to refresh the page by pulling past the top or bottom."
             android:title="Enable Pull-To-Refresh" />
 
-        <Preference
-            android:key="ampSortOptionDialog"
-            android:persistent="false"
+        <ListPreference
+            android:defaultValue="-1"
+            android:entries="@array/ampOptionKeys"
+            android:entryValues="@array/ampOptionValues"
+            android:key="ampSortOption"
+            android:persistent="true"
             android:summary="Select your preferred sorting style for your Active Messages list."
-            android:title="AMP Sort Options..." />
+            android:title="AMP Sort Options" />
+
         <Preference
             android:key="customSig"
+            android:persistent="false"
             android:summary="Set a custom global signature that applies to any account that does not have its own signature set."
             android:title="Custom Global Signature..." />
 

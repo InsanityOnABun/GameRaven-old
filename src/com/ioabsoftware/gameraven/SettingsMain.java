@@ -49,7 +49,6 @@ public class SettingsMain extends SherlockPreferenceActivity {
 	public static final String NO_DEFAULT_ACCOUNT = "N/A";
 	
 	public static final int MODIFY_SIG_DIALOG = 200;
-	public static final int MODIFY_AMPSORT_DIALOG = 201;
 	
 	private int currentBackupVer = 2;
 	final ArrayList<String> ACCEPTED_KEYS = new ArrayList<String>();
@@ -174,13 +173,6 @@ public class SettingsMain extends SherlockPreferenceActivity {
         findPreference("customSig").setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
                     showDialog(MODIFY_SIG_DIALOG);
-                    return true;
-                }
-        });
-        
-        findPreference("ampSortOptionDialog").setOnPreferenceClickListener(new OnPreferenceClickListener() {
-                public boolean onPreferenceClick(Preference preference) {
-                    showDialog(MODIFY_AMPSORT_DIALOG);
                     return true;
                 }
         });
@@ -557,9 +549,6 @@ public class SettingsMain extends SherlockPreferenceActivity {
     	case MODIFY_SIG_DIALOG:
     		dialog = createModifySigDialog();
     		break;
-    	case MODIFY_AMPSORT_DIALOG:
-    		dialog = createAMPSortDialog();
-    		break;
     	}
     	return dialog;
     }
@@ -644,44 +633,6 @@ public class SettingsMain extends SherlockPreferenceActivity {
 			@Override
 			public void onDismiss(DialogInterface dialog) {
 				removeDialog(MODIFY_SIG_DIALOG);
-			}
-		});
-    	
-    	return d;
-    }
-    
-    private Dialog createAMPSortDialog() {
-    	AlertDialog.Builder b = new AlertDialog.Builder(this);
-    	b.setTitle("AMP Sort Options");
-    	final String[] vals = getResources().getStringArray(R.array.ampOptionValues);
-    	String currVal = settings.getString("ampSortOption", "-1");
-    	
-    	int checkedItem = -1;
-    	for (int x = 0; x < 4; x++) {
-    		if (vals[x].equals(currVal))
-    			checkedItem = x;
-    	}
-    	
-    	b.setSingleChoiceItems(getResources().getStringArray(R.array.ampOptionKeys), checkedItem, new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				settings.edit().putString("ampSortOption", vals[which]).commit();
-				dialog.dismiss();
-			}
-		});
-    	
-    	b.setNegativeButton("Cancel", new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
-    	
-    	Dialog d = b.create();
-    	d.setOnDismissListener(new OnDismissListener() {
-			@Override
-			public void onDismiss(DialogInterface dialog) {
-				removeDialog(MODIFY_AMPSORT_DIALOG);
 			}
 		});
     	
