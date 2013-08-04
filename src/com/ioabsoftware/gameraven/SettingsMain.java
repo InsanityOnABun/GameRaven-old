@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.holoeverywhere.app.AlertDialog;
@@ -71,6 +72,7 @@ public class SettingsMain extends SherlockPreferenceActivity {
 		Intent notifierIntent = new Intent(this, NotifierService.class);
 		notifPendingIntent = PendingIntent.getService(this, 0, notifierIntent, 0);
 
+        ACCEPTED_KEYS.add("timezone");
         ACCEPTED_KEYS.add("notifsEnable");
         ACCEPTED_KEYS.add("notifsAMPEnable");
         ACCEPTED_KEYS.add("notifsTTEnable");
@@ -307,6 +309,8 @@ public class SettingsMain extends SherlockPreferenceActivity {
 				buf.append("[END_HIGHLIGHT_LIST]\n");
 				
 				buf.append("defaultAccount=" + settings.getString("defaultAccount", NO_DEFAULT_ACCOUNT) + '\n');
+				
+				buf.append("timezone=" + settings.getString("timezone", TimeZone.getDefault().getID()) + '\n');
 				
 				if (settings.getBoolean("notifsEnable", false))
 					buf.append("notifsEnable=true\n");

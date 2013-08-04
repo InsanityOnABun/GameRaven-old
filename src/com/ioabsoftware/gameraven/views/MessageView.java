@@ -96,18 +96,14 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 		// Posted 8/1/2013 1:02:05 AM
 		// Posted 3/18/2007 11:42:33 PM
 		try {
-			Date date;
-			date = new SimpleDateFormat("'Posted 'M/d/yyyy h:mm:ss a", Locale.US).parse(postTime);
-
-			String id = AllInOneV2.getSettingsPref().getString("timezone", null);
+			String id = AllInOneV2.getSettingsPref().getString("timezone", TimeZone.getDefault().getID());
 			
-			Time now;
-			if (id != null)
-				now = new Time(id);
-			else
-				now = new Time(TimeZone.getDefault().getID());
+			SimpleDateFormat sdf = new SimpleDateFormat("'Posted 'M/d/yyyy h:mm:ss a", Locale.US);
+			sdf.setTimeZone(TimeZone.getTimeZone(id));
+			Date date = sdf.parse(postTime);
 			
-			Time then = new Time(now.timezone);
+			Time now  = new Time(id);
+			Time then = new Time(id);
 			
 			then.set(date.getTime());
 			then.normalize(true);
@@ -115,35 +111,10 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 			now.setToNow();
 			now.normalize(true);
 			
-			Log.d("timelog", Float.toString((now.toMillis(false) - then.toMillis(false)) /((float) DateUtils.HOUR_IN_MILLIS)));
-			return false;
-			
-//			Time now, then;
-//			if (timezone != null) {
-//				now = new Time(timezone);
-//				then = new Time(timezone);
-//			}
-//			else {
-//				now = new Time(TimeZone.getDefault().getID());
-//				then = new Time(TimeZone.getDefault().getID());
-//			}
-//			
-//			now.setToNow();
-//			then.set(dateParsed.getTime());
-//			
-//			long offset = TimeZone.getDefault().getoff - then.gmtoff;
-//			
-//			long diff = ((now.toMillis(false)) - (then.toMillis(false) - (offset * 1000)));
-//			
-//			String t = ((float) diff  / DateUtils.HOUR_IN_MILLIS) + ", " + 
-//					(new Time(Time.getCurrentTimezone()).gmtoff / 3600) + " - " + (then.gmtoff / 3600) + " = " + (offset / 3600) + ", " 
-//					+ now.timezone;
-//			Log.d("timelog", t);
-//			
-//			if (messageID != null && diff < DateUtils.HOUR_IN_MILLIS)
-//				return true;
-//			else
-//				return false;
+			if ((now.toMillis(false) - then.toMillis(false)) / ((float) DateUtils.HOUR_IN_MILLIS) < 1f)
+				return true;
+			else
+				return false;
 			
 		} catch (ParseException e) {
 			e.printStackTrace();

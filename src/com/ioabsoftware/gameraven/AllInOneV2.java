@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import net.simonvt.menudrawer.MenuDrawer;
@@ -38,6 +39,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -385,8 +387,14 @@ public class AllInOneV2 extends Activity {
         // Whether the previous drawable should be shown
         drawer.setDrawerIndicatorEnabled(true);
         
-        if (!settings.contains("defaultAccount"))
+        if (!settings.contains("defaultAccount")) {
+        	// settings need to be set to default
         	PreferenceManager.setDefaultValues(this, R.xml.settingsmain, false);
+        	Editor sEditor = settings.edit();
+            sEditor.putString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)
+                   .putString("timezone", TimeZone.getDefault().getID())
+                   .commit();
+        }
         else {
         	if (!settings.contains("accsDoNotNeedConversion")) {
         		// accs need conversion from static SALT to UUID system
@@ -404,9 +412,6 @@ public class AllInOneV2 extends Activity {
         	}
         }
         settings.edit().putBoolean("accsDoNotNeedConversion", true).commit();
-        
-        String defAccInit = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
-        settings.edit().putString("defaultAccount", defAccInit).commit();
         
         aBar = getSupportActionBar();
         aBar.setDisplayHomeAsUpEnabled(true);
@@ -2403,7 +2408,6 @@ public class AllInOneV2 extends Activity {
 	}
 
 	private Dialog createMessageActionDialog() {
-		clickedMsg.isEditable();
 		AlertDialog.Builder msgActionBuilder = new AlertDialog.Builder(this);
 		msgActionBuilder.setTitle("Message Actions");
 		
@@ -2416,7 +2420,6 @@ public class AllInOneV2 extends Activity {
 			if (postIcon.isVisible())
 				listBuilder.add("Quote");
 			if (Session.getUser().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
-				//TODO: add logic to decide if edit should be added or not based on time
 				if (Session.getUserLevel() > 29 && clickedMsg.isEditable())
 					listBuilder.add("Edit");
 				if (clickedMsg.getMessageID() != null)
