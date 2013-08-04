@@ -445,11 +445,11 @@ public class AllInOneV2 extends Activity {
         content.setOrientation(LinearLayout.VERTICAL);
         contentScroller.addView(content);
 
-        titleWrapper  = (LinearLayout) findViewById(R.id.aioTitleWrapper);
+        titleWrapper  = (LinearLayout) findViewById(R.id.aioPostTitleWrapper);
         postTitle = (EditText) findViewById(R.id.aioPostTitle);
         postBody = (EditText) findViewById(R.id.aioPostBody);
-        titleCounter = (TextView) findViewById(R.id.aioTitleCounter);
-        bodyCounter = (TextView) findViewById(R.id.aioBodyCounter);
+        titleCounter = (TextView) findViewById(R.id.aioPostTitleCounter);
+        bodyCounter = (TextView) findViewById(R.id.aioPostBodyCounter);
         
         title = (TextView) findViewById(R.id.aioTitle);
         title.setSelected(true);
@@ -508,7 +508,7 @@ public class AllInOneV2 extends Activity {
 				String escapedBody = StringEscapeUtils.escapeHtml4(postBody.getText().toString());
 				// GFAQs adds 13(!) characters onto bodies when they have a sig, apparently.
 				int length = escapedBody.length() + getSig().length() + 13;
-				bodyCounter.setText(length + "/4096 (includes sig)");
+				bodyCounter.setText(length + "/4096");
 			}
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
@@ -816,7 +816,15 @@ public class AllInOneV2 extends Activity {
 		findViewById(R.id.aioFirstPrevSep).setBackgroundColor(accentColor);
 		findViewById(R.id.aioNextLastSep).setBackgroundColor(accentColor);
 		findViewById(R.id.aioSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioPWSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioPostWrapperSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioPostTitleSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioPostBodySep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioBoldSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioItalicSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioCodeSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioSpoilerSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioCiteSep).setBackgroundColor(accentColor);
+		findViewById(R.id.aioHTMLSep).setBackgroundColor(accentColor);
 		findViewById(R.id.aioPostButtonSep).setBackgroundColor(accentColor);
 		findViewById(R.id.aioPollSep).setBackgroundColor(accentColor);
 		findViewById(R.id.aioPostSep).setBackgroundColor(accentColor);
@@ -2131,34 +2139,40 @@ public class AllInOneV2 extends Activity {
 	}
 	
 	private MessageView clickedMsg;
+	private String quoteSelection;
 	public void messageMenuClicked(MessageView msg) {
 		clickedMsg = msg;
+		quoteSelection = clickedMsg.getSelection();
+		if (quoteSelection != null)
+			Toast.makeText(this, "Selected text prepped for quoting.", Toast.LENGTH_SHORT).show();
+		
 		showDialog(MESSAGE_ACTION_DIALOG);
 	}
 	
-	public void editPostSetup(String msg, String msgID) {
+	private void editPostSetup(String msg, String msgID) {
 		postBody.setText(msg);
 		messageIDForEditing = msgID;
 		postOnTopicSetup();
 	}
 	
-	public void quoteSetup(String user, String msg) {
+	private void quoteSetup(String user, String msg) {
 		wtl("quoteSetup fired");
-		String cite = "<cite>" + user + " posted...</cite>\n";
-		String body = "<quote>" + msg + "</quote>\n\n";
+		String quotedMsg = "<cite>" + user + " posted...</cite>\n" +
+						   "<quote>" + msg + "</quote>\n\n";
 		
-		if (postWrapper.getVisibility() != View.VISIBLE) {
-			postBody.setText(cite + body);
+		int start = Math.max(postBody.getSelectionStart(), 0);
+		int end = Math.max(postBody.getSelectionEnd(), 0);
+		postBody.getText().replace(Math.min(start, end), Math.max(start, end), quotedMsg);
+		
+		if (postWrapper.getVisibility() != View.VISIBLE)
 			postOnTopicSetup();
-		}
-		else {
-			postBody.append(cite + body);
-			postBody.setSelection(postBody.getText().length());
-		}
+		else
+			postBody.setSelection(Math.min(start, end) + quotedMsg.length());
+		
 		wtl("quoteSetup finishing");
 	}
 	
-	public void postOnTopicSetup() {
+	private void postOnTopicSetup() {
 		wtl("postOnTopicSetup fired --NEL");
 		pageJumperWrapper.setVisibility(View.GONE);
 		titleWrapper.setVisibility(View.GONE);
@@ -2172,7 +2186,7 @@ public class AllInOneV2 extends Activity {
 			postPostUrl = postPostUrl.substring(0, postPostUrl.indexOf('#'));
 	}
 	
-	public void postOnBoardSetup() {
+	private void postOnBoardSetup() {
 		wtl("postOnBoardSetup fired --NEL");
 		pageJumperWrapper.setVisibility(View.GONE);
 		titleWrapper.setVisibility(View.VISIBLE);
@@ -2380,7 +2394,13 @@ public class AllInOneV2 extends Activity {
 		});
 		return dialog;
     }
-    private void clearPoll() {pollUse = false; pollTitle = EMPTY_STRING; for (int x = 0; x < 10; x++)pollOptions[x] = EMPTY_STRING; pollMinLevel = -1;}
+    
+    private void clearPoll() {
+    	pollUse = false; 
+    	pollTitle = EMPTY_STRING; 
+    	for (int x = 0; x < 10; x++)
+    		pollOptions[x] = EMPTY_STRING; pollMinLevel = -1;
+    }
 
     
 	private Dialog createReportMessageDialog() {
@@ -2406,7 +2426,7 @@ public class AllInOneV2 extends Activity {
 		});
 		return dialog;
 	}
-
+	
 	private Dialog createMessageActionDialog() {
 		AlertDialog.Builder msgActionBuilder = new AlertDialog.Builder(this);
 		msgActionBuilder.setTitle("Message Actions");
@@ -2442,7 +2462,8 @@ public class AllInOneV2 extends Activity {
 					session.get(NetDesc.MESSAGE_DETAIL, clickedMsg.getMessageDetailLink(), null);
 				}
 				else if (selected.equals("Quote")) {
-					quoteSetup(clickedMsg.getUser(), clickedMsg.getMessageForQuoting());
+					String msg = (quoteSelection != null ? quoteSelection : clickedMsg.getMessageForQuoting());
+					quoteSetup(clickedMsg.getUser(), msg);
 				}
 				else if (selected.equals("Edit")) {
 					editPostSetup(clickedMsg.getMessageForEditing(), clickedMsg.getMessageID());
@@ -2833,6 +2854,22 @@ public class AllInOneV2 extends Activity {
 			builder.replace(start + 1, end, replacement);
 			textLower = textLower.replaceFirst(word, replacement + '*');
 		}
+	}
+	
+	public void htmlButtonClicked(View view) {
+		String open = ((TextView) view).getText().toString();
+		String close = "</" + open.substring(1);
+		
+		int start = Math.max(postBody.getSelectionStart(), 0);
+		int end = Math.max(postBody.getSelectionEnd(), 0);
+		
+		String insert;
+		if (start != end)
+			insert = open + postBody.getText().subSequence(start, end) + close;
+		else
+			insert = open + close;
+		
+		postBody.getText().replace(Math.min(start, end), Math.max(start, end), insert, 0, insert.length());
 	}
 	
 	private static final String[] bannedList = {

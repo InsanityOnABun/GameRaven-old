@@ -10,7 +10,6 @@ import java.util.TimeZone;
 import net.margaritov.preference.colorpicker.ColorPickerPreference;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.holoeverywhere.widget.Toast;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -37,7 +36,6 @@ import android.text.style.QuoteSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.text.style.UnderlineSpan;
-import android.util.Log;
 import android.util.StateSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,6 +80,18 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 	
 	public String getUserDetailLink() {
 		return Session.ROOT + "/users/" + username.replace(' ', '+') + "/boards";
+	}
+	
+	/**
+	 * @return selected text, or null if no text is selected
+	 */
+	public String getSelection() {
+		int start = message.getSelectionStart();
+		int end = message.getSelectionEnd();
+		if (start != end)
+			return message.getText().subSequence(start, end).toString();
+		else
+			return null;
 	}
 	
 	public boolean isEdited() {
@@ -396,10 +406,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 	}
 	
 	public String getMessageForQuoting() {
-		if (message.hasSelection())
-			return message.getText().subSequence(message.getSelectionStart(), message.getSelectionEnd()).toString();
-		else
-			return processContent(true);
+		return processContent(true);
 	}
 	
 	public String getMessageForEditing() {

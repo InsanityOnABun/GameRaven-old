@@ -2,5 +2,23 @@
 <resources>
 
     <string name="app_name">GameRaven</string>
+    <string name="gameraven">GameRaven</string>
+    <string name="firstpage">&lt;&lt;</string>
+    <string name="prevpage">&lt;</string>
+    <string name="lastpage">>></string>
+    <string name="nextpage">></string>
+    <string name="title">Title</string>
+    <string name="titlecounter">80/80</string>
+    <string name="body">Body</string>
+    <string name="boldtag">&lt;b></string>
+    <string name="italictag">&lt;i></string>
+    <string name="codetag">&lt;code></string>
+    <string name="spoilertag">&lt;sp></string>
+    <string name="citetag">&lt;cite></string>
+    <string name="quotetag">&lt;qu></string>
+    <string name="bodycounter">4096/4096</string>
+    <string name="cancel">Cancel</string>
+    <string name="poll">Poll...</string>
+    <string name="post">Post</string>
 
 </resources>

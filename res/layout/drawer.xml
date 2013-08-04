@@ -3,6 +3,8 @@
     android:id="@+id/dwrScroller"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fadeScrollbars="false"
+    android:scrollbarStyle="outsideOverlay"
     android:verticalScrollbarPosition="left" >
 
     <LinearLayout
@@ -16,8 +18,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
-            android:layout_marginLeft="2dp"
-            android:layout_marginTop="6dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="9dp"
+            android:paddingLeft="6dp"
             android:text="Logged In As"
             android:textAllCaps="true"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -55,7 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
-                android:layout_marginLeft="2dp"
+                android:layout_marginLeft="6dp"
                 android:layout_marginTop="9dp"
                 android:text="Navigation"
                 android:textAllCaps="true"
@@ -154,7 +157,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
-            android:layout_marginLeft="2dp"
+            android:layout_marginLeft="6dp"
             android:layout_marginTop="9dp"
             android:text="Functions"
             android:textAllCaps="true"
