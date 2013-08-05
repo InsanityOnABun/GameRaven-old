@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -21,13 +22,17 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
+import android.os.Build;
 import android.os.Parcel;
 import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.format.DateUtils;
 import android.text.format.Time;
+import android.text.method.ArrowKeyMovementMethod;
+import android.text.method.LinkMovementMethod;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.CharacterStyle;
 import android.text.style.ClickableSpan;
@@ -35,7 +40,9 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.QuoteSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
+import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
+import android.text.util.Linkify;
 import android.util.StateSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +52,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
+import com.ioabsoftware.gameraven.MessageLinkSpan;
 import com.ioabsoftware.gameraven.R;
+import com.ioabsoftware.gameraven.RichTextUtils;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
 
@@ -53,7 +62,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 
 	private String username, userTitles, postTime, messageID, boardID, topicID;
 	private Element messageContent, messageContentNoPoll;
-	private TextView message;
+	private ClickableLinksTextView message;
 	private AllInOneV2 aio;
 	
 	private static int quoteBackColor = Color.argb(255, 100, 100, 100);
@@ -145,6 +154,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 	 * @param MID
 	 * @param hlColor
 	 */
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public MessageView(final AllInOneV2 aioIn, String userIn, String userTitlesIn, String postNum,
 					   String postTimeIn, Element messageIn, String BID, String TID, String MID, int hlColor) {
 		super(aioIn);
@@ -168,7 +178,7 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 
 		aio.wtl("inflated layout");
         
-		message = (TextView) findViewById(R.id.mvMessage);
+		message = (ClickableLinksTextView) findViewById(R.id.mvMessage);
 		
         ((TextView) findViewById(R.id.mvUser)).setText((userTitles != null ? username + userTitles : username));
         ((TextView) findViewById(R.id.mvUser)).setTextColor(AllInOneV2.getAccentTextColor());
@@ -346,6 +356,17 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         ssb.append('\n');
         message.setText(ssb);
         
+        Linkify.addLinks(message, Linkify.WEB_URLS);
+        
+        aio.wtl("converting links to MessageLinkSpans");
+        message.setText(RichTextUtils.replaceAll((Spanned) message.getText(), URLSpan.class, new URLSpanConverter()));
+        aio.wtl("finished converting links to MessageLinkSpans");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        	message.setMovementMethod(ArrowKeyMovementMethod.getInstance());
+        	message.setTextIsSelectable(true);
+            // the autoLink attribute must be removed, if you hasn't set it then ok, otherwise call textView.setAutoLink(0);
+        }
         
         message.setLinkTextColor(AllInOneV2.getAccentColor());
         aio.registerForContextMenu(message);
@@ -447,7 +468,14 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
 		findViewById(R.id.mvMessageMenuIcon).setVisibility(View.INVISIBLE);
 	}
 	
+
 	
+	class URLSpanConverter implements RichTextUtils.SpanConverter<URLSpan, MessageLinkSpan> {
+		@Override
+		public MessageLinkSpan convert(URLSpan span) {
+			return(new MessageLinkSpan(span.getURL(), aio));
+		}
+	}
 	
 	private class GRQuoteSpan extends QuoteSpan {
 		

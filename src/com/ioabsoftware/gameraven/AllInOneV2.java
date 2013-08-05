@@ -99,7 +99,7 @@ import com.ioabsoftware.gameraven.views.UserDetailView;
 public class AllInOneV2 extends Activity {
 	
 	private static boolean needToCheckForUpdate = true;
-	public static boolean isReleaseBuild = true;
+	public static boolean isReleaseBuild = false;
 	
 	public static final int NEW_VERSION_DIALOG = 101;
 	public static final int SEND_PM_DIALOG = 102;
