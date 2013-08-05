@@ -15,15 +15,14 @@ import org.jsoup.select.Elements;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 import android.widget.TableLayout.LayoutParams;
+import android.widget.Toast;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
 
