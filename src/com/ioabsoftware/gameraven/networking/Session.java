@@ -18,10 +18,10 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
+import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TableLayout.LayoutParams;
 import android.widget.Toast;
 
 import com.ioabsoftware.gameraven.AllInOneV2;

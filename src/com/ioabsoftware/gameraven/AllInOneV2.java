@@ -31,6 +31,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.OnRefreshListener;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
@@ -74,10 +77,6 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.actionbarsherlock.widget.SearchView;
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
-import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
-import com.handmark.pulltorefresh.library.PullToRefreshScrollView;
 import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
@@ -95,7 +94,7 @@ import com.ioabsoftware.gameraven.views.TopicView.TopicViewType;
 import com.ioabsoftware.gameraven.views.TrackedTopicView;
 import com.ioabsoftware.gameraven.views.UserDetailView;
 
-@SuppressWarnings("deprecation")
+//@SuppressWarnings("deprecation")
 public class AllInOneV2 extends Activity {
 	
 	private static boolean needToCheckForUpdate = true;
@@ -184,7 +183,7 @@ public class AllInOneV2 extends Activity {
 	
 	private LinearLayout postWrapper;
 	
-	private PullToRefreshScrollView contentPTR;
+	private PullToRefreshAttacher contentPTR;
 	private ScrollView contentScroller;
 	private LinearLayout content;
 	private WebView adView;
@@ -251,10 +250,6 @@ public class AllInOneV2 extends Activity {
         }
         
     	super.onCreate(savedInstanceState);
-    	
-    	requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        
-        addonSherlock().setProgressBarIndeterminateVisibility(false);
     	
         setContentView(R.layout.allinonev2);
     	
@@ -432,17 +427,27 @@ public class AllInOneV2 extends Activity {
 
     	wtl("getting all the views");
         
-        contentPTR = (PullToRefreshScrollView) findViewById(R.id.aioScroller);
-        contentPTR.setOnRefreshListener(new OnRefreshListener<ScrollView>() {
+//        contentPTR = (PullToRefreshScrollView) findViewById(R.id.aioScroller);
+//        contentPTR.setOnRefreshListener(new OnRefreshListener<ScrollView>() {
+//			@Override
+//			public void onRefresh(PullToRefreshBase<ScrollView> refreshView) {
+//				refreshClicked(contentPTR);
+//			}
+//		});
+//        contentScroller = contentPTR.getRefreshableView();
+        
+        contentPTR = PullToRefreshAttacher.get(this);
+        PullToRefreshLayout ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
+        ptrLayout.setPullToRefreshAttacher(contentPTR, new OnRefreshListener() {
 			@Override
-			public void onRefresh(PullToRefreshBase<ScrollView> refreshView) {
-				refreshClicked(contentPTR);
+			public void onRefreshStarted(View view) {
+				refreshClicked(view);
 			}
 		});
         
-        contentScroller = contentPTR.getRefreshableView();
         content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
+        contentScroller = (ScrollView) findViewById(R.id.aioScroller);
         contentScroller.addView(content);
 
         titleWrapper  = (LinearLayout) findViewById(R.id.aioPostTitleWrapper);
@@ -774,10 +779,7 @@ public class AllInOneV2 extends Activity {
     	wtl("onResume fired");
     	super.onResume();
 		
-		if (settings.getBoolean("enablePTR", false))
-			contentPTR.setMode(Mode.BOTH);
-		else
-	        contentPTR.setMode(Mode.DISABLED);
+    	contentPTR.setEnabled(settings.getBoolean("enablePTR", false));
 		
 		accentColor = settings.getInt("accentColor", (getResources().getColor(R.color.holo_blue)));
 		float[] hsv = new float[3];
@@ -810,6 +812,7 @@ public class AllInOneV2 extends Activity {
 		selector.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(accentColor));
 		selector.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(accentColor));
 		selector.addState(StateSet.WILD_CARD, new ColorDrawable(Color.TRANSPARENT));
+		
 
 		findViewById(R.id.aioTopSep).setBackgroundColor(accentColor);
 		findViewById(R.id.aioPJTopSep).setBackgroundColor(accentColor);
@@ -973,7 +976,7 @@ public class AllInOneV2 extends Activity {
 	}
 
 	private void uiCleanup() {
-		addonSherlock().setProgressBarIndeterminateVisibility(false);
+		contentPTR.setRefreshing(false);
 		if (refreshIcon != null)
 			refreshIcon.setVisible(true);
 		if (postWrapper.getVisibility() == View.VISIBLE) {
@@ -987,7 +990,7 @@ public class AllInOneV2 extends Activity {
 	
 	public void preExecuteSetup(NetDesc desc) {
 		wtl("GRAIO dPreES fired --NEL, desc: " + desc.name());
-		addonSherlock().setProgressBarIndeterminateVisibility(true);
+		contentPTR.setRefreshing(true);
 		if (refreshIcon != null)
 			refreshIcon.setVisible(false);
 		if (searchIcon != null)
@@ -1042,7 +1045,7 @@ public class AllInOneV2 extends Activity {
 		
 		wtl("GRAIO hNR fired, desc: " + desc.name());
 		
-		contentPTR.setMode(Mode.DISABLED);
+		contentPTR.setEnabled(false);
 		contentScroller.scrollTo(0, 0);
 
 		searchIcon.setVisible(false);
@@ -1470,7 +1473,7 @@ public class AllInOneV2 extends Activity {
 							content.addView(b);
 						}
 						
-						Element table = pRes.getElementsByTag("table").first();
+						Element table = pRes.select("table.board").first();
 						if (table != null) {
 							
 							table.getElementsByTag("col").get(2).remove();
@@ -1548,6 +1551,12 @@ public class AllInOneV2 extends Activity {
 						headerTitle = headerElem.text();
 					else
 						headerTitle = "GFAQs Cache Error, Title Not Found";
+					
+					if (headerTitle.equals("Log In to GameFAQs")) {
+						headerElem = pRes.getElementsByClass("title").get(1);
+						if (headerElem != null)
+							headerTitle = headerElem.text();
+					}
 
 					if (pRes.select("ul.paginate").size() > 1) {
 						pj = pRes.select("ul.paginate").get(1);
@@ -1607,7 +1616,7 @@ public class AllInOneV2 extends Activity {
 						updatePostingRights(pRes, true);
 					}
 					
-					Elements rows = pRes.getElementsByTag("table").first().getElementsByTag("tr");
+					Elements rows = pRes.select("table.board").first().getElementsByTag("tr");
 					int rowCount = rows.size();
 					
 					MessageView message = null;
@@ -1706,10 +1715,10 @@ public class AllInOneV2 extends Activity {
 					
 					final MessageView lastMessage = message;
 					if (goToLastPost && !Session.applySavedScroll) {
-						contentPTR.post(new Runnable() {
+						contentScroller.post(new Runnable() {
 					        @Override
 					        public void run() {
-					        	contentPTR.getRefreshableView().smoothScrollTo(0, lastMessage.getTop());
+					        	contentScroller.smoothScrollTo(0, lastMessage.getTop());
 					        }
 					    });
 					}
@@ -1752,7 +1761,9 @@ public class AllInOneV2 extends Activity {
 					break;
 					
 				case USER_DETAIL:
-					Elements udRows = pRes.getElementsByTag("tbody").first().children();
+					wtl("starting user detail processing");
+					tbody = pRes.select("table.board").first().getElementsByTag("tbody").first();
+					Log.d("udtb", tbody.outerHtml());
 					String name = null;
 					String ID = null;
 					String level = null;
@@ -1761,14 +1772,17 @@ public class AllInOneV2 extends Activity {
 					String sig = null;
 					String karma = null;
 					String AMP = null;
-					for (Element row : udRows) {
+					for (Element row : tbody.children()) {
 						String label = row.child(0).text().toLowerCase(Locale.US);
+						wtl("user detail row label: " + label);
 						if (label.equals("user name"))
 							name = row.child(1).text();
 						else if (label.equals("user id"))
 							ID = row.child(1).text();
-						else if (label.equals("board user level"))
+						else if (label.equals("board user level")) {
 							level = row.child(1).html();
+							wtl("set level: " + level);
+						}
 						else if (label.equals("account created"))
 							creation = row.child(1).text();
 						else if (label.equals("last visit"))
@@ -1832,7 +1846,7 @@ public class AllInOneV2 extends Activity {
 					
 					searchIcon.setVisible(true);
 					
-					Elements gameSearchTables = pRes.getElementsByTag("table");
+					Elements gameSearchTables = pRes.select("table.results");
 					int tCount = gameSearchTables.size();
 					int tCounter = 0;
 					if (!gameSearchTables.isEmpty()) {
@@ -1900,15 +1914,14 @@ public class AllInOneV2 extends Activity {
 				adBuilder.append("</body></html>");
 				adView.loadDataWithBaseURL(session.getLastPath(), adBuilder.toString(), "text/html", "iso-8859-1", null);
 
-				if (settings.getBoolean("enablePTR", false))
-					contentPTR.setMode(Mode.BOTH);
+				contentPTR.setEnabled(settings.getBoolean("enablePTR", false));
 				
 				wtl("applysavedscroll: " + Session.applySavedScroll + ". savedscrollval: " + Session.savedScrollVal);
 				if (Session.applySavedScroll) {
-					contentPTR.post(new Runnable() {
+					contentScroller.post(new Runnable() {
 				        @Override
 				        public void run() {
-				        	contentPTR.getRefreshableView().scrollTo(0, Session.savedScrollVal);
+				        	contentScroller.scrollTo(0, Session.savedScrollVal);
 				        }
 				    });
 					Session.applySavedScroll = false;
@@ -1934,7 +1947,7 @@ public class AllInOneV2 extends Activity {
 		}
 		
 		if (contentPTR.isRefreshing())
-			contentPTR.onRefreshComplete();
+			contentPTR.setRefreshComplete();
 			
 		wtl("GRAIO hNR finishing");
 	}
@@ -1944,7 +1957,7 @@ public class AllInOneV2 extends Activity {
 	 * *********************************/
 
 	private void processBoards(Document pRes, boolean includeBoardCategories) {
-		Elements homeTables = pRes.getElementsByTag("table");
+		Elements homeTables = pRes.select("table.board");
 		
 		boolean skippedFirst = false;
 		for (Element row : homeTables.first().getElementsByTag("tr")) {
@@ -2032,7 +2045,7 @@ public class AllInOneV2 extends Activity {
 	
 	public void postExecuteCleanup(NetDesc desc) {
 		wtl("GRAIO dPostEC --NEL, desc: " + desc.name());
-		addonSherlock().setProgressBarIndeterminateVisibility(false);
+		contentPTR.setRefreshing(false);
 		if (refreshIcon != null)
 			refreshIcon.setVisible(true);
 		if (desc == NetDesc.BOARD || desc == NetDesc.TOPIC)
