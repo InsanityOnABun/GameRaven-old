@@ -20,5 +20,18 @@
     <string name="cancel">Cancel</string>
     <string name="poll">Poll...</string>
     <string name="post">Post</string>
+    <string name="logged_in_as">Logged In As...</string>
+    <string name="change_acc_default">Logged Out (click to change)</string>
+    <string name="navigation">Navigation</string>
+    <string name="board_jumper">Board Jumper</string>
+    <string name="amp_list">AMP List</string>
+    <string name="tracked_topics">Tracked Topics</string>
+    <string name="pm_inbox">PM Inbox</string>
+    <string name="functions">Functions</string>
+    <string name="copy_curr_page">Copy Current Page URL</string>
+    <string name="manage_highlight_list">Manage Highlight List</string>
+    <string name="settings">Settings</string>
+    <string name="bug_report">Bug Report</string>
+    <string name="exit_gameraven">Exit GameRaven</string>
 
 </resources>

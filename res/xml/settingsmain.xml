@@ -19,6 +19,11 @@
             android:persistent="false"
             android:summary="Add new accounts and modify existing ones."
             android:title="Manage Accounts" />
+        <Preference
+            android:key="customSig"
+            android:persistent="false"
+            android:summary="Custom signature that applies to accounts that do not have their own set."
+            android:title="Custom Global Signature..." />
 
         <ListPreference
             android:entries="@array/timezones"
@@ -101,7 +106,7 @@
             android:defaultValue="false"
             android:key="enablePTR"
             android:persistent="true"
-            android:summary="Enables the option to refresh the page by pulling past the top or bottom."
+            android:summary="Enables the option to refresh the page by pulling past the top."
             android:title="Enable Pull-To-Refresh" />
 
         <ListPreference
@@ -112,12 +117,6 @@
             android:persistent="true"
             android:summary="Select your preferred sorting style for your Active Messages list."
             android:title="AMP Sort Options" />
-
-        <Preference
-            android:key="customSig"
-            android:persistent="false"
-            android:summary="Set a custom global signature that applies to any account that does not have its own signature set."
-            android:title="Custom Global Signature..." />
 
         <CheckBoxPreference
             android:defaultValue="false"

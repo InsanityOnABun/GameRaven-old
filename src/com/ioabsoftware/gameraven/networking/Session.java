@@ -97,7 +97,8 @@ public class Session implements HandlesNetworkResult {
     private boolean addToHistory = true;
 	private LinkedList<History> history;
 	
-	private boolean needToSetNavList = true;
+	private String initUrl = null;
+	private NetDesc initDesc = null;
     
 	
 	/**********************************************
@@ -126,6 +127,22 @@ public class Session implements HandlesNetworkResult {
 	}
 	
 	/**
+	 * Construct a new session for the specified user, 
+	 * using the specified password, that redirects to
+	 * the GFAQs homepage.
+	 * @param userIn The user for this session.
+	 * @param passwordIn The password for this session.
+	 * @param initUrlIn The URL to load once successfully logged in.
+	 * @param initDescIn The desc to use once successfully logged in.
+	 */
+	public Session(AllInOneV2 aioIn, String userIn, String passwordIn, String initUrlIn, NetDesc initDescIn)
+	{
+		initUrl = initUrlIn;
+		initDesc = initDescIn;
+		finalConstructor(aioIn, userIn, passwordIn);
+	}
+	
+	/**
 	 * Final construction method.
 	 * @param activity The current activity
 	 * @param userIn Username, or null if no user
@@ -138,18 +155,19 @@ public class Session implements HandlesNetworkResult {
 		aio.disableNavList();
 		
         history = new LinkedList<History>();
+        
+        user = userIn;
+		password = passwordIn;
 		
-		if (userIn == null) {
+		if (user == null) {
 			aio.wtl("session constructor, user is null, starting logged out session");
-			user = null;
-			password = null;
 			get(NetDesc.BOARD_JUMPER, ROOT + "/boards", null);
+			aio.setLoginName("Logged Out");
 		}
 		else {
 			aio.wtl("session constructor, user is not null, starting logged in session");
-			user = userIn;
-			password = passwordIn;
 			get(NetDesc.LOGIN_S1, ROOT + "/boards", null);
+			aio.setLoginName(user);
 		}
 	}
 	
@@ -558,7 +576,11 @@ public class Session implements HandlesNetworkResult {
 					aio.wtl("session hNR determined this is login step 2");
 					aio.setAMPLinkVisible(userLevel > 19);
 					
-					if (AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false) && userLevel > 19) {
+					if (initUrl != null) {
+						aio.wtl("loading previous page");
+						get(initDesc, initUrl, null);
+					}
+					else if (AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false) && userLevel > 19) {
 						aio.wtl("loading AMP");
 						get(NetDesc.AMP_LIST, AllInOneV2.buildAMPLink(), null);
 					}
@@ -866,11 +888,6 @@ public class Session implements HandlesNetworkResult {
 				case READ_PM:
 				case VERIFY_ACCOUNT_S1:
 				case VERIFY_ACCOUNT_S2:
-					if (needToSetNavList) {
-						aio.setNavList(isLoggedIn());
-						needToSetNavList = false;
-					}
-					
 					aio.wtl("session hNR determined this should be handled by AIO");
 					aio.processContent(res, desc);
 					break;

@@ -10,7 +10,7 @@
     <LinearLayout
         android:id="@+id/dwrGlobalWrapper"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical" >
 
         <TextView
@@ -21,7 +21,7 @@
             android:layout_marginLeft="6dp"
             android:layout_marginTop="9dp"
             android:paddingLeft="6dp"
-            android:text="Logged In As"
+            android:text="@string/logged_in_as"
             android:textAllCaps="true"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="?attr/themedDrawerHeaderColor" />
@@ -34,10 +34,13 @@
             android:background="#33B5E5"
             android:visibility="visible" />
 
-        <org.holoeverywhere.widget.Spinner
+        <Button
             android:id="@+id/dwrChangeAcc"
+            style="@style/Widget.Sherlock.ActionButton"
             android:layout_width="match_parent"
-            android:layout_height="?android:attr/listPreferredItemHeight" />
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:gravity="left|center_vertical"
+            android:text="@string/change_acc_default" />
 
         <View
             android:id="@+id/dwrChangeAccSep"
@@ -60,7 +63,7 @@
                 android:layout_marginBottom="2dp"
                 android:layout_marginLeft="6dp"
                 android:layout_marginTop="9dp"
-                android:text="Navigation"
+                android:text="@string/navigation"
                 android:textAllCaps="true"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="?attr/themedDrawerHeaderColor" />
@@ -79,7 +82,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/listPreferredItemHeight"
                 android:gravity="left|center_vertical"
-                android:text="Board Jumper" />
+                android:text="@string/board_jumper" />
 
             <View
                 android:id="@+id/dwrBJSep"
@@ -107,7 +110,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="?android:attr/listPreferredItemHeight"
                         android:gravity="left|center_vertical"
-                        android:text="AMP List" />
+                        android:text="@string/amp_list" />
 
                     <View
                         android:id="@+id/dwrAMPSep"
@@ -124,7 +127,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="?android:attr/listPreferredItemHeight"
                     android:gravity="left|center_vertical"
-                    android:text="Tracked Topics" />
+                    android:text="@string/tracked_topics" />
 
                 <View
                     android:id="@+id/dwrTTSep"
@@ -140,7 +143,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="?android:attr/listPreferredItemHeight"
                     android:gravity="left|center_vertical"
-                    android:text="PM Inbox" />
+                    android:text="@string/pm_inbox" />
 
                 <View
                     android:id="@+id/dwrPMSep"
@@ -159,7 +162,7 @@
             android:layout_marginBottom="2dp"
             android:layout_marginLeft="6dp"
             android:layout_marginTop="9dp"
-            android:text="Functions"
+            android:text="@string/functions"
             android:textAllCaps="true"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="?attr/themedDrawerHeaderColor" />
@@ -173,12 +176,12 @@
             android:visibility="visible" />
 
         <Button
-            android:id="@+id/dwrOpenInBrowser"
+            android:id="@+id/dwrCopyCurrURL"
             style="@style/Widget.Sherlock.ActionButton"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
-            android:text="Open in Browser" />
+            android:text="@string/copy_curr_page" />
 
         <View
             android:id="@+id/dwrOPiBSep"
@@ -194,7 +197,7 @@
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
-            android:text="Manage Highlight List" />
+            android:text="@string/manage_highlight_list" />
 
         <View
             android:id="@+id/dwrHLSep"
@@ -210,7 +213,7 @@
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
-            android:text="Settings" />
+            android:text="@string/settings" />
 
         <View
             android:id="@+id/dwrSettingsSep"
@@ -226,7 +229,7 @@
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
-            android:text="Bug Report" />
+            android:text="@string/bug_report" />
 
         <View
             android:id="@+id/dwrODBugRepSep"
@@ -242,7 +245,7 @@
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
-            android:text="Exit GameRaven" />
+            android:text="@string/exit_gameraven" />
 
         <View
             android:id="@+id/dwrExitSep"

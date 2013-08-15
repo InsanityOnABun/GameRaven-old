@@ -150,23 +150,21 @@
             android:background="@color/holo_blue"
             android:visibility="visible" />
     </LinearLayout>
-    
+
     <uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout
-    android:id="@+id/ptr_layout"
+        android:id="@+id/ptr_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/aioPostWrapper"
         android:layout_below="@+id/aioHeader"
-        android:scrollbarStyle="outsideOverlay">
+        android:scrollbarStyle="outsideOverlay" >
 
-    <ScrollView
-        android:id="@+id/aioScroller"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-
-    </ScrollView>
-
-</uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
+        <ScrollView
+            android:id="@+id/aioScroller"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" >
+        </ScrollView>
+    </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
 
     <LinearLayout
         android:id="@+id/aioPostWrapper"

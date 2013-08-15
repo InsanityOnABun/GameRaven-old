@@ -21,9 +21,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
-import org.holoeverywhere.widget.AdapterView;
-import org.holoeverywhere.widget.AdapterView.OnItemSelectedListener;
-import org.holoeverywhere.widget.ArrayAdapter;
 import org.holoeverywhere.widget.Spinner;
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
@@ -31,10 +28,11 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.DefaultHeaderTransformer;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.OnRefreshListener;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -48,6 +46,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -75,7 +74,6 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
 import com.actionbarsherlock.widget.SearchView;
 import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
@@ -94,17 +92,17 @@ import com.ioabsoftware.gameraven.views.TopicView.TopicViewType;
 import com.ioabsoftware.gameraven.views.TrackedTopicView;
 import com.ioabsoftware.gameraven.views.UserDetailView;
 
-//@SuppressWarnings("deprecation")
 public class AllInOneV2 extends Activity {
 	
 	private static boolean needToCheckForUpdate = true;
-	public static boolean isReleaseBuild = false;
+	public static boolean isReleaseBuild = true;
 	
 	public static final int NEW_VERSION_DIALOG = 101;
 	public static final int SEND_PM_DIALOG = 102;
 	public static final int MESSAGE_ACTION_DIALOG = 103;
 	public static final int REPORT_MESSAGE_DIALOG = 104;
 	public static final int POLL_OPTIONS_DIALOG = 105;
+	public static final int CHANGE_LOGGED_IN_DIALOG = 106;
 	
 	protected static final String ACCOUNTS_PREFNAME = "com.ioabsoftware.DroidFAQs.Accounts";
 	protected static final String SALT_FALLBACK = "RIP Man fan died at the room shot up to 97 degrees";
@@ -252,19 +250,23 @@ public class AllInOneV2 extends Activity {
     	super.onCreate(savedInstanceState);
     	
         setContentView(R.layout.allinonev2);
+        
+        aBar = getSupportActionBar();
+        aBar.setDisplayHomeAsUpEnabled(true);
+        aBar.setDisplayShowTitleEnabled(false);
     	
-    	drawer = MenuDrawer.attach(this);
+        drawer = MenuDrawer.attach(this);
         drawer.setContentView(R.layout.allinonev2);
         drawer.setMenuView(R.layout.drawer);
         
         drawer.setOnDrawerStateChangeListener(new OnDrawerStateChangeListener() {
-			
+
 			@Override
 			public void onDrawerStateChange(int oldState, int newState) {
 				if (newState == MenuDrawer.STATE_CLOSED)
 					drawer.findViewById(R.id.dwrScroller).scrollTo(0, 0);
 			}
-			
+
 			@Override
 			public void onDrawerSlide(float openRatio, int offsetPixels) {
 				// not needed
@@ -277,30 +279,12 @@ public class AllInOneV2 extends Activity {
         	drawer.findViewById(R.id.dwrScroller).setBackgroundResource(android.R.drawable.screen_background_dark_transparent);
 
         
-        ((Spinner) drawer.findViewById(R.id.dwrChangeAcc)).setOnItemSelectedListener(new OnItemSelectedListener() {
+        ((Button) drawer.findViewById(R.id.dwrChangeAcc)).setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,
-					int pos, long id) {
-				if (drawer.isMenuVisible()) {
-					if (pos == 0 && Session.getUser() != null) {
-						wtl("starting new session from onItemSelected, no login");
-						session = new Session(AllInOneV2.this);
-						drawer.closeMenu(true);
-					}
-
-					else {
-						String selUser = parent.getItemAtPosition(pos).toString();
-						if (!selUser.equals(Session.getUser())) {
-							wtl("starting new session from onItemSelected, logged in");
-							session = new Session(AllInOneV2.this, selUser, accounts.getString(selUser));
-							drawer.closeMenu(true);
-						}
-					}
-				}
+			public void onClick(View v) {
+				drawer.closeMenu(true);
+				showDialog(CHANGE_LOGGED_IN_DIALOG);
 			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {}
 		});
         
         ((Button) drawer.findViewById(R.id.dwrBoardJumper)).setOnClickListener(new View.OnClickListener() {
@@ -335,12 +319,25 @@ public class AllInOneV2 extends Activity {
 			}
 		});
         
-        ((Button) drawer.findViewById(R.id.dwrOpenInBrowser)).setOnClickListener(new View.OnClickListener() {
+        ((Button) drawer.findViewById(R.id.dwrCopyCurrURL)).setOnClickListener(new View.OnClickListener() {
+			@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+			@SuppressWarnings("deprecation")
 			@Override
 			public void onClick(View v) {
-				drawer.closeMenu(false);
-				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(session.getLastPath()));
-				startActivity(browserIntent);
+				if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+	                android.text.ClipboardManager clipboard = 
+	                		(android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+	                
+	                clipboard.setText(session.getLastPath());
+	            } 
+				else {
+	                android.content.ClipboardManager clipboard = 
+	                		(android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+	                
+	                clipboard.setPrimaryClip(android.content.ClipData.newPlainText("simple text", session.getLastPath()));
+	            }
+				drawer.closeMenu(true);
+				Toast.makeText(AllInOneV2.this, "URL copied to clipboard.", Toast.LENGTH_SHORT).show();
 			}
 		});
         
@@ -407,13 +404,6 @@ public class AllInOneV2 extends Activity {
         	}
         }
         settings.edit().putBoolean("accsDoNotNeedConversion", true).commit();
-        
-        aBar = getSupportActionBar();
-        aBar.setDisplayHomeAsUpEnabled(true);
-        aBar.setDisplayShowTitleEnabled(false);
-        aBar.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        
-    	wtl("logging started from onCreate");
     	
     	wtl("getting accounts");
     	
@@ -426,15 +416,6 @@ public class AllInOneV2 extends Activity {
         accounts = new SecurePreferences(getApplicationContext(), ACCOUNTS_PREFNAME, secureSalt, false);
 
     	wtl("getting all the views");
-        
-//        contentPTR = (PullToRefreshScrollView) findViewById(R.id.aioScroller);
-//        contentPTR.setOnRefreshListener(new OnRefreshListener<ScrollView>() {
-//			@Override
-//			public void onRefresh(PullToRefreshBase<ScrollView> refreshView) {
-//				refreshClicked(contentPTR);
-//			}
-//		});
-//        contentScroller = contentPTR.getRefreshableView();
         
         contentPTR = PullToRefreshAttacher.get(this);
         PullToRefreshLayout ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
@@ -552,8 +533,27 @@ public class AllInOneV2 extends Activity {
 		wtl("onCreate finishing");
     }
 	
+	private String lcPostBody, lcPostTitle;
+	@Override
+	protected void onStop() {
+		lcPostBody = postBody.getText().toString();
+		lcPostTitle = postTitle.getText().toString();
+		super.onStop();
+	}
+	
+	@Override
+	protected void onRestart() {
+		super.onRestart();
+		if (lcPostBody != null) {
+			postBody.setText(lcPostBody);
+			postTitle.setText(lcPostTitle);
+		}
+	}
+
+	private boolean needToSetNavList = true;
 	public void disableNavList() {
 		drawer.findViewById(R.id.dwrNavWrapper).setVisibility(View.GONE);
+		needToSetNavList = true;
 	}
 	
 	public void setNavList(boolean isLoggedIn) {
@@ -624,6 +624,8 @@ public class AllInOneV2 extends Activity {
             }
         };
         searchView.setOnQueryTextListener(queryTextListener);
+        
+//        refreshIcon.setVisible(false);
         
         return true;
     }
@@ -801,6 +803,8 @@ public class AllInOneV2 extends Activity {
 			isAccentLight = true;
 		}
 		
+		((DefaultHeaderTransformer) contentPTR.getHeaderTransformer()).setProgressBarColor(accentColor);
+		
 		int msgSelectorColor = Color.HSVToColor(hsv);
 		
 		msgHeadSelector = new StateListDrawable();
@@ -852,25 +856,6 @@ public class AllInOneV2 extends Activity {
     			session = new Session(this);
     		}
     	}
-    	
-    	String[] keys = accounts.getKeys();
-		
-		final String[] usernames = new String[keys.length + 1];
-		usernames[0] = "Log Out";
-		for (int i = 1; i < usernames.length; i++)
-			usernames[i] = keys[i - 1].toString();
-		
-		int selected = 0;
-		for (int x = 1; x < usernames.length; x++)
-		{
-			if (usernames[x].equals(Session.getUser())) 
-				selected = x;
-		}
-		
-		((Spinner) drawer.findViewById(R.id.dwrChangeAcc)).
-			setAdapter(new ArrayAdapter<String>(this, R.layout.dropdown_item, usernames));
-		
-		((Spinner) drawer.findViewById(R.id.dwrChangeAcc)).setSelection(selected);
 		
 		if (needToCheckForUpdate && isReleaseBuild) {
 			needToCheckForUpdate = false;
@@ -883,6 +868,10 @@ public class AllInOneV2 extends Activity {
 		NotifierService.dismissNotif(this);
 		wtl("onResume finishing");
     }
+	
+	public void setLoginName(String name) {
+		((TextView) findViewById(R.id.dwrChangeAcc)).setText(name + " (Click to Change)");
+	}
 	
 	public void postError(String msg) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -976,6 +965,7 @@ public class AllInOneV2 extends Activity {
 	}
 
 	private void uiCleanup() {
+		findViewById(R.id.aioTopSep).setVisibility(View.VISIBLE);
 		contentPTR.setRefreshing(false);
 		if (refreshIcon != null)
 			refreshIcon.setVisible(true);
@@ -1003,6 +993,8 @@ public class AllInOneV2 extends Activity {
 			remFavIcon.setVisible(false);
 		if (topicListIcon != null)
 			topicListIcon.setVisible(false);
+		
+		findViewById(R.id.aioTopSep).setVisibility(View.INVISIBLE);
 		
 		if (desc != NetDesc.POSTMSG_S1 && desc != NetDesc.POSTTPC_S1 &&
 			desc != NetDesc.QPOSTMSG_S1 && desc != NetDesc.QPOSTTPC_S1 &&
@@ -2045,6 +2037,13 @@ public class AllInOneV2 extends Activity {
 	
 	public void postExecuteCleanup(NetDesc desc) {
 		wtl("GRAIO dPostEC --NEL, desc: " + desc.name());
+		findViewById(R.id.aioTopSep).setVisibility(View.VISIBLE);
+		
+		if (needToSetNavList) {
+			setNavList(Session.isLoggedIn());
+			needToSetNavList = false;
+		}
+		
 		contentPTR.setRefreshing(false);
 		if (refreshIcon != null)
 			refreshIcon.setVisible(true);
@@ -2332,6 +2331,10 @@ public class AllInOneV2 extends Activity {
     	case POLL_OPTIONS_DIALOG:
     		dialog = createPollOptionsDialog();
     		break;
+    		
+    	case CHANGE_LOGGED_IN_DIALOG:
+    		dialog = createChangeLoggedInDialog();
+    		break;
     	}
     	
     	return dialog;
@@ -2579,6 +2582,54 @@ public class AllInOneV2 extends Activity {
 		});
 		return d;
 	}
+	
+	private Dialog createChangeLoggedInDialog() {
+		AlertDialog.Builder accountChanger = new AlertDialog.Builder(this);
+		
+		String[] keys = accounts.getKeys();
+		
+		final String[] usernames = new String[keys.length + 1];
+		usernames[0] = "Log Out";
+		for (int i = 1; i < usernames.length; i++)
+			usernames[i] = keys[i - 1].toString();
+		
+		final String currUser = Session.getUser();
+		int selected = 0;
+		
+		for (int x = 1; x < usernames.length; x++)
+		{
+			if (usernames[x].equals(currUser)) 
+				selected = x;
+		}
+		
+		accountChanger.setTitle("Pick an Account");
+		accountChanger.setSingleChoiceItems(usernames, selected, new DialogInterface.OnClickListener() {
+		    public void onClick(DialogInterface dialog, int item) {
+		    	if (item == 0 && currUser != null)
+		    		session = new Session(AllInOneV2.this);
+		    	
+		    	else
+		    	{
+			        String selUser = usernames[item].toString();
+			    	if (!selUser.equals(currUser))
+			        	session = new Session(AllInOneV2.this, selUser, accounts.getString(selUser), session.getLastPath(), session.getLastDesc());
+			    }
+		    	
+		    	dismissDialog(CHANGE_LOGGED_IN_DIALOG);
+		    }
+		});
+		
+		accountChanger.setNegativeButton("Cancel", null);
+		
+		
+		Dialog d = accountChanger.create();
+		d.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			public void onDismiss(DialogInterface dialog) {
+				removeDialog(CHANGE_LOGGED_IN_DIALOG);
+			}
+		});
+		return d;
+	}
 
 	private Dialog createNewVerDialog() {
 		AlertDialog.Builder newVersion = new AlertDialog.Builder(this);
@@ -2589,11 +2640,8 @@ public class AllInOneV2 extends Activity {
 				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.evernote.com/shard/s252/sh/b680bb2b-64a1-426d-a98d-6cbfb846a883/75eebb4db64c6e1769dd2d0ace487a88")));
 			}
 		});
-		newVersion.setNegativeButton("No", new OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				dismissDialog(NEW_VERSION_DIALOG);
-			}
-		});
+		
+		newVersion.setNegativeButton("No", null);
 		return newVersion.create();
 	}
 	
@@ -2635,7 +2683,9 @@ public class AllInOneV2 extends Activity {
 	
 	public void refreshClicked(View view) {
 		wtl("refreshClicked fired --NEL");
-		view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+		if (view != null)
+			view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+		
 		if (session.getLastPath() == null) {
 			if (Session.isLoggedIn()) {
 				wtl("starting new session from refreshClicked, logged in");

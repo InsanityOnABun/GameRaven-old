@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="MyThemes.DarkTheme" parent="Holo.Theme">
+        <item name="android:actionBarStyle" tools:targetApi="11">@style/Widget.Sherlock.ActionBar.Solid</item>
+        <item name="actionBarStyle">@style/Widget.Sherlock.ActionBar.Solid</item>
         <item name="themedSearchIcon">@drawable/ic_search</item>
         <item name="themedAddFavIcon">@drawable/ic_addfav</item>
         <item name="themedRemFavIcon">@drawable/ic_remfav</item>
@@ -16,6 +18,8 @@
     </style>
 
     <style name="MyThemes.LightTheme" parent="Holo.Theme.Light">
+        <item name="android:actionBarStyle" tools:targetApi="11">@style/Widget.Sherlock.Light.ActionBar.Solid</item>
+        <item name="actionBarStyle">@style/Widget.Sherlock.Light.ActionBar.Solid</item>
         <item name="themedSearchIcon">@drawable/ic_search_light</item>
         <item name="themedAddFavIcon">@drawable/ic_addfav_light</item>
         <item name="themedRemFavIcon">@drawable/ic_remfav_light</item>
