@@ -43,7 +43,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -241,6 +243,7 @@ public class AllInOneV2 extends Activity {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
+		accentColor = 0;
         
 		usingLightTheme = settings.getBoolean("useLightTheme", false);
         if (usingLightTheme) {
@@ -783,61 +786,73 @@ public class AllInOneV2 extends Activity {
 		
     	contentPTR.setEnabled(settings.getBoolean("enablePTR", false));
 		
+    	int oldColor = accentColor;
 		accentColor = settings.getInt("accentColor", (getResources().getColor(R.color.holo_blue)));
-		float[] hsv = new float[3];
-		Color.colorToHSV(accentColor, hsv);
-		if (settings.getBoolean("useWhiteAccentText", false)) {
-			// color is probably dark
-			if (hsv[2] > 0)
-				hsv[2] *= 1.2f;
-			else
-				hsv[2] = 0.2f;
+		if (accentColor != oldColor) {
+			float[] hsv = new float[3];
+			Color.colorToHSV(accentColor, hsv);
+			if (settings.getBoolean("useWhiteAccentText", false)) {
+				// color is probably dark
+				if (hsv[2] > 0)
+					hsv[2] *= 1.2f;
+				else
+					hsv[2] = 0.2f;
+				
+				accentTextColor = Color.WHITE;
+				isAccentLight = false;
+			}
+			else {
+				// color is probably bright
+				hsv[2] *= 0.8f;
+				accentTextColor = Color.BLACK;
+				isAccentLight = true;
+			}
 			
-			accentTextColor = Color.WHITE;
-			isAccentLight = false;
-		}
-		else {
-			// color is probably bright
-			hsv[2] *= 0.8f;
-			accentTextColor = Color.BLACK;
-			isAccentLight = true;
-		}
-		
-		((DefaultHeaderTransformer) contentPTR.getHeaderTransformer()).setProgressBarColor(accentColor);
-		
-		int msgSelectorColor = Color.HSVToColor(hsv);
-		
-		msgHeadSelector = new StateListDrawable();
-		msgHeadSelector.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(msgSelectorColor));
-		msgHeadSelector.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(msgSelectorColor));
-		msgHeadSelector.addState(StateSet.WILD_CARD, new ColorDrawable(accentColor));
+			Drawable aBarDrawable;
+			if (usingLightTheme)
+				aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_dark_holo);
+			else
+				aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_light_holo);
+			
+			aBarDrawable.setColorFilter(accentColor, PorterDuff.Mode.SRC_ATOP);
+			aBar.setBackgroundDrawable(aBarDrawable);
+			
+			((DefaultHeaderTransformer) contentPTR.getHeaderTransformer()).setProgressBarColor(accentColor);
+			
+			int msgSelectorColor = Color.HSVToColor(hsv);
+			
+			msgHeadSelector = new StateListDrawable();
+			msgHeadSelector.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(msgSelectorColor));
+			msgHeadSelector.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(msgSelectorColor));
+			msgHeadSelector.addState(StateSet.WILD_CARD, new ColorDrawable(accentColor));
 
-		selector = new StateListDrawable();
-		selector.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(accentColor));
-		selector.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(accentColor));
-		selector.addState(StateSet.WILD_CARD, new ColorDrawable(Color.TRANSPARENT));
+			selector = new StateListDrawable();
+			selector.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(accentColor));
+			selector.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(accentColor));
+			selector.addState(StateSet.WILD_CARD, new ColorDrawable(Color.TRANSPARENT));
+			
+			
+			findViewById(R.id.aioPJTopSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioFirstPrevSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioNextLastSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioPostWrapperSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioPostTitleSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioPostBodySep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioBoldSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioItalicSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioCodeSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioSpoilerSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioCiteSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioHTMLSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioPostButtonSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioPollSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioPostSep).setBackgroundColor(accentColor);
+			drawer.findViewById(R.id.dwrCAHSep).setBackgroundColor(accentColor);
+			drawer.findViewById(R.id.dwrNavSep).setBackgroundColor(accentColor);
+			drawer.findViewById(R.id.dwrFuncSep).setBackgroundColor(accentColor);
+		}
 		
-
-		findViewById(R.id.aioTopSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioPJTopSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioFirstPrevSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioNextLastSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioPostWrapperSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioPostTitleSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioPostBodySep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioBoldSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioItalicSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioCodeSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioSpoilerSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioCiteSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioHTMLSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioPostButtonSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioPollSep).setBackgroundColor(accentColor);
-		findViewById(R.id.aioPostSep).setBackgroundColor(accentColor);
-		drawer.findViewById(R.id.dwrCAHSep).setBackgroundColor(accentColor);
-		drawer.findViewById(R.id.dwrNavSep).setBackgroundColor(accentColor);
-		drawer.findViewById(R.id.dwrFuncSep).setBackgroundColor(accentColor);
 		
 		if (session != null) {
 			if (settings.getBoolean("reloadOnResume", false)) {
@@ -965,7 +980,6 @@ public class AllInOneV2 extends Activity {
 	}
 
 	private void uiCleanup() {
-		findViewById(R.id.aioTopSep).setVisibility(View.VISIBLE);
 		contentPTR.setRefreshing(false);
 		if (refreshIcon != null)
 			refreshIcon.setVisible(true);
@@ -993,8 +1007,6 @@ public class AllInOneV2 extends Activity {
 			remFavIcon.setVisible(false);
 		if (topicListIcon != null)
 			topicListIcon.setVisible(false);
-		
-		findViewById(R.id.aioTopSep).setVisibility(View.INVISIBLE);
 		
 		if (desc != NetDesc.POSTMSG_S1 && desc != NetDesc.POSTTPC_S1 &&
 			desc != NetDesc.QPOSTMSG_S1 && desc != NetDesc.QPOSTTPC_S1 &&
@@ -2037,7 +2049,6 @@ public class AllInOneV2 extends Activity {
 	
 	public void postExecuteCleanup(NetDesc desc) {
 		wtl("GRAIO dPostEC --NEL, desc: " + desc.name());
-		findViewById(R.id.aioTopSep).setVisibility(View.VISIBLE);
 		
 		if (needToSetNavList) {
 			setNavList(Session.isLoggedIn());

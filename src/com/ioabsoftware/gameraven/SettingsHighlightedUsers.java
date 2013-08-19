@@ -2,6 +2,8 @@ package com.ioabsoftware.gameraven;
 
 import org.holoeverywhere.app.Activity;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
@@ -25,6 +27,15 @@ public class SettingsHighlightedUsers extends Activity implements HlUDDismissLis
         }
 		
 		super.onCreate(savedInstanceState);
+		
+		Drawable aBarDrawable;
+		if (AllInOneV2.getUsingLightTheme())
+			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_dark_holo);
+		else
+			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_light_holo);
+		
+		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
+		getSupportActionBar().setBackgroundDrawable(aBarDrawable);
 		
 		wrapper = new LinearLayout(this);
 		LinearLayout outerWrapper = new LinearLayout(this);

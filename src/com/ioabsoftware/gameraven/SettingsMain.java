@@ -25,6 +25,8 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -68,6 +70,15 @@ public class SettingsMain extends SherlockPreferenceActivity {
 		super.onCreate(savedInstanceState);
         
         addPreferencesFromResource(R.xml.settingsmain);
+        
+        Drawable aBarDrawable;
+		if (AllInOneV2.getUsingLightTheme())
+			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_dark_holo);
+		else
+			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_light_holo);
+		
+		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
+		getSupportActionBar().setBackgroundDrawable(aBarDrawable);
 
 		Intent notifierIntent = new Intent(this, NotifierService.class);
 		notifPendingIntent = PendingIntent.getService(this, 0, notifierIntent, 0);

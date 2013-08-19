@@ -19,6 +19,8 @@ import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.DialogInterface.OnShowListener;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
@@ -64,6 +66,15 @@ public class SettingsAccount extends SherlockPreferenceActivity implements Handl
 		super.onCreate(savedInstanceState);
         
         addPreferencesFromResource(R.xml.settingsaccount);
+
+        Drawable aBarDrawable;
+		if (AllInOneV2.getUsingLightTheme())
+			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_dark_holo);
+		else
+			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_light_holo);
+		
+		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
+		getSupportActionBar().setBackgroundDrawable(aBarDrawable);
 
         accounts = (PreferenceCategory) findPreference("accounts");
 		updateAccountList();

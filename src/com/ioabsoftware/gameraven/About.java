@@ -2,6 +2,8 @@ package com.ioabsoftware.gameraven;
 
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -20,6 +22,15 @@ public class About extends SherlockActivity {
     	super.onCreate(savedInstanceState);
     	
     	setContentView(R.layout.about);
+    	
+    	Drawable aBarDrawable;
+		if (AllInOneV2.getUsingLightTheme())
+			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_dark_holo);
+		else
+			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_light_holo);
+		
+		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
+		getSupportActionBar().setBackgroundDrawable(aBarDrawable);
         
         try {
 			((TextView) findViewById(R.id.abtBuildVer)).setText(this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName);
