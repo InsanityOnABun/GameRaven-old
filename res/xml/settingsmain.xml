@@ -142,6 +142,15 @@
         android:orderingFromXml="true"
         android:persistent="false"
         android:title="Theming Settings" >
+		<com.robobunny.SeekBarPreference
+			android:key="textScale"
+			android:title="Text Scale"
+			android:summary="Adjust the scale of various text elements"
+			android:defaultValue="100"
+			android:max="120"
+			robobunny:min="80"
+			robobunny:unitsLeft=""
+			robobunny:unitsRight="%" />
         <Preference
             android:key="manageHighlightedUsers"
             android:persistent="false"

@@ -56,6 +56,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.StateSet;
+import android.util.TypedValue;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -222,6 +223,8 @@ public class AllInOneV2 extends Activity {
 	private static int accentColor, accentTextColor;
 	public static int getAccentColor() {return accentColor;};
 	public static int getAccentTextColor() {return accentTextColor;}
+	private static float textScale = 1f;
+	public static float getTextScale() {return textScale;}
 	private static StateListDrawable msgHeadSelector;
 	public static StateListDrawable getMsgHeadSelector() {return msgHeadSelector;}
 	private static StateListDrawable selector;
@@ -785,6 +788,33 @@ public class AllInOneV2 extends Activity {
     	super.onResume();
 		
     	contentPTR.setEnabled(settings.getBoolean("enablePTR", false));
+    	
+    	float oldScale = textScale;
+    	textScale = settings.getInt("textScale", 100) / 100f;
+    	if (textScale != oldScale) {
+    		title.setTextSize(TypedValue.COMPLEX_UNIT_PX, title.getTextSize() * getTextScale());
+    		
+    		TextView cah = (TextView) drawer.findViewById(R.id.dwrChangeAccHeader);
+    		TextView ca = (TextView) drawer.findViewById(R.id.dwrChangeAcc);
+
+    		int px = TypedValue.COMPLEX_UNIT_PX;
+    		float htSize = cah.getTextSize() * getTextScale();
+    		float btSize = ca.getTextSize() * getTextScale();
+    		
+    		cah.setTextSize(px, htSize);
+    		ca.setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrNavHeader)).setTextSize(px, htSize);
+    		((TextView) drawer.findViewById(R.id.dwrBoardJumper)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrAMPList)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrTrackedTopics)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrPMInbox)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrFuncHeader)).setTextSize(px, htSize);
+    		((TextView) drawer.findViewById(R.id.dwrCopyCurrURL)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrHighlightList)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrSettings)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrODBugRep)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrExit)).setTextSize(px, btSize);
+    	}
 		
     	int oldColor = accentColor;
 		accentColor = settings.getInt("accentColor", (getResources().getColor(R.color.holo_blue)));
@@ -857,6 +887,7 @@ public class AllInOneV2 extends Activity {
 		if (session != null) {
 			if (settings.getBoolean("reloadOnResume", false)) {
 				wtl("session exists, reload on resume is true, refreshing page");
+				isRoR = true;
 	    		session.refresh();
 			}
     	}
@@ -1013,9 +1044,10 @@ public class AllInOneV2 extends Activity {
 			desc != NetDesc.QEDIT_MSG)
 				postCleanup();
 	}
-	
+
+	private boolean isRoR = false;
 	private void postCleanup() {
-		if (postWrapper.getVisibility() == View.VISIBLE) {
+		if (!isRoR && postWrapper.getVisibility() == View.VISIBLE) {
 			pageJumperWrapper.setVisibility(View.VISIBLE);
 			wtl("postCleanup fired --NEL");
 			postWrapper.setVisibility(View.GONE);
@@ -2060,6 +2092,9 @@ public class AllInOneV2 extends Activity {
 			refreshIcon.setVisible(true);
 		if (desc == NetDesc.BOARD || desc == NetDesc.TOPIC)
 			postCleanup();
+		
+		if (isRoR)
+			isRoR = false;
 	}
 	
 	private boolean goToLastPost = false;

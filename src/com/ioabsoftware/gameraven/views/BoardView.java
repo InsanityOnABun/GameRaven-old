@@ -4,6 +4,7 @@ import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 
 import android.content.Context;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -29,8 +30,15 @@ public class BoardView extends LinearLayout {
     	TextView desc = (TextView) findViewById(R.id.bvDesc);
     	TextView lastPost = (TextView) findViewById(R.id.bvLastPost);
     	TextView tpcMsgDetails = (TextView) findViewById(R.id.bvTpcMsgDetails);
+    	TextView name = (TextView) findViewById(R.id.bvName);
 
-    	((TextView) findViewById(R.id.bvName)).setText(nameIn);
+    	int px = TypedValue.COMPLEX_UNIT_PX;
+    	desc.setTextSize(px, desc.getTextSize() * AllInOneV2.getTextScale());
+    	lastPost.setTextSize(px, lastPost.getTextSize() * AllInOneV2.getTextScale());
+    	tpcMsgDetails.setTextSize(px, tpcMsgDetails.getTextSize() * AllInOneV2.getTextScale());
+    	name.setTextSize(px, name.getTextSize() * AllInOneV2.getTextScale());
+
+    	name.setText(nameIn);
     	
     	if (descIn != null)
     		desc.setText(descIn);
