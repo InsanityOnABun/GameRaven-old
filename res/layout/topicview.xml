@@ -23,32 +23,12 @@
             android:textSize="10sp" />
 
         <TextView
-            android:id="@+id/tvLastPost"
+            android:id="@+id/tvMsgCountLastPost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/tvLPSep"
-            android:text="12/12 12:12PM"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="10sp" />
-
-        <TextView
-            android:id="@+id/tvDetailSeperator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/tvLastPost"
-            android:text=" Msgs, Last: "
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="10sp" />
-
-        <TextView
-            android:id="@+id/tvMsgCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/tvDetailSeperator"
-            android:text="500"
+            android:text="500 Msgs, Last: 12/12 12:12PM"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textSize="10sp" />
 
@@ -69,11 +49,12 @@
         <com.ioabsoftware.gameraven.views.LinkButtonView
             android:id="@+id/tvLastPostLink"
             style="@style/Widget.Sherlock.ActionButton"
-            android:layout_width="50dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/tvTitle"
             android:layout_alignParentRight="true"
-            android:text="Last Post"
+            android:layout_alignTop="@+id/tvMsgCountLastPost"
+            android:text="Last\nPost"
             android:textColor="?attr/themedTextColor"
             android:textSize="12sp" />
 

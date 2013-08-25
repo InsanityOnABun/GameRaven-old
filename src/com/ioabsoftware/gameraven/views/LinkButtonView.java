@@ -4,6 +4,7 @@ import com.ioabsoftware.gameraven.AllInOneV2;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -43,6 +44,7 @@ public class LinkButtonView extends TextView {
 	public void setUrlAndType(String urlIn, Type typeIn) {
 		url = urlIn;
 		type = typeIn;
+		setTextSize(TypedValue.COMPLEX_UNIT_PX, getTextSize() * AllInOneV2.getTextScale());
 	}
 
 }

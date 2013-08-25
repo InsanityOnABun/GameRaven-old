@@ -47,9 +47,11 @@ public class MessageLinkSpan extends ClickableSpan {
 				return;
 			}
 			// check if this is a board or topic url
-			else if (url.contains("boards")) {
-				
-				if (url.contains("boardlist.php")) {
+			else if (url.contains("/boards")) {
+				if (url.contains("/users/")) {
+					aio.getSession().get(NetDesc.USER_DETAIL, url, null);
+				}
+				else if (url.contains("boardlist.php")) {
 					aio.getSession().get(NetDesc.BOARD_LIST, url, null);
 				}
 				else {

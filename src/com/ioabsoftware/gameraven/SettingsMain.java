@@ -103,6 +103,7 @@ public class SettingsMain extends SherlockPreferenceActivity {
         ACCEPTED_KEYS.add("confirmPostCancel");
         ACCEPTED_KEYS.add("confirmPostSubmit");
         ACCEPTED_KEYS.add("autoCensorEnable");
+        ACCEPTED_KEYS.add("textScale");
         
         findPreference("donate").setOnPreferenceClickListener(new OnPreferenceClickListener() {
 			@Override
@@ -364,6 +365,8 @@ public class SettingsMain extends SherlockPreferenceActivity {
 					buf.append("enablePTR=true\n");
 				else
 					buf.append("enablePTR=false\n");
+				
+				buf.append("textScale=" + settings.getInt("textScale", 100) + '\n');
 				
 				if (settings.getBoolean("useLightTheme", false))
 					buf.append("useLightTheme=true\n");

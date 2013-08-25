@@ -16,7 +16,7 @@
         <com.ioabsoftware.gameraven.views.LinkButtonView
             android:id="@+id/ttStopTracking"
             style="@style/Widget.Sherlock.ActionButton"
-            android:layout_width="25dp"
+            android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/ttTitle"
             android:gravity="center"
@@ -49,32 +49,12 @@
             android:textSize="10sp" />
 
         <TextView
-            android:id="@+id/ttLastPost"
+            android:id="@+id/ttMessageCountLastPost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/ttLPSep"
-            android:text="12/12 12:12PM"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="10sp" />
-
-        <TextView
-            android:id="@+id/ttDetailSeperator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/ttLastPost"
-            android:text=" Msgs, Last: "
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="10sp" />
-
-        <TextView
-            android:id="@+id/ttMsgCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/ttDetailSeperator"
-            android:text="500"
+            android:text="500 Msgs, Last: 12/12 12:12PM"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textSize="10sp" />
 
@@ -82,7 +62,7 @@
             android:id="@+id/ttTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ttLastPost"
+            android:layout_below="@+id/ttMessageCountLastPost"
             android:layout_toLeftOf="@+id/ttLPSep"
             android:layout_toRightOf="@+id/ttSTSep"
             android:ellipsize="end"
@@ -95,11 +75,12 @@
         <com.ioabsoftware.gameraven.views.LinkButtonView
             android:id="@+id/ttLastPostLink"
             style="@style/Widget.Sherlock.ActionButton"
-            android:layout_width="50dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/ttTitle"
             android:layout_alignParentRight="true"
-            android:text="Last Post"
+            android:layout_alignTop="@+id/ttMessageCountLastPost"
+            android:text="Last\nPost"
             android:textColor="?attr/themedTextColor"
             android:textSize="12sp" />
 

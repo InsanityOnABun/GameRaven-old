@@ -28,9 +28,12 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.DefaultHeaderTransformer;
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.AbsDefaultHeaderTransformer;
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshAttacher;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.OnRefreshListener;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.Options;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.SearchManager;
@@ -423,7 +426,9 @@ public class AllInOneV2 extends Activity {
 
     	wtl("getting all the views");
         
-        contentPTR = PullToRefreshAttacher.get(this);
+    	Options op = new Options();
+    	op.refreshMinimize = false;
+        contentPTR = PullToRefreshAttacher.get(this, op);
         PullToRefreshLayout ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
         ptrLayout.setPullToRefreshAttacher(contentPTR, new OnRefreshListener() {
 			@Override
@@ -476,6 +481,12 @@ public class AllInOneV2 extends Activity {
 			}
 		});
         pageLabel = (TextView) findViewById(R.id.aioPageLabel);
+        
+        htBase = ((TextView) drawer.findViewById(R.id.dwrChangeAccHeader)).getTextSize();
+		btBase = ((TextView) drawer.findViewById(R.id.dwrChangeAcc)).getTextSize();
+		ttBase = title.getTextSize();
+		pjbBase = firstPage.getTextSize();
+		pjlBase = pageLabel.getTextSize();
         
         postTitle.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -538,23 +549,6 @@ public class AllInOneV2 extends Activity {
     	
 		wtl("onCreate finishing");
     }
-	
-	private String lcPostBody, lcPostTitle;
-	@Override
-	protected void onStop() {
-		lcPostBody = postBody.getText().toString();
-		lcPostTitle = postTitle.getText().toString();
-		super.onStop();
-	}
-	
-	@Override
-	protected void onRestart() {
-		super.onRestart();
-		if (lcPostBody != null) {
-			postBody.setText(lcPostBody);
-			postTitle.setText(lcPostTitle);
-		}
-	}
 
 	private boolean needToSetNavList = true;
 	public void disableNavList() {
@@ -782,6 +776,7 @@ public class AllInOneV2 extends Activity {
         }
     }
 	
+    private float htBase, btBase, ttBase, pjbBase, pjlBase;
 	@Override
     public void onResume() {
     	wtl("onResume fired");
@@ -792,17 +787,21 @@ public class AllInOneV2 extends Activity {
     	float oldScale = textScale;
     	textScale = settings.getInt("textScale", 100) / 100f;
     	if (textScale != oldScale) {
-    		title.setTextSize(TypedValue.COMPLEX_UNIT_PX, title.getTextSize() * getTextScale());
-    		
-    		TextView cah = (TextView) drawer.findViewById(R.id.dwrChangeAccHeader);
-    		TextView ca = (TextView) drawer.findViewById(R.id.dwrChangeAcc);
-
     		int px = TypedValue.COMPLEX_UNIT_PX;
-    		float htSize = cah.getTextSize() * getTextScale();
-    		float btSize = ca.getTextSize() * getTextScale();
     		
-    		cah.setTextSize(px, htSize);
-    		ca.setTextSize(px, btSize);
+    		title.setTextSize(px, ttBase * getTextScale());
+    		
+    		firstPage.setTextSize(px, pjbBase * getTextScale());
+    		prevPage.setTextSize(px, pjbBase * getTextScale());
+    		nextPage.setTextSize(px, pjbBase * getTextScale());
+    		lastPage.setTextSize(px, pjbBase * getTextScale());
+    		pageLabel.setTextSize(px, pjlBase * getTextScale());
+    		
+    		float htSize = htBase * getTextScale();
+    		float btSize = btBase * getTextScale();
+    		
+    		((TextView) drawer.findViewById(R.id.dwrChangeAccHeader)).setTextSize(px, htSize);
+    		((TextView) drawer.findViewById(R.id.dwrChangeAcc)).setTextSize(px, btSize);
     		((TextView) drawer.findViewById(R.id.dwrNavHeader)).setTextSize(px, htSize);
     		((TextView) drawer.findViewById(R.id.dwrBoardJumper)).setTextSize(px, btSize);
     		((TextView) drawer.findViewById(R.id.dwrAMPList)).setTextSize(px, btSize);
@@ -847,7 +846,7 @@ public class AllInOneV2 extends Activity {
 			aBarDrawable.setColorFilter(accentColor, PorterDuff.Mode.SRC_ATOP);
 			aBar.setBackgroundDrawable(aBarDrawable);
 			
-			((DefaultHeaderTransformer) contentPTR.getHeaderTransformer()).setProgressBarColor(accentColor);
+			((AbsDefaultHeaderTransformer) contentPTR.getHeaderTransformer()).setProgressBarColor(accentColor);
 			
 			int msgSelectorColor = Color.HSVToColor(hsv);
 			
@@ -1866,7 +1865,7 @@ public class AllInOneV2 extends Activity {
 					if (!pRes.getElementsContainingOwnText("Next Page").isEmpty())
 						nextPageElem = pRes.getElementsContainingOwnText("Next Page").first();
 					
-					pageCount = "page count not available";
+					pageCount = "???";
 					if (nextPageElem != null) {
 						nextPage = "/search/index.html?game=" + searchQuery + "&page=" + (currPageNum + 1);
 					}
@@ -2839,6 +2838,8 @@ public class AllInOneV2 extends Activity {
 							} catch (android.content.ActivityNotFoundException ex) {
 							    Toast.makeText(AllInOneV2.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
 							}
+							
+							d.dismiss();
 		            	}
 		            	else {
 		            		input.requestFocus();

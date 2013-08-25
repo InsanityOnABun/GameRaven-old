@@ -55,8 +55,8 @@
                     android:layout_alignParentLeft="true"
                     android:layout_below="@+id/aioPJTopSep"
                     android:enabled="false"
-                    android:minHeight="30dp"
-                    android:minWidth="46dp"
+                    android:minHeight="32dp"
+                    android:minWidth="54dp"
                     android:text="@string/firstpage"
                     android:textColor="?attr/themedPageJumperColor" />
 
@@ -79,8 +79,8 @@
                     android:layout_alignBottom="@+id/aioFirstPage"
                     android:layout_toRightOf="@+id/aioFirstPrevSep"
                     android:enabled="false"
-                    android:minHeight="30dp"
-                    android:minWidth="46dp"
+                    android:minHeight="32dp"
+                    android:minWidth="54dp"
                     android:text="@string/prevpage"
                     android:textColor="?attr/themedPageJumperColor" />
 
@@ -93,8 +93,8 @@
                     android:layout_alignBottom="@+id/aioPreviousPage"
                     android:layout_alignParentRight="true"
                     android:enabled="false"
-                    android:minHeight="30dp"
-                    android:minWidth="46dp"
+                    android:minHeight="32dp"
+                    android:minWidth="54dp"
                     android:text="@string/lastpage"
                     android:textColor="?attr/themedPageJumperColor" />
 
@@ -117,8 +117,8 @@
                     android:layout_alignBottom="@+id/aioLastPage"
                     android:layout_toLeftOf="@+id/aioNextLastSep"
                     android:enabled="false"
-                    android:minHeight="30dp"
-                    android:minWidth="46dp"
+                    android:minHeight="32dp"
+                    android:minWidth="54dp"
                     android:text="@string/nextpage"
                     android:textColor="?attr/themedPageJumperColor" />
 
@@ -126,11 +126,11 @@
                     android:id="@+id/aioPageLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/aioFirstPage"
                     android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
                     android:layout_toLeftOf="@+id/aioNextPage"
                     android:layout_toRightOf="@+id/aioPreviousPage"
-                    android:gravity="center_horizontal"
+                    android:gravity="center"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
             </RelativeLayout>
         </RelativeLayout>

@@ -5,6 +5,7 @@ import com.ioabsoftware.gameraven.R;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,9 +20,17 @@ public class PMView extends LinearLayout {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.pmview, this);
         
-        ((TextView) findViewById(R.id.pmSubject)).setText(subjectIn);
-        ((TextView) findViewById(R.id.pmSender)).setText(senderIn);
-        ((TextView) findViewById(R.id.pmTime)).setText(timeIn);
+        TextView subject = (TextView) findViewById(R.id.pmSubject);
+        TextView sender = (TextView) findViewById(R.id.pmSender);
+        TextView time = (TextView) findViewById(R.id.pmTime);
+
+        subject.setTextSize(TypedValue.COMPLEX_UNIT_PX, subject.getTextSize() * AllInOneV2.getTextScale());
+        sender.setTextSize(TypedValue.COMPLEX_UNIT_PX, sender.getTextSize() * AllInOneV2.getTextScale());
+        time.setTextSize(TypedValue.COMPLEX_UNIT_PX, time.getTextSize() * AllInOneV2.getTextScale());
+        
+        subject.setText(subjectIn);
+        sender.setText(senderIn);
+        time.setText(timeIn);
         	
         
         url = urlIn;

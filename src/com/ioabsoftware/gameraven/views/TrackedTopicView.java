@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.util.AttributeSet;
 import android.util.StateSet;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,13 +25,20 @@ public class TrackedTopicView extends LinearLayout {
 		
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.trackedtopicview, this);
-
-        ((TextView) findViewById(R.id.ttBoardName)).setText(board);
-        ((TextView) findViewById(R.id.ttTitle)).setText(title);
-        ((TextView) findViewById(R.id.ttLastPost)).setText(lastPost);
-        ((TextView) findViewById(R.id.ttMsgCount)).setText(msgs);
         
         url = urlIn;
+        
+        TextView boardName = (TextView) findViewById(R.id.ttBoardName);
+        TextView titleV = (TextView) findViewById(R.id.ttTitle);
+        TextView msgLP = (TextView) findViewById(R.id.ttMessageCountLastPost);
+
+        boardName.setTextSize(TypedValue.COMPLEX_UNIT_PX, boardName.getTextSize() * AllInOneV2.getTextScale());
+        titleV.setTextSize(TypedValue.COMPLEX_UNIT_PX, titleV.getTextSize() * AllInOneV2.getTextScale());
+        msgLP.setTextSize(TypedValue.COMPLEX_UNIT_PX, msgLP.getTextSize() * AllInOneV2.getTextScale());
+
+        boardName.setText(board);
+        titleV.setText(title);
+        msgLP.setText(msgs + " Msgs, Last: " + lastPost);
 
         findViewById(R.id.ttSep).setBackgroundColor(AllInOneV2.getAccentColor());
         findViewById(R.id.ttSTSep).setBackgroundColor(AllInOneV2.getAccentColor());

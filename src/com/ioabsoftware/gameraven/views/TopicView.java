@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.util.AttributeSet;
 import android.util.StateSet;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -30,10 +31,17 @@ public class TopicView extends LinearLayout {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.topicview, this);
         
-        ((TextView) findViewById(R.id.tvTitle)).setText(titleIn);
-        ((TextView) findViewById(R.id.tvTC)).setText(tcIn);
-        ((TextView) findViewById(R.id.tvLastPost)).setText(lastPostIn);
-        ((TextView) findViewById(R.id.tvMsgCount)).setText(mCount);
+        TextView title = (TextView) findViewById(R.id.tvTitle);
+        TextView tc = (TextView) findViewById(R.id.tvTC);
+        TextView msgLP = (TextView) findViewById(R.id.tvMsgCountLastPost);
+
+        title.setTextSize(TypedValue.COMPLEX_UNIT_PX, title.getTextSize() * AllInOneV2.getTextScale());
+        tc.setTextSize(TypedValue.COMPLEX_UNIT_PX, tc.getTextSize() * AllInOneV2.getTextScale());
+        msgLP.setTextSize(TypedValue.COMPLEX_UNIT_PX, msgLP.getTextSize() * AllInOneV2.getTextScale());
+        
+        title.setText(titleIn);
+        tc.setText(tcIn);
+        msgLP.setText(mCount + " Msgs, Last: " + lastPostIn);
         
         url = urlIn;
 
@@ -41,8 +49,8 @@ public class TopicView extends LinearLayout {
         findViewById(R.id.tvLPSep).setBackgroundColor(AllInOneV2.getAccentColor());
         
         if (hlColor != 0) {
-        	((TextView) findViewById(R.id.tvTC)).setTextColor(hlColor);
-        	((TextView) findViewById(R.id.tvTitle)).setTextColor(hlColor);
+        	tc.setTextColor(hlColor);
+        	title.setTextColor(hlColor);
         }
         
         setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());

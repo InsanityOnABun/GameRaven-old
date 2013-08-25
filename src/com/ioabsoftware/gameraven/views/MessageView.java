@@ -44,6 +44,7 @@ import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 import android.text.util.Linkify;
 import android.util.StateSet;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -180,10 +181,17 @@ public class MessageView extends LinearLayout implements View.OnClickListener {
         
 		message = (ClickableLinksTextView) findViewById(R.id.mvMessage);
 		
-        ((TextView) findViewById(R.id.mvUser)).setText((userTitles != null ? username + userTitles : username));
-        ((TextView) findViewById(R.id.mvUser)).setTextColor(AllInOneV2.getAccentTextColor());
-        ((TextView) findViewById(R.id.mvPostNumber)).setText((postNum != null ? "#" + postNum + ", " + postTime : postTime));
-        ((TextView) findViewById(R.id.mvPostNumber)).setTextColor(AllInOneV2.getAccentTextColor());
+		TextView user = (TextView) findViewById(R.id.mvUser);
+		TextView post = (TextView) findViewById(R.id.mvPostNumber);
+		
+		user.setTextSize(TypedValue.COMPLEX_UNIT_PX, user.getTextSize() * AllInOneV2.getTextScale());
+		post.setTextSize(TypedValue.COMPLEX_UNIT_PX, post.getTextSize() * AllInOneV2.getTextScale());
+		message.setTextSize(TypedValue.COMPLEX_UNIT_PX, message.getTextSize() * AllInOneV2.getTextScale());
+		
+		user.setText((userTitles != null ? username + userTitles : username));
+		user.setTextColor(AllInOneV2.getAccentTextColor());
+		post.setText((postNum != null ? "#" + postNum + ", " + postTime : postTime));
+		post.setTextColor(AllInOneV2.getAccentTextColor());
 
 		aio.wtl("set text and color for user and post number");
         

@@ -68,14 +68,21 @@ public class BoardView extends LinearLayout {
         setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
 	}
 	
-	public BoardView(Context context, String platform, String name, String urlIn) {
+	public BoardView(Context context, String platformIn, String nameIn, String urlIn) {
 		super(context);
 		
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.gamesearchview, this);
         
-        ((TextView) findViewById(R.id.gsPlatform)).setText("Platform: " + platform);
-        ((TextView) findViewById(R.id.gsName)).setText(name);
+        TextView platform = (TextView) findViewById(R.id.gsPlatform);
+        TextView name = (TextView) findViewById(R.id.gsName);
+        
+        int px = TypedValue.COMPLEX_UNIT_PX;
+        name.setTextSize(px, name.getTextSize() * AllInOneV2.getTextScale());
+        platform.setTextSize(px, platform.getTextSize() * AllInOneV2.getTextScale());
+    	
+        name.setText(nameIn);
+        platform.setText("Platform: " + platform);
         
 		url = urlIn;
 		type = BoardViewType.NORMAL;
