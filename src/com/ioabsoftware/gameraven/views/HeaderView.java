@@ -16,7 +16,8 @@ public class HeaderView extends LinearLayout {
 		
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.headerview, this);
-        findViewById(R.id.hdrWrapper).setBackgroundColor(AllInOneV2.getAccentColor());
+        
+        setBackgroundColor(AllInOneV2.getAccentColor());
         
         TextView tView = (TextView) findViewById(R.id.hdrText);
         tView.setTextSize(TypedValue.COMPLEX_UNIT_PX, tView.getTextSize() * AllInOneV2.getTextScale());
