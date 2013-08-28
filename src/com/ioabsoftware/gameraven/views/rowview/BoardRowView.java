@@ -6,6 +6,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
@@ -61,9 +62,27 @@ public class BoardRowView extends BaseRowView {
 		BoardRowData castData = (BoardRowData) data;
 		
 		name.setText(castData.getName());
-		desc.setText(castData.getDesc());
-		lastPost.setText("Last Post: " + castData.getLastPost());
-		tpcMsgDetails.setText("Tpcs: " + castData.getTCount() + "; Msgs: " + castData.getMCount());
+		
+		String descText = castData.getDesc();
+		if (descText != null)
+    		desc.setText(descText);
+    	else
+    		desc.setVisibility(View.INVISIBLE);
+    	
+    	switch (castData.getBoardType()) {
+		case NORMAL:
+            lastPost.setText("Last Post: " + castData.getLastPost());
+            tpcMsgDetails.setText("Tpcs: " + castData.getTCount() + "; Msgs: " + castData.getMCount());
+			break;
+		case SPLIT:
+			lastPost.setText("--Split List--");
+            tpcMsgDetails.setVisibility(View.INVISIBLE);
+			break;
+		case LIST:
+            lastPost.setText("--Board List--");
+            tpcMsgDetails.setVisibility(View.INVISIBLE);
+			break;
+    	}
 	}
 
 }

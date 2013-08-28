@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/gsGlobalWrapper"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="2dp"
-    android:orientation="vertical" >
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <RelativeLayout
         android:id="@+id/gsWrapper"
@@ -32,14 +27,15 @@
             android:maxLines="2"
             android:text="Android"
             android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <View
+            android:id="@+id/gsSep"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/gsName"
+            android:layout_marginTop="2dp"
+            android:background="#33B5E5"
+            android:visibility="visible" />
     </RelativeLayout>
 
-    <View
-        android:id="@+id/gsSep"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="2dp"
-        android:background="#33B5E5"
-        android:visibility="visible" />
-
-</LinearLayout>
+</merge>

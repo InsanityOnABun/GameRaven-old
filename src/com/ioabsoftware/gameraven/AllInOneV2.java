@@ -1908,6 +1908,7 @@ public class AllInOneV2 extends Activity {
 									prevPlatform = platform;
 								}
 								
+								//TODO use gamesearch data/view
 								BoardView bv = new BoardView(this, platform, bName, bUrl);
 								bv.setOnClickListener(cl);
 								content.addView(bv);
