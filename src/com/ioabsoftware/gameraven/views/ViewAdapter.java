@@ -5,7 +5,12 @@ import java.util.ArrayList;
 import com.ioabsoftware.gameraven.views.rowdata.BaseRowData;
 import com.ioabsoftware.gameraven.views.rowdata.RowType;
 import com.ioabsoftware.gameraven.views.rowview.BaseRowView;
+import com.ioabsoftware.gameraven.views.rowview.BoardRowView;
+import com.ioabsoftware.gameraven.views.rowview.GameSearchRowView;
 import com.ioabsoftware.gameraven.views.rowview.HeaderRowView;
+import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
+import com.ioabsoftware.gameraven.views.rowview.PMRowView;
+import com.ioabsoftware.gameraven.views.rowview.TopicRowView;
 
 import android.content.Context;
 import android.view.View;
@@ -59,6 +64,21 @@ public class ViewAdapter extends BaseAdapter {
 			switch (data.getRowType()) {
 			case HEADER:
 				view = new HeaderRowView(context);
+				break;
+			case BOARD:
+				view = new BoardRowView(context);
+				break;
+			case GAME_SEARCH:
+				view = new GameSearchRowView(context);
+				break;
+			case MESSAGE:
+				view = new MessageRowView(context);
+				break;
+			case PM:
+				view = new PMRowView(context);
+				break;
+			case TOPIC:
+				view = new TopicRowView(context);
 				break;
 			default:
 				throw new IllegalArgumentException();

@@ -152,11 +152,13 @@
         android:layout_below="@+id/aioHeader"
         android:scrollbarStyle="outsideOverlay" >
 
-        <ScrollView
-            android:id="@+id/aioScroller"
+        <ListView
+            android:id="@+id/aioMainList"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent" >
-        </ScrollView>
+            android:layout_height="fill_parent"
+            android:fastScrollEnabled="true"
+            android:smoothScrollbar="false" >
+        </ListView>
     </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
 
     <LinearLayout

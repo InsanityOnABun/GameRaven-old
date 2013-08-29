@@ -12,23 +12,23 @@ import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.views.rowdata.BaseRowData;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData;
-import com.ioabsoftware.gameraven.views.rowdata.GameSearchData;
+import com.ioabsoftware.gameraven.views.rowdata.GameSearchRowData;
 import com.ioabsoftware.gameraven.views.rowdata.RowType;
 
-public class GameSearchView extends BaseRowView {
+public class GameSearchRowView extends BaseRowView {
 	
 	TextView platform, name;
 
-	public GameSearchView(Context context) {
+	public GameSearchRowView(Context context) {
 		super(context);
 	}
 
-	public GameSearchView(Context context, AttributeSet attrs) {
+	public GameSearchRowView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public GameSearchView(Context context, AttributeSet attrs, int defStyle) {
+	public GameSearchRowView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
 
@@ -55,7 +55,7 @@ public class GameSearchView extends BaseRowView {
 		if (data.getRowType() != myType)
 			throw new IllegalArgumentException("data RowType does not match myType");
 		
-		GameSearchData castData = (GameSearchData) data;
+		GameSearchRowData castData = (GameSearchRowData) data;
 		
 		name.setText(castData.getName());
 		platform.setText(castData.getPlatform());

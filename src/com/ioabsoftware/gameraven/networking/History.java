@@ -20,11 +20,11 @@ public class History {
 		return res;}
 
 
-	private int vertPos;
-	public int getVertPos() {
+	private int vertPos[];
+	public int[] getVertPos() {
 		return vertPos;}
 
-	public History(String pathIn, HandlesNetworkResult.NetDesc descIn, Response resIn, int vertPosIn) {
+	public History(String pathIn, HandlesNetworkResult.NetDesc descIn, Response resIn, int vertPosIn[]) {
 		path = pathIn;
 		desc = descIn;
 		res = resIn;

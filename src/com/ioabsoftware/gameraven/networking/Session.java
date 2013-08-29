@@ -86,7 +86,7 @@ public class Session implements HandlesNetworkResult {
 	{return userLevel;}
 	
 	public static boolean applySavedScroll;
-	public static int savedScrollVal;
+	public static int[] savedScrollVal;
 	
 	/** The password of the user for this session.  */
 	private String password = null;

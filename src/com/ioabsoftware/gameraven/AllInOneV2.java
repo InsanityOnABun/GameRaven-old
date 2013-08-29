@@ -71,6 +71,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -84,18 +85,22 @@ import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
-import com.ioabsoftware.gameraven.views.BoardView;
-import com.ioabsoftware.gameraven.views.BoardView.BoardViewType;
-import com.ioabsoftware.gameraven.views.HeaderView;
 import com.ioabsoftware.gameraven.views.LinkButtonView;
 import com.ioabsoftware.gameraven.views.LinkButtonView.Type;
-import com.ioabsoftware.gameraven.views.MessageView;
+import com.ioabsoftware.gameraven.views.rowdata.BaseRowData;
+import com.ioabsoftware.gameraven.views.rowdata.BoardRowData;
+import com.ioabsoftware.gameraven.views.rowdata.BoardRowData.BoardType;
+import com.ioabsoftware.gameraven.views.rowdata.GameSearchRowData;
+import com.ioabsoftware.gameraven.views.rowdata.HeaderRowData;
+import com.ioabsoftware.gameraven.views.rowdata.MessageRowData;
+import com.ioabsoftware.gameraven.views.rowdata.PMRowData;
+import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
+import com.ioabsoftware.gameraven.views.rowdata.TopicRowData.TopicType;
+import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 import com.ioabsoftware.gameraven.views.PMDetailView;
-import com.ioabsoftware.gameraven.views.PMView;
-import com.ioabsoftware.gameraven.views.TopicView;
-import com.ioabsoftware.gameraven.views.TopicView.TopicViewType;
 import com.ioabsoftware.gameraven.views.TrackedTopicView;
 import com.ioabsoftware.gameraven.views.UserDetailView;
+import com.ioabsoftware.gameraven.views.ViewAdapter;
 
 public class AllInOneV2 extends Activity {
 	
@@ -187,7 +192,7 @@ public class AllInOneV2 extends Activity {
 	private LinearLayout postWrapper;
 	
 	private PullToRefreshAttacher contentPTR;
-	private ScrollView contentScroller;
+	private ListView contentList;
 	private LinearLayout content;
 	private WebView adView;
 	
@@ -215,10 +220,10 @@ public class AllInOneV2 extends Activity {
     
     private View pageJumperWrapper;
 	
-	public int getScrollerVertLoc() {
-		return contentScroller.getScrollY();}
-	
-	private final ClickListener cl = new ClickListener();
+	public int[] getScrollerVertLoc() {
+		int firstVis = contentList.getFirstVisiblePosition();
+		return new int[] {firstVis, contentList.getChildAt(0).getTop()};
+	}
 	
 	private static boolean usingLightTheme;
 	public static boolean getUsingLightTheme() {return usingLightTheme;}
@@ -239,6 +244,9 @@ public class AllInOneV2 extends Activity {
 	
 	private MenuDrawer drawer;
 	
+	private static AllInOneV2 me;
+	public static AllInOneV2 get() {return me;}
+	
 	
 	
 	/**********************************************
@@ -247,6 +255,7 @@ public class AllInOneV2 extends Activity {
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
+		me = this;
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		accentColor = 0;
         
@@ -438,8 +447,7 @@ public class AllInOneV2 extends Activity {
         
         content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
-        contentScroller = (ScrollView) findViewById(R.id.aioScroller);
-        contentScroller.addView(content);
+        contentList = (ListView) findViewById(R.id.aioMainList);
 
         titleWrapper  = (LinearLayout) findViewById(R.id.aioPostTitleWrapper);
         postTitle = (EditText) findViewById(R.id.aioPostTitle);
@@ -1056,7 +1064,6 @@ public class AllInOneV2 extends Activity {
 			clearPoll();
 			messageIDForEditing = null;
 			postPostUrl = null;
-			content.requestFocus();
 			
 			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).
 									hideSoftInputFromWindow(postBody.getWindowToken(), 0);
@@ -1074,13 +1081,14 @@ public class AllInOneV2 extends Activity {
 	 * START HNR
 	 * ******************************************/
 	
+	ArrayList<BaseRowData> adapterRows;
 	@SuppressLint("SetJavaScriptEnabled")
 	public void processContent(Response res, NetDesc desc) {
 		
 		wtl("GRAIO hNR fired, desc: " + desc.name());
 		
 		contentPTR.setEnabled(false);
-		contentScroller.scrollTo(0, 0);
+		contentList.scrollTo(0, 0);
 
 		searchIcon.setVisible(false);
 		searchIcon.collapseActionView();
@@ -1091,6 +1099,8 @@ public class AllInOneV2 extends Activity {
 		remFavIcon.setVisible(false);
 		
 		topicListIcon.setVisible(false);
+		
+		adapterRows = new ArrayList<BaseRowData>();
 		
 		
 		try {
@@ -1151,7 +1161,7 @@ public class AllInOneV2 extends Activity {
 				case BOARD_JUMPER:
 				case LOGIN_S2:
 					updateHeaderNoJumper("Board Jumper", NetDesc.BOARD_JUMPER);
-					content.addView(new HeaderView(this, "Announcements"));
+					adapterRows.add(new HeaderRowData("Announcements"));
 					
 					searchIcon.setVisible(true);
 					
@@ -1209,18 +1219,12 @@ public class AllInOneV2 extends Activity {
 							String link = subjectLinkElem.attr("href");
 							String time = cells.get(3).text();
 							
-							PMView pm = new PMView(this, subject, sender, time, link);
-							pm.setOnClickListener(cl);
-							
-							if (isOld)
-								pm.setOld();
-							
-							content.addView(pm);
+							adapterRows.add(new PMRowData(subject, sender, time, link));
 						}
 					}
 					else {
 						updateHeaderNoJumper(headerTitle, NetDesc.PM_INBOX);
-						content.addView(new HeaderView(this, "You have no private messages at this time."));
+						adapterRows.add(new HeaderRowData("You have no private messages at this time."));
 					}
 					
 					postIcon.setVisible(true);
@@ -1246,9 +1250,10 @@ public class AllInOneV2 extends Activity {
 					
 					updateHeaderNoJumper(pmTitle, NetDesc.READ_PM);
 					
-					PMDetailView pmd = new PMDetailView(this, sender, pmTitle, pmMessage + pmFoot);
-					pmd.setOnClickListener(cl);
-					content.addView(pmd);
+					//TODO pm detail
+//					PMDetailView pmd = new PMDetailView(this, sender, pmTitle, pmMessage + pmFoot);
+//					pmd.setOnClickListener(cl);
+//					content.addView(pmd);
 					break;
 					
 				case AMP_LIST:
@@ -1327,28 +1332,22 @@ public class AllInOneV2 extends Activity {
 							Element lPostLinkElem = cells.get(3).children().get(1);
 							String lPost = lPostLinkElem.text();
 							String lPostLink = lPostLinkElem.attr("href");
-
-							TopicView topic = new TopicView(this, title, board,
-									lPost, mCount, link, TopicViewType.NORMAL, 0);
-
-							topic.setOnClickListener(cl);
-							topic.setOnLongClickListener(cl);
-
-							LinkButtonView lp = (LinkButtonView) topic.findViewById(R.id.tvLastPostLink);
-							lp.setUrlAndType(lPostLink, Type.LAST_POST);
-							lp.setOnClickListener(cl);
-
-							content.addView(topic);
+							
+							adapterRows.add(new TopicRowData(title, board, lPost, mCount, 
+									link, lPostLink, TopicType.NORMAL, 0));
 						}
 					}
 					else {
-						content.addView(new HeaderView(this, "You have no active messages at this time."));
+						adapterRows.add(new HeaderRowData("You have no active messages at this time."));
 					}
 					
 					wtl("amp response block finished");
 					break;
 					
 				case TRACKED_TOPICS:
+					if (true)
+						throw new IllegalAccessException("not implemented");
+					
 					headerTitle = Session.getUser() + "'s Tracked Topics";
 					updateHeaderNoJumper(headerTitle, desc);
 					tbody = pRes.getElementsByTag("tbody").first();
@@ -1371,23 +1370,24 @@ public class AllInOneV2 extends Activity {
 							TrackedTopicView tt = new TrackedTopicView(this,
 									board, topicText, lPostText, msgs,
 									topicLink);
-							tt.setOnClickListener(cl);
+//							tt.setOnClickListener(cl);
 
+							// TODO: make sure LinkButtonView gets replaced with in-view method
 							LinkButtonView st = (LinkButtonView) tt
 									.findViewById(R.id.ttStopTracking);
 							st.setUrlAndType(removeLink, Type.STOP_TRACK);
-							st.setOnClickListener(cl);
+//							st.setOnClickListener(cl);
 
 							LinkButtonView lp = (LinkButtonView) tt
 									.findViewById(R.id.ttLastPostLink);
 							lp.setUrlAndType(lPostLink, Type.LAST_POST);
-							lp.setOnClickListener(cl);
+//							lp.setOnClickListener(cl);
 
 							content.addView(tt);
 						}
 					}
 					else {
-						content.addView(new HeaderView(this, "You have no tracked topics at this time."));
+						adapterRows.add(new HeaderRowData("You have no tracked topics at this time."));
 					}
 					break;
 					
@@ -1500,11 +1500,8 @@ public class AllInOneV2 extends Activity {
 						Element splitList = pRes.select("p:contains(this is a split board)").first();
 						if (splitList != null) {
 							String splitListLink = splitList.child(0).attr("href");
-							BoardView b = new BoardView(this, "This is a Split Board.", 
-									"Click here to return to the Split List.", 
-									null, null, null, splitListLink, BoardViewType.SPLIT);
-							b.setOnClickListener(cl);
-							content.addView(b);
+							adapterRows.add(new BoardRowData("This is a Split Board.", "Click here to return to the Split List.", 
+									null, null, null, splitListLink, BoardType.SPLIT));
 						}
 						
 						Element table = pRes.select("table.board").first();
@@ -1532,16 +1529,16 @@ public class AllInOneV2 extends Activity {
 									String lpUrl = lPostLinkElem.attr("href");
 									String mCount = cells.get(3).text();
 									
-									TopicViewType type = TopicViewType.NORMAL;
+									TopicType type = TopicType.NORMAL;
 									if (!tImg.endsWith("topic")) {
 										if (tImg.endsWith("closed"))
-											type = TopicViewType.LOCKED;
+											type = TopicType.LOCKED;
 										else if (tImg.endsWith("archived"))
-											type = TopicViewType.ARCHIVED;
+											type = TopicType.ARCHIVED;
 										else if (tImg.endsWith("poll"))
-											type = TopicViewType.POLL;
+											type = TopicType.POLL;
 										else if (tImg.endsWith("sticky"))
-											type = TopicViewType.PINNED;
+											type = TopicType.PINNED;
 									}
 									
 									int hlColor = 0;
@@ -1551,13 +1548,7 @@ public class AllInOneV2 extends Activity {
 										tc += " (" + hUser.getLabel() + ")";
 									}
 									
-									TopicView topic = new TopicView(this, title, tc, lastPost, mCount, tUrl, type, hlColor);
-									topic.setOnClickListener(cl);
-									LinkButtonView lp = (LinkButtonView) topic.findViewById(R.id.tvLastPostLink);
-									lp.setUrlAndType(lpUrl, Type.LAST_POST);
-									lp.setOnClickListener(cl);
-									
-									content.addView(topic);
+									adapterRows.add(new TopicRowData(title, tc, lastPost, mCount, tUrl, lpUrl, type, hlColor));
 								}
 								else
 									skipFirst = false;
@@ -1565,7 +1556,7 @@ public class AllInOneV2 extends Activity {
 							wtl("board row parsing end");
 						}
 						else {
-							content.addView(new HeaderView(this, "There are no topics at this time."));
+							adapterRows.add(new HeaderRowData("There are no topics at this time."));
 						}
 					}
 					
@@ -1653,7 +1644,6 @@ public class AllInOneV2 extends Activity {
 					Elements rows = pRes.select("table.board").first().getElementsByTag("tr");
 					int rowCount = rows.size();
 					
-					MessageView message = null;
 					Set<String> hlUsers = hlDB.getHighlightedUsers().keySet();
 					for (int x = 0; x < rowCount; x++) {
 						Element row = rows.get(x);
@@ -1741,20 +1731,8 @@ public class AllInOneV2 extends Activity {
 							userTitles += " (" + hUser.getLabel() + ")";
 						}
 						
-						message = new MessageView(this, user, userTitles,
-								postNum, postTime, msgBody, boardID,
-								topicID, mID, hlColor);
-						content.addView(message);
-					}
-					
-					final MessageView lastMessage = message;
-					if (goToLastPost && !Session.applySavedScroll) {
-						contentScroller.post(new Runnable() {
-					        @Override
-					        public void run() {
-					        	contentScroller.smoothScrollTo(0, lastMessage.getTop());
-					        }
-					    });
+						adapterRows.add(new MessageRowData(user, userTitles, postNum, 
+								postTime, msgBody, boardID, topicID, mID, hlColor));
 					}
 					
 					break;
@@ -1769,14 +1747,14 @@ public class AllInOneV2 extends Activity {
 					
 					String user = msgDRows.first().child(0).child(0).text();
 					
-					content.addView(new HeaderView(this, "Current Version"));
+					adapterRows.add(new HeaderRowData("Current Version"));
 					
 					Element currRow;
 					String postTime;
 					String mID = parseMessageID(resUrl);
 					for (int x = 0; x < msgDRows.size(); x++) {
 						if (x == 1)
-							content.addView(new HeaderView(this, "Previous Version(s)"));
+						adapterRows.add(new HeaderRowData("Previous Version(s)"));
 						else {
 							currRow = msgDRows.get(x);
 							
@@ -1786,9 +1764,9 @@ public class AllInOneV2 extends Activity {
 								postTime = currRow.child(0).textNodes().get(0).text();
 							
 							Element body = currRow.child(1);
-							MessageView msg = new MessageView(this, user, null, null, postTime, body, boardID, topicID, mID, 0);
-							msg.disableTopClick();
-							content.addView(msg);
+							adapterRows.add(new MessageRowData(user, null, null, postTime, body, boardID, topicID, mID, 0));
+							//TODO: disable top click
+//							msg.disableTopClick();
 						}
 					}
 					
@@ -1887,9 +1865,9 @@ public class AllInOneV2 extends Activity {
 						for (Element table : gameSearchTables) {
 							tCounter++;
 							if (tCounter < tCount)
-								content.addView(new HeaderView(this, "Best Matches"));
+								adapterRows.add(new HeaderRowData("Best Matches"));
 							else
-								content.addView(new HeaderView(this, "Good Matches"));
+								adapterRows.add(new HeaderRowData("Good Matches"));
 							
 							String prevPlatform = EMPTY_STRING;
 							
@@ -1908,17 +1886,14 @@ public class AllInOneV2 extends Activity {
 									prevPlatform = platform;
 								}
 								
-								//TODO use gamesearch data/view
-								BoardView bv = new BoardView(this, platform, bName, bUrl);
-								bv.setOnClickListener(cl);
-								content.addView(bv);
+								adapterRows.add(new GameSearchRowData(bName, platform, bUrl));
 							}
 							
 							wtl("board row parsing end");
 						}
 					}
 					else {
-						content.addView(new HeaderView(this, "No results."));
+						adapterRows.add(new HeaderRowData("No results."));
 					}
 					
 					wtl("game search response block finished");
@@ -1933,7 +1908,8 @@ public class AllInOneV2 extends Activity {
 				adView = new WebView(this);
 		        adView.getSettings().setJavaScriptEnabled(settings.getBoolean("enableJS", true));
 		        
-				content.addView(adView);
+		        //TODO ad stuff
+//				content.addView(adView);
 				
 				String bgcolor;
 				if (usingLightTheme)
@@ -1951,21 +1927,10 @@ public class AllInOneV2 extends Activity {
 
 				contentPTR.setEnabled(settings.getBoolean("enablePTR", false));
 				
-				wtl("applysavedscroll: " + Session.applySavedScroll + ". savedscrollval: " + Session.savedScrollVal);
-				if (Session.applySavedScroll) {
-					contentScroller.post(new Runnable() {
-				        @Override
-				        public void run() {
-				        	contentScroller.scrollTo(0, Session.savedScrollVal);
-				        }
-				    });
-					Session.applySavedScroll = false;
-				}
-				
 			}
 			else {
 				wtl("res is null");
-				content.addView(new HeaderView(this, "You broke it. Somehow processContent was called with a null response."));
+				adapterRows.add(new HeaderRowData("You broke it. Somehow processContent was called with a null response."));
 			}
 		}
 		catch (Exception e) {
@@ -1979,6 +1944,28 @@ public class AllInOneV2 extends Activity {
 			tryCaught(res.url().toString(), desc.toString(), ExceptionUtils.getStackTrace(e), res.body());
 			if (session.canGoBack())
 				session.goBack(false);
+		}
+		
+		contentList.setAdapter(new ViewAdapter(this, adapterRows));
+		
+		if (consumeGoToLastPost() && !Session.applySavedScroll) {
+			contentList.post(new Runnable() {
+		        @Override
+		        public void run() {
+		        	contentList.setSelection(contentList.getCount() - 1);
+		        }
+		    });
+		}
+		
+		wtl("applysavedscroll: " + Session.applySavedScroll + ". savedscrollval: " + Session.savedScrollVal);
+		if (Session.applySavedScroll) {
+			contentList.post(new Runnable() {
+		        @Override
+		        public void run() {
+		        	contentList.setSelectionFromTop(Session.savedScrollVal[0], Session.savedScrollVal[1]);
+		        }
+		    });
+			Session.applySavedScroll = false;
 		}
 		
 		if (contentPTR.isRefreshing())
@@ -1998,7 +1985,7 @@ public class AllInOneV2 extends Activity {
 		for (Element row : homeTables.first().getElementsByTag("tr")) {
 			if (skippedFirst) {
 				if (row.hasClass("head")) {
-					content.addView(new HeaderView(this, row.text()));
+					adapterRows.add(new HeaderRowData(row.text()));
 				}
 				else {
 					// [title + link] [topics] [msgs] [last post]
@@ -2017,22 +2004,19 @@ public class AllInOneV2 extends Activity {
 					String mCount = null;
 					String lPost = null;
 					
-					BoardViewType bvt;
+					BoardType bvt;
 					
 					if (cells.size() > 3) {
 						tCount = cells.get(1).text();
 						mCount = cells.get(2).text();
 						lPost = cells.get(3).text();
 						
-						bvt = BoardViewType.NORMAL;
+						bvt = BoardType.NORMAL;
 					}
 					else
-						bvt = BoardViewType.SPLIT;
+						bvt = BoardType.SPLIT;
 					
-					BoardView board = new BoardView(this, title, boardDesc, lPost, tCount, mCount, link, bvt);
-					board.setOnClickListener(cl);
-					
-					content.addView(board);
+					adapterRows.add(new BoardRowData(title, boardDesc, lPost, tCount, mCount, link, bvt));
 				}
 			}
 			else {
@@ -2049,14 +2033,10 @@ public class AllInOneV2 extends Activity {
 					String title = cell.child(0).text();
 					String link = cell.child(0).attr("href");
 					String boardDesc = cell.child(2).text();
-					BoardView board = new BoardView(this, title, boardDesc,
-							null, null, null, link, BoardViewType.LIST);
-					board.setOnClickListener(cl);
-					content.addView(board);
+					adapterRows.add(new BoardRowData(title, boardDesc, null, null, null, link, BoardType.LIST));
 				} else {
 					if (rowX == 1) {
-						content.addView(new HeaderView(this,
-								"Message Board Categories"));
+						adapterRows.add(new HeaderRowData("Message Board Categories"));
 					}
 				}
 			}
@@ -2097,52 +2077,59 @@ public class AllInOneV2 extends Activity {
 	}
 	
 	private boolean goToLastPost = false;
-	public class ClickListener implements View.OnClickListener, View.OnLongClickListener {
-		@Override
-		public void onClick(View v) {
-			if (BoardView.class.isInstance(v)) {
-				BoardView bv = (BoardView) v;
-				if (bv.getType() == BoardViewType.LIST) {
-					session.get(NetDesc.BOARD_LIST, bv.getUrl(), null);
-				}
-				else {
-					session.get(NetDesc.BOARD, bv.getUrl(), null);
-				}
-			}
-			else if (TopicView.class.isInstance(v)) {
-				goToLastPost = false;
-				session.get(NetDesc.TOPIC, ((TopicView)v).getUrl(), null);
-			}
-			else if (TrackedTopicView.class.isInstance(v)) {
-				goToLastPost = false;
-				session.get(NetDesc.TOPIC, ((TrackedTopicView)v).getUrl(), null);
-			}
-			else if (LinkButtonView.class.isInstance(v)) {
-				if (((LinkButtonView) v).getType() == Type.LAST_POST) {
-					goToLastPost = true;
-					session.get(NetDesc.TOPIC, ((LinkButtonView) v).getUrl(), null);
-				}
-				else if (((LinkButtonView) v).getType() == Type.STOP_TRACK) {
-					session.get(NetDesc.TRACKED_TOPICS, ((LinkButtonView) v).getUrl(), null);
-				}
-			}
-			else if (PMView.class.isInstance(v)) {
-				session.get(NetDesc.READ_PM, ((PMView)v).getUrl(), null);
-			}
-			else if (PMDetailView.class.isInstance(v)) {
-				pmSetup(((PMDetailView)v).getSender(), ((PMDetailView)v).getTitle(), EMPTY_STRING);
-			}
-		}
-
-		
-		@Override
-		public boolean onLongClick(View v) {
-			String url = ((TopicView)v).getUrl();
-			url = url.substring(0, url.lastIndexOf('/'));
-			session.get(NetDesc.BOARD, url, null);
-			return true;
-		}
+	public void enableGoToLastPost() {goToLastPost = true;}
+	private boolean consumeGoToLastPost() {
+		boolean temp = goToLastPost;
+		goToLastPost = false;
+		return temp;
 	}
+	//TODO overhaul click listener
+//	public class ClickListener implements View.OnClickListener, View.OnLongClickListener {
+//		@Override
+//		public void onClick(View v) {
+//			if (BoardView.class.isInstance(v)) {
+//				BoardView bv = (BoardView) v;
+//				if (bv.getType() == BoardViewType.LIST) {
+//					session.get(NetDesc.BOARD_LIST, bv.getUrl(), null);
+//				}
+//				else {
+//					session.get(NetDesc.BOARD, bv.getUrl(), null);
+//				}
+//			}
+//			else if (TopicView.class.isInstance(v)) {
+//				goToLastPost = false;
+//				session.get(NetDesc.TOPIC, ((TopicView)v).getUrl(), null);
+//			}
+//			else if (TrackedTopicView.class.isInstance(v)) {
+//				goToLastPost = false;
+//				session.get(NetDesc.TOPIC, ((TrackedTopicView)v).getUrl(), null);
+//			}
+//			else if (LinkButtonView.class.isInstance(v)) {
+//				if (((LinkButtonView) v).getType() == Type.LAST_POST) {
+//					goToLastPost = true;
+//					session.get(NetDesc.TOPIC, ((LinkButtonView) v).getUrl(), null);
+//				}
+//				else if (((LinkButtonView) v).getType() == Type.STOP_TRACK) {
+//					session.get(NetDesc.TRACKED_TOPICS, ((LinkButtonView) v).getUrl(), null);
+//				}
+//			}
+//			else if (PMView.class.isInstance(v)) {
+//				session.get(NetDesc.READ_PM, ((PMView)v).getUrl(), null);
+//			}
+//			else if (PMDetailView.class.isInstance(v)) {
+//				pmSetup(((PMDetailView)v).getSender(), ((PMDetailView)v).getTitle(), EMPTY_STRING);
+//			}
+//		}
+//
+//		
+//		@Override
+//		public boolean onLongClick(View v) {
+//			String url = ((TopicView)v).getUrl();
+//			url = url.substring(0, url.lastIndexOf('/'));
+//			session.get(NetDesc.BOARD, url, null);
+//			return true;
+//		}
+//	}
 	
 	private void updateHeader(String titleIn, String firstPageIn, String prevPageIn, String currPage, 
 							  String pageCount, String nextPageIn, String lastPageIn, NetDesc desc) {
@@ -2195,9 +2182,9 @@ public class AllInOneV2 extends Activity {
 		updateHeader(title, null, null, "-1", "-1", null, null, desc);
 	}
 	
-	private MessageView clickedMsg;
+	private MessageRowView clickedMsg;
 	private String quoteSelection;
-	public void messageMenuClicked(MessageView msg) {
+	public void messageMenuClicked(MessageRowView msg) {
 		clickedMsg = msg;
 		quoteSelection = clickedMsg.getSelection();
 		if (quoteSelection != null)

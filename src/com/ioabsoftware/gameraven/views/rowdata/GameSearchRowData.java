@@ -1,14 +1,16 @@
 package com.ioabsoftware.gameraven.views.rowdata;
 
-public class GameSearchData extends BaseRowData {
+public class GameSearchRowData extends BaseRowData {
 
-	private String name, platform;
+	private String name, platform, url;
 	public String getName() {return name;}
 	public String getPlatform() {return platform;}
+	public String getUrl() {return url;}
 	
-	public GameSearchData(String nameIn, String platformIn) {
+	public GameSearchRowData(String nameIn, String platformIn, String urlIn) {
 		name = nameIn;
 		platform = platformIn;
+		url = urlIn;
 	}
 	
 	@Override

@@ -24,7 +24,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/gsPlatform"
+            android:gravity="center_vertical"
             android:maxLines="2"
+            android:minLines="2"
             android:text="Android"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 

@@ -46,7 +46,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="13sp" />
 
-        <com.ioabsoftware.gameraven.views.LinkButtonView
+        <TextView
             android:id="@+id/tvLastPostLink"
             style="@style/Widget.Sherlock.ActionButton"
             android:layout_width="wrap_content"
