@@ -7,13 +7,15 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
-import com.ioabsoftware.gameraven.views.rowdata.BaseRowData;
-import com.ioabsoftware.gameraven.views.rowdata.RowType;
+import com.ioabsoftware.gameraven.views.BaseRowData;
+import com.ioabsoftware.gameraven.views.BaseRowView;
+import com.ioabsoftware.gameraven.views.RowType;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
 
 public class TopicRowView extends BaseRowView {
@@ -22,7 +24,12 @@ public class TopicRowView extends BaseRowView {
     TextView tc;
     TextView msgLP;
     
+    ImageView typeIndicator;
+    
     TopicRowData myData;
+    
+    private static int defaultTitleColor = 0;
+    private static int defaultTCColor = 0;
 	
 	public TopicRowView(Context context) {
 		super(context);
@@ -38,7 +45,7 @@ public class TopicRowView extends BaseRowView {
 	}
 
 	@Override
-	void init(Context context) {
+	protected void init(Context context) {
 		myType = RowType.TOPIC;
 		setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.topicview, this, true);
@@ -46,6 +53,13 @@ public class TopicRowView extends BaseRowView {
         title = (TextView) findViewById(R.id.tvTitle);
         tc = (TextView) findViewById(R.id.tvTC);
         msgLP = (TextView) findViewById(R.id.tvMsgCountLastPost);
+        
+        typeIndicator = (ImageView) findViewById(R.id.tvTypeIndicator);
+        
+        if (defaultTitleColor == 0) {
+        	defaultTitleColor = title.getCurrentTextColor();
+        	defaultTCColor = tc.getCurrentTextColor();
+        }
         
         title.setTextSize(TypedValue.COMPLEX_UNIT_PX, title.getTextSize() * AllInOneV2.getTextScale());
         tc.setTextSize(TypedValue.COMPLEX_UNIT_PX, tc.getTextSize() * AllInOneV2.getTextScale());
@@ -73,15 +87,6 @@ public class TopicRowView extends BaseRowView {
 				AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getUrl(), null);
 			}
 		});
-        
-        setOnLongClickListener(new OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				String url = myData.getUrl().substring(0, myData.getUrl().lastIndexOf('/'));
-				AllInOneV2.get().getSession().get(NetDesc.BOARD, url, null);
-				return true;
-			}
-		});
 	}
 
 	@Override
@@ -99,6 +104,28 @@ public class TopicRowView extends BaseRowView {
         if (hlColor != 0) {
         	tc.setTextColor(hlColor);
         	title.setTextColor(hlColor);
+        }
+        else {
+        	tc.setTextColor(defaultTCColor);
+        	title.setTextColor(defaultTitleColor);
+        }
+        
+        switch (myData.getType()) {
+		case NORMAL:
+			typeIndicator.setVisibility(View.GONE);
+			break;
+		case POLL:
+			typeIndicator.setImageResource((AllInOneV2.getUsingLightTheme() ? R.drawable.ic_poll_light : R.drawable.ic_poll));
+			break;
+		case LOCKED:
+			typeIndicator.setImageResource((AllInOneV2.getUsingLightTheme() ? R.drawable.ic_locked_light : R.drawable.ic_locked));
+			break;
+		case ARCHIVED:
+			typeIndicator.setImageResource((AllInOneV2.getUsingLightTheme() ? R.drawable.ic_archived_light : R.drawable.ic_archived));
+			break;
+		case PINNED:
+			typeIndicator.setImageResource((AllInOneV2.getUsingLightTheme() ? R.drawable.ic_pinned_light : R.drawable.ic_pinned));
+			break;
         }
 	}
 

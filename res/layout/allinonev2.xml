@@ -157,7 +157,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:fastScrollEnabled="true"
-            android:smoothScrollbar="false" >
+            android:smoothScrollbar="true" >
         </ListView>
     </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
 

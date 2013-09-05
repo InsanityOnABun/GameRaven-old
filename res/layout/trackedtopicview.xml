@@ -13,7 +13,7 @@
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp" >
 
-        <com.ioabsoftware.gameraven.views.LinkButtonView
+        <TextView
             android:id="@+id/ttStopTracking"
             style="@style/Widget.Sherlock.ActionButton"
             android:layout_width="30dp"
@@ -72,7 +72,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="13sp" />
 
-        <com.ioabsoftware.gameraven.views.LinkButtonView
+        <TextView
             android:id="@+id/ttLastPostLink"
             style="@style/Widget.Sherlock.ActionButton"
             android:layout_width="wrap_content"

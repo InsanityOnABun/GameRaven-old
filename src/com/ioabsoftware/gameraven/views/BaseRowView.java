@@ -1,4 +1,4 @@
-package com.ioabsoftware.gameraven.views.rowview;
+package com.ioabsoftware.gameraven.views;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -7,8 +7,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.ioabsoftware.gameraven.views.rowdata.BaseRowData;
-import com.ioabsoftware.gameraven.views.rowdata.RowType;
 
 public abstract class BaseRowView extends LinearLayout {
 	
@@ -30,7 +28,7 @@ public abstract class BaseRowView extends LinearLayout {
 		init(context);
 	}
 	
-	abstract void init(Context context);
+	protected abstract void init(Context context);
 	
 	public abstract void showView(BaseRowData data);
 	

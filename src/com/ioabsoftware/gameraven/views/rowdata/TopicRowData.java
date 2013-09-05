@@ -1,5 +1,8 @@
 package com.ioabsoftware.gameraven.views.rowdata;
 
+import com.ioabsoftware.gameraven.views.BaseRowData;
+import com.ioabsoftware.gameraven.views.RowType;
+
 
 public class TopicRowData extends BaseRowData {
 

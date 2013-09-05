@@ -11,9 +11,10 @@ import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
-import com.ioabsoftware.gameraven.views.rowdata.BaseRowData;
+import com.ioabsoftware.gameraven.views.BaseRowData;
+import com.ioabsoftware.gameraven.views.BaseRowView;
+import com.ioabsoftware.gameraven.views.RowType;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData;
-import com.ioabsoftware.gameraven.views.rowdata.RowType;
 
 public class BoardRowView extends BaseRowView {
 
@@ -33,7 +34,7 @@ public class BoardRowView extends BaseRowView {
 	}
 	
 	@Override
-	void init(Context context) {
+	protected void init(Context context) {
 		myType = RowType.BOARD;
 		setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.boardview, this, true);

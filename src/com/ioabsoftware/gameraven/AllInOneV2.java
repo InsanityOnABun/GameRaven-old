@@ -64,7 +64,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -72,7 +71,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -85,22 +83,22 @@ import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
-import com.ioabsoftware.gameraven.views.LinkButtonView;
-import com.ioabsoftware.gameraven.views.LinkButtonView.Type;
-import com.ioabsoftware.gameraven.views.rowdata.BaseRowData;
+import com.ioabsoftware.gameraven.views.BaseRowData;
+import com.ioabsoftware.gameraven.views.ViewAdapter;
+import com.ioabsoftware.gameraven.views.rowdata.AMPRowData;
+import com.ioabsoftware.gameraven.views.rowdata.AdRowData;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData.BoardType;
 import com.ioabsoftware.gameraven.views.rowdata.GameSearchRowData;
 import com.ioabsoftware.gameraven.views.rowdata.HeaderRowData;
 import com.ioabsoftware.gameraven.views.rowdata.MessageRowData;
+import com.ioabsoftware.gameraven.views.rowdata.PMDetailRowData;
 import com.ioabsoftware.gameraven.views.rowdata.PMRowData;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData.TopicType;
+import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
+import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
-import com.ioabsoftware.gameraven.views.PMDetailView;
-import com.ioabsoftware.gameraven.views.TrackedTopicView;
-import com.ioabsoftware.gameraven.views.UserDetailView;
-import com.ioabsoftware.gameraven.views.ViewAdapter;
 
 public class AllInOneV2 extends Activity {
 	
@@ -193,8 +191,6 @@ public class AllInOneV2 extends Activity {
 	
 	private PullToRefreshAttacher contentPTR;
 	private ListView contentList;
-	private LinearLayout content;
-	private WebView adView;
 	
 	private ActionBar aBar;
 	private MenuItem refreshIcon;
@@ -445,8 +441,6 @@ public class AllInOneV2 extends Activity {
 			}
 		});
         
-        content = new LinearLayout(this);
-        content.setOrientation(LinearLayout.VERTICAL);
         contentList = (ListView) findViewById(R.id.aioMainList);
 
         titleWrapper  = (LinearLayout) findViewById(R.id.aioPostTitleWrapper);
@@ -1131,8 +1125,6 @@ public class AllInOneV2 extends Activity {
 				topicID = null;
 				messageIDForEditing = null;
 				
-				content.removeAllViews();
-				
 				Element tbody;
 				Element pj = null;
 				String headerTitle;
@@ -1219,7 +1211,7 @@ public class AllInOneV2 extends Activity {
 							String link = subjectLinkElem.attr("href");
 							String time = cells.get(3).text();
 							
-							adapterRows.add(new PMRowData(subject, sender, time, link));
+							adapterRows.add(new PMRowData(subject, sender, time, link, isOld));
 						}
 					}
 					else {
@@ -1250,10 +1242,7 @@ public class AllInOneV2 extends Activity {
 					
 					updateHeaderNoJumper(pmTitle, NetDesc.READ_PM);
 					
-					//TODO pm detail
-//					PMDetailView pmd = new PMDetailView(this, sender, pmTitle, pmMessage + pmFoot);
-//					pmd.setOnClickListener(cl);
-//					content.addView(pmd);
+					adapterRows.add(new PMDetailRowData(sender, pmTitle, pmMessage + pmFoot));
 					break;
 					
 				case AMP_LIST:
@@ -1333,7 +1322,7 @@ public class AllInOneV2 extends Activity {
 							String lPost = lPostLinkElem.text();
 							String lPostLink = lPostLinkElem.attr("href");
 							
-							adapterRows.add(new TopicRowData(title, board, lPost, mCount, 
+							adapterRows.add(new AMPRowData(title, board, lPost, mCount, 
 									link, lPostLink, TopicType.NORMAL, 0));
 						}
 					}
@@ -1345,9 +1334,6 @@ public class AllInOneV2 extends Activity {
 					break;
 					
 				case TRACKED_TOPICS:
-					if (true)
-						throw new IllegalAccessException("not implemented");
-					
 					headerTitle = Session.getUser() + "'s Tracked Topics";
 					updateHeaderNoJumper(headerTitle, desc);
 					tbody = pRes.getElementsByTag("tbody").first();
@@ -1366,24 +1352,9 @@ public class AllInOneV2 extends Activity {
 							String lPostLink = cells.get(4).child(0)
 									.attr("href");
 							String lPostText = cells.get(4).text();
-
-							TrackedTopicView tt = new TrackedTopicView(this,
-									board, topicText, lPostText, msgs,
-									topicLink);
-//							tt.setOnClickListener(cl);
-
-							// TODO: make sure LinkButtonView gets replaced with in-view method
-							LinkButtonView st = (LinkButtonView) tt
-									.findViewById(R.id.ttStopTracking);
-							st.setUrlAndType(removeLink, Type.STOP_TRACK);
-//							st.setOnClickListener(cl);
-
-							LinkButtonView lp = (LinkButtonView) tt
-									.findViewById(R.id.ttLastPostLink);
-							lp.setUrlAndType(lPostLink, Type.LAST_POST);
-//							lp.setOnClickListener(cl);
-
-							content.addView(tt);
+							
+							adapterRows.add(new TrackedTopicRowData(board, topicText, lPostText, 
+									msgs, topicLink, removeLink, lPostLink));
 						}
 					}
 					else {
@@ -1809,8 +1780,7 @@ public class AllInOneV2 extends Activity {
 					
 					updateHeaderNoJumper(name + "'s Details", NetDesc.USER_DETAIL);
 					
-					UserDetailView userDetail = new UserDetailView(this, name, ID, level, creation, lVisit, sig, karma, AMP);
-					content.addView(userDetail);
+					adapterRows.add(new UserDetailRowData(name, ID, level, creation, lVisit, sig, karma, AMP));
 					break;
 					
 				case GAME_SEARCH:
@@ -1905,12 +1875,6 @@ public class AllInOneV2 extends Activity {
 					break;
 				}
 				
-				adView = new WebView(this);
-		        adView.getSettings().setJavaScriptEnabled(settings.getBoolean("enableJS", true));
-		        
-		        //TODO ad stuff
-//				content.addView(adView);
-				
 				String bgcolor;
 				if (usingLightTheme)
 		        	bgcolor = "#ffffff";
@@ -1923,7 +1887,8 @@ public class AllInOneV2 extends Activity {
 					adBuilder.append(e.outerHtml());
 				}
 				adBuilder.append("</body></html>");
-				adView.loadDataWithBaseURL(session.getLastPath(), adBuilder.toString(), "text/html", "iso-8859-1", null);
+				
+				adapterRows.add(new AdRowData(adBuilder.toString(), session.getLastPath()));
 
 				contentPTR.setEnabled(settings.getBoolean("enablePTR", false));
 				

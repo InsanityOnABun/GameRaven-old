@@ -36,6 +36,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -46,8 +47,10 @@ import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.RichTextUtils;
 import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
+import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.ClickableLinksTextView;
 import com.ioabsoftware.gameraven.views.GRQuoteSpan;
+import com.ioabsoftware.gameraven.views.RowType;
 
 public class MessageRowData extends BaseRowData {
 
@@ -74,7 +77,12 @@ public class MessageRowData extends BaseRowData {
 	public Element getMessage() {return messageElem;}
 	public Element getMessageNoPoll() {return messageElemNoPoll;}
 	
-	public LinearLayout getPoll() {return poll;}
+	public LinearLayout getPoll() {
+		if (poll.getParent() != null)
+			((ViewGroup) poll.getParent()).removeView(poll);
+		
+		return poll;
+	}
 	public boolean hasPoll() {return poll != null;}
 	
 	public CharSequence getSpannedMessage() {return spannedMessage;}
