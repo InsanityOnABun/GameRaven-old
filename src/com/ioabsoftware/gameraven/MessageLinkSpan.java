@@ -34,7 +34,7 @@ public class MessageLinkSpan extends ClickableSpan {
 				url += "/";
 			if (url.contains("/pm/")) {
 				if (url.contains("?id=")) {
-					aio.getSession().get(NetDesc.READ_PM, url, null);
+					aio.getSession().get(NetDesc.PM_DETAIL, url, null);
 				}
 				else {
 					aio.getSession().get(NetDesc.PM_INBOX, url, null);

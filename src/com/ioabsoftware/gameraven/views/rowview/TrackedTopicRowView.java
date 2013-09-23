@@ -58,7 +58,7 @@ public class TrackedTopicRowView extends BaseRowView {
         findViewById(R.id.ttSTSep).setBackgroundColor(AllInOneV2.getAccentColor());
         findViewById(R.id.ttLPSep).setBackgroundColor(AllInOneV2.getAccentColor());
         
-        setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
+        setBackgroundDrawable(AllInOneV2.getSelector());
         
         setOnClickListener(new OnClickListener() {
 			@Override
@@ -77,7 +77,7 @@ public class TrackedTopicRowView extends BaseRowView {
 		});
         
         TextView lPostLink = (TextView) findViewById(R.id.ttLastPostLink);
-        lPostLink.setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
+        lPostLink.setBackgroundDrawable(AllInOneV2.getSelector());
         lPostLink.setTextSize(TypedValue.COMPLEX_UNIT_PX, lPostLink.getTextSize() * AllInOneV2.getTextScale());
         lPostLink.setOnClickListener(new OnClickListener() {
 			@Override
@@ -88,7 +88,7 @@ public class TrackedTopicRowView extends BaseRowView {
 		});
         
         TextView removeLink = (TextView) findViewById(R.id.ttStopTracking);
-        removeLink.setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
+        removeLink.setBackgroundDrawable(AllInOneV2.getSelector());
         removeLink.setTextSize(TypedValue.COMPLEX_UNIT_PX, removeLink.getTextSize() * AllInOneV2.getTextScale());
         removeLink.setOnClickListener(new OnClickListener() {
 			@Override

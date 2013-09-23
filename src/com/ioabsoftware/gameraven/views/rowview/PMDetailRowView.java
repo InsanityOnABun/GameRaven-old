@@ -55,7 +55,7 @@ public class PMDetailRowView extends BaseRowView {
         findViewById(R.id.pmdMidSep).setBackgroundColor(AllInOneV2.getAccentColor());
         findViewById(R.id.pmdBotSep).setBackgroundColor(AllInOneV2.getAccentColor());
         
-        setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
+        setBackgroundDrawable(AllInOneV2.getSelector());
         
         setOnClickListener(new OnClickListener() {
 			@Override

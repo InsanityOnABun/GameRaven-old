@@ -1,5 +1,6 @@
 package com.ioabsoftware.gameraven.networking;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -240,7 +241,7 @@ public class Session implements HandlesNetworkResult {
 		case MESSAGE_DETAIL:
 		case USER_DETAIL:
 		case PM_INBOX:
-		case READ_PM:
+		case PM_DETAIL:
 		case MARKMSG_S1:
 		case CLOSE_TOPIC:
 		case DLTMSG_S1:
@@ -276,14 +277,24 @@ public class Session implements HandlesNetworkResult {
 	public void handleNetworkResult(Response res, NetDesc desc) {
 		aio.wtl("session hNR fired, desc: " + desc.name());
 		try {
+			aio.wtl("checking if res is null or empty");
 			if (res != null && !res.body().equals(AllInOneV2.EMPTY_STRING)) {
-				
+
+				aio.wtl("parsing res");
+				Document pRes = res.parse();
+
+				aio.wtl("cloning pRes");
+				Document pResClone = pRes.clone();
+				String resUrl = res.url().toString();
+
+				aio.wtl("checking if update check");
 				if (desc == NetDesc.DEV_UPDATE_CHECK) {
 					aio.wtl("session hNR has determined this is an update check");
-					aio.processContent(res, desc);
+					aio.processContent(res, desc, pResClone, resUrl);
 					return;
 				}
-				
+
+				aio.wtl("checking if res does not start with root");
 				if (!res.url().toString().startsWith(ROOT)) {
 					AlertDialog.Builder b = new AlertDialog.Builder(aio);
 					b.setTitle("Redirected");
@@ -304,9 +315,8 @@ public class Session implements HandlesNetworkResult {
 					b.create().show();
 					return;
 				}
-				
-				Document pRes = res.parse();
-				
+
+				aio.wtl("checking if pRes contains captcha");
 				if (!pRes.select("header.page_header:contains(CAPTCHA)").isEmpty()) {
 					
 					String captcha = pRes.select("iframe").outerHtml();
@@ -396,7 +406,7 @@ public class Session implements HandlesNetworkResult {
 				case MESSAGE_DETAIL:
 				case USER_DETAIL:
 				case PM_INBOX:
-				case READ_PM:
+				case PM_DETAIL:
 				case UNSPECIFIED:
 				case DEV_UPDATE_CHECK:
 				case LOGIN_S1:
@@ -442,7 +452,7 @@ public class Session implements HandlesNetworkResult {
 						case MESSAGE_DETAIL:
 						case USER_DETAIL:
 						case PM_INBOX:
-						case READ_PM:
+						case PM_DETAIL:
 						case UNSPECIFIED:
 							aio.wtl("beginning history addition");
 							int i = lastPath.indexOf('#');
@@ -508,7 +518,7 @@ public class Session implements HandlesNetworkResult {
 				case MESSAGE_DETAIL:
 				case USER_DETAIL:
 				case PM_INBOX:
-				case READ_PM:
+				case PM_DETAIL:
 				case UNSPECIFIED:
 				case DEV_UPDATE_CHECK:
 				case LOGIN_S1:
@@ -802,11 +812,11 @@ public class Session implements HandlesNetworkResult {
 					if (!pRes.select("p:contains(no longer available for viewing)").isEmpty()) {
 						Toast.makeText(aio, "The topic you selected is no longer available for viewing.", Toast.LENGTH_SHORT).show();
 						aio.wtl("topic is no longer available, treat response as a board");
-						aio.processContent(res, NetDesc.BOARD);
+						aio.processContent(res, NetDesc.BOARD, pResClone, resUrl);
 					}
 					else {
 						aio.wtl("handle the topic in AIO");
-						aio.processContent(res, desc);
+						aio.processContent(res, desc, pResClone, resUrl);
 					}
 					break;
 					
@@ -885,11 +895,11 @@ public class Session implements HandlesNetworkResult {
 				case UNSPECIFIED:
 				case USER_DETAIL:
 				case PM_INBOX:
-				case READ_PM:
+				case PM_DETAIL:
 				case VERIFY_ACCOUNT_S1:
 				case VERIFY_ACCOUNT_S2:
 					aio.wtl("session hNR determined this should be handled by AIO");
-					aio.processContent(res, desc);
+					aio.processContent(res, desc, pResClone, resUrl);
 					break;
 				}
 			}
@@ -918,7 +928,7 @@ public class Session implements HandlesNetworkResult {
 		case MESSAGE_DETAIL:
 		case USER_DETAIL:
 		case PM_INBOX:
-		case READ_PM:
+		case PM_DETAIL:
 		case CLOSE_TOPIC:
 		case GAME_SEARCH:
 		case BOARD_LIST:
@@ -976,7 +986,15 @@ public class Session implements HandlesNetworkResult {
 			lastDesc = h.getDesc();
 			lastRes = h.getRes();
 			lastPath = h.getRes().url().toString();
-			aio.processContent(h.getRes(), h.getDesc());
+			try {
+				aio.processContent(lastRes, lastDesc, lastRes.parse(), lastRes.url().toString() );
+			} catch (IOException e) {
+				/* THIS SHOULD NEVER CRASH
+				 * No res should be able to get added to the history list
+				 * if it is unparseable
+				 */
+				e.printStackTrace();
+			}
 		}
 	}
 	

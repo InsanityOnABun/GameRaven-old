@@ -57,6 +57,8 @@ public class UserDetailRowView extends BaseRowView {
         
         sigWrapper = (RelativeLayout) findViewById(R.id.udSigWrapper);
         
+        sig.setLinkTextColor(AllInOneV2.getAccentColor());
+        
         sendPM = (Button) findViewById(R.id.udSendPM);
         sendPM.setOnClickListener(new OnClickListener() {
 			@Override

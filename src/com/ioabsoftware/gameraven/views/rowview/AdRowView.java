@@ -5,17 +5,14 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.webkit.WebView;
+import android.view.View;
 
-import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
 import com.ioabsoftware.gameraven.views.rowdata.AdRowData;
 
 public class AdRowView extends BaseRowView {
-
-	private WebView web;
 	
 	public AdRowView(Context context, BaseRowData data) {
 		super(context);
@@ -23,9 +20,7 @@ public class AdRowView extends BaseRowView {
 		if (data.getRowType() != myType)
 			throw new IllegalArgumentException("data RowType does not match myType");
 		
-		AdRowData myData = (AdRowData) data;
-		
-		web.loadDataWithBaseURL(myData.getPath(), myData.getSource(), "text/html", "iso-8859-1", null);
+		addView(((AdRowData) data).getWebView());
 	}
 	
 	public AdRowView(Context context) {
@@ -46,10 +41,6 @@ public class AdRowView extends BaseRowView {
 	protected void init(Context context) {
 		myType = RowType.AD;
 		setOrientation(VERTICAL);
-		
-		web = new WebView(getContext());
-		web.getSettings().setJavaScriptEnabled(AllInOneV2.getSettingsPref().getBoolean("enableJS", true));
-		this.addView(web);
 	}
 
 	@Override

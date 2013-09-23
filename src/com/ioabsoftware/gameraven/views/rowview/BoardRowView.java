@@ -11,14 +11,18 @@ import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
+import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData;
+import com.ioabsoftware.gameraven.views.rowdata.BoardRowData.BoardType;
 
 public class BoardRowView extends BaseRowView {
 
 	private TextView desc, lastPost, tpcMsgDetails, name;
+	
+	BoardRowData myData;
 
 	public BoardRowView(Context context) {
 		super(context);
@@ -51,8 +55,20 @@ public class BoardRowView extends BaseRowView {
     	name.setTextSize(px, name.getTextSize() * AllInOneV2.getTextScale());
     	
     	findViewById(R.id.bvSep).setBackgroundColor(AllInOneV2.getAccentColor());
+    	
+    	setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (myData.getBoardType() == BoardType.LIST) {
+					AllInOneV2.get().getSession().get(NetDesc.BOARD_LIST, myData.getUrl(), null);
+				}
+				else {
+					AllInOneV2.get().getSession().get(NetDesc.BOARD, myData.getUrl(), null);
+				}
+			}
+		});
         
-        setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
+        setBackgroundDrawable(AllInOneV2.getSelector());
 	}
 
 	@Override
@@ -60,20 +76,23 @@ public class BoardRowView extends BaseRowView {
 		if (data.getRowType() != myType)
 			throw new IllegalArgumentException("data RowType does not match myType");
 		
-		BoardRowData castData = (BoardRowData) data;
+		myData = (BoardRowData) data;
 		
-		name.setText(castData.getName());
+		name.setText(myData.getName());
 		
-		String descText = castData.getDesc();
-		if (descText != null)
+		String descText = myData.getDesc();
+		if (descText != null) {
+			desc.setVisibility(View.VISIBLE);
     		desc.setText(descText);
+		}
     	else
     		desc.setVisibility(View.INVISIBLE);
     	
-    	switch (castData.getBoardType()) {
+    	switch (myData.getBoardType()) {
 		case NORMAL:
-            lastPost.setText("Last Post: " + castData.getLastPost());
-            tpcMsgDetails.setText("Tpcs: " + castData.getTCount() + "; Msgs: " + castData.getMCount());
+            tpcMsgDetails.setVisibility(View.VISIBLE);
+            lastPost.setText("Last Post: " + myData.getLastPost());
+            tpcMsgDetails.setText("Tpcs: " + myData.getTCount() + "; Msgs: " + myData.getMCount());
 			break;
 		case SPLIT:
 			lastPost.setText("--Split List--");

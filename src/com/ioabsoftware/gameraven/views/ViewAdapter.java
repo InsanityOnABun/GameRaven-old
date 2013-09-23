@@ -91,11 +91,11 @@ public class ViewAdapter extends BaseAdapter {
 			case TRACKED_TOPIC:
 				view = new TrackedTopicRowView(context);
 				break;
-			case AD:
-				view = new AdRowView(context);
-				break;
 			case USER_DETAIL:
 				view = new UserDetailRowView(context);
+				break;
+			case AD:
+				view = new AdRowView(context, data);
 				break;
 			default:
 				throw new IllegalArgumentException("row type not handled in ViewAdapter: " + data.getRowType().toString());

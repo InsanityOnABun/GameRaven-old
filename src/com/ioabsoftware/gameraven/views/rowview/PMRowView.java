@@ -7,10 +7,13 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
+import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
@@ -22,6 +25,8 @@ public class PMRowView extends BaseRowView {
 	TextView subject;
     TextView sender;
     TextView time;
+    
+    PMRowData myData;
     
     private static int baseSubjectColor = 0;
 	
@@ -57,7 +62,14 @@ public class PMRowView extends BaseRowView {
         
         findViewById(R.id.pmSep).setBackgroundColor(AllInOneV2.getAccentColor());
         
-        setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
+        setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				AllInOneV2.get().getSession().get(NetDesc.PM_DETAIL, myData.getUrl(), null);
+			}
+		});
+        
+        setBackgroundDrawable(AllInOneV2.getSelector());
 	}
 
 	@Override
@@ -65,13 +77,13 @@ public class PMRowView extends BaseRowView {
 		if (data.getRowType() != myType)
 			throw new IllegalArgumentException("data RowType does not match myType");
 		
-		PMRowData castData = (PMRowData) data;
+		myData = (PMRowData) data;
 		
-		subject.setText(castData.getSubject());
-        sender.setText(castData.getSender());
-        time.setText(castData.getTime());
+		subject.setText(myData.getSubject());
+        sender.setText(myData.getSender());
+        time.setText(myData.getTime());
         
-        if (castData.isOld())
+        if (myData.isOld())
         	subject.setTextColor(Color.GRAY);
         else
         	subject.setTextColor(baseSubjectColor);

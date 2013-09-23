@@ -60,7 +60,7 @@ public class MessageRowData extends BaseRowData {
 	
 	private LinearLayout poll = null;
 	
-	private CharSequence spannedMessage;
+	private Spannable spannedMessage;
 	
 	private int hlColor;
 	
@@ -85,7 +85,7 @@ public class MessageRowData extends BaseRowData {
 	}
 	public boolean hasPoll() {return poll != null;}
 	
-	public CharSequence getSpannedMessage() {return spannedMessage;}
+	public Spannable getSpannedMessage() {return spannedMessage;}
 	
 	public int getHLColor() {return hlColor;}
 	
@@ -104,6 +104,9 @@ public class MessageRowData extends BaseRowData {
 	
 	public MessageRowData(String userIn, String userTitlesIn, String postNumIn, String postTimeIn,
 			Element messageIn, String BID, String TID, String MID, int hlColorIn) {
+		AllInOneV2 aio = AllInOneV2.get();
+		
+		aio.wtl("setting values");
 		username = userIn;
 		userTitles = userTitlesIn;
 		postNum = postNumIn;
@@ -113,10 +116,13 @@ public class MessageRowData extends BaseRowData {
 		topicID = TID;
 		messageID = MID;
 		hlColor = hlColorIn;
-		
+
+		aio.wtl("checking for poll");
 		if (messageElem.getElementsByClass("board_poll").isEmpty())
     		messageElemNoPoll = messageElem.clone();
 		else {
+			aio.wtl("there is a poll");
+			
 			messageElemNoPoll = messageElem.clone();
 			messageElemNoPoll.getElementsByClass("board_poll").first().remove();
         	
@@ -197,14 +203,20 @@ public class MessageRowData extends BaseRowData {
     			poll.addView(b);
         	}
         }
-		
-		SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false));
-        
+
+		aio.wtl("creating ssb");
+		SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false, true));
+
+		aio.wtl("adding <b> spans");
         addSpan(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
+		aio.wtl("adding <i> spans");
         addSpan(ssb, "<i>", "</i>", new StyleSpan(Typeface.ITALIC));
+		aio.wtl("adding <code> spans");
         addSpan(ssb, "<code>", "</code>", new TypefaceSpan("monospace"));
+		aio.wtl("adding <cite> spans");
         addSpan(ssb, "<cite>", "</cite>", new UnderlineSpan(), new StyleSpan(Typeface.ITALIC));
-        
+
+		aio.wtl("adding <quote> spans");
         // quotes don't use CharacterStyles, so do it manually
         while (ssb.toString().contains("<blockquote>")) {
         	int start = ssb.toString().indexOf("<blockquote>");
@@ -235,7 +247,7 @@ public class MessageRowData extends BaseRowData {
         	ssb.setSpan(new GRQuoteSpan(), start, closer, 0);
         }
         
-        
+		aio.wtl("getting text colors for spoilers");
         final int defTextColor;
         final int color;
 		if (AllInOneV2.getUsingLightTheme()) {
@@ -246,7 +258,8 @@ public class MessageRowData extends BaseRowData {
 			color = Color.BLACK;
 			defTextColor = Color.WHITE;
 		}
-		
+
+		aio.wtl("adding <spoiler> spans");
 		// do spoiler tags manually instead of in the method, as the clickablespan needs
 		// to know the start and end points
         while (ssb.toString().contains("<spoiler>")) {
@@ -271,8 +284,23 @@ public class MessageRowData extends BaseRowData {
         }
         
         ssb.append('\n');
-        
+
+		aio.wtl("replacing &gameravenlt; with <");
+        while (ssb.toString().contains("&gameravenlt;")) {
+        	int start = ssb.toString().indexOf("&gameravenlt;");
+        	ssb.replace(start, start + "&gameravenlt;".length(), "<");
+        }
+
+		aio.wtl("replacing &gameravengt; with >");
+        while (ssb.toString().contains("&gameravengt;")) {
+        	int start = ssb.toString().indexOf("&gameravengt;");
+        	ssb.replace(start, start + "&gameravengt;".length(), ">");
+        }
+
+		aio.wtl("linkifying");
         Linkify.addLinks(ssb, Linkify.WEB_URLS);
+
+		aio.wtl("setting spannedMessage");
         spannedMessage = RichTextUtils.replaceAll(ssb, URLSpan.class, new URLSpanConverter());
 	}
 	
@@ -326,14 +354,14 @@ public class MessageRowData extends BaseRowData {
 	}
 	
 	public String getMessageForQuoting() {
-		return processContent(true);
+		return processContent(true, false);
 	}
 	
 	public String getMessageForEditing() {
-		return processContent(false);
+		return processContent(false, false);
 	}
 	
-	private String processContent(boolean removeSig) {
+	private String processContent(boolean removeSig, boolean ignoreLtGt) {
 		String finalBody = messageElemNoPoll.html();
 		
 		finalBody = finalBody.replace("<span class=\"fspoiler\">", "<spoiler>").replace("</span>", "</spoiler>");
@@ -357,8 +385,12 @@ public class MessageRowData extends BaseRowData {
 			if (sigStart != -1)
 				finalBody = finalBody.substring(0, sigStart);
 		}
+
+		if (ignoreLtGt)
+			finalBody = finalBody.replace("&lt;", "&gameravenlt;").replace("&gt;", "&gameravengt;");
 		
 		finalBody = StringEscapeUtils.unescapeHtml4(finalBody);
+		
 		return finalBody;
 	}
 	

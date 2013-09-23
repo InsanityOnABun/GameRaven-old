@@ -1,22 +1,22 @@
 package com.ioabsoftware.gameraven.views.rowdata;
 
+import android.webkit.WebView;
+
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.RowType;
 
 public class AdRowData extends BaseRowData {
-
-	private String source, path;
-	public String getSource() {return source;}
-	public String getPath() {return path;}
+	
+	private WebView web;
+	public WebView getWebView() {return web;}
 	
 	@Override
 	public RowType getRowType() {
 		return RowType.AD;
 	}
 	
-	public AdRowData(String sourceIn, String pathIn) {
-		source = sourceIn;
-		path = pathIn;
+	public AdRowData(WebView webIn) {
+		web = webIn;
 	}
 
 }

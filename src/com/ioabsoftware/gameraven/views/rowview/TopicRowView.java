@@ -68,10 +68,10 @@ public class TopicRowView extends BaseRowView {
         findViewById(R.id.tvSep).setBackgroundColor(AllInOneV2.getAccentColor());
         findViewById(R.id.tvLPSep).setBackgroundColor(AllInOneV2.getAccentColor());
         
-        setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
+        setBackgroundDrawable(AllInOneV2.getSelector());
         
         TextView lPostLink = (TextView) findViewById(R.id.tvLastPostLink);
-        lPostLink.setBackgroundDrawable(AllInOneV2.getSelector().getConstantState().newDrawable());
+        lPostLink.setBackgroundDrawable(AllInOneV2.getSelector());
         lPostLink.setTextSize(TypedValue.COMPLEX_UNIT_PX, lPostLink.getTextSize() * AllInOneV2.getTextScale());
         lPostLink.setOnClickListener(new OnClickListener() {
 			@Override

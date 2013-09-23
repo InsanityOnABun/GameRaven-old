@@ -1,6 +1,7 @@
 package com.ioabsoftware.gameraven;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Drawable.ConstantState;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -64,6 +66,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -103,7 +106,7 @@ import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 public class AllInOneV2 extends Activity {
 	
 	private static boolean needToCheckForUpdate = true;
-	public static boolean isReleaseBuild = false;
+	public static boolean isReleaseBuild = true;
 	
 	public static final int NEW_VERSION_DIALOG = 101;
 	public static final int SEND_PM_DIALOG = 102;
@@ -228,10 +231,10 @@ public class AllInOneV2 extends Activity {
 	public static int getAccentTextColor() {return accentTextColor;}
 	private static float textScale = 1f;
 	public static float getTextScale() {return textScale;}
-	private static StateListDrawable msgHeadSelector;
-	public static StateListDrawable getMsgHeadSelector() {return msgHeadSelector;}
-	private static StateListDrawable selector;
-	public static StateListDrawable getSelector() {return selector;}
+	private static ConstantState msgHeadSelector;
+	public static Drawable getMsgHeadSelector() {return msgHeadSelector.newDrawable();}
+	private static ConstantState selector;
+	public static Drawable getSelector() {return selector.newDrawable();}
 	private static boolean isAccentLight;
 	public static boolean isAccentLight() {return isAccentLight;}
 	
@@ -293,6 +296,7 @@ public class AllInOneV2 extends Activity {
 
         
         ((Button) drawer.findViewById(R.id.dwrChangeAcc)).setOnClickListener(new View.OnClickListener() {
+			@SuppressWarnings("deprecation")
 			@Override
 			public void onClick(View v) {
 				drawer.closeMenu(true);
@@ -626,8 +630,6 @@ public class AllInOneV2 extends Activity {
         };
         searchView.setOnQueryTextListener(queryTextListener);
         
-//        refreshIcon.setVisible(false);
-        
         return true;
     }
     
@@ -851,15 +853,17 @@ public class AllInOneV2 extends Activity {
 			
 			int msgSelectorColor = Color.HSVToColor(hsv);
 			
-			msgHeadSelector = new StateListDrawable();
-			msgHeadSelector.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(msgSelectorColor));
-			msgHeadSelector.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(msgSelectorColor));
-			msgHeadSelector.addState(StateSet.WILD_CARD, new ColorDrawable(accentColor));
+			StateListDrawable msgHead = new StateListDrawable();
+			msgHead.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(msgSelectorColor));
+			msgHead.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(msgSelectorColor));
+			msgHead.addState(StateSet.WILD_CARD, new ColorDrawable(accentColor));
+			msgHeadSelector = msgHead.getConstantState();
 
-			selector = new StateListDrawable();
-			selector.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(accentColor));
-			selector.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(accentColor));
-			selector.addState(StateSet.WILD_CARD, new ColorDrawable(Color.TRANSPARENT));
+			StateListDrawable slctr = new StateListDrawable();
+			slctr.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(accentColor));
+			slctr.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(accentColor));
+			slctr.addState(StateSet.WILD_CARD, new ColorDrawable(Color.TRANSPARENT));
+			selector = slctr.getConstantState();
 			
 			
 			findViewById(R.id.aioPJTopSep).setBackgroundColor(accentColor);
@@ -1002,7 +1006,16 @@ public class AllInOneV2 extends Activity {
 			b.setNegativeButton("Dismiss", new OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					processContent(session.getLastRes(), session.getLastDesc());
+					try {
+						processContent(session.getLastRes(), session.getLastDesc(), 
+								session.getLastRes().parse(), session.getLastRes().url().toString());
+					} catch (IOException e) {
+						/* THIS SHOULD NEVER CRASH
+						 * No res should be able to get set to lastRes
+						 * if it is unparseable
+						 */
+						e.printStackTrace();
+					}
 					postExecuteCleanup(session.getLastDesc());
 				}
 			});
@@ -1076,8 +1089,9 @@ public class AllInOneV2 extends Activity {
 	 * ******************************************/
 	
 	ArrayList<BaseRowData> adapterRows;
+	@SuppressWarnings("deprecation")
 	@SuppressLint("SetJavaScriptEnabled")
-	public void processContent(Response res, NetDesc desc) {
+	public void processContent(Response res, NetDesc desc, Document pRes, String resUrl) {
 		
 		wtl("GRAIO hNR fired, desc: " + desc.name());
 		
@@ -1100,10 +1114,6 @@ public class AllInOneV2 extends Activity {
 		try {
 			if (res != null) {
 				wtl("res is not null");
-
-				wtl("parsing res");
-				Document pRes = res.parse();
-				String resUrl = res.url().toString();
 				
 				if (desc == NetDesc.DEV_UPDATE_CHECK) {
 					wtl("GRAIO hNR determined this is update check response");
@@ -1135,19 +1145,22 @@ public class AllInOneV2 extends Activity {
 				String nextPage = null;
 				String lastPage = null;
 				
-				Element pmInboxLink = pRes.select("div.masthead_user").first().select("a[href=/pm/]").first();
-				if (pmInboxLink != null && desc != NetDesc.PM_INBOX) {
-					if (!pmInboxLink.text().equals("Inbox")) {
-						Toast.makeText(this, "You have unread PM(s)", Toast.LENGTH_SHORT).show();
-					}
-				}
+				String bgcolor;
+				if (usingLightTheme)
+		        	bgcolor = "#ffffff";
+				else
+					bgcolor = "#000000";
 				
-				Element trackedLink = pRes.select("div.masthead_user").first().select("a[href=/boards/tracked]").first();
-				if (trackedLink != null && desc != NetDesc.TRACKED_TOPICS) {
-					if (!trackedLink.text().equals("Topics")) {
-						Toast.makeText(this, "You have unread tracked topic(s)", Toast.LENGTH_SHORT).show();
-					}
+				StringBuilder adBuilder = new StringBuilder();
+				adBuilder.append("<html><body bgcolor=\"" + bgcolor + "\">");
+				for (Element e : pRes.getElementsByClass("ad")) {
+					adBuilder.append(e.outerHtml());
 				}
+				adBuilder.append("</body></html>");
+				
+				WebView web = new WebView(this);
+				web.getSettings().setJavaScriptEnabled(AllInOneV2.getSettingsPref().getBoolean("enableJS", true));
+				web.loadDataWithBaseURL(session.getLastPath(), adBuilder.toString(), "text/html", "iso-8859-1", null);
 				
 				switch (desc) {
 				case BOARD_JUMPER:
@@ -1222,8 +1235,8 @@ public class AllInOneV2 extends Activity {
 					postIcon.setVisible(true);
 					pMode = PostMode.NEW_PM;
 					break;
-//					
-				case READ_PM:
+					
+				case PM_DETAIL:
 					headerTitle = pRes.select("h2.title").first().text();
 					String pmTitle = headerTitle;
 					if (!pmTitle.startsWith("Re: "))
@@ -1240,7 +1253,7 @@ public class AllInOneV2 extends Activity {
 					
 					String sender = footText.substring(9, footText.indexOf(" on "));
 					
-					updateHeaderNoJumper(pmTitle, NetDesc.READ_PM);
+					updateHeaderNoJumper(pmTitle, NetDesc.PM_DETAIL);
 					
 					adapterRows.add(new PMDetailRowData(sender, pmTitle, pmMessage + pmFoot));
 					break;
@@ -1702,6 +1715,7 @@ public class AllInOneV2 extends Activity {
 							userTitles += " (" + hUser.getLabel() + ")";
 						}
 						
+						wtl("creating messagerowdata object");
 						adapterRows.add(new MessageRowData(user, userTitles, postNum, 
 								postTime, msgBody, boardID, topicID, mID, hlColor));
 					}
@@ -1875,20 +1889,21 @@ public class AllInOneV2 extends Activity {
 					break;
 				}
 				
-				String bgcolor;
-				if (usingLightTheme)
-		        	bgcolor = "#ffffff";
-				else
-					bgcolor = "#000000";
+				adapterRows.add(new AdRowData(web));
 				
-				StringBuilder adBuilder = new StringBuilder();
-				adBuilder.append("<html><body bgcolor=\"" + bgcolor + "\">");
-				for (Element e : pRes.getElementsByClass("ad")) {
-					adBuilder.append(e.outerHtml());
+				Element pmInboxLink = pRes.select("div.masthead_user").first().select("a[href=/pm/]").first();
+				if (pmInboxLink != null && desc != NetDesc.PM_INBOX) {
+					if (!pmInboxLink.text().equals("Inbox")) {
+						Toast.makeText(this, "You have unread PM(s)", Toast.LENGTH_SHORT).show();
+					}
 				}
-				adBuilder.append("</body></html>");
 				
-				adapterRows.add(new AdRowData(adBuilder.toString(), session.getLastPath()));
+				Element trackedLink = pRes.select("div.masthead_user").first().select("a[href=/boards/tracked]").first();
+				if (trackedLink != null && desc != NetDesc.TRACKED_TOPICS) {
+					if (!trackedLink.text().equals("Topics")) {
+						Toast.makeText(this, "You have unread tracked topic(s)", Toast.LENGTH_SHORT).show();
+					}
+				}
 
 				contentPTR.setEnabled(settings.getBoolean("enablePTR", false));
 				
@@ -2048,53 +2063,6 @@ public class AllInOneV2 extends Activity {
 		goToLastPost = false;
 		return temp;
 	}
-	//TODO overhaul click listener
-//	public class ClickListener implements View.OnClickListener, View.OnLongClickListener {
-//		@Override
-//		public void onClick(View v) {
-//			if (BoardView.class.isInstance(v)) {
-//				BoardView bv = (BoardView) v;
-//				if (bv.getType() == BoardViewType.LIST) {
-//					session.get(NetDesc.BOARD_LIST, bv.getUrl(), null);
-//				}
-//				else {
-//					session.get(NetDesc.BOARD, bv.getUrl(), null);
-//				}
-//			}
-//			else if (TopicView.class.isInstance(v)) {
-//				goToLastPost = false;
-//				session.get(NetDesc.TOPIC, ((TopicView)v).getUrl(), null);
-//			}
-//			else if (TrackedTopicView.class.isInstance(v)) {
-//				goToLastPost = false;
-//				session.get(NetDesc.TOPIC, ((TrackedTopicView)v).getUrl(), null);
-//			}
-//			else if (LinkButtonView.class.isInstance(v)) {
-//				if (((LinkButtonView) v).getType() == Type.LAST_POST) {
-//					goToLastPost = true;
-//					session.get(NetDesc.TOPIC, ((LinkButtonView) v).getUrl(), null);
-//				}
-//				else if (((LinkButtonView) v).getType() == Type.STOP_TRACK) {
-//					session.get(NetDesc.TRACKED_TOPICS, ((LinkButtonView) v).getUrl(), null);
-//				}
-//			}
-//			else if (PMView.class.isInstance(v)) {
-//				session.get(NetDesc.READ_PM, ((PMView)v).getUrl(), null);
-//			}
-//			else if (PMDetailView.class.isInstance(v)) {
-//				pmSetup(((PMDetailView)v).getSender(), ((PMDetailView)v).getTitle(), EMPTY_STRING);
-//			}
-//		}
-//
-//		
-//		@Override
-//		public boolean onLongClick(View v) {
-//			String url = ((TopicView)v).getUrl();
-//			url = url.substring(0, url.lastIndexOf('/'));
-//			session.get(NetDesc.BOARD, url, null);
-//			return true;
-//		}
-//	}
 	
 	private void updateHeader(String titleIn, String firstPageIn, String prevPageIn, String currPage, 
 							  String pageCount, String nextPageIn, String lastPageIn, NetDesc desc) {
@@ -2149,6 +2117,7 @@ public class AllInOneV2 extends Activity {
 	
 	private MessageRowView clickedMsg;
 	private String quoteSelection;
+	@SuppressWarnings("deprecation")
 	public void messageMenuClicked(MessageRowView msg) {
 		clickedMsg = msg;
 		quoteSelection = clickedMsg.getSelection();
@@ -2230,6 +2199,7 @@ public class AllInOneV2 extends Activity {
 			postCleanup();
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void postPollOptions(View view) {
 		showDialog(POLL_OPTIONS_DIALOG);
 	}
@@ -2401,6 +2371,7 @@ public class AllInOneV2 extends Activity {
 		
     	Dialog dialog = b.create();
 		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@SuppressWarnings("deprecation")
 			public void onDismiss(DialogInterface dialog) {
 				removeDialog(POLL_OPTIONS_DIALOG);
 			}
@@ -2433,6 +2404,7 @@ public class AllInOneV2 extends Activity {
 		
 		Dialog dialog = reportMsgBuilder.create();
 		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@SuppressWarnings("deprecation")
 			public void onDismiss(DialogInterface dialog) {
 				removeDialog(REPORT_MESSAGE_DIALOG);
 			}
@@ -2468,6 +2440,7 @@ public class AllInOneV2 extends Activity {
 		final String[] options = new String[listBuilder.size()];
 		listBuilder.toArray(options);
 		msgActionBuilder.setItems(options, new OnClickListener() {
+			@SuppressWarnings("deprecation")
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				String selected = options[which];
@@ -2507,6 +2480,7 @@ public class AllInOneV2 extends Activity {
 		
 		Dialog dialog = msgActionBuilder.create();
 		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@SuppressWarnings("deprecation")
 			public void onDismiss(DialogInterface dialog) {
 				removeDialog(MESSAGE_ACTION_DIALOG);
 			}
@@ -2572,6 +2546,7 @@ public class AllInOneV2 extends Activity {
 		});
   	
 		d.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@SuppressWarnings("deprecation")
 			public void onDismiss(DialogInterface dialog) {
 				pmSending = null;
 				removeDialog(SEND_PM_DIALOG);
@@ -2601,7 +2576,8 @@ public class AllInOneV2 extends Activity {
 		
 		accountChanger.setTitle("Pick an Account");
 		accountChanger.setSingleChoiceItems(usernames, selected, new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int item) {
+		    @SuppressWarnings("deprecation")
+			public void onClick(DialogInterface dialog, int item) {
 		    	if (item == 0 && currUser != null)
 		    		session = new Session(AllInOneV2.this);
 		    	
@@ -2621,6 +2597,7 @@ public class AllInOneV2 extends Activity {
 		
 		Dialog d = accountChanger.create();
 		d.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@SuppressWarnings("deprecation")
 			public void onDismiss(DialogInterface dialog) {
 				removeDialog(CHANGE_LOGGED_IN_DIALOG);
 			}
@@ -2643,7 +2620,8 @@ public class AllInOneV2 extends Activity {
 	}
 	
 	public String savedTo, savedSubject, savedMessage;
-    public void pmSetup(String toIn, String subjectIn, String messageIn) {
+    @SuppressWarnings("deprecation")
+	public void pmSetup(String toIn, String subjectIn, String messageIn) {
     	if (toIn != null && !toIn.equals("null"))
     		savedTo = toIn;
     	else
@@ -2666,7 +2644,8 @@ public class AllInOneV2 extends Activity {
     	showDialog(SEND_PM_DIALOG);
     }
     
-    public void pmCleanup(boolean wasSuccessful, String error) {
+    @SuppressWarnings("deprecation")
+	public void pmCleanup(boolean wasSuccessful, String error) {
     	if (wasSuccessful) {
     		Toast.makeText(this, "PM sent.", Toast.LENGTH_SHORT).show();
         	dismissDialog(SEND_PM_DIALOG);
@@ -2721,11 +2700,27 @@ public class AllInOneV2 extends Activity {
 		return sig;
     }
 	
-	private static SimpleDateFormat timingFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss.SSS z", Locale.US);
+	private static long lastNano = 0;
     public void wtl(String msg) {
     	if (!isReleaseBuild) {
+    		long currNano = System.nanoTime();
+    		
 			msg = msg.replaceAll("\\\\n", "(nl)");
-			msg = timingFormat.format(new Date()) + "// " + msg;
+			
+			long elapsed;
+			if (lastNano == 0)
+				elapsed = 0;
+			else
+				elapsed = currNano - lastNano;
+			
+			elapsed = elapsed / 1000000;
+			
+			if (elapsed > 100)
+				Log.w("logger", "time since previous log was over 100 milliseconds");
+			
+			lastNano = System.nanoTime();
+			
+			msg = elapsed + "// " + msg;
 			Log.d("logger", msg);
 		}
     }

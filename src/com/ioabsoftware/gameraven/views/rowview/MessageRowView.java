@@ -73,10 +73,13 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 		post.setTextSize(px, post.getTextSize() * AllInOneV2.getTextScale());
 		message.setTextSize(px, message.getTextSize() * AllInOneV2.getTextScale());
 		
-		topWrapper.setBackgroundDrawable(AllInOneV2.getMsgHeadSelector().getConstantState().newDrawable());
+		topWrapper.setBackgroundDrawable(AllInOneV2.getMsgHeadSelector());
 		topWrapper.setOnClickListener(this);
         
         message.setLinkTextColor(AllInOneV2.getAccentColor());
+		
+		post.setTextColor(AllInOneV2.getAccentTextColor());
+		user.setTextColor(AllInOneV2.getAccentTextColor());
 		
 		if (AllInOneV2.isAccentLight())
         	((ImageView) findViewById(R.id.mvMessageMenuIcon)).setImageResource(R.drawable.ic_info_light);
@@ -93,20 +96,21 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 		user.setText((myData.hasTitles() ? myData.getUser() + myData.getUserTitles() : myData.getUser()));
 		post.setText((myData.hasMsgID() ? "#" + myData.getPostNum() + ", " + myData.getPostTime() : myData.getPostTime()));
 		
-		post.setTextColor(AllInOneV2.getAccentTextColor());
-		user.setTextColor(AllInOneV2.getAccentTextColor());
-		
 		if (myData.hasPoll()) {
 			isShowingPoll = true;
 			pollWrapper.setVisibility(View.VISIBLE);
 			pollWrapper.addView(myData.getPoll());
 		}
-		else if (isShowingPoll)
+		else if (isShowingPoll) {
+			isShowingPoll = false;
 			pollWrapper.setVisibility(View.GONE);
+		}
 		
 		if (myData.getHLColor() == 0) {
-			if (isHighlighted)
-				topWrapper.setBackgroundDrawable(AllInOneV2.getMsgHeadSelector().getConstantState().newDrawable());
+			if (isHighlighted) {
+				isHighlighted = false;
+				topWrapper.setBackgroundDrawable(AllInOneV2.getMsgHeadSelector());
+			}
 		}
         else {
         	isHighlighted = true;
@@ -131,7 +135,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
     		hlSelector.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(msgSelectorColor));
     		hlSelector.addState(StateSet.WILD_CARD, new ColorDrawable(myData.getHLColor()));
     		
-    		topWrapper.setBackgroundDrawable(hlSelector.getConstantState().newDrawable());
+    		topWrapper.setBackgroundDrawable(hlSelector);
         }
 		
 		message.setText(myData.getSpannedMessage());
