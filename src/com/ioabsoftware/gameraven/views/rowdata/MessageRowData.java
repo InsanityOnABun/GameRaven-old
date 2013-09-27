@@ -129,6 +129,11 @@ public class MessageRowData extends BaseRowData {
         	Element pollElem = messageElem.getElementsByClass("board_poll").first();
         	
         	poll = new LinearLayout(AllInOneV2.get());
+    		poll.setOrientation(LinearLayout.VERTICAL);
+        	
+        	LinearLayout pollInnerWrapper = new LinearLayout(AllInOneV2.get());
+        	pollInnerWrapper.setPadding(15, 0, 15, 15);
+        	pollInnerWrapper.setOrientation(LinearLayout.VERTICAL);
     		
     		ShapeDrawable s = new ShapeDrawable();
     		Paint p = s.getPaint();
@@ -138,9 +143,8 @@ public class MessageRowData extends BaseRowData {
     		
     		poll.setBackgroundDrawable(s);
     		poll.addView(new HeaderView(AllInOneV2.get(), pollElem.getElementsByClass("poll_head").first().text()));
-
-    		poll.setPadding(15, 0, 15, 15);
-    		poll.setOrientation(LinearLayout.VERTICAL);
+    		poll.addView(pollInnerWrapper);
+    		
         	if (pollElem.getElementsByTag("form").isEmpty()) {
         		// poll has been voted in
         		// poll_foot_left
@@ -158,14 +162,14 @@ public class MessageRowData extends BaseRowData {
         			else
             			t.setText(text);
         			
-        			poll.addView(t);
+        			pollInnerWrapper.addView(t);
         		}
         		
         		String foot = pollElem.getElementsByClass("poll_foot_left").text();
         		if (foot.length() > 0) {
         			t = new TextView(AllInOneV2.get());
         			t.setText(foot);
-        			poll.addView(t);
+        			pollInnerWrapper.addView(t);
         		}
         		
         	}
@@ -189,7 +193,7 @@ public class MessageRowData extends BaseRowData {
     						AllInOneV2.get().getSession().post(NetDesc.TOPIC, action, data);
     					}
     				});
-    				poll.addView(b);
+    				pollInnerWrapper.addView(b);
     			}
     			
     			Button b = new Button(AllInOneV2.get());
@@ -200,7 +204,7 @@ public class MessageRowData extends BaseRowData {
 						AllInOneV2.get().getSession().get(NetDesc.TOPIC, action + "?results=1", null);
 					}
 				});
-    			poll.addView(b);
+    			pollInnerWrapper.addView(b);
         	}
         }
 

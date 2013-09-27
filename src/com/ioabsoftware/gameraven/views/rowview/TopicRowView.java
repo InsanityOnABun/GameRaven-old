@@ -28,8 +28,8 @@ public class TopicRowView extends BaseRowView {
     
     TopicRowData myData;
     
-    private static int defaultTitleColor = 0;
-    private static int defaultTCColor = 0;
+    private int defaultTitleColor;
+    private int defaultTCColor;
 	
 	public TopicRowView(Context context) {
 		super(context);
@@ -56,10 +56,8 @@ public class TopicRowView extends BaseRowView {
         
         typeIndicator = (ImageView) findViewById(R.id.tvTypeIndicator);
         
-        if (defaultTitleColor == 0) {
-        	defaultTitleColor = title.getCurrentTextColor();
-        	defaultTCColor = tc.getCurrentTextColor();
-        }
+        defaultTitleColor = title.getCurrentTextColor();
+        defaultTCColor = tc.getCurrentTextColor();
         
         title.setTextSize(TypedValue.COMPLEX_UNIT_PX, title.getTextSize() * AllInOneV2.getTextScale());
         tc.setTextSize(TypedValue.COMPLEX_UNIT_PX, tc.getTextSize() * AllInOneV2.getTextScale());

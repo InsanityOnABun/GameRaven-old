@@ -33,7 +33,7 @@ public abstract class BaseRowView extends LinearLayout {
 	}
 	
 	protected Drawable getSelector() {
-		StateDrawable s = new StateDrawable(new Drawable[] {getResources().getDrawable(R.drawable.msghead)});
+		StateDrawable s = new StateDrawable(new Drawable[] {getResources().getDrawable(R.drawable.selector)});
 		s.setMyColor(Color.TRANSPARENT);
 		return s;
 	}
