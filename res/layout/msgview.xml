@@ -11,9 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:background="@color/holo_blue"
         android:clickable="true"
-        android:paddingLeft="3dp"
         android:paddingRight="3dp" >
 
         <LinearLayout
@@ -22,6 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
             android:orientation="vertical" >
 
             <TextView

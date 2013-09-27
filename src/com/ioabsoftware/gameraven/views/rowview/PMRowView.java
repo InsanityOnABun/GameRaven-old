@@ -69,7 +69,7 @@ public class PMRowView extends BaseRowView {
 			}
 		});
         
-        setBackgroundDrawable(AllInOneV2.getSelector());
+        setBackgroundDrawable(getSelector());
 	}
 
 	@Override

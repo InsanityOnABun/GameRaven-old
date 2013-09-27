@@ -68,10 +68,10 @@ public class TopicRowView extends BaseRowView {
         findViewById(R.id.tvSep).setBackgroundColor(AllInOneV2.getAccentColor());
         findViewById(R.id.tvLPSep).setBackgroundColor(AllInOneV2.getAccentColor());
         
-        setBackgroundDrawable(AllInOneV2.getSelector());
+        setBackgroundDrawable(getSelector());
         
         TextView lPostLink = (TextView) findViewById(R.id.tvLastPostLink);
-        lPostLink.setBackgroundDrawable(AllInOneV2.getSelector());
+        lPostLink.setBackgroundDrawable(getSelector());
         lPostLink.setTextSize(TypedValue.COMPLEX_UNIT_PX, lPostLink.getTextSize() * AllInOneV2.getTextScale());
         lPostLink.setOnClickListener(new OnClickListener() {
 			@Override
@@ -115,18 +115,23 @@ public class TopicRowView extends BaseRowView {
 			typeIndicator.setVisibility(View.GONE);
 			break;
 		case POLL:
-			typeIndicator.setImageResource((AllInOneV2.getUsingLightTheme() ? R.drawable.ic_poll_light : R.drawable.ic_poll));
+			setTypeIndicator(AllInOneV2.getUsingLightTheme() ? R.drawable.ic_poll_light : R.drawable.ic_poll);
 			break;
 		case LOCKED:
-			typeIndicator.setImageResource((AllInOneV2.getUsingLightTheme() ? R.drawable.ic_locked_light : R.drawable.ic_locked));
+			setTypeIndicator(AllInOneV2.getUsingLightTheme() ? R.drawable.ic_locked_light : R.drawable.ic_locked);
 			break;
 		case ARCHIVED:
-			typeIndicator.setImageResource((AllInOneV2.getUsingLightTheme() ? R.drawable.ic_archived_light : R.drawable.ic_archived));
+			setTypeIndicator(AllInOneV2.getUsingLightTheme() ? R.drawable.ic_archived_light : R.drawable.ic_archived);
 			break;
 		case PINNED:
-			typeIndicator.setImageResource((AllInOneV2.getUsingLightTheme() ? R.drawable.ic_pinned_light : R.drawable.ic_pinned));
+			setTypeIndicator(AllInOneV2.getUsingLightTheme() ? R.drawable.ic_pinned_light : R.drawable.ic_pinned);
 			break;
         }
 	}
+    
+    private void setTypeIndicator(int resId) {
+    	typeIndicator.setImageResource(resId);
+		typeIndicator.setVisibility(View.VISIBLE);
+    }
 
 }

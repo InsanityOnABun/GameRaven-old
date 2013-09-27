@@ -231,10 +231,6 @@ public class AllInOneV2 extends Activity {
 	public static int getAccentTextColor() {return accentTextColor;}
 	private static float textScale = 1f;
 	public static float getTextScale() {return textScale;}
-	private static ConstantState msgHeadSelector;
-	public static Drawable getMsgHeadSelector() {return msgHeadSelector.newDrawable();}
-	private static ConstantState selector;
-	public static Drawable getSelector() {return selector.newDrawable();}
 	private static boolean isAccentLight;
 	public static boolean isAccentLight() {return isAccentLight;}
 	
@@ -850,20 +846,6 @@ public class AllInOneV2 extends Activity {
 			aBar.setBackgroundDrawable(aBarDrawable);
 			
 			((AbsDefaultHeaderTransformer) contentPTR.getHeaderTransformer()).setProgressBarColor(accentColor);
-			
-			int msgSelectorColor = Color.HSVToColor(hsv);
-			
-			StateListDrawable msgHead = new StateListDrawable();
-			msgHead.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(msgSelectorColor));
-			msgHead.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(msgSelectorColor));
-			msgHead.addState(StateSet.WILD_CARD, new ColorDrawable(accentColor));
-			msgHeadSelector = msgHead.getConstantState();
-
-			StateListDrawable slctr = new StateListDrawable();
-			slctr.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(accentColor));
-			slctr.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(accentColor));
-			slctr.addState(StateSet.WILD_CARD, new ColorDrawable(Color.TRANSPARENT));
-			selector = slctr.getConstantState();
 			
 			
 			findViewById(R.id.aioPJTopSep).setBackgroundColor(accentColor);
@@ -1514,16 +1496,21 @@ public class AllInOneV2 extends Activity {
 									String mCount = cells.get(3).text();
 									
 									TopicType type = TopicType.NORMAL;
-									if (!tImg.endsWith("topic")) {
-										if (tImg.endsWith("closed"))
-											type = TopicType.LOCKED;
-										else if (tImg.endsWith("archived"))
-											type = TopicType.ARCHIVED;
-										else if (tImg.endsWith("poll"))
-											type = TopicType.POLL;
-										else if (tImg.endsWith("sticky"))
-											type = TopicType.PINNED;
-									}
+									if (tImg.contains("poll"))
+										type = TopicType.POLL;
+									else if (tImg.contains("sticky"))
+										type = TopicType.PINNED;
+									else if (tImg.contains("closed"))
+										type = TopicType.LOCKED;
+									else if (tImg.contains("archived"))
+										type = TopicType.ARCHIVED;
+									
+									wtl(tImg + ", " + type.name());
+									
+									//TODO: differentiate read topics
+									boolean isRead = false;
+									if (tImg.endsWith("_read"))
+										isRead = true;
 									
 									int hlColor = 0;
 									if (hlUsers.contains(tc.toLowerCase(Locale.US))) {

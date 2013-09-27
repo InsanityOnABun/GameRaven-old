@@ -142,15 +142,16 @@
         android:orderingFromXml="true"
         android:persistent="false"
         android:title="Theming Settings" >
-		<com.robobunny.SeekBarPreference
-			android:key="textScale"
-			android:title="Text Scale"
-			android:summary="Adjust the scale of various text elements"
-			android:defaultValue="100"
-			android:max="120"
-			robobunny:min="80"
-			robobunny:unitsLeft=""
-			robobunny:unitsRight="%" />
+        <com.robobunny.SeekBarPreference
+            android:defaultValue="100"
+            android:key="textScale"
+            android:max="120"
+            android:summary="Adjust the scale of various text elements"
+            android:title="Text Scale"
+            robobunny:min="80"
+            robobunny:unitsLeft=""
+            robobunny:unitsRight="%" />
+
         <Preference
             android:key="manageHighlightedUsers"
             android:persistent="false"
@@ -167,7 +168,7 @@
             android:defaultValue="false"
             android:key="useWhiteAccentText"
             android:persistent="true"
-            android:summary="Text over accent colors will be white. (Refresh to take complete effect)"
+            android:summary="Changes require restart to take effect. (Menu -> Exit GameRaven)"
             android:title="Use White Accent Text" />
 
         <net.margaritov.preference.colorpicker.ColorPickerPreference

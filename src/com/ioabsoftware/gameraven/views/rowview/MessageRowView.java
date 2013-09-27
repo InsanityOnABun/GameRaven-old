@@ -2,13 +2,10 @@ package com.ioabsoftware.gameraven.views.rowview;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.StateListDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.method.ArrowKeyMovementMethod;
 import android.util.AttributeSet;
-import android.util.StateSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +19,7 @@ import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.ClickableLinksTextView;
 import com.ioabsoftware.gameraven.views.RowType;
+import com.ioabsoftware.gameraven.views.StateDrawable;
 import com.ioabsoftware.gameraven.views.rowdata.MessageRowData;
 
 public class MessageRowView extends BaseRowView implements View.OnClickListener {
@@ -36,6 +34,8 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 	ClickableLinksTextView message;
 	
 	MessageRowData myData;
+	
+	StateDrawable headerSelector;
 	
 	boolean isHighlighted = false;
 	boolean isShowingPoll = false;
@@ -73,7 +73,9 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 		post.setTextSize(px, post.getTextSize() * AllInOneV2.getTextScale());
 		message.setTextSize(px, message.getTextSize() * AllInOneV2.getTextScale());
 		
-		topWrapper.setBackgroundDrawable(AllInOneV2.getMsgHeadSelector());
+		headerSelector = new StateDrawable(new Drawable[] {getResources().getDrawable(R.drawable.msghead)});
+		headerSelector.setMyColor(AllInOneV2.getAccentColor());
+		topWrapper.setBackgroundDrawable(headerSelector);
 		topWrapper.setOnClickListener(this);
         
         message.setLinkTextColor(AllInOneV2.getAccentColor());
@@ -109,33 +111,12 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 		if (myData.getHLColor() == 0) {
 			if (isHighlighted) {
 				isHighlighted = false;
-				topWrapper.setBackgroundDrawable(AllInOneV2.getMsgHeadSelector());
+				headerSelector.setMyColor(AllInOneV2.getAccentColor());
 			}
 		}
         else {
         	isHighlighted = true;
-        	float[] hsv = new float[3];
-    		Color.colorToHSV(myData.getHLColor(), hsv);
-        	if (AllInOneV2.getSettingsPref().getBoolean("useWhiteAccentText", false)) {
-    			// color is probably dark
-    			if (hsv[2] > 0)
-    				hsv[2] *= 1.2f;
-    			else
-    				hsv[2] = 0.2f;
-    		}
-    		else {
-    			// color is probably bright
-    			hsv[2] *= 0.8f;
-    		}
-    		
-    		int msgSelectorColor = Color.HSVToColor(hsv);
-    		
-    		StateListDrawable hlSelector = new StateListDrawable();
-    		hlSelector.addState(new int[] {android.R.attr.state_focused}, new ColorDrawable(msgSelectorColor));
-    		hlSelector.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(msgSelectorColor));
-    		hlSelector.addState(StateSet.WILD_CARD, new ColorDrawable(myData.getHLColor()));
-    		
-    		topWrapper.setBackgroundDrawable(hlSelector);
+        	headerSelector.setMyColor(myData.getHLColor());
         }
 		
 		message.setText(myData.getSpannedMessage());
@@ -145,6 +126,8 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
         	message.setTextIsSelectable(true);
             // the autoLink attribute must be removed, if you hasn't set it then ok, otherwise call textView.setAutoLink(0);
         }
+
+		headerSelector.invalidateDrawable(headerSelector);
 	}
 	
 	/**
@@ -188,7 +171,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 	}
 	
 	public String getMessageForEditing() {
-		return myData.getMessageForQuoting();
+		return myData.getMessageForEditing();
 	}
 
 	@Override
