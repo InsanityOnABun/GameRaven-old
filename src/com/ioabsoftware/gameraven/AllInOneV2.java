@@ -1317,8 +1317,7 @@ public class AllInOneV2 extends Activity {
 							String lPost = lPostLinkElem.text();
 							String lPostLink = lPostLinkElem.attr("href");
 							
-							adapterRows.add(new AMPRowData(title, board, lPost, mCount, 
-									link, lPostLink, TopicType.NORMAL, 0));
+							adapterRows.add(new AMPRowData(title, board, lPost, mCount, link, lPostLink));
 						}
 					}
 					else {
@@ -1519,7 +1518,8 @@ public class AllInOneV2 extends Activity {
 										tc += " (" + hUser.getLabel() + ")";
 									}
 									
-									adapterRows.add(new TopicRowData(title, tc, lastPost, mCount, tUrl, lpUrl, type, hlColor));
+									adapterRows.add(new TopicRowData(title, tc, lastPost, mCount, tUrl,
+																	 lpUrl, type, isRead, hlColor));
 								}
 								else
 									skipFirst = false;

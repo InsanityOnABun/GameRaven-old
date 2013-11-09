@@ -2,6 +2,8 @@ package com.ioabsoftware.gameraven.views.rowview;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -23,6 +25,7 @@ public class TopicRowView extends BaseRowView {
 	TextView title;
     TextView tc;
     TextView msgLP;
+    TextView lpLink;
     
     ImageView typeIndicator;
     
@@ -30,6 +33,8 @@ public class TopicRowView extends BaseRowView {
     
     private int defaultTitleColor;
     private int defaultTCColor;
+    private int defaultMsgLPColor;
+    private int defaultLPLinkColor;
 	
 	public TopicRowView(Context context) {
 		super(context);
@@ -53,11 +58,14 @@ public class TopicRowView extends BaseRowView {
         title = (TextView) findViewById(R.id.tvTitle);
         tc = (TextView) findViewById(R.id.tvTC);
         msgLP = (TextView) findViewById(R.id.tvMsgCountLastPost);
+        lpLink = (TextView) findViewById(R.id.tvLastPostLink);
         
         typeIndicator = (ImageView) findViewById(R.id.tvTypeIndicator);
         
         defaultTitleColor = title.getCurrentTextColor();
         defaultTCColor = tc.getCurrentTextColor();
+        defaultMsgLPColor = msgLP.getCurrentTextColor();
+        defaultLPLinkColor = lpLink.getCurrentTextColor();
         
         title.setTextSize(TypedValue.COMPLEX_UNIT_PX, title.getTextSize() * AllInOneV2.getTextScale());
         tc.setTextSize(TypedValue.COMPLEX_UNIT_PX, tc.getTextSize() * AllInOneV2.getTextScale());
@@ -99,13 +107,24 @@ public class TopicRowView extends BaseRowView {
         msgLP.setText(myData.getMCount() + " Msgs, Last: " + myData.getLastPost());
         
         int hlColor = myData.getHLColor();
-        if (hlColor != 0) {
+        if (myData.isRead()) {
+        	int readColor = AllInOneV2.getUsingLightTheme() ? Color.LTGRAY : Color.DKGRAY;
+        	tc.setTextColor(readColor);
+        	title.setTextColor(readColor);
+        	msgLP.setTextColor(readColor);
+        	lpLink.setTextColor(readColor);
+        }
+        else if (hlColor != 0) {
         	tc.setTextColor(hlColor);
         	title.setTextColor(hlColor);
+        	msgLP.setTextColor(hlColor);
+        	lpLink.setTextColor(hlColor);
         }
         else {
         	tc.setTextColor(defaultTCColor);
         	title.setTextColor(defaultTitleColor);
+        	msgLP.setTextColor(defaultMsgLPColor);
+        	lpLink.setTextColor(defaultLPLinkColor);
         }
         
         switch (myData.getType()) {

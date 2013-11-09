@@ -21,6 +21,9 @@ public class TopicRowData extends BaseRowData {
 	TopicType type;
 	public TopicType getType() {return type;}
 	
+	boolean isRead;
+	public boolean isRead() {return isRead;}
+	
 	int hlColor;
 	public int getHLColor() {return hlColor;}
 	
@@ -29,8 +32,8 @@ public class TopicRowData extends BaseRowData {
 		return RowType.TOPIC;
 	}
 	
-	public TopicRowData(String titleIn, String tcIn, String lastPostIn, 
-			String mCountIn, String urlIn, String lPostUrlIn, TopicType typeIn, int hlColorIn) {
+	public TopicRowData(String titleIn, String tcIn, String lastPostIn, String mCountIn, 
+			String urlIn, String lPostUrlIn, TopicType typeIn, boolean isReadIn, int hlColorIn) {
 		title = titleIn;
 		tc = tcIn;
 		lastPost = lastPostIn;
@@ -39,6 +42,8 @@ public class TopicRowData extends BaseRowData {
 		lPostUrl = lPostUrlIn;
 		
 		type = typeIn;
+		
+		isRead = isReadIn;
 		
 		hlColor = hlColorIn;
 	}

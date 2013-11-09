@@ -10,9 +10,8 @@ public class AMPRowData extends TopicRowData {
 	}
 	
 	public AMPRowData(String titleIn, String tcIn, String lastPostIn,
-			String mCountIn, String urlIn, String lPostUrlIn, TopicType typeIn,
-			int hlColorIn) {
-		super(titleIn, tcIn, lastPostIn, mCountIn, urlIn, lPostUrlIn, typeIn, hlColorIn);
+			String mCountIn, String urlIn, String lPostUrlIn) {
+		super(titleIn, tcIn, lastPostIn, mCountIn, urlIn, lPostUrlIn, TopicType.NORMAL, false, 0);
 	}
 
 }
