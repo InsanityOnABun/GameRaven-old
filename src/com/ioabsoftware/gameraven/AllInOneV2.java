@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import net.simonvt.menudrawer.MenuDrawer;
 import net.simonvt.menudrawer.MenuDrawer.OnDrawerStateChangeListener;
+import net.simonvt.menudrawer.MenuDrawer.Type;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -29,11 +30,12 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
-import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.AbsDefaultHeaderTransformer;
-import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshAttacher;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.OnRefreshListener;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.Options;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.AbcDefaultHeaderTransformer;
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.Options;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.SearchManager;
@@ -47,23 +49,25 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Drawable.ConstantState;
-import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.StateSet;
 import android.util.TypedValue;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
@@ -77,11 +81,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
 import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
@@ -98,6 +97,7 @@ import com.ioabsoftware.gameraven.views.rowdata.MessageRowData;
 import com.ioabsoftware.gameraven.views.rowdata.PMDetailRowData;
 import com.ioabsoftware.gameraven.views.rowdata.PMRowData;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
+import com.ioabsoftware.gameraven.views.rowdata.TopicRowData.ReadStatus;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData.TopicType;
 import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
@@ -192,7 +192,7 @@ public class AllInOneV2 extends Activity {
 	
 	private LinearLayout postWrapper;
 	
-	private PullToRefreshAttacher contentPTR;
+	private PullToRefreshLayout ptrLayout;
 	private ListView contentList;
 	
 	private ActionBar aBar;
@@ -267,7 +267,7 @@ public class AllInOneV2 extends Activity {
         aBar.setDisplayHomeAsUpEnabled(true);
         aBar.setDisplayShowTitleEnabled(false);
     	
-        drawer = MenuDrawer.attach(this);
+        drawer = MenuDrawer.attach(this, Type.OVERLAY);
         drawer.setContentView(R.layout.allinonev2);
         drawer.setMenuView(R.layout.drawer);
         
@@ -429,17 +429,26 @@ public class AllInOneV2 extends Activity {
         accounts = new SecurePreferences(getApplicationContext(), ACCOUNTS_PREFNAME, secureSalt, false);
 
     	wtl("getting all the views");
+
+        ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
         
-    	Options op = new Options();
-    	op.refreshMinimize = false;
-        contentPTR = PullToRefreshAttacher.get(this, op);
-        PullToRefreshLayout ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
-        ptrLayout.setPullToRefreshAttacher(contentPTR, new OnRefreshListener() {
-			@Override
-			public void onRefreshStarted(View view) {
-				refreshClicked(view);
-			}
-		});
+        // Now setup the PullToRefreshLayout
+        ActionBarPullToRefresh.from(this)
+        		.options(Options.create()
+        				.noMinimize()
+        				.refreshOnUp(true)
+        				.build())
+                // Mark All Children as pullable
+                .allChildrenArePullable()
+                // Set the OnRefreshListener
+                .listener(new OnRefreshListener() {
+					@Override
+					public void onRefreshStarted(View view) {
+						refreshClicked(view);
+					}
+				})
+                // Finally commit the setup to our PullToRefreshLayout
+                .setup(ptrLayout);
         
         contentList = (ListView) findViewById(R.id.aioMainList);
 
@@ -568,7 +577,7 @@ public class AllInOneV2 extends Activity {
 	@Override
     public boolean onSearchRequested() {
     	if (searchIcon.isVisible())
-    		searchIcon.expandActionView();
+    		MenuItemCompat.expandActionView(searchIcon);
 		return false;
     }
 	
@@ -584,7 +593,7 @@ public class AllInOneV2 extends Activity {
 	/** Adds menu items */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         searchIcon = menu.getItem(0);
         topicListIcon = menu.getItem(1);
@@ -593,38 +602,42 @@ public class AllInOneV2 extends Activity {
         postIcon = menu.getItem(4);
         refreshIcon = menu.getItem(5);
         
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) searchIcon.getActionView();
-        if (null != searchView )
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchIcon);
+        if (searchView != null)
         {
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));  
+            
+            SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() 
+            {
+                public boolean onQueryTextChange(String newText) 
+                {
+                    // just do default
+                    return false;
+                }
+
+                public boolean onQueryTextSubmit(String query) 
+                {
+          	      HashMap<String, String> data = new HashMap<String, String>();
+          	      if (session.getLastDesc() == NetDesc.BOARD) {
+          	    	  wtl("searching board for query");
+          	    	  data.put("search", query);
+              	      session.get(NetDesc.BOARD, session.getLastPathWithoutData(), data);
+          	      }
+          	      else if (session.getLastDesc() == NetDesc.BOARD_JUMPER || session.getLastDesc() == NetDesc.GAME_SEARCH) {
+          	    	  wtl("searching for games");
+          	    	  data.put("game", query);
+              	      session.get(NetDesc.GAME_SEARCH, "/search/index.html", data);
+          	      }
+                    return true;
+                }
+            };
+            
+            searchView.setOnQueryTextListener(queryTextListener);
         }
-
-        SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() 
-        {
-            public boolean onQueryTextChange(String newText) 
-            {
-                // just do default
-                return false;
-            }
-
-            public boolean onQueryTextSubmit(String query) 
-            {
-      	      HashMap<String, String> data = new HashMap<String, String>();
-      	      if (session.getLastDesc() == NetDesc.BOARD) {
-      	    	  wtl("searching board for query");
-      	    	  data.put("search", query);
-          	      session.get(NetDesc.BOARD, session.getLastPathWithoutData(), data);
-      	      }
-      	      else if (session.getLastDesc() == NetDesc.BOARD_JUMPER || session.getLastDesc() == NetDesc.GAME_SEARCH) {
-      	    	  wtl("searching for games");
-      	    	  data.put("game", query);
-          	      session.get(NetDesc.GAME_SEARCH, "/search/index.html", data);
-      	      }
-                return true;
-            }
-        };
-        searchView.setOnQueryTextListener(queryTextListener);
+        else {
+//        	throw new NullPointerException("searchView is null");
+        }
         
         return true;
     }
@@ -640,7 +653,7 @@ public class AllInOneV2 extends Activity {
         	return true;
         	
         case R.id.search:
-        	searchIcon.expandActionView();
+    		MenuItemCompat.expandActionView(searchIcon);
         	return true;
         	
         case R.id.addFav:
@@ -781,7 +794,7 @@ public class AllInOneV2 extends Activity {
     	wtl("onResume fired");
     	super.onResume();
 		
-    	contentPTR.setEnabled(settings.getBoolean("enablePTR", false));
+    	ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
     	
     	float oldScale = textScale;
     	textScale = settings.getInt("textScale", 100) / 100f;
@@ -838,14 +851,14 @@ public class AllInOneV2 extends Activity {
 			
 			Drawable aBarDrawable;
 			if (usingLightTheme)
-				aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_dark_holo);
+				aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_dark_holo);
 			else
-				aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_light_holo);
+				aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_light_holo);
 			
 			aBarDrawable.setColorFilter(accentColor, PorterDuff.Mode.SRC_ATOP);
 			aBar.setBackgroundDrawable(aBarDrawable);
 			
-			((AbsDefaultHeaderTransformer) contentPTR.getHeaderTransformer()).setProgressBarColor(accentColor);
+			((AbcDefaultHeaderTransformer) ptrLayout.getHeaderTransformer()).setProgressBarColor(accentColor);
 			
 			
 			findViewById(R.id.aioPJTopSep).setBackgroundColor(accentColor);
@@ -1006,7 +1019,7 @@ public class AllInOneV2 extends Activity {
 	}
 
 	private void uiCleanup() {
-		contentPTR.setRefreshing(false);
+		ptrLayout.setRefreshing(false);
 		if (refreshIcon != null)
 			refreshIcon.setVisible(true);
 		if (postWrapper.getVisibility() == View.VISIBLE) {
@@ -1020,7 +1033,7 @@ public class AllInOneV2 extends Activity {
 	
 	public void preExecuteSetup(NetDesc desc) {
 		wtl("GRAIO dPreES fired --NEL, desc: " + desc.name());
-		contentPTR.setRefreshing(true);
+		ptrLayout.setRefreshing(true);
 		if (refreshIcon != null)
 			refreshIcon.setVisible(false);
 		if (searchIcon != null)
@@ -1077,11 +1090,11 @@ public class AllInOneV2 extends Activity {
 		
 		wtl("GRAIO hNR fired, desc: " + desc.name());
 		
-		contentPTR.setEnabled(false);
+		ptrLayout.setEnabled(false);
 		contentList.scrollTo(0, 0);
 
 		searchIcon.setVisible(false);
-		searchIcon.collapseActionView();
+		MenuItemCompat.collapseActionView(searchIcon);
 		
 		postIcon.setVisible(false);
 		
@@ -1506,10 +1519,11 @@ public class AllInOneV2 extends Activity {
 									
 									wtl(tImg + ", " + type.name());
 									
-									//TODO: differentiate read topics
-									boolean isRead = false;
+									ReadStatus status = ReadStatus.UNREAD;
 									if (tImg.endsWith("_read"))
-										isRead = true;
+										status = ReadStatus.READ;
+									else if (tImg.endsWith("_unread"))
+										status = ReadStatus.NEW_POST;
 									
 									int hlColor = 0;
 									if (hlUsers.contains(tc.toLowerCase(Locale.US))) {
@@ -1519,7 +1533,7 @@ public class AllInOneV2 extends Activity {
 									}
 									
 									adapterRows.add(new TopicRowData(title, tc, lastPost, mCount, tUrl,
-																	 lpUrl, type, isRead, hlColor));
+																	 lpUrl, type, status, hlColor));
 								}
 								else
 									skipFirst = false;
@@ -1892,7 +1906,7 @@ public class AllInOneV2 extends Activity {
 					}
 				}
 
-				contentPTR.setEnabled(settings.getBoolean("enablePTR", false));
+				ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
 				
 			}
 			else {
@@ -1935,8 +1949,8 @@ public class AllInOneV2 extends Activity {
 			Session.applySavedScroll = false;
 		}
 		
-		if (contentPTR.isRefreshing())
-			contentPTR.setRefreshComplete();
+		if (ptrLayout.isRefreshing())
+			ptrLayout.setRefreshComplete();
 			
 		wtl("GRAIO hNR finishing");
 	}
@@ -2033,7 +2047,7 @@ public class AllInOneV2 extends Activity {
 			needToSetNavList = false;
 		}
 		
-		contentPTR.setRefreshing(false);
+		ptrLayout.setRefreshing(false);
 		if (refreshIcon != null)
 			refreshIcon.setVisible(true);
 		if (desc == NetDesc.BOARD || desc == NetDesc.TOPIC)
@@ -2846,8 +2860,8 @@ public class AllInOneV2 extends Activity {
     
     @Override
 	public void onBackPressed() {
-    	if (searchIcon.isActionViewExpanded()) {
-    		searchIcon.collapseActionView();
+    	if (MenuItemCompat.isActionViewExpanded(searchIcon)) {
+    		MenuItemCompat.collapseActionView(searchIcon);
     	}
     	else if (drawer.isMenuVisible()) {
     		drawer.closeMenu(true);

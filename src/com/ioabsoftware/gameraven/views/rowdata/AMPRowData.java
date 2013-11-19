@@ -11,7 +11,8 @@ public class AMPRowData extends TopicRowData {
 	
 	public AMPRowData(String titleIn, String tcIn, String lastPostIn,
 			String mCountIn, String urlIn, String lPostUrlIn) {
-		super(titleIn, tcIn, lastPostIn, mCountIn, urlIn, lPostUrlIn, TopicType.NORMAL, false, 0);
+		super(titleIn, tcIn, lastPostIn, mCountIn, urlIn, lPostUrlIn, 
+				TopicType.NORMAL, ReadStatus.UNREAD, 0);
 	}
 
 }

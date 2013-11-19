@@ -49,7 +49,7 @@
 
                 <Button
                     android:id="@+id/aioFirstPage"
-                    style="@style/Widget.Sherlock.ActionButton"
+                    style="@style/Widget.AppCompat.ActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
@@ -72,7 +72,7 @@
 
                 <Button
                     android:id="@+id/aioPreviousPage"
-                    style="@style/Widget.Sherlock.ActionButton"
+                    style="@style/Widget.AppCompat.ActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/aioFirstPage"
@@ -86,7 +86,7 @@
 
                 <Button
                     android:id="@+id/aioLastPage"
-                    style="@style/Widget.Sherlock.ActionButton"
+                    style="@style/Widget.AppCompat.ActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/aioFirstPage"
@@ -110,7 +110,7 @@
 
                 <Button
                     android:id="@+id/aioNextPage"
-                    style="@style/Widget.Sherlock.ActionButton"
+                    style="@style/Widget.AppCompat.ActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/aioFirstPage"
@@ -144,7 +144,7 @@
             android:visibility="visible" />
     </LinearLayout>
 
-    <uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout
+    <uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout
         android:id="@+id/ptr_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -159,7 +159,7 @@
             android:fastScrollEnabled="true"
             android:smoothScrollbar="true" >
         </ListView>
-    </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
+    </uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout>
 
     <LinearLayout
         android:id="@+id/aioPostWrapper"
@@ -276,7 +276,7 @@
 
                         <Button
                             android:id="@+id/aioBold"
-                            style="@style/Widget.Sherlock.ActionButton"
+                            style="@style/Widget.AppCompat.ActionButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:onClick="htmlButtonClicked"
@@ -293,7 +293,7 @@
 
                         <Button
                             android:id="@+id/aioItalic"
-                            style="@style/Widget.Sherlock.ActionButton"
+                            style="@style/Widget.AppCompat.ActionButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:onClick="htmlButtonClicked"
@@ -310,7 +310,7 @@
 
                         <Button
                             android:id="@+id/aioCode"
-                            style="@style/Widget.Sherlock.ActionButton"
+                            style="@style/Widget.AppCompat.ActionButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:onClick="htmlButtonClicked"
@@ -327,7 +327,7 @@
 
                         <Button
                             android:id="@+id/aioSpoiler"
-                            style="@style/Widget.Sherlock.ActionButton"
+                            style="@style/Widget.AppCompat.ActionButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:onClick="htmlButtonClicked"
@@ -343,7 +343,7 @@
 
                         <Button
                             android:id="@+id/aioCite"
-                            style="@style/Widget.Sherlock.ActionButton"
+                            style="@style/Widget.AppCompat.ActionButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:onClick="htmlButtonClicked"
@@ -359,7 +359,7 @@
 
                         <Button
                             android:id="@+id/aioQuote"
-                            style="@style/Widget.Sherlock.ActionButton"
+                            style="@style/Widget.AppCompat.ActionButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:onClick="htmlButtonClicked"
@@ -403,7 +403,7 @@
 
             <Button
                 android:id="@+id/aioPostCancel"
-                style="@style/Widget.Sherlock.ActionButton"
+                style="@style/Widget.AppCompat.ActionButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
@@ -419,7 +419,7 @@
 
             <Button
                 android:id="@+id/aioPollOptions"
-                style="@style/Widget.Sherlock.ActionButton"
+                style="@style/Widget.AppCompat.ActionButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
@@ -436,7 +436,7 @@
 
             <Button
                 android:id="@+id/aioPostDo"
-                style="@style/Widget.Sherlock.ActionButton"
+                style="@style/Widget.AppCompat.ActionButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"

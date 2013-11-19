@@ -35,12 +35,12 @@
         <item name="themedDrawerHeaderColor">@color/drawerHeaderLight</item>
     </style>
 
-    <style name="MyThemes.DarkTheme.ActionBar.FullyTransparent" parent="Widget.Sherlock.ActionBar">
+    <style name="MyThemes.DarkTheme.ActionBar.FullyTransparent" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">@color/transparent</item>
         <item name="background">@color/transparent</item>
     </style>
 
-    <style name="MyThemesLightTheme.ActionBar.FullyTransparent" parent="Widget.Sherlock.Light.ActionBar">
+    <style name="MyThemesLightTheme.ActionBar.FullyTransparent" parent="Widget.AppCompat.Light.ActionBar">
         <item name="android:background">@color/transparent</item>
         <item name="background">@color/transparent</item>
     </style>

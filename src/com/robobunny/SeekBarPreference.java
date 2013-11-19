@@ -1,10 +1,11 @@
 package com.robobunny;
 
+import org.holoeverywhere.preference.Preference;
+
 import com.ioabsoftware.gameraven.R;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.preference.Preference;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;

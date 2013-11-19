@@ -1,5 +1,7 @@
 package com.ioabsoftware.gameraven;
 
+import org.holoeverywhere.app.Activity;
+
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.PorterDuff;
@@ -9,10 +11,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.ioabsoftware.gameraven.R;
 
-public class About extends SherlockActivity {
+public class About extends Activity {
 
 	public void onCreate(Bundle savedInstanceState) {
 		if (AllInOneV2.getUsingLightTheme()) {
@@ -25,9 +26,9 @@ public class About extends SherlockActivity {
     	
     	Drawable aBarDrawable;
 		if (AllInOneV2.getUsingLightTheme())
-			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_dark_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_dark_holo);
 		else
-			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_light_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_light_holo);
 		
 		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
 		getSupportActionBar().setBackgroundDrawable(aBarDrawable);

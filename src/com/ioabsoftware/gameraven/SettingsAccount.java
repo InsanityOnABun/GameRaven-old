@@ -7,6 +7,11 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
 import org.holoeverywhere.app.ProgressDialog;
+import org.holoeverywhere.preference.Preference;
+import org.holoeverywhere.preference.Preference.OnPreferenceClickListener;
+import org.holoeverywhere.preference.PreferenceActivity;
+import org.holoeverywhere.preference.PreferenceCategory;
+import org.holoeverywhere.preference.PreferenceGroup;
 import org.holoeverywhere.widget.Toast;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
@@ -22,9 +27,6 @@ import android.content.DialogInterface.OnShowListener;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceCategory;
-import android.preference.Preference.OnPreferenceClickListener;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -36,13 +38,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult;
 import com.ioabsoftware.gameraven.networking.NetworkTask;
 import com.ioabsoftware.gameraven.networking.Session;
 
-public class SettingsAccount extends SherlockPreferenceActivity implements HandlesNetworkResult {
+public class SettingsAccount extends PreferenceActivity implements HandlesNetworkResult {
 
 	public static final int ADD_ACCOUNT_DIALOG = 300;
 	public static final int VERIFY_ACCOUNT_DIALOG = 301;
@@ -69,9 +70,9 @@ public class SettingsAccount extends SherlockPreferenceActivity implements Handl
 
         Drawable aBarDrawable;
 		if (AllInOneV2.getUsingLightTheme())
-			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_dark_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_dark_holo);
 		else
-			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_light_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_light_holo);
 		
 		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
 		getSupportActionBar().setBackgroundDrawable(aBarDrawable);
@@ -229,6 +230,7 @@ public class SettingsAccount extends SherlockPreferenceActivity implements Handl
 				settings.edit().remove("customSig" + clickedAccount.getTitle().toString()).commit();
 				
 				AllInOneV2.getAccounts().removeValue(clickedAccount.getTitle().toString());
+				accounts.removePreference(clickedAccount);
 				accounts.removePreference(clickedAccount);
 				dismissDialog(MODIFY_ACCOUNT_DIALOG);
 				Toast.makeText(SettingsAccount.this, "Account removed.", Toast.LENGTH_SHORT).show();

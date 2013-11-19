@@ -38,7 +38,6 @@ import javax.crypto.spec.SecretKeySpec;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
-import com.ioabsoftware.gameraven.R;
 
 
 public class SecurePreferences {

@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -19,6 +20,7 @@ import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
+import com.ioabsoftware.gameraven.views.rowdata.TopicRowData.ReadStatus;
 
 public class TopicRowView extends BaseRowView {
 	
@@ -107,7 +109,7 @@ public class TopicRowView extends BaseRowView {
         msgLP.setText(myData.getMCount() + " Msgs, Last: " + myData.getLastPost());
         
         int hlColor = myData.getHLColor();
-        if (myData.isRead()) {
+        if (myData.getStatus() == ReadStatus.READ) {
         	int readColor = AllInOneV2.getUsingLightTheme() ? Color.LTGRAY : Color.DKGRAY;
         	tc.setTextColor(readColor);
         	title.setTextColor(readColor);
@@ -125,6 +127,19 @@ public class TopicRowView extends BaseRowView {
         	title.setTextColor(defaultTitleColor);
         	msgLP.setTextColor(defaultMsgLPColor);
         	lpLink.setTextColor(defaultLPLinkColor);
+        }
+        
+        if (myData.getStatus() == ReadStatus.NEW_POST) {
+        	tc.setTypeface(tc.getTypeface(), Typeface.ITALIC);
+        	title.setTypeface(title.getTypeface(), Typeface.ITALIC);
+        	msgLP.setTypeface(msgLP.getTypeface(), Typeface.ITALIC);
+        	lpLink.setTypeface(lpLink.getTypeface(), Typeface.ITALIC);
+        }
+        else {
+        	tc.setTypeface(tc.getTypeface(), Typeface.NORMAL);
+        	title.setTypeface(title.getTypeface(), Typeface.NORMAL);
+        	msgLP.setTypeface(msgLP.getTypeface(), Typeface.NORMAL);
+        	lpLink.setTypeface(lpLink.getTypeface(), Typeface.NORMAL);
         }
         
         switch (myData.getType()) {

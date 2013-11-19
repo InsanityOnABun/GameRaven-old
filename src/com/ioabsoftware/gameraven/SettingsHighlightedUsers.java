@@ -30,9 +30,9 @@ public class SettingsHighlightedUsers extends Activity implements HlUDDismissLis
 		
 		Drawable aBarDrawable;
 		if (AllInOneV2.getUsingLightTheme())
-			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_dark_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_dark_holo);
 		else
-			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_light_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_light_holo);
 		
 		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
 		getSupportActionBar().setBackgroundDrawable(aBarDrawable);

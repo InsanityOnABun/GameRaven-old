@@ -10,8 +10,14 @@ import java.util.ArrayList;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
+import org.holoeverywhere.preference.ListPreference;
+import org.holoeverywhere.preference.Preference;
+import org.holoeverywhere.preference.Preference.OnPreferenceChangeListener;
+import org.holoeverywhere.preference.Preference.OnPreferenceClickListener;
+import org.holoeverywhere.preference.PreferenceActivity;
 import org.holoeverywhere.widget.NumberPicker;
 import org.holoeverywhere.widget.Toast;
 
@@ -31,23 +37,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.Preference.OnPreferenceChangeListener;
-import android.preference.Preference.OnPreferenceClickListener;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 
-public class SettingsMain extends SherlockPreferenceActivity {
+public class SettingsMain extends PreferenceActivity {
 	
 	public static final String NO_DEFAULT_ACCOUNT = "N/A";
 	
@@ -73,9 +73,9 @@ public class SettingsMain extends SherlockPreferenceActivity {
         
         Drawable aBarDrawable;
 		if (AllInOneV2.getUsingLightTheme())
-			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_dark_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_dark_holo);
 		else
-			aBarDrawable = getResources().getDrawable(R.drawable.abs__ab_transparent_light_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_light_holo);
 		
 		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
 		getSupportActionBar().setBackgroundDrawable(aBarDrawable);

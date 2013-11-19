@@ -15,7 +15,7 @@
 
         <TextView
             android:id="@+id/ttStopTracking"
-            style="@style/Widget.Sherlock.ActionButton"
+            style="@style/Widget.AppCompat.ActionButton"
             android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/ttTitle"
@@ -74,7 +74,7 @@
 
         <TextView
             android:id="@+id/ttLastPostLink"
-            style="@style/Widget.Sherlock.ActionButton"
+            style="@style/Widget.AppCompat.ActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/ttTitle"

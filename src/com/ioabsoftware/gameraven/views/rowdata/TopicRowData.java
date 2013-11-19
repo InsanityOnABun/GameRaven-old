@@ -10,6 +10,10 @@ public class TopicRowData extends BaseRowData {
 		NORMAL, POLL, LOCKED, ARCHIVED, PINNED
 	}
 	
+	public static enum ReadStatus {
+		UNREAD, READ, NEW_POST
+	}
+	
 	String title, tc, lastPost, mCount, url, lPostUrl;
 	public String getTitle() {return title;}
 	public String getTC() {return tc;}
@@ -21,8 +25,8 @@ public class TopicRowData extends BaseRowData {
 	TopicType type;
 	public TopicType getType() {return type;}
 	
-	boolean isRead;
-	public boolean isRead() {return isRead;}
+	ReadStatus status;
+	public ReadStatus getStatus() {return status;}
 	
 	int hlColor;
 	public int getHLColor() {return hlColor;}
@@ -33,7 +37,7 @@ public class TopicRowData extends BaseRowData {
 	}
 	
 	public TopicRowData(String titleIn, String tcIn, String lastPostIn, String mCountIn, 
-			String urlIn, String lPostUrlIn, TopicType typeIn, boolean isReadIn, int hlColorIn) {
+			String urlIn, String lPostUrlIn, TopicType typeIn, ReadStatus statusIn, int hlColorIn) {
 		title = titleIn;
 		tc = tcIn;
 		lastPost = lastPostIn;
@@ -43,7 +47,7 @@ public class TopicRowData extends BaseRowData {
 		
 		type = typeIn;
 		
-		isRead = isReadIn;
+		status = statusIn;
 		
 		hlColor = hlColorIn;
 	}
