@@ -33,6 +33,13 @@
     <string name="settings">Settings</string>
     <string name="bug_report">Bug Report</string>
     <string name="exit_gameraven">Exit GameRaven</string>
+    <string name="search">Search</string>
+    <string name="return_to_topic_list">Return to Topic List</string>
+    <string name="add_to_favorites">Add to Favorites</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
+    <string name="post_new_">Post new...</string>
+    <string name="refresh">Refresh</string>
+    <string name="last_post">Last\nPost</string>
     
     <!-- Start Color Picker Strings -->
     <string name="dialog_color_picker">Color Picker</string>

@@ -1,9 +1,7 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.text.method.ArrowKeyMovementMethod;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -47,8 +45,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 	public MessageRowView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
-
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	
 	public MessageRowView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
@@ -86,14 +83,15 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 		if (AllInOneV2.isAccentLight())
         	((ImageView) findViewById(R.id.mvMessageMenuIcon)).setImageResource(R.drawable.ic_info_light);
 	}
-
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	
 	@Override
 	public void showView(BaseRowData data) {
 		if (data.getRowType() != myType)
 			throw new IllegalArgumentException("data RowType does not match myType");
 		
 		myData = (MessageRowData) data;
+
+		topWrapper.setClickable(myData.topClickable());
 		
 		user.setText((myData.hasTitles() ? myData.getUser() + myData.getUserTitles() : myData.getUser()));
 		post.setText((myData.hasMsgID() ? "#" + myData.getPostNum() + ", " + myData.getPostTime() : myData.getPostTime()));
@@ -121,11 +119,9 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 		
 		message.setText(myData.getSpannedMessage());
 		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-        	message.setMovementMethod(ArrowKeyMovementMethod.getInstance());
-        	message.setTextIsSelectable(true);
-            // the autoLink attribute must be removed, if you hasn't set it then ok, otherwise call textView.setAutoLink(0);
-        }
+    	message.setMovementMethod(ArrowKeyMovementMethod.getInstance());
+    	message.setTextIsSelectable(true);
+        // the autoLink attribute must be removed, if you hasn't set it then ok, otherwise call textView.setAutoLink(0);
 
 		headerSelector.invalidateDrawable(headerSelector);
 	}

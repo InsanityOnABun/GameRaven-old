@@ -4,29 +4,25 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.holoeverywhere.app.AlertDialog;
-import org.holoeverywhere.app.Dialog;
-import org.holoeverywhere.app.ProgressDialog;
-import org.holoeverywhere.preference.Preference;
-import org.holoeverywhere.preference.Preference.OnPreferenceClickListener;
-import org.holoeverywhere.preference.PreferenceActivity;
-import org.holoeverywhere.preference.PreferenceCategory;
-import org.holoeverywhere.preference.PreferenceGroup;
-import org.holoeverywhere.widget.Toast;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
 
-import android.app.PendingIntent;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.DialogInterface.OnShowListener;
+import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -34,11 +30,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.Toast;
 
-import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult;
 import com.ioabsoftware.gameraven.networking.NetworkTask;
 import com.ioabsoftware.gameraven.networking.Session;
@@ -70,12 +66,12 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 
         Drawable aBarDrawable;
 		if (AllInOneV2.getUsingLightTheme())
-			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_dark_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);
 		else
-			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_light_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_light_holo);
 		
 		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
-		getSupportActionBar().setBackgroundDrawable(aBarDrawable);
+		getActionBar().setBackgroundDrawable(aBarDrawable);
 
         accounts = (PreferenceCategory) findPreference("accounts");
 		updateAccountList();

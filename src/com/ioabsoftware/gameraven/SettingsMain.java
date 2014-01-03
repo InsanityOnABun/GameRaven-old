@@ -10,18 +10,10 @@ import java.util.ArrayList;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.holoeverywhere.LayoutInflater;
-import org.holoeverywhere.app.AlertDialog;
-import org.holoeverywhere.app.Dialog;
-import org.holoeverywhere.preference.ListPreference;
-import org.holoeverywhere.preference.Preference;
-import org.holoeverywhere.preference.Preference.OnPreferenceChangeListener;
-import org.holoeverywhere.preference.Preference.OnPreferenceClickListener;
-import org.holoeverywhere.preference.PreferenceActivity;
-import org.holoeverywhere.widget.NumberPicker;
-import org.holoeverywhere.widget.Toast;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -37,14 +29,21 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 
 public class SettingsMain extends PreferenceActivity {
@@ -73,12 +72,12 @@ public class SettingsMain extends PreferenceActivity {
         
         Drawable aBarDrawable;
 		if (AllInOneV2.getUsingLightTheme())
-			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_dark_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);
 		else
-			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_light_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_light_holo);
 		
 		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
-		getSupportActionBar().setBackgroundDrawable(aBarDrawable);
+		getActionBar().setBackgroundDrawable(aBarDrawable);
 
 		Intent notifierIntent = new Intent(this, NotifierService.class);
 		notifPendingIntent = PendingIntent.getService(this, 0, notifierIntent, 0);

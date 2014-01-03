@@ -1,19 +1,12 @@
 package com.ioabsoftware.gameraven.db;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
 import net.margaritov.preference.colorpicker.ColorPickerDialog;
 import net.margaritov.preference.colorpicker.ColorPickerDialog.OnColorChangedListener;
-
-import org.holoeverywhere.app.AlertDialog;
-import org.holoeverywhere.widget.Toast;
-
-import com.ioabsoftware.gameraven.AllInOneV2;
-import com.ioabsoftware.gameraven.R;
-
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,7 +14,6 @@ import android.content.DialogInterface.OnShowListener;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.v4.app._HoloActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,6 +21,10 @@ import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.ioabsoftware.gameraven.AllInOneV2;
+import com.ioabsoftware.gameraven.R;
 
 public class HighlightListDBHelper extends SQLiteOpenHelper {
 	
@@ -141,6 +137,8 @@ public class HighlightListDBHelper extends SQLiteOpenHelper {
 				highlightedUsers.put(cur.getString(1).toLowerCase(Locale.US), 
 						new HighlightedUser(cur.getInt(0), cur.getString(1), cur.getString(2), cur.getInt(3)));
 			} while (cur.moveToNext());
+			
+			cur.close();
 		}
 	}
 	
@@ -160,7 +158,7 @@ public class HighlightListDBHelper extends SQLiteOpenHelper {
 		final boolean isAddNew = isNewCheck;
 		
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(c);
-    	LayoutInflater inflater = ((_HoloActivity) c).getLayoutInflater();
+    	LayoutInflater inflater = c.getLayoutInflater();
     	final View dialogView = inflater.inflate(R.layout.highlightuserdialog, null);
     	dialogBuilder.setView(dialogView);
     	dialogBuilder.setTitle("Add Highlighted User");

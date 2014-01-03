@@ -19,14 +19,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.Session;
-import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 
 public class NotifierService extends IntentService {
 	
@@ -164,7 +160,7 @@ public class NotifierService extends IntentService {
 						
 						notifText.append(" found");
 						
-						NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(
+						Notification.Builder notifBuilder = new Notification.Builder(
 								this)
 								.setSmallIcon(R.drawable.ic_notif_small)
 								.setContentTitle("GameRaven")
@@ -176,7 +172,7 @@ public class NotifierService extends IntentService {
 						notifBuilder.setDefaults(Notification.DEFAULT_ALL);
 						NotificationManager notifManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 						// mId allows you to update the notification later on.
-						notifManager.notify(NOTIF_TAG, NOTIF_ID, notifBuilder.build());
+						notifManager.notify(NOTIF_TAG, NOTIF_ID, notifBuilder.getNotification());
 					}
 				}
 

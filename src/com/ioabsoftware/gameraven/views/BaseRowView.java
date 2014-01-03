@@ -1,15 +1,12 @@
 package com.ioabsoftware.gameraven.views;
 
-import com.ioabsoftware.gameraven.R;
-
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.LinearLayout;
+
+import com.ioabsoftware.gameraven.R;
 
 
 public abstract class BaseRowView extends LinearLayout {
@@ -25,8 +22,7 @@ public abstract class BaseRowView extends LinearLayout {
 		super(context, attrs);
 		init(context);
 	}
-
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	
 	public BaseRowView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init(context);

@@ -16,9 +16,6 @@
 
 package net.margaritov.preference.colorpicker;
 
-import org.holoeverywhere.preference.Preference;
-import org.holoeverywhere.widget.LinearLayout;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -27,9 +24,11 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.preference.Preference;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 /**
  * A preference type that allows a user to choose a time

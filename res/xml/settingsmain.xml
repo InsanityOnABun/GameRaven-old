@@ -146,7 +146,7 @@
             android:defaultValue="100"
             android:key="textScale"
             android:max="120"
-            android:summary="Adjust the scale of various text elements"
+            android:summary="Adjust the scale of various text elements."
             android:title="Text Scale"
             robobunny:min="80"
             robobunny:unitsLeft=""

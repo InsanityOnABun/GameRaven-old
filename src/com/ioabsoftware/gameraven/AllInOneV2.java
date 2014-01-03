@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -20,24 +19,22 @@ import net.simonvt.menudrawer.MenuDrawer.Type;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.holoeverywhere.app.Activity;
-import org.holoeverywhere.app.AlertDialog;
-import org.holoeverywhere.app.Dialog;
-import org.holoeverywhere.widget.Spinner;
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
-import uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.AbcDefaultHeaderTransformer;
-import uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
 import uk.co.senab.actionbarpulltorefresh.library.Options;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
-
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
+import android.app.ActionBar;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -51,13 +48,9 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -78,6 +71,8 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -105,7 +100,6 @@ import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 
 public class AllInOneV2 extends Activity {
 	
-	private static boolean needToCheckForUpdate = true;
 	public static boolean isReleaseBuild = true;
 	
 	public static final int NEW_VERSION_DIALOG = 101;
@@ -116,7 +110,6 @@ public class AllInOneV2 extends Activity {
 	public static final int CHANGE_LOGGED_IN_DIALOG = 106;
 	
 	protected static final String ACCOUNTS_PREFNAME = "com.ioabsoftware.DroidFAQs.Accounts";
-	protected static final String SALT_FALLBACK = "RIP Man fan died at the room shot up to 97 degrees";
 	protected static String secureSalt;
 	
 	public static final String EMPTY_STRING = "";
@@ -263,7 +256,7 @@ public class AllInOneV2 extends Activity {
     	
         setContentView(R.layout.allinonev2);
         
-        aBar = getSupportActionBar();
+        aBar = getActionBar();
         aBar.setDisplayHomeAsUpEnabled(true);
         aBar.setDisplayShowTitleEnabled(false);
     	
@@ -292,7 +285,6 @@ public class AllInOneV2 extends Activity {
 
         
         ((Button) drawer.findViewById(R.id.dwrChangeAcc)).setOnClickListener(new View.OnClickListener() {
-			@SuppressWarnings("deprecation")
 			@Override
 			public void onClick(View v) {
 				drawer.closeMenu(true);
@@ -333,22 +325,12 @@ public class AllInOneV2 extends Activity {
 		});
         
         ((Button) drawer.findViewById(R.id.dwrCopyCurrURL)).setOnClickListener(new View.OnClickListener() {
-			@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-			@SuppressWarnings("deprecation")
 			@Override
 			public void onClick(View v) {
-				if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-	                android.text.ClipboardManager clipboard = 
-	                		(android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-	                
-	                clipboard.setText(session.getLastPath());
-	            } 
-				else {
-	                android.content.ClipboardManager clipboard = 
-	                		(android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-	                
-	                clipboard.setPrimaryClip(android.content.ClipData.newPlainText("simple text", session.getLastPath()));
-	            }
+				android.content.ClipboardManager clipboard = 
+                		(android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                
+                clipboard.setPrimaryClip(android.content.ClipData.newPlainText("simple text", session.getLastPath()));
 				drawer.closeMenu(true);
 				Toast.makeText(AllInOneV2.this, "URL copied to clipboard.", Toast.LENGTH_SHORT).show();
 			}
@@ -389,6 +371,7 @@ public class AllInOneV2 extends Activity {
         	drawer.setSlideDrawable(R.drawable.ic_drawer_light);
         else
         	drawer.setSlideDrawable(R.drawable.ic_drawer);
+        
         // Whether the previous drawable should be shown
         drawer.setDrawerIndicatorEnabled(true);
         
@@ -400,23 +383,6 @@ public class AllInOneV2 extends Activity {
                    .putString("timezone", TimeZone.getDefault().getID())
                    .commit();
         }
-        else {
-        	if (!settings.contains("accsDoNotNeedConversion")) {
-        		// accs need conversion from static SALT to UUID system
-        		HashMap<String, String> accs = new HashMap<String, String>();
-        		SecurePreferences oldAccs = new SecurePreferences(getApplicationContext(), ACCOUNTS_PREFNAME, SALT_FALLBACK, false);
-        		for (String s : oldAccs.getKeys()) {
-        			accs.put(s, oldAccs.getString(s));
-        		}
-        		secureSalt = UUID.randomUUID().toString();
-        		settings.edit().putString("secureSalt", secureSalt).commit();
-        		SecurePreferences newAccs = new SecurePreferences(getApplicationContext(), ACCOUNTS_PREFNAME, secureSalt, false);
-        		for (Map.Entry<String, String> e : accs.entrySet()) {
-        			newAccs.put(e.getKey(), e.getValue());
-        		}
-        	}
-        }
-        settings.edit().putBoolean("accsDoNotNeedConversion", true).commit();
     	
     	wtl("getting accounts");
     	
@@ -427,9 +393,7 @@ public class AllInOneV2 extends Activity {
     		settings.edit().putString("secureSalt", secureSalt).commit();
     	}
         accounts = new SecurePreferences(getApplicationContext(), ACCOUNTS_PREFNAME, secureSalt, false);
-
-    	wtl("getting all the views");
-
+        
         ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
         
         // Now setup the PullToRefreshLayout
@@ -554,9 +518,6 @@ public class AllInOneV2 extends Activity {
     	wtl("starting db creation");
     	hlDB = new HighlightListDBHelper(this);
     	
-    	wtl("setting check for update flag");
-    	needToCheckForUpdate = true;
-    	
 		wtl("onCreate finishing");
     }
 
@@ -577,7 +538,8 @@ public class AllInOneV2 extends Activity {
 	@Override
     public boolean onSearchRequested() {
     	if (searchIcon.isVisible())
-    		MenuItemCompat.expandActionView(searchIcon);
+    		searchIcon.expandActionView();
+    	
 		return false;
     }
 	
@@ -602,7 +564,7 @@ public class AllInOneV2 extends Activity {
         postIcon = menu.getItem(4);
         refreshIcon = menu.getItem(5);
         
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchIcon);
+        SearchView searchView = (SearchView) searchIcon.getActionView();
         if (searchView != null)
         {
             SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -653,7 +615,8 @@ public class AllInOneV2 extends Activity {
         	return true;
         	
         case R.id.search:
-    		MenuItemCompat.expandActionView(searchIcon);
+        	onSearchRequested();
+//    		MenuItemCompat.expandActionView(searchIcon);
         	return true;
         	
         case R.id.addFav:
@@ -851,14 +814,14 @@ public class AllInOneV2 extends Activity {
 			
 			Drawable aBarDrawable;
 			if (usingLightTheme)
-				aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_dark_holo);
+				aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);
 			else
-				aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_light_holo);
+				aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_light_holo);
 			
 			aBarDrawable.setColorFilter(accentColor, PorterDuff.Mode.SRC_ATOP);
 			aBar.setBackgroundDrawable(aBarDrawable);
 			
-			((AbcDefaultHeaderTransformer) ptrLayout.getHeaderTransformer()).setProgressBarColor(accentColor);
+			((DefaultHeaderTransformer) ptrLayout.getHeaderTransformer()).setProgressBarColor(accentColor);
 			
 			
 			findViewById(R.id.aioPJTopSep).setBackgroundColor(accentColor);
@@ -902,12 +865,6 @@ public class AllInOneV2 extends Activity {
     		}
     	}
 		
-		if (needToCheckForUpdate && isReleaseBuild) {
-			needToCheckForUpdate = false;
-			wtl("starting update check");
-			session.devCheckForUpdate();
-		}
-		
 		title.setSelected(true);
 		
 		NotifierService.dismissNotif(this);
@@ -950,72 +907,70 @@ public class AllInOneV2 extends Activity {
 	}
 	
 	public void timeoutCleanup(NetDesc desc) {
-		if (desc != NetDesc.DEV_UPDATE_CHECK) {
-			String msg = "timeout msg unset";
-			String title = "timeout title unset";
-			String posButtonText = "pos button text not set";
-			boolean retrySub = false;
-			switch (desc) {
-			case LOGIN_S1:
-			case LOGIN_S2:
-				title = "Login Timeout";
-				msg = "Login timed out, press retry to try again.";
-				posButtonText = "Retry";
-				break;
-			case POSTMSG_S1:
-			case POSTMSG_S2:
-			case POSTMSG_S3:
-			case POSTTPC_S1:
-			case POSTTPC_S2:
-			case POSTTPC_S3:
-			case QPOSTMSG_S1:
-			case QPOSTMSG_S3:
-			case QPOSTTPC_S1:
-			case QPOSTTPC_S3:
-				title = "Post Timeout";
-				msg = "Post timed out. Press refresh to check if your post made it through.";
-				posButtonText = "Refresh";
-				break;
-			default:
-				retrySub = true;
-				title = "Timeout";
-				msg = "Connection timed out, press retry to try again.";
-				posButtonText = "Retry";
-				break;
+		String msg = "timeout msg unset";
+		String title = "timeout title unset";
+		String posButtonText = "pos button text not set";
+		boolean retrySub = false;
+		switch (desc) {
+		case LOGIN_S1:
+		case LOGIN_S2:
+			title = "Login Timeout";
+			msg = "Login timed out, press retry to try again.";
+			posButtonText = "Retry";
+			break;
+		case POSTMSG_S1:
+		case POSTMSG_S2:
+		case POSTMSG_S3:
+		case POSTTPC_S1:
+		case POSTTPC_S2:
+		case POSTTPC_S3:
+		case QPOSTMSG_S1:
+		case QPOSTMSG_S3:
+		case QPOSTTPC_S1:
+		case QPOSTTPC_S3:
+			title = "Post Timeout";
+			msg = "Post timed out. Press refresh to check if your post made it through.";
+			posButtonText = "Refresh";
+			break;
+		default:
+			retrySub = true;
+			title = "Timeout";
+			msg = "Connection timed out, press retry to try again.";
+			posButtonText = "Retry";
+			break;
 
-			}
-			final boolean retry = retrySub;
-			
-			AlertDialog.Builder b = new AlertDialog.Builder(this);
-			b.setTitle(title);
-			b.setMessage(msg);
-			b.setPositiveButton(posButtonText, new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					if (retry)
-						session.get(session.getLastAttemptedDesc(), session.getLastAttemptedPath(), null);
-					else
-						refreshClicked(new View(AllInOneV2.this));
-				}
-			});
-			b.setNegativeButton("Dismiss", new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					try {
-						processContent(session.getLastRes(), session.getLastDesc(), 
-								session.getLastRes().parse(), session.getLastRes().url().toString());
-					} catch (IOException e) {
-						/* THIS SHOULD NEVER CRASH
-						 * No res should be able to get set to lastRes
-						 * if it is unparseable
-						 */
-						e.printStackTrace();
-					}
-					postExecuteCleanup(session.getLastDesc());
-				}
-			});
-			b.create().show();
 		}
+		final boolean retry = retrySub;
+		
+		AlertDialog.Builder b = new AlertDialog.Builder(this);
+		b.setTitle(title);
+		b.setMessage(msg);
+		b.setPositiveButton(posButtonText, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				if (retry)
+					session.get(session.getLastAttemptedDesc(), session.getLastAttemptedPath(), null);
+				else
+					refreshClicked(new View(AllInOneV2.this));
+			}
+		});
+		b.setNegativeButton("Dismiss", new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				try {
+					processContent(session.getLastRes(), session.getLastDesc(), 
+							session.getLastRes().parse(), session.getLastRes().url().toString());
+				} catch (IOException e) {
+					/* THIS SHOULD NEVER CRASH
+					 * No res should be able to get set to lastRes
+					 * if it is unparseable
+					 */
+					e.printStackTrace();
+				}
+				postExecuteCleanup(session.getLastDesc());
+			}
+		});
+		b.create().show();
 	}
 
 	private void uiCleanup() {
@@ -1084,7 +1039,6 @@ public class AllInOneV2 extends Activity {
 	 * ******************************************/
 	
 	ArrayList<BaseRowData> adapterRows;
-	@SuppressWarnings("deprecation")
 	@SuppressLint("SetJavaScriptEnabled")
 	public void processContent(Response res, NetDesc desc, Document pRes, String resUrl) {
 		
@@ -1094,7 +1048,7 @@ public class AllInOneV2 extends Activity {
 		contentList.scrollTo(0, 0);
 
 		searchIcon.setVisible(false);
-		MenuItemCompat.collapseActionView(searchIcon);
+		searchIcon.collapseActionView();
 		
 		postIcon.setVisible(false);
 		
@@ -1109,21 +1063,6 @@ public class AllInOneV2 extends Activity {
 		try {
 			if (res != null) {
 				wtl("res is not null");
-				
-				if (desc == NetDesc.DEV_UPDATE_CHECK) {
-					wtl("GRAIO hNR determined this is update check response");
-					
-					String version = pRes.getElementById("contentsinner").ownText();
-					version = version.trim();
-					wtl("latest version is " + version);
-					if (!version.equals(this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName)) {
-						wtl("version does not match current version, showing update dialog");
-						showDialog(NEW_VERSION_DIALOG);
-					}
-					
-					wtl("GRAIO hNR finishing via return, desc: " + desc.name());
-					return;
-				}
 
 				wtl("setting board, topic, message id to null");
 				boardID = null;
@@ -1735,7 +1674,8 @@ public class AllInOneV2 extends Activity {
 					
 					adapterRows.add(new HeaderRowData("Current Version"));
 					
-					Element currRow;
+					Element currRow, body;
+					MessageRowData msg;
 					String postTime;
 					String mID = parseMessageID(resUrl);
 					for (int x = 0; x < msgDRows.size(); x++) {
@@ -1749,10 +1689,10 @@ public class AllInOneV2 extends Activity {
 							else
 								postTime = currRow.child(0).textNodes().get(0).text();
 							
-							Element body = currRow.child(1);
-							adapterRows.add(new MessageRowData(user, null, null, postTime, body, boardID, topicID, mID, 0));
-							//TODO: disable top click
-//							msg.disableTopClick();
+							body = currRow.child(1);
+							msg = new MessageRowData(user, null, null, postTime, body, boardID, topicID, mID, 0);
+							msg.disableTopClick();
+							adapterRows.add(msg);
 						}
 					}
 					
@@ -2118,7 +2058,6 @@ public class AllInOneV2 extends Activity {
 	
 	private MessageRowView clickedMsg;
 	private String quoteSelection;
-	@SuppressWarnings("deprecation")
 	public void messageMenuClicked(MessageRowView msg) {
 		clickedMsg = msg;
 		quoteSelection = clickedMsg.getSelection();
@@ -2200,7 +2139,6 @@ public class AllInOneV2 extends Activity {
 			postCleanup();
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void postPollOptions(View view) {
 		showDialog(POLL_OPTIONS_DIALOG);
 	}
@@ -2372,7 +2310,6 @@ public class AllInOneV2 extends Activity {
 		
     	Dialog dialog = b.create();
 		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			@SuppressWarnings("deprecation")
 			public void onDismiss(DialogInterface dialog) {
 				removeDialog(POLL_OPTIONS_DIALOG);
 			}
@@ -2405,7 +2342,6 @@ public class AllInOneV2 extends Activity {
 		
 		Dialog dialog = reportMsgBuilder.create();
 		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			@SuppressWarnings("deprecation")
 			public void onDismiss(DialogInterface dialog) {
 				removeDialog(REPORT_MESSAGE_DIALOG);
 			}
@@ -2441,7 +2377,6 @@ public class AllInOneV2 extends Activity {
 		final String[] options = new String[listBuilder.size()];
 		listBuilder.toArray(options);
 		msgActionBuilder.setItems(options, new OnClickListener() {
-			@SuppressWarnings("deprecation")
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				String selected = options[which];
@@ -2481,7 +2416,6 @@ public class AllInOneV2 extends Activity {
 		
 		Dialog dialog = msgActionBuilder.create();
 		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			@SuppressWarnings("deprecation")
 			public void onDismiss(DialogInterface dialog) {
 				removeDialog(MESSAGE_ACTION_DIALOG);
 			}
@@ -2547,7 +2481,6 @@ public class AllInOneV2 extends Activity {
 		});
   	
 		d.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			@SuppressWarnings("deprecation")
 			public void onDismiss(DialogInterface dialog) {
 				pmSending = null;
 				removeDialog(SEND_PM_DIALOG);
@@ -2577,7 +2510,6 @@ public class AllInOneV2 extends Activity {
 		
 		accountChanger.setTitle("Pick an Account");
 		accountChanger.setSingleChoiceItems(usernames, selected, new DialogInterface.OnClickListener() {
-		    @SuppressWarnings("deprecation")
 			public void onClick(DialogInterface dialog, int item) {
 		    	if (item == 0 && currUser != null)
 		    		session = new Session(AllInOneV2.this);
@@ -2598,7 +2530,6 @@ public class AllInOneV2 extends Activity {
 		
 		Dialog d = accountChanger.create();
 		d.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			@SuppressWarnings("deprecation")
 			public void onDismiss(DialogInterface dialog) {
 				removeDialog(CHANGE_LOGGED_IN_DIALOG);
 			}
@@ -2621,7 +2552,6 @@ public class AllInOneV2 extends Activity {
 	}
 	
 	public String savedTo, savedSubject, savedMessage;
-    @SuppressWarnings("deprecation")
 	public void pmSetup(String toIn, String subjectIn, String messageIn) {
     	if (toIn != null && !toIn.equals("null"))
     		savedTo = toIn;
@@ -2645,7 +2575,6 @@ public class AllInOneV2 extends Activity {
     	showDialog(SEND_PM_DIALOG);
     }
     
-    @SuppressWarnings("deprecation")
 	public void pmCleanup(boolean wasSuccessful, String error) {
     	if (wasSuccessful) {
     		Toast.makeText(this, "PM sent.", Toast.LENGTH_SHORT).show();
@@ -2860,8 +2789,8 @@ public class AllInOneV2 extends Activity {
     
     @Override
 	public void onBackPressed() {
-    	if (MenuItemCompat.isActionViewExpanded(searchIcon)) {
-    		MenuItemCompat.collapseActionView(searchIcon);
+    	if (searchIcon.isActionViewExpanded()) {
+    		searchIcon.collapseActionView();
     	}
     	else if (drawer.isMenuVisible()) {
     		drawer.closeMenu(true);

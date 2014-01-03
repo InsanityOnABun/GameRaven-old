@@ -36,7 +36,7 @@
 
         <Button
             android:id="@+id/dwrChangeAcc"
-            style="@style/Widget.AppCompat.ActionButton"
+            style="@android:style/Widget.Holo.ActionButton"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
@@ -78,7 +78,7 @@
 
             <Button
                 android:id="@+id/dwrBoardJumper"
-                style="@style/Widget.AppCompat.ActionButton"
+                style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/listPreferredItemHeight"
                 android:gravity="left|center_vertical"
@@ -106,7 +106,7 @@
 
                     <Button
                         android:id="@+id/dwrAMPList"
-                        style="@style/Widget.AppCompat.ActionButton"
+                        style="@android:style/Widget.Holo.ActionButton"
                         android:layout_width="match_parent"
                         android:layout_height="?android:attr/listPreferredItemHeight"
                         android:gravity="left|center_vertical"
@@ -123,7 +123,7 @@
 
                 <Button
                     android:id="@+id/dwrTrackedTopics"
-                    style="@style/Widget.AppCompat.ActionButton"
+                    style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="match_parent"
                     android:layout_height="?android:attr/listPreferredItemHeight"
                     android:gravity="left|center_vertical"
@@ -139,7 +139,7 @@
 
                 <Button
                     android:id="@+id/dwrPMInbox"
-                    style="@style/Widget.AppCompat.ActionButton"
+                    style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="match_parent"
                     android:layout_height="?android:attr/listPreferredItemHeight"
                     android:gravity="left|center_vertical"
@@ -177,7 +177,7 @@
 
         <Button
             android:id="@+id/dwrCopyCurrURL"
-            style="@style/Widget.AppCompat.ActionButton"
+            style="@android:style/Widget.Holo.ActionButton"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
@@ -193,7 +193,7 @@
 
         <Button
             android:id="@+id/dwrHighlightList"
-            style="@style/Widget.AppCompat.ActionButton"
+            style="@android:style/Widget.Holo.ActionButton"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
@@ -209,7 +209,7 @@
 
         <Button
             android:id="@+id/dwrSettings"
-            style="@style/Widget.AppCompat.ActionButton"
+            style="@android:style/Widget.Holo.ActionButton"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
@@ -225,7 +225,7 @@
 
         <Button
             android:id="@+id/dwrODBugRep"
-            style="@style/Widget.AppCompat.ActionButton"
+            style="@android:style/Widget.Holo.ActionButton"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"
@@ -241,7 +241,7 @@
 
         <Button
             android:id="@+id/dwrExit"
-            style="@style/Widget.AppCompat.ActionButton"
+            style="@android:style/Widget.Holo.ActionButton"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:gravity="left|center_vertical"

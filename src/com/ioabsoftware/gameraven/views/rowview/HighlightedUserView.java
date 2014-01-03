@@ -1,6 +1,7 @@
-package com.ioabsoftware.gameraven.views;
+package com.ioabsoftware.gameraven.views.rowview;
 
 import android.content.Context;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,8 +13,10 @@ import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.SettingsHighlightedUsers;
 import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
+import com.ioabsoftware.gameraven.views.BaseRowData;
+import com.ioabsoftware.gameraven.views.BaseRowView;
 
-public class HighlightedUserView extends LinearLayout implements OnClickListener {
+public class HighlightedUserView extends BaseRowView implements OnClickListener {
 	
 	private SettingsHighlightedUsers hlActivity;
 	
@@ -21,6 +24,18 @@ public class HighlightedUserView extends LinearLayout implements OnClickListener
 	
 	private TextView nameView, labelView;
 	private LinearLayout colorFrame;
+	
+	public HighlightedUserView(Context context) {
+		super(context);
+	}
+
+	public HighlightedUserView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+	}
+	
+	public HighlightedUserView(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+	}
 
 	public HighlightedUserView(SettingsHighlightedUsers hlActivityIn, HighlightedUser userIn) {
 		super(hlActivityIn);
@@ -42,12 +57,26 @@ public class HighlightedUserView extends LinearLayout implements OnClickListener
         if (user.getColor() != 0)
         	colorFrame.setBackgroundColor(user.getColor());
         
+        setBackgroundDrawable(getSelector());
+        
         setOnClickListener(this);
 	}
 
 	@Override
 	public void onClick(View v) {
 		HighlightListDBHelper.showHighlightUserDialog(hlActivity, user, null, hlActivity);
+	}
+
+	@Override
+	protected void init(Context context) {
+		// nada
+		
+	}
+
+	@Override
+	public void showView(BaseRowData data) {
+		// nada
+		
 	}
 	
 	

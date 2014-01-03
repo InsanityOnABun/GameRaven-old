@@ -194,11 +194,6 @@ public class Session implements HandlesNetworkResult {
 		return ROOT + path;
 	}
 	
-	public void devCheckForUpdate() {
-		new NetworkTask(this, NetDesc.DEV_UPDATE_CHECK, Method.GET, 
-				new HashMap<String, String>(), "http://freetexthost.com/zknqchrb4q", null).execute();
-	}
-	
 	/**
 	 * Sends a GET request to a specified page.
 	 * @param caller The HandlesNetworkResult making this call.
@@ -255,7 +250,6 @@ public class Session implements HandlesNetworkResult {
 			aio.preExecuteSetup(desc);
 			break;
 
-		case DEV_UPDATE_CHECK:
 		case LOGIN_S2:
 		case MARKMSG_S2:
 		case DLTMSG_S2:
@@ -286,13 +280,6 @@ public class Session implements HandlesNetworkResult {
 				aio.wtl("cloning pRes");
 				Document pResClone = pRes.clone();
 				String resUrl = res.url().toString();
-
-				aio.wtl("checking if update check");
-				if (desc == NetDesc.DEV_UPDATE_CHECK) {
-					aio.wtl("session hNR has determined this is an update check");
-					aio.processContent(res, desc, pResClone, resUrl);
-					return;
-				}
 
 				aio.wtl("checking if res does not start with root");
 				if (!res.url().toString().startsWith(ROOT)) {
@@ -408,7 +395,6 @@ public class Session implements HandlesNetworkResult {
 				case PM_INBOX:
 				case PM_DETAIL:
 				case UNSPECIFIED:
-				case DEV_UPDATE_CHECK:
 				case LOGIN_S1:
 				case LOGIN_S2:
 				case DLTMSG_S1:
@@ -477,7 +463,6 @@ public class Session implements HandlesNetworkResult {
 							aio.wtl("finished history addition");
 							break;
 							
-						case DEV_UPDATE_CHECK:
 						case MARKMSG_S1:
 						case MARKMSG_S2:
 						case CLOSE_TOPIC:
@@ -520,7 +505,6 @@ public class Session implements HandlesNetworkResult {
 				case PM_INBOX:
 				case PM_DETAIL:
 				case UNSPECIFIED:
-				case DEV_UPDATE_CHECK:
 				case LOGIN_S1:
 				case LOGIN_S2:
 				case QEDIT_MSG:
@@ -884,7 +868,6 @@ public class Session implements HandlesNetworkResult {
 					}
 					break;
 
-				case DEV_UPDATE_CHECK:
 				case GAME_SEARCH:
 				case BOARD_LIST:
 				case MESSAGE_DETAIL:
@@ -938,7 +921,6 @@ public class Session implements HandlesNetworkResult {
 			
 			break;
 			
-		case DEV_UPDATE_CHECK:
 		case LOGIN_S1:
 		case LOGIN_S2:
 		case MARKMSG_S1:

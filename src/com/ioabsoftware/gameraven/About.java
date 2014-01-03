@@ -1,7 +1,6 @@
 package com.ioabsoftware.gameraven;
 
-import org.holoeverywhere.app.Activity;
-
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.PorterDuff;
@@ -10,8 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-
-import com.ioabsoftware.gameraven.R;
 
 public class About extends Activity {
 
@@ -26,12 +23,12 @@ public class About extends Activity {
     	
     	Drawable aBarDrawable;
 		if (AllInOneV2.getUsingLightTheme())
-			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_dark_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);
 		else
-			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_light_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_light_holo);
 		
 		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
-		getSupportActionBar().setBackgroundDrawable(aBarDrawable);
+		getActionBar().setBackgroundDrawable(aBarDrawable);
         
         try {
 			((TextView) findViewById(R.id.abtBuildVer)).setText(this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName);

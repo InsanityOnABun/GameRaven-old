@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="MyThemes.DarkTheme" parent="Holo.Theme">
-        <item name="android:actionBarStyle" tools:targetApi="11">@style/MyThemes.DarkTheme.ActionBar.FullyTransparent</item>
-        <item name="actionBarStyle">@style/MyThemes.DarkTheme.ActionBar.FullyTransparent</item>
+    <style name="MyThemes.DarkTheme" parent="@android:style/Theme.Holo">
+        <item name="android:actionBarStyle">@style/MyThemes.DarkTheme.ActionBar.FullyTransparent</item>
         <item name="themedSearchIcon">@drawable/ic_search</item>
         <item name="themedAddFavIcon">@drawable/ic_addfav</item>
         <item name="themedRemFavIcon">@drawable/ic_remfav</item>
@@ -17,10 +16,8 @@
         <item name="themedDrawerHeaderColor">@color/drawerHeader</item>
     </style>
 
-    <style name="MyThemes.LightTheme" parent="Holo.Theme.Light">
-        <item name="android:actionBarStyle" tools:targetApi="11">@style/MyThemesLightTheme.ActionBar.FullyTransparent</item>
-        <item name="actionBarStyle">@style/MyThemesLightTheme.ActionBar.FullyTransparent</item>
-        <item name="windowContentOverlay">@null</item>
+    <style name="MyThemes.LightTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/MyThemes.LightTheme.ActionBar.FullyTransparent</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="themedSearchIcon">@drawable/ic_search_light</item>
         <item name="themedAddFavIcon">@drawable/ic_addfav_light</item>
@@ -35,14 +32,12 @@
         <item name="themedDrawerHeaderColor">@color/drawerHeaderLight</item>
     </style>
 
-    <style name="MyThemes.DarkTheme.ActionBar.FullyTransparent" parent="Widget.AppCompat.ActionBar">
+    <style name="MyThemes.DarkTheme.ActionBar.FullyTransparent" parent="@android:style/Widget.Holo.ActionBar">
         <item name="android:background">@color/transparent</item>
-        <item name="background">@color/transparent</item>
     </style>
 
-    <style name="MyThemesLightTheme.ActionBar.FullyTransparent" parent="Widget.AppCompat.Light.ActionBar">
+    <style name="MyThemes.LightTheme.ActionBar.FullyTransparent" parent="@android:style/Widget.Holo.Light.ActionBar">
         <item name="android:background">@color/transparent</item>
-        <item name="background">@color/transparent</item>
     </style>
 
 </resources>

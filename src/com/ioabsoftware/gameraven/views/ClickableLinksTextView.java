@@ -2,9 +2,7 @@ package com.ioabsoftware.gameraven.views;
 
 import java.lang.reflect.Field;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.text.Layout;
 import android.text.Spannable;
 import android.text.style.ClickableSpan;
@@ -151,14 +149,5 @@ public class ClickableLinksTextView extends TextView {
         } catch (Exception e) {
             return false;
         }
-    }
-    
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    @Override
-	public boolean isTextSelectable() {
-    	if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
-            return false;
-        
-        return super.isTextSelectable();
     }
 }

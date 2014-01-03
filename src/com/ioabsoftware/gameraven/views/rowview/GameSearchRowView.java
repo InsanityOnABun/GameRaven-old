@@ -1,13 +1,10 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
@@ -16,9 +13,7 @@ import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
-import com.ioabsoftware.gameraven.views.rowdata.BoardRowData;
 import com.ioabsoftware.gameraven.views.rowdata.GameSearchRowData;
-import com.ioabsoftware.gameraven.views.rowdata.BoardRowData.BoardType;
 
 public class GameSearchRowView extends BaseRowView {
 	
@@ -33,8 +28,7 @@ public class GameSearchRowView extends BaseRowView {
 	public GameSearchRowView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
-
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	
 	public GameSearchRowView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}

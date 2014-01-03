@@ -1,11 +1,8 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -45,8 +42,7 @@ public class TopicRowView extends BaseRowView {
 	public TopicRowView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
-
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	
 	public TopicRowView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
@@ -130,16 +126,17 @@ public class TopicRowView extends BaseRowView {
         }
         
         if (myData.getStatus() == ReadStatus.NEW_POST) {
-        	tc.setTypeface(tc.getTypeface(), Typeface.ITALIC);
-        	title.setTypeface(title.getTypeface(), Typeface.ITALIC);
-        	msgLP.setTypeface(msgLP.getTypeface(), Typeface.ITALIC);
-        	lpLink.setTypeface(lpLink.getTypeface(), Typeface.ITALIC);
+        	tc.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
+        	title.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
+        	msgLP.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
+        	lpLink.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
         }
         else {
-        	tc.setTypeface(tc.getTypeface(), Typeface.NORMAL);
-        	title.setTypeface(title.getTypeface(), Typeface.NORMAL);
-        	msgLP.setTypeface(msgLP.getTypeface(), Typeface.NORMAL);
-        	lpLink.setTypeface(lpLink.getTypeface(), Typeface.NORMAL);
+        	
+        	tc.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+        	title.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+        	msgLP.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+        	lpLink.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
         }
         
         switch (myData.getType()) {

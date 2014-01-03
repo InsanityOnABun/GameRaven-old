@@ -7,9 +7,7 @@ import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 
-
 import android.os.AsyncTask;
-import android.util.Log;
 
 public class NetworkTask extends AsyncTask<Void, Void, Response> {
 

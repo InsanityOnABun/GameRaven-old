@@ -1,7 +1,6 @@
 package com.ioabsoftware.gameraven;
 
-import org.holoeverywhere.app.Activity;
-
+import android.app.Activity;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -9,10 +8,9 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
-import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.db.HlUDDismissListener;
-import com.ioabsoftware.gameraven.views.HighlightedUserView;
+import com.ioabsoftware.gameraven.views.rowview.HighlightedUserView;
 
 public class SettingsHighlightedUsers extends Activity implements HlUDDismissListener {
 
@@ -30,12 +28,12 @@ public class SettingsHighlightedUsers extends Activity implements HlUDDismissLis
 		
 		Drawable aBarDrawable;
 		if (AllInOneV2.getUsingLightTheme())
-			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_dark_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);
 		else
-			aBarDrawable = getResources().getDrawable(R.drawable.abc_ab_transparent_light_holo);
+			aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_light_holo);
 		
 		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
-		getSupportActionBar().setBackgroundDrawable(aBarDrawable);
+		getActionBar().setBackgroundDrawable(aBarDrawable);
 		
 		wrapper = new LinearLayout(this);
 		LinearLayout outerWrapper = new LinearLayout(this);

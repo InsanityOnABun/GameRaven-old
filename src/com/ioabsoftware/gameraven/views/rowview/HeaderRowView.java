@@ -1,12 +1,9 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
@@ -27,8 +24,7 @@ public class HeaderRowView extends BaseRowView {
 	public HeaderRowView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
-
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	
 	public HeaderRowView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}

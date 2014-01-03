@@ -1,9 +1,8 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.text.Html;
+import android.text.method.ArrowKeyMovementMethod;
 import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -31,8 +30,7 @@ public class PMDetailRowView extends BaseRowView {
 	public PMDetailRowView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
-
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	
 	public PMDetailRowView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
@@ -55,16 +53,16 @@ public class PMDetailRowView extends BaseRowView {
         findViewById(R.id.pmdMidSep).setBackgroundColor(AllInOneV2.getAccentColor());
         findViewById(R.id.pmdBotSep).setBackgroundColor(AllInOneV2.getAccentColor());
         
-        setBackgroundDrawable(getSelector());
+        replyLabel.setBackgroundDrawable(getSelector());
         
-        setOnClickListener(new OnClickListener() {
+        replyLabel.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				AllInOneV2.get().pmSetup(myData.getSender(), myData.getTitle(), null);
 			}
 		});
 	}
-
+	
 	@Override
 	public void showView(BaseRowData data) {
 		if (data.getRowType() != myType)
@@ -74,6 +72,10 @@ public class PMDetailRowView extends BaseRowView {
 		
 		messageView.setText(Html.fromHtml(myData.getMessage(), null, null));
         Linkify.addLinks(messageView, Linkify.WEB_URLS);
+        
+    	messageView.setMovementMethod(ArrowKeyMovementMethod.getInstance());
+    	messageView.setTextIsSelectable(true);
+        // the autoLink attribute must be removed, if you hasn't set it then ok, otherwise call textView.setAutoLink(0);
 	}
 
 }

@@ -48,13 +48,13 @@
 
         <TextView
             android:id="@+id/tvLastPostLink"
-            style="@style/Widget.AppCompat.ActionButton"
+            style="@android:style/Widget.Holo.ActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/tvTitle"
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/tvMsgCountLastPost"
-            android:text="Last\nPost"
+            android:text="@string/last_post"
             android:textColor="?attr/themedTextColor"
             android:textSize="12sp" />
 

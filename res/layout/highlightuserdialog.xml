@@ -52,7 +52,7 @@
 
         <Button
             android:id="@+id/huSetColor"
-            style="@style/Widget.AppCompat.ActionButton"
+            style="@android:style/Widget.Holo.ActionButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"

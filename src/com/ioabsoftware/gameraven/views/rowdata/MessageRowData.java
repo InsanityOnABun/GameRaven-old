@@ -45,8 +45,8 @@ import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.MessageLinkSpan;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.RichTextUtils;
-import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
+import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.ClickableLinksTextView;
 import com.ioabsoftware.gameraven.views.GRQuoteSpan;
@@ -63,6 +63,10 @@ public class MessageRowData extends BaseRowData {
 	private Spannable spannedMessage;
 	
 	private int hlColor;
+	
+	private boolean topClickable = true;
+	public void disableTopClick() {topClickable = false;}
+	public boolean topClickable() {return topClickable;}
 	
 	public String getUser() {return username;}
 	public String getUserTitles() {return userTitles;}

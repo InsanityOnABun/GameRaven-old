@@ -3,8 +3,6 @@ package com.ioabsoftware.gameraven.views.rowdata;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.RowType;
 
-import android.content.Context;
-
 public class PMRowData extends BaseRowData {
 
 	private String subject, sender, time, url;

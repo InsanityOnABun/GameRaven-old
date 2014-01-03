@@ -1,11 +1,11 @@
 package com.ioabsoftware.gameraven.views;
 
-import com.ioabsoftware.gameraven.AllInOneV2;
-
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+
+import com.ioabsoftware.gameraven.AllInOneV2;
 
 public class StateDrawable extends LayerDrawable {
 

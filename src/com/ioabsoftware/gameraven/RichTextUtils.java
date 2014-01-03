@@ -4,7 +4,6 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.CharacterStyle;
-import android.text.style.URLSpan;
 
 public class RichTextUtils {
 	
