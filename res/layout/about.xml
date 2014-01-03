@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<org.holoeverywhere.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/abtGlobalWrapper"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical" >
 
-    <org.holoeverywhere.widget.TextView
+    <TextView
         android:id="@+id/abtTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="GameRaven"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <org.holoeverywhere.widget.TextView
+    <TextView
         android:id="@+id/abtBuildVer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,30 +21,22 @@
         android:text="**BUILD_VER_NOT_SET**"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <org.holoeverywhere.widget.TextView
-        android:id="@+id/abtInstructions"
+    <TextView
+        android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingBottom="20dp"
-        android:text="When reporting a bug, please note the build version of the app shown above, and try to provide any information to help reproduce the bug."
+        android:gravity="center_horizontal"
+        android:text="Copyright \u00a9 Insanity On A Bun Software"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <org.holoeverywhere.widget.LinearLayout
+    <LinearLayout
         android:id="@+id/abtBtnWrapper1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp" >
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp" >
 
-        <org.holoeverywhere.widget.Button
-            android:id="@+id/abtBugReport"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="bugReport"
-            android:text="Send Bug Report" />
-
-        <org.holoeverywhere.widget.Button
+        <Button
             android:id="@+id/abtFeatureRequest"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -52,43 +44,21 @@
             android:onClick="featureRequest"
             android:text="Send Feature Request" />
 
-        <org.holoeverywhere.widget.Button
+        <Button
             android:id="@+id/abtGenFeedback"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:onClick="genFeedback"
             android:text="Send Feedback" />
-    </org.holoeverywhere.widget.LinearLayout>
 
-    <org.holoeverywhere.widget.LinearLayout
-        android:id="@+id/abtBtnWrapper2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <org.holoeverywhere.widget.Button
-            android:id="@+id/abtKnownBugs"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="viewBugs"
-            android:text="View Known Bugs" />
-
-        <org.holoeverywhere.widget.Button
+        <Button
             android:id="@+id/abtPrivacyPolicy"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:onClick="viewPrivacyPolicy"
             android:text="View Privacy Policy" />
+    </LinearLayout>
 
-        <org.holoeverywhere.widget.Button
-            android:id="@+id/abtUpdateCheck"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="updateCheck"
-            android:text="Check for Updates" />
-    </org.holoeverywhere.widget.LinearLayout>
-
-</org.holoeverywhere.widget.LinearLayout>
+</LinearLayout>

@@ -102,7 +102,6 @@ public class AllInOneV2 extends Activity {
 	
 	public static boolean isReleaseBuild = true;
 	
-	public static final int NEW_VERSION_DIALOG = 101;
 	public static final int SEND_PM_DIALOG = 102;
 	public static final int MESSAGE_ACTION_DIALOG = 103;
 	public static final int REPORT_MESSAGE_DIALOG = 104;
@@ -866,6 +865,21 @@ public class AllInOneV2 extends Activity {
     	}
 		
 		title.setSelected(true);
+		
+		if (!settings.contains("beenWelcomed")) {
+			settings.edit().putBoolean("beenWelcomed", true).apply();
+			AlertDialog.Builder b = new AlertDialog.Builder(this);
+			b.setTitle("Welcome!");
+			b.setMessage("Would you like to view the quick start help files? This dialog won't be shown again.");
+			b.setPositiveButton("Yes", new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/InsanityOnABun/GameRaven/wiki")));
+				}
+			});
+			b.setNegativeButton("No", null);
+			b.create().show();
+		}
 		
 		NotifierService.dismissNotif(this);
 		wtl("onResume finishing");
@@ -2218,10 +2232,6 @@ public class AllInOneV2 extends Activity {
     	
     	switch (id) {
     		
-    	case NEW_VERSION_DIALOG:
-    		dialog = createNewVerDialog();
-    		break;
-    		
     	case SEND_PM_DIALOG:
     		dialog = createSendPMDialog();
     		break;
@@ -2535,20 +2545,6 @@ public class AllInOneV2 extends Activity {
 			}
 		});
 		return d;
-	}
-
-	private Dialog createNewVerDialog() {
-		AlertDialog.Builder newVersion = new AlertDialog.Builder(this);
-		newVersion.setTitle("New Version of GameRaven found!");
-		newVersion.setMessage("Would you like to go to the download page for the new version?");
-		newVersion.setPositiveButton("Yes", new OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.evernote.com/shard/s252/sh/b680bb2b-64a1-426d-a98d-6cbfb846a883/75eebb4db64c6e1769dd2d0ace487a88")));
-			}
-		});
-		
-		newVersion.setNegativeButton("No", null);
-		return newVersion.create();
 	}
 	
 	public String savedTo, savedSubject, savedMessage;
