@@ -100,7 +100,7 @@ import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 
 public class AllInOneV2 extends Activity {
 	
-	public static boolean isReleaseBuild = true;
+	public static boolean isReleaseBuild = false;
 	
 	public static final int SEND_PM_DIALOG = 102;
 	public static final int MESSAGE_ACTION_DIALOG = 103;
@@ -1927,13 +1927,21 @@ public class AllInOneV2 extends Activity {
 					Elements cells = row.children();
 					Element titleCell = cells.get(0);
 					
-					String title = titleCell.child(0).text();
+					String lvlReq = EMPTY_STRING;
+					String title = EMPTY_STRING;
+					
+					if (!titleCell.textNodes().isEmpty())
+						lvlReq = titleCell.textNodes().get(0).toString();
+					
+					title = titleCell.child(0).text() + lvlReq;
 					
 					String boardDesc = null;
 					if (titleCell.children().size() > 2)
 						boardDesc = titleCell.child(2).text();
 					
-					String link = cells.get(0).children().first().attr("href");
+					String link = titleCell.children().first().attr("href");
+					if (link.equals(EMPTY_STRING))
+						link = null;
 					
 					String tCount = null;
 					String mCount = null;
