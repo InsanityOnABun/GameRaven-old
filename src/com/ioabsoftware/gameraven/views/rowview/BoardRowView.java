@@ -1,5 +1,6 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -56,11 +57,21 @@ public class BoardRowView extends BaseRowView {
     	setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (myData.getBoardType() == BoardType.LIST) {
-					AllInOneV2.get().getSession().get(NetDesc.BOARD_LIST, myData.getUrl(), null);
+				if (myData.getUrl() == null) {
+					AlertDialog.Builder b = new AlertDialog.Builder(BoardRowView.this.getContext());
+					b.setTitle("Cannot Access " + myData.getName());
+					b.setMessage(myData.getName() + 
+							" cannot be accessed, most likely due to user level requirements.");
+					b.setPositiveButton("Ok", null);
+					b.create().show();
 				}
 				else {
-					AllInOneV2.get().getSession().get(NetDesc.BOARD, myData.getUrl(), null);
+					if (myData.getBoardType() == BoardType.LIST) {
+						AllInOneV2.get().getSession().get(NetDesc.BOARD_LIST, myData.getUrl(), null);
+					}
+					else {
+						AllInOneV2.get().getSession().get(NetDesc.BOARD, myData.getUrl(), null);
+					}
 				}
 			}
 		});
