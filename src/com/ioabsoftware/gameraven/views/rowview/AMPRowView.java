@@ -7,6 +7,7 @@ import android.view.View;
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 import com.ioabsoftware.gameraven.views.RowType;
+import com.ioabsoftware.gameraven.views.rowdata.AMPRowData;
 
 public class AMPRowView extends TopicRowView {
 
@@ -32,6 +33,16 @@ public class AMPRowView extends TopicRowView {
 			public boolean onLongClick(View v) {
 				String url = myData.getUrl().substring(0, myData.getUrl().lastIndexOf('/'));
 				AllInOneV2.get().getSession().get(NetDesc.BOARD, url, null);
+				return true;
+			}
+		});
+		
+		lpLink.setOnLongClickListener(new OnLongClickListener() {
+			
+			@Override
+			public boolean onLongClick(View v) {
+				AllInOneV2.get().enableGoToUrlDefinedPost();
+				AllInOneV2.get().getSession().get(NetDesc.TOPIC, ((AMPRowData) myData).getYLPUrl(), null);
 				return true;
 			}
 		});

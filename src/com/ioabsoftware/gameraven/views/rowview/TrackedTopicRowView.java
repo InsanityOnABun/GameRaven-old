@@ -77,7 +77,7 @@ public class TrackedTopicRowView extends BaseRowView {
         lPostLink.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				AllInOneV2.get().enableGoToLastPost();
+				AllInOneV2.get().enableGoToUrlDefinedPost();
 				AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getLastPostUrl(), null);
 			}
 		});
