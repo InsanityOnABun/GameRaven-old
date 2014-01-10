@@ -380,6 +380,14 @@ public class Session implements HandlesNetworkResult {
 					}
 				}
 				
+				if (pRes.title().equals("GameFAQs - 503 - Temporarily Unavailable")) {
+					aio.fourOhError(503, "GameFAQs is experiencing some temporary difficulties with " +
+							"the site. Probably because of something they did. Please wait a few " +
+							"seconds before refreshing this page to try again.");
+					
+					return;
+				}
+				
 				updateUserLevel(pRes);
 				
 				switch (desc) {
