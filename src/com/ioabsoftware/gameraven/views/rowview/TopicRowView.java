@@ -74,13 +74,12 @@ public class TopicRowView extends BaseRowView {
         
         setBackgroundDrawable(getSelector());
         
-        TextView lPostLink = (TextView) findViewById(R.id.tvLastPostLink);
-        lPostLink.setBackgroundDrawable(getSelector());
-        lPostLink.setTextSize(TypedValue.COMPLEX_UNIT_PX, lPostLink.getTextSize() * AllInOneV2.getTextScale());
-        lPostLink.setOnClickListener(new OnClickListener() {
+        lpLink.setBackgroundDrawable(getSelector());
+        lpLink.setTextSize(TypedValue.COMPLEX_UNIT_PX, lpLink.getTextSize() * AllInOneV2.getTextScale());
+        lpLink.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				AllInOneV2.get().enableGoToLastPost();
+				AllInOneV2.get().enableGoToUrlDefinedPost();
 				AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getLastPostUrl(), null);
 			}
 		});

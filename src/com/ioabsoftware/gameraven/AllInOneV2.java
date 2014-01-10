@@ -100,7 +100,7 @@ import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 
 public class AllInOneV2 extends Activity {
 	
-	public static boolean isReleaseBuild = true;
+	public static boolean isReleaseBuild = false;
 	
 	public static final int SEND_PM_DIALOG = 102;
 	public static final int MESSAGE_ACTION_DIALOG = 103;
@@ -1274,16 +1274,17 @@ public class AllInOneV2 extends Activity {
 							// [board] [title] [msg] [last post] [your last post]
 							Elements cells = row.children();
 							String board = cells.get(0).text();
-							Element titleLinkElem = cells.get(1).children()
-									.first();
+							Element titleLinkElem = cells.get(1).child(0);
 							String title = titleLinkElem.text();
 							String link = titleLinkElem.attr("href");
 							String mCount = cells.get(2).textNodes().get(0).text().trim();
-							Element lPostLinkElem = cells.get(3).children().get(1);
+							Element lPostLinkElem = cells.get(3).child(1);
 							String lPost = lPostLinkElem.text();
 							String lPostLink = lPostLinkElem.attr("href");
+							String ylpLink = cells.get(4).child(1).attr("href");
 							
-							adapterRows.add(new AMPRowData(title, board, lPost, mCount, link, lPostLink));
+							adapterRows.add(new AMPRowData(title, board, lPost, mCount, link,
+									lPostLink, ylpLink));
 						}
 					}
 					else {
@@ -1579,8 +1580,16 @@ public class AllInOneV2 extends Activity {
 						updatePostingRights(pRes, true);
 					}
 					
+					String goToThisPost = null;
+					if (goToUrlDefinedPost) {
+						String url = res.url().toString();
+						goToThisPost = url.substring(url.indexOf('#') + 1);
+					}
+					
 					Elements rows = pRes.select("table.board").first().getElementsByTag("tr");
 					int rowCount = rows.size();
+					
+					int msgIndex = 0;
 					
 					Set<String> hlUsers = hlDB.getHighlightedUsers().keySet();
 					for (int x = 0; x < rowCount; x++) {
@@ -1669,9 +1678,16 @@ public class AllInOneV2 extends Activity {
 							userTitles += " (" + hUser.getLabel() + ")";
 						}
 						
+						if (goToUrlDefinedPost) {
+							if (postNum.equals(goToThisPost))
+								goToThisIndex = msgIndex;
+						}
+						
 						wtl("creating messagerowdata object");
 						adapterRows.add(new MessageRowData(user, userTitles, postNum, 
 								postTime, msgBody, boardID, topicID, mID, hlColor));
+						
+						msgIndex++;
 					}
 					
 					break;
@@ -1883,11 +1899,11 @@ public class AllInOneV2 extends Activity {
 		
 		contentList.setAdapter(new ViewAdapter(this, adapterRows));
 		
-		if (consumeGoToLastPost() && !Session.applySavedScroll) {
+		if (consumeGoToUrlDefinedPost() && !Session.applySavedScroll) {
 			contentList.post(new Runnable() {
 		        @Override
 		        public void run() {
-		        	contentList.setSelection(contentList.getCount() - 1);
+		        	contentList.setSelection(goToThisIndex);
 		        }
 		    });
 		}
@@ -2019,11 +2035,12 @@ public class AllInOneV2 extends Activity {
 			isRoR = false;
 	}
 	
-	private boolean goToLastPost = false;
-	public void enableGoToLastPost() {goToLastPost = true;}
-	private boolean consumeGoToLastPost() {
-		boolean temp = goToLastPost;
-		goToLastPost = false;
+	private boolean goToUrlDefinedPost = false;
+	private int goToThisIndex = 0;
+	public void enableGoToUrlDefinedPost() {goToUrlDefinedPost = true;}
+	private boolean consumeGoToUrlDefinedPost() {
+		boolean temp = goToUrlDefinedPost;
+		goToUrlDefinedPost = false;
 		return temp;
 	}
 	
