@@ -39,6 +39,8 @@ import com.ioabsoftware.gameraven.networking.HandlesNetworkResult;
 import com.ioabsoftware.gameraven.networking.NetworkTask;
 import com.ioabsoftware.gameraven.networking.Session;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+
 public class SettingsAccount extends PreferenceActivity implements HandlesNetworkResult {
 
 	public static final int ADD_ACCOUNT_DIALOG = 300;
@@ -173,9 +175,9 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 									.execute();
 						}
 						else {
-							Toast.makeText(SettingsAccount.this, 
+							Crouton.showText(SettingsAccount.this, 
 									"Please use your username, not your email address.", 
-									Toast.LENGTH_SHORT).show();
+									AllInOneV2.getCroutonStyle());
 						}
 					}
 		        });
@@ -207,12 +209,12 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if (isChecked) {
 					settings.edit().putString("defaultAccount", clickedAccount.getTitle().toString()).commit();
-					Toast.makeText(SettingsAccount.this, "Default account saved.", Toast.LENGTH_SHORT).show();
+					Crouton.showText(SettingsAccount.this, "Default account saved.", AllInOneV2.getCroutonStyle());
 				}
 				else {
 					settings.edit().putString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT).commit();
 					settings.edit().putLong("notifsLastPost", 0).commit();
-					Toast.makeText(SettingsAccount.this, "Default account removed.", Toast.LENGTH_SHORT).show();
+					Crouton.showText(SettingsAccount.this, "Default account removed.", AllInOneV2.getCroutonStyle());
 				}
 			}
 		});
@@ -229,7 +231,7 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 				accounts.removePreference(clickedAccount);
 				accounts.removePreference(clickedAccount);
 				dismissDialog(MODIFY_ACCOUNT_DIALOG);
-				Toast.makeText(SettingsAccount.this, "Account removed.", Toast.LENGTH_SHORT).show();
+				Crouton.showText(SettingsAccount.this, "Account removed.", AllInOneV2.getCroutonStyle());
 			}
         });
     	
@@ -270,14 +272,20 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 				
 				if (length < 161) {
 					if (lines < 2) {
-						settings.edit().putString("customSig" + clickedAccount.getTitle().toString(), sigContent.getText().toString()).commit();
-						Toast.makeText(SettingsAccount.this, "Signature saved.", Toast.LENGTH_SHORT).show();
+						settings.edit().putString("customSig" + clickedAccount.getTitle().toString(), 
+								sigContent.getText().toString()).commit();
+						
+						Crouton.showText(SettingsAccount.this, "Signature saved.", AllInOneV2.getCroutonStyle());
 					}
 					else
-						Toast.makeText(SettingsAccount.this, "Signatures can only have 1 line break.", Toast.LENGTH_SHORT).show();
+						Crouton.showText(SettingsAccount.this, 
+								"Signatures can only have 1 line break.", 
+								AllInOneV2.getCroutonStyle());
 				}
 				else
-					Toast.makeText(SettingsAccount.this, "Signatures can only have a maximum of 160 characters.", Toast.LENGTH_SHORT).show();
+					Crouton.showText(SettingsAccount.this, 
+							"Signatures can only have a maximum of 160 characters.", 
+							AllInOneV2.getCroutonStyle());
 			}
 		});
     	
@@ -286,7 +294,7 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 			public void onClick(DialogInterface dialog, int which) {
 				settings.edit().putString("customSig" + clickedAccount.getTitle().toString(), "").commit();
 				sigContent.setText("");
-				Toast.makeText(SettingsAccount.this, "Signature cleared and saved.", Toast.LENGTH_SHORT).show();
+				Crouton.showText(SettingsAccount.this, "Signature cleared and saved.", AllInOneV2.getCroutonStyle());
 			}
 		});
     	
@@ -312,7 +320,7 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 			try {
 				pRes = res.parse();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				// should never fail
 				e.printStackTrace();
 			}
 			if (desc == NetDesc.VERIFY_ACCOUNT_S1) {
@@ -333,18 +341,20 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 					AllInOneV2.getAccounts().put(verifyUser, verifyPass);
 		    		dismissDialog(VERIFY_ACCOUNT_DIALOG);
 					removeDialog(ADD_ACCOUNT_DIALOG);
-		    		Toast.makeText(this, "Verification succeeded.", Toast.LENGTH_SHORT).show();
+					Crouton.showText(this, "Verification succeeded.", AllInOneV2.getCroutonStyle());
 				}
 				else {
 					dismissDialog(VERIFY_ACCOUNT_DIALOG);
 					showDialog(ADD_ACCOUNT_DIALOG);
-		    		Toast.makeText(this, "Verification failed. Check your username and password and try again.", Toast.LENGTH_SHORT).show();
+					Crouton.showText(this, 
+							"Verification failed. Check your username and password and try again.", 
+							AllInOneV2.getCroutonStyle());
 				}
 			}
 		}
 		else {
 			dismissDialog(VERIFY_ACCOUNT_DIALOG);
-    		Toast.makeText(this, "Network connection failed. Check your network settings.", Toast.LENGTH_SHORT).show();
+			Crouton.showText(this, "Network connection failed. Check your network settings.", AllInOneV2.getCroutonStyle());
 		}
 	}
 

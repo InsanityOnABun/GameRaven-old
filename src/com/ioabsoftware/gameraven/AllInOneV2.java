@@ -62,6 +62,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -74,7 +75,6 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
@@ -98,9 +98,13 @@ import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 
+import de.keyboardsurfer.android.widget.crouton.Configuration;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
+
 public class AllInOneV2 extends Activity {
 	
-	public static boolean isReleaseBuild = true;
+	public static boolean isReleaseBuild = false;
 	
 	public static final int SEND_PM_DIALOG = 102;
 	public static final int MESSAGE_ACTION_DIALOG = 103;
@@ -226,6 +230,12 @@ public class AllInOneV2 extends Activity {
 	private static boolean isAccentLight;
 	public static boolean isAccentLight() {return isAccentLight;}
 	
+	private static Style croutonStyle;
+	public static Style getCroutonStyle() {return croutonStyle;}
+	private static Configuration croutonShort = new Configuration.Builder()
+												.setDuration(2500).build();
+	
+	
 	private static HighlightListDBHelper hlDB;
 	public static HighlightListDBHelper getHLDB() {return hlDB;}
 	
@@ -331,7 +341,7 @@ public class AllInOneV2 extends Activity {
                 
                 clipboard.setPrimaryClip(android.content.ClipData.newPlainText("simple text", session.getLastPath()));
 				drawer.closeMenu(true);
-				Toast.makeText(AllInOneV2.this, "URL copied to clipboard.", Toast.LENGTH_SHORT).show();
+				Crouton.showText(AllInOneV2.this, "URL copied to clipboard.", croutonStyle, ptrLayout);
 			}
 		});
         
@@ -842,6 +852,18 @@ public class AllInOneV2 extends Activity {
 			drawer.findViewById(R.id.dwrCAHSep).setBackgroundColor(accentColor);
 			drawer.findViewById(R.id.dwrNavSep).setBackgroundColor(accentColor);
 			drawer.findViewById(R.id.dwrFuncSep).setBackgroundColor(accentColor);
+			
+			int tColor;
+			if (isAccentLight)
+				tColor = android.R.color.black;
+			else
+				tColor = android.R.color.white;
+			
+			croutonStyle = new Style.Builder()
+								.setBackgroundColorValue(accentColor)
+								.setTextColor(tColor)
+								.setConfiguration(croutonShort)
+								.build();
 		}
 		
 		
@@ -1865,14 +1887,14 @@ public class AllInOneV2 extends Activity {
 				Element pmInboxLink = pRes.select("div.masthead_user").first().select("a[href=/pm/]").first();
 				if (pmInboxLink != null && desc != NetDesc.PM_INBOX) {
 					if (!pmInboxLink.text().equals("Inbox")) {
-						Toast.makeText(this, "You have unread PM(s)", Toast.LENGTH_SHORT).show();
+						Crouton.showText(this, "You have unread PM(s)", croutonStyle, ptrLayout);
 					}
 				}
 				
 				Element trackedLink = pRes.select("div.masthead_user").first().select("a[href=/boards/tracked]").first();
 				if (trackedLink != null && desc != NetDesc.TRACKED_TOPICS) {
 					if (!trackedLink.text().equals("Topics")) {
-						Toast.makeText(this, "You have unread tracked topic(s)", Toast.LENGTH_SHORT).show();
+						Crouton.showText(this, "You have unread tracked topic(s)", croutonStyle, ptrLayout);
 					}
 				}
 
@@ -2101,7 +2123,7 @@ public class AllInOneV2 extends Activity {
 		clickedMsg = msg;
 		quoteSelection = clickedMsg.getSelection();
 		if (quoteSelection != null)
-			Toast.makeText(this, "Selected text prepped for quoting.", Toast.LENGTH_SHORT).show();
+			Crouton.showText(this, "Selected text prepped for quoting.", croutonStyle, ptrLayout);
 		
 		showDialog(MESSAGE_ACTION_DIALOG);
 	}
@@ -2440,7 +2462,7 @@ public class AllInOneV2 extends Activity {
 					session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink(), null);
 				}
 				else {
-					Toast.makeText(AllInOneV2.this, "not recognized: " + selected, Toast.LENGTH_SHORT).show();
+					Crouton.showText(AllInOneV2.this, "not recognized: " + selected, croutonStyle, ptrLayout);
 				}
 				
 				dialog.dismiss();
@@ -2503,13 +2525,22 @@ public class AllInOneV2 extends Activity {
 									
 								}
 								else
-									Toast.makeText(AllInOneV2.this, "The message can't be empty.", Toast.LENGTH_SHORT).show();
+									Crouton.showText(AllInOneV2.this, 
+											"The message can't be empty.", 
+											croutonStyle, 
+											(ViewGroup) to.getParent());
 							}
 							else
-								Toast.makeText(AllInOneV2.this, "The subject can't be empty.", Toast.LENGTH_SHORT).show();
+								Crouton.showText(AllInOneV2.this, 
+										"The subject can't be empty.", 
+										croutonStyle, 
+										(ViewGroup) to.getParent());
 						}
 						else
-							Toast.makeText(AllInOneV2.this, "The recepient can't be empty.", Toast.LENGTH_SHORT).show();
+							Crouton.showText(AllInOneV2.this, 
+									"The recepient can't be empty.", 
+									croutonStyle, 
+									(ViewGroup) to.getParent());
 					}
 		        });
 			}
@@ -2598,11 +2629,15 @@ public class AllInOneV2 extends Activity {
     
 	public void pmCleanup(boolean wasSuccessful, String error) {
     	if (wasSuccessful) {
-    		Toast.makeText(this, "PM sent.", Toast.LENGTH_SHORT).show();
+			Crouton.showText(this, "PM sent.", croutonStyle, ptrLayout);
+			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
+				.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+//				hideSoftInputFromWindow(postBody.getWindowToken(), 0);
+			
         	dismissDialog(SEND_PM_DIALOG);
     	}
     	else {
-    		Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+			Crouton.showText(this, error, croutonStyle, (ViewGroup) pmSending.getParent());
     		pmSending.setVisibility(View.GONE);
     	}
     }
@@ -2734,14 +2769,17 @@ public class AllInOneV2 extends Activity {
 							try {
 							    startActivity(Intent.createChooser(i, "Send mail..."));
 							} catch (android.content.ActivityNotFoundException ex) {
-							    Toast.makeText(AllInOneV2.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+								Crouton.showText(AllInOneV2.this, "There are no email clients installed.", croutonStyle, ptrLayout);
 							}
 							
 							d.dismiss();
 		            	}
 		            	else {
 		            		input.requestFocus();
-		            		Toast.makeText(AllInOneV2.this, "Please include a brief comment in provided text box.", Toast.LENGTH_SHORT).show();
+							Crouton.showText(AllInOneV2.this, 
+									"Please include a brief comment in provided text box.", 
+									croutonStyle, 
+									ptrLayout);
 		            	}
 		            }
 		        });
