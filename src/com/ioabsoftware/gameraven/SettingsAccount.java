@@ -164,7 +164,7 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 
 		            @Override
 		            public void onClick(View view) {
-						verifyUser = ((TextView) v.findViewById(R.id.addaccUser)).getText().toString();
+						verifyUser = ((TextView) v.findViewById(R.id.addaccUser)).getText().toString().trim();
 						verifyPass = ((TextView) v.findViewById(R.id.addaccPassword)).getText().toString();
 						
 						if (verifyUser.indexOf('@') == -1) {
@@ -228,7 +228,6 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 				settings.edit().remove("customSig" + clickedAccount.getTitle().toString()).commit();
 				
 				AllInOneV2.getAccounts().removeValue(clickedAccount.getTitle().toString());
-				accounts.removePreference(clickedAccount);
 				accounts.removePreference(clickedAccount);
 				dismissDialog(MODIFY_ACCOUNT_DIALOG);
 				Crouton.showText(SettingsAccount.this, "Account removed.", AllInOneV2.getCroutonStyle());
