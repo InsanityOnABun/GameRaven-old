@@ -2418,7 +2418,7 @@ public class AllInOneV2 extends Activity {
 		if (Session.isLoggedIn()) {
 			if (postIcon.isVisible())
 				listBuilder.add("Quote");
-			if (Session.getUser().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
+			if (Session.getUser().trim().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
 				if (Session.getUserLevel() > 29 && clickedMsg.isEditable())
 					listBuilder.add("Edit");
 				if (clickedMsg.getMessageID() != null)
