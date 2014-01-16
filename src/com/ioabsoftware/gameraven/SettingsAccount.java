@@ -27,11 +27,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -140,10 +142,14 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
     	return dialog;
     }
     
+    private LinearLayout addAccWrapper;
     private Dialog createAddAccountDialog() {
     	AlertDialog.Builder b = new AlertDialog.Builder(this);
     	LayoutInflater inflater = getLayoutInflater();
     	final View v = inflater.inflate(R.layout.addaccount, null);
+    	
+    	addAccWrapper = (LinearLayout) v.findViewById(R.id.addaccWrapper);
+    	
     	b.setView(v);
     	b.setTitle("Add Account");
     	
@@ -177,10 +183,20 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 						else {
 							Crouton.showText(SettingsAccount.this, 
 									"Please use your username, not your email address.", 
-									AllInOneV2.getCroutonStyle());
+									AllInOneV2.getCroutonStyle(),
+									(ViewGroup) v.findViewById(R.id.addaccUser).getParent());
 						}
 					}
 		        });
+			}
+		});
+    	
+    	d.setOnDismissListener(new OnDismissListener() {
+			
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				addAccWrapper = null;
+				removeDialog(ADD_ACCOUNT_DIALOG);
 			}
 		});
 				
@@ -209,12 +225,18 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if (isChecked) {
 					settings.edit().putString("defaultAccount", clickedAccount.getTitle().toString()).commit();
-					Crouton.showText(SettingsAccount.this, "Default account saved.", AllInOneV2.getCroutonStyle());
+					Crouton.showText(SettingsAccount.this, 
+							"Default account saved.", 
+							AllInOneV2.getCroutonStyle(), 
+							(ViewGroup) buttonView.getParent().getParent());
 				}
 				else {
 					settings.edit().putString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT).commit();
 					settings.edit().putLong("notifsLastPost", 0).commit();
-					Crouton.showText(SettingsAccount.this, "Default account removed.", AllInOneV2.getCroutonStyle());
+					Crouton.showText(SettingsAccount.this, 
+							"Default account removed.", 
+							AllInOneV2.getCroutonStyle(), 
+							(ViewGroup) buttonView.getParent().getParent());
 				}
 			}
 		});
@@ -259,34 +281,7 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 		
 		sigContent.setText(settings.getString("customSig" + clickedAccount.getTitle().toString(), ""));
     	
-    	b.setPositiveButton("Save Sig", new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				String escapedSig = StringEscapeUtils.escapeHtml4(sigContent.getText().toString());
-				int length = escapedSig.length();
-				int lines = 0;
-				for(int i = 0; i < escapedSig.length(); i++) {
-				    if(escapedSig.charAt(i) == '\n') lines++;
-				}
-				
-				if (length < 161) {
-					if (lines < 2) {
-						settings.edit().putString("customSig" + clickedAccount.getTitle().toString(), 
-								sigContent.getText().toString()).commit();
-						
-						Crouton.showText(SettingsAccount.this, "Signature saved.", AllInOneV2.getCroutonStyle());
-					}
-					else
-						Crouton.showText(SettingsAccount.this, 
-								"Signatures can only have 1 line break.", 
-								AllInOneV2.getCroutonStyle());
-				}
-				else
-					Crouton.showText(SettingsAccount.this, 
-							"Signatures can only have a maximum of 160 characters.", 
-							AllInOneV2.getCroutonStyle());
-			}
-		});
+    	b.setPositiveButton("Save Sig", null);
     	
     	b.setNeutralButton("Clear Sig", new OnClickListener() {
 			@Override
@@ -299,7 +294,46 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
     	
     	b.setNegativeButton("Close", null);
     	
-    	AlertDialog d = b.create();
+    	final AlertDialog d = b.create();
+    	
+    	d.setOnShowListener(new OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialog) {
+				d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						String escapedSig = StringEscapeUtils.escapeHtml4(sigContent.getText().toString());
+						int length = escapedSig.length();
+						int lines = 0;
+						for(int i = 0; i < escapedSig.length(); i++) {
+						    if(escapedSig.charAt(i) == '\n') lines++;
+						}
+						
+						if (length < 161) {
+							if (lines < 2) {
+								settings.edit().putString("customSig" + clickedAccount.getTitle().toString(), 
+										sigContent.getText().toString()).commit();
+								
+								Crouton.showText(SettingsAccount.this, "Signature saved.", AllInOneV2.getCroutonStyle());
+								d.dismiss();
+							}
+							else {
+								Crouton.showText(SettingsAccount.this, 
+										"Signatures can only have 1 line break.", 
+										AllInOneV2.getCroutonStyle(),
+										(ViewGroup) sigContent.getParent());
+							}
+						}
+						else {
+							Crouton.showText(SettingsAccount.this, 
+									"Signatures can only have a maximum of 160 characters.", 
+									AllInOneV2.getCroutonStyle(),
+									(ViewGroup) sigContent.getParent());
+						}
+					}
+				});
+			}
+		});
     	
     	d.setOnDismissListener(new OnDismissListener() {
 			@Override
@@ -344,16 +378,16 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 				}
 				else {
 					dismissDialog(VERIFY_ACCOUNT_DIALOG);
-					showDialog(ADD_ACCOUNT_DIALOG);
 					Crouton.showText(this, 
 							"Verification failed. Check your username and password and try again.", 
-							AllInOneV2.getCroutonStyle());
+							AllInOneV2.getCroutonStyle(),
+							addAccWrapper);
 				}
 			}
 		}
 		else {
 			dismissDialog(VERIFY_ACCOUNT_DIALOG);
-			Crouton.showText(this, "Network connection failed. Check your network settings.", AllInOneV2.getCroutonStyle());
+			Crouton.showText(this, "Network connection failed. Check your network settings.", AllInOneV2.getCroutonStyle(), addAccWrapper);
 		}
 	}
 

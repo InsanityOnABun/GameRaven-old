@@ -65,6 +65,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -1058,8 +1061,8 @@ public class AllInOneV2 extends Activity {
 			messageIDForEditing = null;
 			postPostUrl = null;
 			
-			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).
-									hideSoftInputFromWindow(postBody.getWindowToken(), 0);
+			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
+				.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 		}
 	}
 	
@@ -2122,8 +2125,6 @@ public class AllInOneV2 extends Activity {
 	public void messageMenuClicked(MessageRowView msg) {
 		clickedMsg = msg;
 		quoteSelection = clickedMsg.getSelection();
-		if (quoteSelection != null)
-			Crouton.showText(this, "Selected text prepped for quoting.", croutonStyle, ptrLayout);
 		
 		showDialog(MESSAGE_ACTION_DIALOG);
 	}
@@ -2408,6 +2409,11 @@ public class AllInOneV2 extends Activity {
 	
 	private Dialog createMessageActionDialog() {
 		AlertDialog.Builder msgActionBuilder = new AlertDialog.Builder(this);
+		
+		LayoutInflater inflater = getLayoutInflater();
+		final View v = inflater.inflate(R.layout.msgaction, null);
+		msgActionBuilder.setView(v);
+		
 		msgActionBuilder.setTitle("Message Actions");
 		
 		ArrayList<String> listBuilder = new ArrayList<String>();
@@ -2431,12 +2437,17 @@ public class AllInOneV2 extends Activity {
 		listBuilder.add("Highlight User");
 		listBuilder.add("User Details");
 		
-		final String[] options = new String[listBuilder.size()];
-		listBuilder.toArray(options);
-		msgActionBuilder.setItems(options, new OnClickListener() {
+		ListView lv = (ListView) v.findViewById(R.id.maList);
+		final LinearLayout wrapper = (LinearLayout) v.findViewById(R.id.maWrapper);
+		
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+		adapter.addAll(listBuilder);
+		
+		lv.setAdapter(adapter);
+		lv.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				String selected = options[which];
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				String selected = (String) parent.getItemAtPosition(position);
 				if (selected.equals("View Previous Version(s)")) {
 					session.get(NetDesc.MESSAGE_DETAIL, clickedMsg.getMessageDetailLink(), null);
 				}
@@ -2465,7 +2476,7 @@ public class AllInOneV2 extends Activity {
 					Crouton.showText(AllInOneV2.this, "not recognized: " + selected, croutonStyle, ptrLayout);
 				}
 				
-				dialog.dismiss();
+				dismissDialog(MESSAGE_ACTION_DIALOG);
 			}
 		});
 		
@@ -2477,6 +2488,15 @@ public class AllInOneV2 extends Activity {
 				removeDialog(MESSAGE_ACTION_DIALOG);
 			}
 		});
+		
+		dialog.setOnShowListener(new OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialog) {
+				if (quoteSelection != null)
+					Crouton.showText(AllInOneV2.this, "Selected text prepped for quoting.", croutonStyle, wrapper);
+			}
+		});
+		
 		return dialog;
 	}
 
@@ -2632,7 +2652,6 @@ public class AllInOneV2 extends Activity {
 			Crouton.showText(this, "PM sent.", croutonStyle, ptrLayout);
 			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
 				.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-//				hideSoftInputFromWindow(postBody.getWindowToken(), 0);
 			
         	dismissDialog(SEND_PM_DIALOG);
     	}
@@ -2777,9 +2796,9 @@ public class AllInOneV2 extends Activity {
 		            	else {
 		            		input.requestFocus();
 							Crouton.showText(AllInOneV2.this, 
-									"Please include a brief comment in provided text box.", 
+									"Please include a brief comment in the provided text box.", 
 									croutonStyle, 
-									ptrLayout);
+									(ViewGroup) input.getParent());
 		            	}
 		            }
 		        });

@@ -804,7 +804,7 @@ public class Session implements HandlesNetworkResult {
 				case TOPIC:
 					aio.wtl("session hNR determined this is a topic");
 					if (!pRes.select("p:contains(no longer available for viewing)").isEmpty()) {
-						Crouton.showText(aio, "The topic you selected is no longer available for viewing.", aio.getCroutonStyle());
+						Crouton.showText(aio, "The topic you selected is no longer available for viewing.", AllInOneV2.getCroutonStyle());
 						aio.wtl("topic is no longer available, treat response as a board");
 						aio.processContent(res, NetDesc.BOARD, pResClone, resUrl);
 					}
@@ -822,16 +822,16 @@ public class Session implements HandlesNetworkResult {
 						post(NetDesc.MARKMSG_S2, res.url() + "?action=mod", markData);
 					}
 					else
-						Crouton.showText(aio, "The topic has already been removed!", aio.getCroutonStyle());
+						Crouton.showText(aio, "The topic has already been removed!", AllInOneV2.getCroutonStyle());
 					
 					break;
 					
 				case MARKMSG_S2:
 					//This message has been marked for moderation.
 					if (!pRes.select("p:contains(This message has been marked for moderation.)").isEmpty())
-						Crouton.showText(aio, "Message marked successfully.", aio.getCroutonStyle());
+						Crouton.showText(aio, "Message marked successfully.", AllInOneV2.getCroutonStyle());
 					else
-						Crouton.showText(aio, "There was an error marking the message.", aio.getCroutonStyle());
+						Crouton.showText(aio, "There was an error marking the message.", AllInOneV2.getCroutonStyle());
 					
 					refresh();
 					break;
@@ -850,7 +850,7 @@ public class Session implements HandlesNetworkResult {
 					break;
 					
 				case CLOSE_TOPIC:
-					Crouton.showText(aio, "Topic closed successfully.", aio.getCroutonStyle());
+					Crouton.showText(aio, "Topic closed successfully.", AllInOneV2.getCroutonStyle());
 					goBack(true);
 					break;
 					
