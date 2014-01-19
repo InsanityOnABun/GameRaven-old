@@ -62,8 +62,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -74,7 +78,6 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
@@ -97,6 +100,10 @@ import com.ioabsoftware.gameraven.views.rowdata.TopicRowData.TopicType;
 import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
+
+import de.keyboardsurfer.android.widget.crouton.Configuration;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 public class AllInOneV2 extends Activity {
 	
@@ -226,6 +233,12 @@ public class AllInOneV2 extends Activity {
 	private static boolean isAccentLight;
 	public static boolean isAccentLight() {return isAccentLight;}
 	
+	private static Style croutonStyle;
+	public static Style getCroutonStyle() {return croutonStyle;}
+	private static Configuration croutonShort = new Configuration.Builder()
+												.setDuration(2500).build();
+	
+	
 	private static HighlightListDBHelper hlDB;
 	public static HighlightListDBHelper getHLDB() {return hlDB;}
 	
@@ -331,7 +344,7 @@ public class AllInOneV2 extends Activity {
                 
                 clipboard.setPrimaryClip(android.content.ClipData.newPlainText("simple text", session.getLastPath()));
 				drawer.closeMenu(true);
-				Toast.makeText(AllInOneV2.this, "URL copied to clipboard.", Toast.LENGTH_SHORT).show();
+				Crouton.showText(AllInOneV2.this, "URL copied to clipboard.", croutonStyle, ptrLayout);
 			}
 		});
         
@@ -842,6 +855,18 @@ public class AllInOneV2 extends Activity {
 			drawer.findViewById(R.id.dwrCAHSep).setBackgroundColor(accentColor);
 			drawer.findViewById(R.id.dwrNavSep).setBackgroundColor(accentColor);
 			drawer.findViewById(R.id.dwrFuncSep).setBackgroundColor(accentColor);
+			
+			int tColor;
+			if (isAccentLight)
+				tColor = android.R.color.black;
+			else
+				tColor = android.R.color.white;
+			
+			croutonStyle = new Style.Builder()
+								.setBackgroundColorValue(accentColor)
+								.setTextColor(tColor)
+								.setConfiguration(croutonShort)
+								.build();
 		}
 		
 		
@@ -884,6 +909,12 @@ public class AllInOneV2 extends Activity {
 		NotifierService.dismissNotif(this);
 		wtl("onResume finishing");
     }
+	
+	@Override
+	public void onDestroy() {
+		Crouton.clearCroutonsForActivity(this);
+		super.onDestroy();
+	}
 	
 	public void setLoginName(String name) {
 		((TextView) findViewById(R.id.dwrChangeAcc)).setText(name + " (Click to Change)");
@@ -1037,7 +1068,7 @@ public class AllInOneV2 extends Activity {
 			postPostUrl = null;
 			
 			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).
-									hideSoftInputFromWindow(postBody.getWindowToken(), 0);
+					hideSoftInputFromWindow(postBody.getWindowToken(), 0);
 		}
 	}
 	
@@ -1865,14 +1896,14 @@ public class AllInOneV2 extends Activity {
 				Element pmInboxLink = pRes.select("div.masthead_user").first().select("a[href=/pm/]").first();
 				if (pmInboxLink != null && desc != NetDesc.PM_INBOX) {
 					if (!pmInboxLink.text().equals("Inbox")) {
-						Toast.makeText(this, "You have unread PM(s)", Toast.LENGTH_SHORT).show();
+						Crouton.showText(this, "You have unread PM(s)", croutonStyle, ptrLayout);
 					}
 				}
 				
 				Element trackedLink = pRes.select("div.masthead_user").first().select("a[href=/boards/tracked]").first();
 				if (trackedLink != null && desc != NetDesc.TRACKED_TOPICS) {
 					if (!trackedLink.text().equals("Topics")) {
-						Toast.makeText(this, "You have unread tracked topic(s)", Toast.LENGTH_SHORT).show();
+						Crouton.showText(this, "You have unread tracked topic(s)", croutonStyle, ptrLayout);
 					}
 				}
 
@@ -2100,8 +2131,6 @@ public class AllInOneV2 extends Activity {
 	public void messageMenuClicked(MessageRowView msg) {
 		clickedMsg = msg;
 		quoteSelection = clickedMsg.getSelection();
-		if (quoteSelection != null)
-			Toast.makeText(this, "Selected text prepped for quoting.", Toast.LENGTH_SHORT).show();
 		
 		showDialog(MESSAGE_ACTION_DIALOG);
 	}
@@ -2386,6 +2415,11 @@ public class AllInOneV2 extends Activity {
 	
 	private Dialog createMessageActionDialog() {
 		AlertDialog.Builder msgActionBuilder = new AlertDialog.Builder(this);
+		
+		LayoutInflater inflater = getLayoutInflater();
+		final View v = inflater.inflate(R.layout.msgaction, null);
+		msgActionBuilder.setView(v);
+		
 		msgActionBuilder.setTitle("Message Actions");
 		
 		ArrayList<String> listBuilder = new ArrayList<String>();
@@ -2396,7 +2430,7 @@ public class AllInOneV2 extends Activity {
 		if (Session.isLoggedIn()) {
 			if (postIcon.isVisible())
 				listBuilder.add("Quote");
-			if (Session.getUser().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
+			if (Session.getUser().trim().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
 				if (Session.getUserLevel() > 29 && clickedMsg.isEditable())
 					listBuilder.add("Edit");
 				if (clickedMsg.getMessageID() != null)
@@ -2409,12 +2443,17 @@ public class AllInOneV2 extends Activity {
 		listBuilder.add("Highlight User");
 		listBuilder.add("User Details");
 		
-		final String[] options = new String[listBuilder.size()];
-		listBuilder.toArray(options);
-		msgActionBuilder.setItems(options, new OnClickListener() {
+		ListView lv = (ListView) v.findViewById(R.id.maList);
+		final LinearLayout wrapper = (LinearLayout) v.findViewById(R.id.maWrapper);
+		
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+		adapter.addAll(listBuilder);
+		
+		lv.setAdapter(adapter);
+		lv.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				String selected = options[which];
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				String selected = (String) parent.getItemAtPosition(position);
 				if (selected.equals("View Previous Version(s)")) {
 					session.get(NetDesc.MESSAGE_DETAIL, clickedMsg.getMessageDetailLink(), null);
 				}
@@ -2440,10 +2479,10 @@ public class AllInOneV2 extends Activity {
 					session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink(), null);
 				}
 				else {
-					Toast.makeText(AllInOneV2.this, "not recognized: " + selected, Toast.LENGTH_SHORT).show();
+					Crouton.showText(AllInOneV2.this, "not recognized: " + selected, croutonStyle, ptrLayout);
 				}
 				
-				dialog.dismiss();
+				dismissDialog(MESSAGE_ACTION_DIALOG);
 			}
 		});
 		
@@ -2455,6 +2494,15 @@ public class AllInOneV2 extends Activity {
 				removeDialog(MESSAGE_ACTION_DIALOG);
 			}
 		});
+		
+		dialog.setOnShowListener(new OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialog) {
+				if (quoteSelection != null)
+					Crouton.showText(AllInOneV2.this, "Selected text prepped for quoting.", croutonStyle, wrapper);
+			}
+		});
+		
 		return dialog;
 	}
 
@@ -2503,13 +2551,22 @@ public class AllInOneV2 extends Activity {
 									
 								}
 								else
-									Toast.makeText(AllInOneV2.this, "The message can't be empty.", Toast.LENGTH_SHORT).show();
+									Crouton.showText(AllInOneV2.this, 
+											"The message can't be empty.", 
+											croutonStyle, 
+											(ViewGroup) to.getParent());
 							}
 							else
-								Toast.makeText(AllInOneV2.this, "The subject can't be empty.", Toast.LENGTH_SHORT).show();
+								Crouton.showText(AllInOneV2.this, 
+										"The subject can't be empty.", 
+										croutonStyle, 
+										(ViewGroup) to.getParent());
 						}
 						else
-							Toast.makeText(AllInOneV2.this, "The recepient can't be empty.", Toast.LENGTH_SHORT).show();
+							Crouton.showText(AllInOneV2.this, 
+									"The recepient can't be empty.", 
+									croutonStyle, 
+									(ViewGroup) to.getParent());
 					}
 		        });
 			}
@@ -2598,11 +2655,14 @@ public class AllInOneV2 extends Activity {
     
 	public void pmCleanup(boolean wasSuccessful, String error) {
     	if (wasSuccessful) {
-    		Toast.makeText(this, "PM sent.", Toast.LENGTH_SHORT).show();
+			Crouton.showText(this, "PM sent.", croutonStyle, ptrLayout);
+			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).
+					hideSoftInputFromWindow(pmSending.getWindowToken(), 0);
+			
         	dismissDialog(SEND_PM_DIALOG);
     	}
     	else {
-    		Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+			Crouton.showText(this, error, croutonStyle, (ViewGroup) pmSending.getParent());
     		pmSending.setVisibility(View.GONE);
     	}
     }
@@ -2734,14 +2794,17 @@ public class AllInOneV2 extends Activity {
 							try {
 							    startActivity(Intent.createChooser(i, "Send mail..."));
 							} catch (android.content.ActivityNotFoundException ex) {
-							    Toast.makeText(AllInOneV2.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+								Crouton.showText(AllInOneV2.this, "There are no email clients installed.", croutonStyle, ptrLayout);
 							}
 							
 							d.dismiss();
 		            	}
 		            	else {
 		            		input.requestFocus();
-		            		Toast.makeText(AllInOneV2.this, "Please include a brief comment in provided text box.", Toast.LENGTH_SHORT).show();
+							Crouton.showText(AllInOneV2.this, 
+									"Please include a brief comment in the provided text box.", 
+									croutonStyle, 
+									(ViewGroup) input.getParent());
 		            	}
 		            }
 		        });

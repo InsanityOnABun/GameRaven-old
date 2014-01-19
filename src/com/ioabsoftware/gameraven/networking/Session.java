@@ -27,6 +27,8 @@ import android.widget.Toast;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+
 /**
  * Session is used to establish and maintain GFAQs sessions, and to send GET and POST requests.
  * @author Charles Rosaaen, Insanity On A Bun Software
@@ -802,7 +804,7 @@ public class Session implements HandlesNetworkResult {
 				case TOPIC:
 					aio.wtl("session hNR determined this is a topic");
 					if (!pRes.select("p:contains(no longer available for viewing)").isEmpty()) {
-						Toast.makeText(aio, "The topic you selected is no longer available for viewing.", Toast.LENGTH_SHORT).show();
+						Crouton.showText(aio, "The topic you selected is no longer available for viewing.", AllInOneV2.getCroutonStyle());
 						aio.wtl("topic is no longer available, treat response as a board");
 						aio.processContent(res, NetDesc.BOARD, pResClone, resUrl);
 					}
@@ -820,16 +822,16 @@ public class Session implements HandlesNetworkResult {
 						post(NetDesc.MARKMSG_S2, res.url() + "?action=mod", markData);
 					}
 					else
-						Toast.makeText(aio, "The topic has already been removed!", Toast.LENGTH_SHORT).show();
+						Crouton.showText(aio, "The topic has already been removed!", AllInOneV2.getCroutonStyle());
 					
 					break;
 					
 				case MARKMSG_S2:
 					//This message has been marked for moderation.
 					if (!pRes.select("p:contains(This message has been marked for moderation.)").isEmpty())
-						Toast.makeText(aio, "Message marked successfully.", Toast.LENGTH_SHORT).show();
+						Crouton.showText(aio, "Message marked successfully.", AllInOneV2.getCroutonStyle());
 					else
-						Toast.makeText(aio, "There was an error marking the message.", Toast.LENGTH_SHORT).show();
+						Crouton.showText(aio, "There was an error marking the message.", AllInOneV2.getCroutonStyle());
 					
 					refresh();
 					break;
@@ -848,7 +850,7 @@ public class Session implements HandlesNetworkResult {
 					break;
 					
 				case CLOSE_TOPIC:
-					Toast.makeText(aio, "Topic closed successfully.", Toast.LENGTH_SHORT).show();
+					Crouton.showText(aio, "Topic closed successfully.", AllInOneV2.getCroutonStyle());
 					goBack(true);
 					break;
 					

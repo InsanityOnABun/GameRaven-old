@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TimeZone;
 
+import net.margaritov.preference.colorpicker.ColorPickerPreference;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import android.app.AlarmManager;
@@ -40,11 +42,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ioabsoftware.gameraven.db.HighlightedUser;
+
+import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 public class SettingsMain extends PreferenceActivity {
 	
@@ -159,7 +164,7 @@ public class SettingsMain extends PreferenceActivity {
 				if ((Boolean) newValue == true) {
 					// enabling notifications
 					if (settings.getString("defaultAccount", NO_DEFAULT_ACCOUNT).equals(NO_DEFAULT_ACCOUNT)) {
-						Toast.makeText(SettingsMain.this, "You have no default account set!", Toast.LENGTH_SHORT).show();
+						Crouton.showText(SettingsMain.this, "You have no default account set!", AllInOneV2.getCroutonStyle());
 						return false;
 					}
 					else {
@@ -200,10 +205,8 @@ public class SettingsMain extends PreferenceActivity {
         findPreference("resetAccentColor").setOnPreferenceClickListener(new OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
-				settings.edit().putInt("accentColor", getResources().getColor(R.color.holo_blue)).commit();
-				Toast.makeText(SettingsMain.this, "Accent color reset.", Toast.LENGTH_SHORT).show();
-				finish();
-				startActivity(getIntent());
+				Crouton.showText(SettingsMain.this, "Accent color reset.", AllInOneV2.getCroutonStyle());
+				((ColorPickerPreference) findPreference("accentColor")).onColorChanged(getResources().getColor(R.color.holo_blue));
 				return false;
 			}
 		});
@@ -265,6 +268,12 @@ public class SettingsMain extends PreferenceActivity {
         	p.setEntries(entries);
         	p.setEntryValues(vals);
         }
+	}
+	
+	@Override
+	public void onDestroy() {
+		Crouton.clearCroutonsForActivity(this);
+		super.onDestroy();
 	}
 
 	private void enableNotifs(String freq) {
@@ -402,17 +411,16 @@ public class SettingsMain extends PreferenceActivity {
 					buf.append("autoCensorEnable=false\n");
 				
 				buf.close();
-				Toast.makeText(this, "Backup done.", Toast.LENGTH_SHORT).show();
+				Crouton.showText(this, "Backup done.", AllInOneV2.getCroutonStyle());
 
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else {
 			// Something else is wrong. It may be one of many other states, but all we need
 			//  to know is we can neither read nor write
 			Log.e("writeToLog", "error writing to log, external storage is not writable");
-			Toast.makeText(this, "Backup failed. External storage is most likely not accessible.", Toast.LENGTH_SHORT).show();
+			Crouton.showText(this, "Backup failed. External storage is most likely not accessible.", AllInOneV2.getCroutonStyle());
 		}
 	}
 	
@@ -489,7 +497,7 @@ public class SettingsMain extends PreferenceActivity {
 									}
 								}
 								else
-									Toast.makeText(this, "Line unhandled: " + line, Toast.LENGTH_LONG).show();
+									AllInOneV2.get().wtl("line unhandled in restore: " + line);
 							}
 							else if (line.contains("=")) {
 								splitLine = line.split("=", 2);
@@ -497,7 +505,7 @@ public class SettingsMain extends PreferenceActivity {
 								values.add(splitLine[1]);
 							}
 							else
-								Toast.makeText(this, "Line unhandled: " + line, Toast.LENGTH_LONG).show();
+								AllInOneV2.get().wtl("line unhandled in restore: " + line);
 						}
 					}
 					
@@ -528,7 +536,7 @@ public class SettingsMain extends PreferenceActivity {
 								editor.putString(key, val);
 						}
 						else
-							Toast.makeText(this, "Key, Val pair not recognized: " + key + ", " + val, Toast.LENGTH_LONG).show();
+							AllInOneV2.get().wtl("Key, Val pair not recognized in restore: " + key + ", " + val);
 					}
 					
 					editor.commit();
@@ -536,25 +544,26 @@ public class SettingsMain extends PreferenceActivity {
 					disableNotifs();
 					if (settings.getBoolean("notifsEnable", false))
 						enableNotifs(settings.getString("notifsFrequency", "60"));
-					
+
+//					Crouton.showText(this, "Restore done.", AllInOneV2.getCroutonStyle());
 					Toast.makeText(this, "Restore done.", Toast.LENGTH_SHORT).show();
 					finish();
 					startActivity(getIntent());
 
 				} catch (IOException e) {
 					e.printStackTrace();
-					Toast.makeText(this, "Settings file is corrupt.", Toast.LENGTH_SHORT).show();
+					Crouton.showText(this, "Settings file is corrupt.", AllInOneV2.getCroutonStyle());
 				}
 			}
 			else {
-				Toast.makeText(this, "Settings file not found.", Toast.LENGTH_SHORT).show();
+				Crouton.showText(this, "Settings file not found.", AllInOneV2.getCroutonStyle());
 			}
 		} 
 		else {
 			// Something else is wrong. It may be one of many other states, but all we need
 			//  to know is we can neither read nor write
 			Log.e("writeToLog", "error writing to log, external storage is not writable");
-			Toast.makeText(this, "Restore failed. External storage is most likely not accessible.", Toast.LENGTH_SHORT).show();
+			Crouton.showText(this, "Restore failed. External storage is most likely not accessible.", AllInOneV2.getCroutonStyle());
 		}
 	}
 	
@@ -579,6 +588,7 @@ public class SettingsMain extends PreferenceActivity {
     	
     	final EditText sigText = (EditText) v.findViewById(R.id.sigEditText);
     	final TextView sigCounter = (TextView) v.findViewById(R.id.sigCounter);
+    	final LinearLayout sigWrapper = (LinearLayout) v.findViewById(R.id.sigWrapper);
     	
     	sigText.setHint(AllInOneV2.defaultSig);
     	sigText.addTextChangedListener(new TextWatcher() {
@@ -610,7 +620,7 @@ public class SettingsMain extends PreferenceActivity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				settings.edit().putString("customSig", "").commit();
-				Toast.makeText(SettingsMain.this, "Signature cleared and saved.", Toast.LENGTH_SHORT).show();
+				Crouton.showText(SettingsMain.this, "Signature cleared and saved.", AllInOneV2.getCroutonStyle());
 			}
 		});
 		b.setNegativeButton("Cancel", null);
@@ -633,14 +643,20 @@ public class SettingsMain extends PreferenceActivity {
 						if (length < 161) {
 							if (lines < 2) {
 								settings.edit().putString("customSig", sigText.getText().toString()).commit();
-								Toast.makeText(SettingsMain.this, "Signature saved.", Toast.LENGTH_SHORT).show();
+								Crouton.showText(SettingsMain.this, "Signature saved.", AllInOneV2.getCroutonStyle());
 								d.dismiss();
 							}
 							else
-								Toast.makeText(SettingsMain.this, "Signatures can only have 1 line break.", Toast.LENGTH_SHORT).show();
+								Crouton.showText(SettingsMain.this, 
+										"Signatures can only have 1 line break.", 
+										AllInOneV2.getCroutonStyle(),
+										sigWrapper);
 						}
 						else
-							Toast.makeText(SettingsMain.this, "Signatures can only have a maximum of 160 characters.", Toast.LENGTH_SHORT).show();
+							Crouton.showText(SettingsMain.this, 
+									"Signatures can only have a maximum of 160 characters.", 
+									AllInOneV2.getCroutonStyle(),
+									sigWrapper);
 		            }
 		        });
 			}
