@@ -910,6 +910,12 @@ public class AllInOneV2 extends Activity {
 		wtl("onResume finishing");
     }
 	
+	@Override
+	public void onDestroy() {
+		Crouton.clearCroutonsForActivity(this);
+		super.onDestroy();
+	}
+	
 	public void setLoginName(String name) {
 		((TextView) findViewById(R.id.dwrChangeAcc)).setText(name + " (Click to Change)");
 	}

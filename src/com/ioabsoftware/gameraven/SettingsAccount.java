@@ -88,6 +88,12 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 
         });
 	}
+	
+	@Override
+	public void onDestroy() {
+		Crouton.clearCroutonsForActivity(this);
+		super.onDestroy();
+	}
 
 	private void updateAccountList() {
 		accounts.removeAll();

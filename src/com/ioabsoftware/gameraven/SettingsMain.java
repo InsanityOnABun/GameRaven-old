@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TimeZone;
 
+import net.margaritov.preference.colorpicker.ColorPickerPreference;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import android.app.AlarmManager;
@@ -40,6 +42,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -202,10 +205,8 @@ public class SettingsMain extends PreferenceActivity {
         findPreference("resetAccentColor").setOnPreferenceClickListener(new OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
-				settings.edit().putInt("accentColor", getResources().getColor(R.color.holo_blue)).commit();
 				Crouton.showText(SettingsMain.this, "Accent color reset.", AllInOneV2.getCroutonStyle());
-				finish();
-				startActivity(getIntent());
+				((ColorPickerPreference) findPreference("accentColor")).onColorChanged(getResources().getColor(R.color.holo_blue));
 				return false;
 			}
 		});
@@ -267,6 +268,12 @@ public class SettingsMain extends PreferenceActivity {
         	p.setEntries(entries);
         	p.setEntryValues(vals);
         }
+	}
+	
+	@Override
+	public void onDestroy() {
+		Crouton.clearCroutonsForActivity(this);
+		super.onDestroy();
 	}
 
 	private void enableNotifs(String freq) {
@@ -538,7 +545,8 @@ public class SettingsMain extends PreferenceActivity {
 					if (settings.getBoolean("notifsEnable", false))
 						enableNotifs(settings.getString("notifsFrequency", "60"));
 
-					Crouton.showText(this, "Restore done.", AllInOneV2.getCroutonStyle());
+//					Crouton.showText(this, "Restore done.", AllInOneV2.getCroutonStyle());
+					Toast.makeText(this, "Restore done.", Toast.LENGTH_SHORT).show();
 					finish();
 					startActivity(getIntent());
 
@@ -580,6 +588,7 @@ public class SettingsMain extends PreferenceActivity {
     	
     	final EditText sigText = (EditText) v.findViewById(R.id.sigEditText);
     	final TextView sigCounter = (TextView) v.findViewById(R.id.sigCounter);
+    	final LinearLayout sigWrapper = (LinearLayout) v.findViewById(R.id.sigWrapper);
     	
     	sigText.setHint(AllInOneV2.defaultSig);
     	sigText.addTextChangedListener(new TextWatcher() {
@@ -640,12 +649,14 @@ public class SettingsMain extends PreferenceActivity {
 							else
 								Crouton.showText(SettingsMain.this, 
 										"Signatures can only have 1 line break.", 
-										AllInOneV2.getCroutonStyle());
+										AllInOneV2.getCroutonStyle(),
+										sigWrapper);
 						}
 						else
 							Crouton.showText(SettingsMain.this, 
 									"Signatures can only have a maximum of 160 characters.", 
-									AllInOneV2.getCroutonStyle());
+									AllInOneV2.getCroutonStyle(),
+									sigWrapper);
 		            }
 		        });
 			}
