@@ -1061,8 +1061,8 @@ public class AllInOneV2 extends Activity {
 			messageIDForEditing = null;
 			postPostUrl = null;
 			
-			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
-				.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).
+					hideSoftInputFromWindow(postBody.getWindowToken(), 0);
 		}
 	}
 	
@@ -2650,8 +2650,8 @@ public class AllInOneV2 extends Activity {
 	public void pmCleanup(boolean wasSuccessful, String error) {
     	if (wasSuccessful) {
 			Crouton.showText(this, "PM sent.", croutonStyle, ptrLayout);
-			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
-				.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).
+					hideSoftInputFromWindow(pmSending.getWindowToken(), 0);
 			
         	dismissDialog(SEND_PM_DIALOG);
     	}
