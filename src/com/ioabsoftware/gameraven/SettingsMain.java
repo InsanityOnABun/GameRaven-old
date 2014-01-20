@@ -40,6 +40,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -83,6 +84,8 @@ public class SettingsMain extends PreferenceActivity {
 		
 		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
 		getActionBar().setBackgroundDrawable(aBarDrawable);
+		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		Intent notifierIntent = new Intent(this, NotifierService.class);
 		notifPendingIntent = PendingIntent.getService(this, 0, notifierIntent, 0);
@@ -268,6 +271,18 @@ public class SettingsMain extends PreferenceActivity {
         	p.setEntries(entries);
         	p.setEntryValues(vals);
         }
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    // Respond to the action bar's Up/Home button
+	    case android.R.id.home:
+	    	finish();
+	        return true;
+	    }
+	    
+	    return super.onOptionsItemSelected(item);
 	}
 	
 	@Override

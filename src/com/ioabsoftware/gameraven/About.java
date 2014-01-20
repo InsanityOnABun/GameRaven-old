@@ -7,6 +7,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -29,12 +30,26 @@ public class About extends Activity {
 		
 		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
 		getActionBar().setBackgroundDrawable(aBarDrawable);
+		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
         
         try {
 			((TextView) findViewById(R.id.abtBuildVer)).setText(this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName);
 		} catch (NameNotFoundException e) {
 			((TextView) findViewById(R.id.abtBuildVer)).setText("Build version not set. Stupid developer.");
 		}
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    // Respond to the action bar's Up/Home button
+	    case android.R.id.home:
+	    	finish();
+	        return true;
+	    }
+	    
+	    return super.onOptionsItemSelected(item);
 	}
 	
 	public void featureRequest(View view) {

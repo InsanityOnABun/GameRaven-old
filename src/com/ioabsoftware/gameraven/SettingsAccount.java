@@ -26,6 +26,7 @@ import android.preference.PreferenceCategory;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -76,6 +77,8 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 		
 		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
 		getActionBar().setBackgroundDrawable(aBarDrawable);
+		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
         accounts = (PreferenceCategory) findPreference("accounts");
 		updateAccountList();
@@ -87,6 +90,18 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
                 }
 
         });
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    // Respond to the action bar's Up/Home button
+	    case android.R.id.home:
+	    	finish();
+	        return true;
+	    }
+	    
+	    return super.onOptionsItemSelected(item);
 	}
 	
 	@Override

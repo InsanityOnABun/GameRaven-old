@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -35,6 +36,8 @@ public class SettingsHighlightedUsers extends Activity implements HlUDDismissLis
 		aBarDrawable.setColorFilter(AllInOneV2.getAccentColor(), PorterDuff.Mode.SRC_ATOP);
 		getActionBar().setBackgroundDrawable(aBarDrawable);
 		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		
 		wrapper = new LinearLayout(this);
 		LinearLayout outerWrapper = new LinearLayout(this);
 		
@@ -55,6 +58,18 @@ public class SettingsHighlightedUsers extends Activity implements HlUDDismissLis
 		setContentView(outerWrapper, lp);
 		
 		updateList();
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    // Respond to the action bar's Up/Home button
+	    case android.R.id.home:
+	    	finish();
+	        return true;
+	    }
+	    
+	    return super.onOptionsItemSelected(item);
 	}
 	
 	public void updateList() {
