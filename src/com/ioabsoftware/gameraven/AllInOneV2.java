@@ -63,6 +63,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.AdapterView;
@@ -107,7 +108,7 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 
 public class AllInOneV2 extends Activity {
 	
-	public static boolean isReleaseBuild = true;
+	public static boolean isReleaseBuild = false;
 	
 	public static final int SEND_PM_DIALOG = 102;
 	public static final int MESSAGE_ACTION_DIALOG = 103;
@@ -1082,8 +1083,16 @@ public class AllInOneV2 extends Activity {
 	/********************************************
 	 * START HNR
 	 * ******************************************/
-	
+
 	ArrayList<BaseRowData> adapterRows;
+	
+	WebView web;
+	String adBaseUrl;
+	StringBuilder adBuilder = new StringBuilder();
+	Runnable loadAds = new Runnable() {
+		@Override
+		public void run() {web.loadDataWithBaseURL(adBaseUrl, adBuilder.toString(), null, "iso-8859-1", null);}
+	};
 	@SuppressLint("SetJavaScriptEnabled")
 	public void processContent(Response res, NetDesc desc, Document pRes, String resUrl) {
 		
@@ -1130,16 +1139,25 @@ public class AllInOneV2 extends Activity {
 				else
 					bgcolor = "#000000";
 				
-				StringBuilder adBuilder = new StringBuilder();
-				adBuilder.append("<html><body bgcolor=\"" + bgcolor + "\">");
+				adBuilder.setLength(0);
+				adBuilder.append("<html>");
+				adBuilder.append(pRes.head().outerHtml());
+				adBuilder.append("<body bgcolor=\"" + bgcolor + "\">");
 				for (Element e : pRes.getElementsByClass("ad")) {
+					adBuilder.append(e.outerHtml());
+					e.remove();
+				}
+				for (Element e : pRes.getElementsByTag("script")) {
 					adBuilder.append(e.outerHtml());
 				}
 				adBuilder.append("</body></html>");
 				
-				WebView web = new WebView(this);
+				adBaseUrl = res.url().toString();
+				
+				if (web == null)
+					web = new WebView(this);
+				
 				web.getSettings().setJavaScriptEnabled(AllInOneV2.getSettingsPref().getBoolean("enableJS", true));
-				web.loadDataWithBaseURL(session.getLastPath(), adBuilder.toString(), "text/html", "iso-8859-1", null);
 				
 				switch (desc) {
 				case BOARD_JUMPER:
@@ -1891,7 +1909,12 @@ public class AllInOneV2 extends Activity {
 					break;
 				}
 				
+				try {
+					((ViewGroup) web.getParent()).removeView(web);
+				} catch (Exception e1) {}
+				
 				adapterRows.add(new AdRowData(web));
+				contentList.post(loadAds);
 				
 				Element pmInboxLink = pRes.select("div.masthead_user").first().select("a[href=/pm/]").first();
 				if (pmInboxLink != null && desc != NetDesc.PM_INBOX) {
