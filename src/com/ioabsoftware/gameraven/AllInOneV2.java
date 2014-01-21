@@ -2087,6 +2087,8 @@ public class AllInOneV2 extends Activity {
 		
 		if (isRoR)
 			isRoR = false;
+		
+		System.gc();
 	}
 	
 	private boolean goToUrlDefinedPost = false;
