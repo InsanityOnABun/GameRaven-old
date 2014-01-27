@@ -36,7 +36,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult;
 import com.ioabsoftware.gameraven.networking.NetworkTask;

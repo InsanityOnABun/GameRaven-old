@@ -23,7 +23,6 @@ import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
 
