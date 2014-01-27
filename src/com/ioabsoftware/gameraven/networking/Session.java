@@ -161,6 +161,10 @@ public class Session implements HandlesNetworkResult {
         user = userIn;
 		password = passwordIn;
 		
+		// reset the Session unread PM and TT counters
+		AllInOneV2.getSettingsPref().edit().putInt("unreadPMCount", 0);
+		AllInOneV2.getSettingsPref().edit().putInt("unreadTTCount", 0);
+		
 		if (user == null) {
 			aio.wtl("session constructor, user is null, starting logged out session");
 			get(NetDesc.BOARD_JUMPER, ROOT + "/boards", null);
