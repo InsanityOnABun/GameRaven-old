@@ -1919,7 +1919,7 @@ public class AllInOneV2 extends Activity {
 				if (pmInboxLink != null) {
 					String text = pmInboxLink.text();
 					if (text.contains("(")) {
-						int count = Integer.parseInt(text.substring(text.indexOf('('), text.indexOf(')')));
+						int count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
 						int prevCount = settings.getInt("unreadPMCount", 0);
 						if (count > prevCount) {
 							settings.edit().putInt("unreadPMCount", count).apply();
@@ -1935,7 +1935,7 @@ public class AllInOneV2 extends Activity {
 				if (trackedLink != null) {
 					String text = trackedLink.text();
 					if (text.contains("(")) {
-						int count = Integer.parseInt(text.substring(text.indexOf('('), text.indexOf(')')));
+						int count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
 						int prevCount = settings.getInt("unreadTrackedTopicCount", 0);
 						if (count > prevCount) {
 							settings.edit().putInt("unreadTrackedTopicCount", count).apply();
