@@ -131,9 +131,9 @@ public class NotifierService extends IntentService {
 							String text = pmInboxLink.text();
 							if (text.contains("(")) {
 								int count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
-								int prevCount = prefs.getInt("unreadPMCount", 0);
+								int prevCount = prefs.getInt("notifsUnreadPMCount", 0);
 								if (count > prevCount) {
-									prefs.edit().putInt("unreadPMCount", count).apply();
+									prefs.edit().putInt("notifsUnreadPMCount", count).apply();
 									String msg;
 									if (count > 1)
 										msg = "1 new PM found for " + username;
@@ -152,9 +152,9 @@ public class NotifierService extends IntentService {
 							String text = trackedLink.text();
 							if (text.contains("(")) {
 								int count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
-								int prevCount = prefs.getInt("unreadTrackedTopicCount", 0);
+								int prevCount = prefs.getInt("notifsUnreadTTCount", 0);
 								if (count > prevCount) {
-									prefs.edit().putInt("unreadTrackedTopicCount", count).apply();
+									prefs.edit().putInt("notifsUnreadTTCount", count).apply();
 									String msg;
 									if (count > 1)
 										msg = "1 unread tracked topic found for " + username;

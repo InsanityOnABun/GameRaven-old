@@ -1111,6 +1111,13 @@ public class AllInOneV2 extends Activity {
 		
 		adapterRows = new ArrayList<BaseRowData>();
 		
+		boolean isDefaultAcc;
+		if (Session.getUser() != null && 
+				Session.getUser().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)))
+			isDefaultAcc = true;
+		else
+			isDefaultAcc = false;
+		
 		
 		try {
 			if (res != null) {
@@ -1207,7 +1214,7 @@ public class AllInOneV2 extends Activity {
 						updateHeader(headerTitle, firstPage, prevPage, currPage, 
 									 pageCount, nextPage, lastPage, NetDesc.PM_INBOX);
 						
-						if (Session.getUser().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)))
+						if (isDefaultAcc)
 							NotifierService.dismissPMNotif(this);
 						
 						for (Element row : tbody.getElementsByTag("tr")) {
@@ -1298,12 +1305,11 @@ public class AllInOneV2 extends Activity {
 					updateHeader(headerTitle, firstPage, prevPage, currPage, 
 							pageCount, nextPage, lastPage, NetDesc.AMP_LIST);
 					
-					if (Session.getUser().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)))
+					if (isDefaultAcc)
 						NotifierService.dismissAMPNotif(this);
 					
 					if (!tbody.children().isEmpty()) {
-						if (settings.getBoolean("notifsEnable", false) && 
-								Session.getUser().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT))) {
+						if (settings.getBoolean("notifsEnable", false) && isDefaultAcc) {
 							Element lPost = pRes.select("td.lastpost").first();
 							if (lPost != null) {
 								String lTime = lPost.text();
@@ -1351,7 +1357,7 @@ public class AllInOneV2 extends Activity {
 					headerTitle = Session.getUser() + "'s Tracked Topics";
 					updateHeaderNoJumper(headerTitle, desc);
 					
-					if (Session.getUser().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)))
+					if (isDefaultAcc)
 						NotifierService.dismissTTNotif(this);
 					
 					tbody = pRes.getElementsByTag("tbody").first();
@@ -1930,8 +1936,12 @@ public class AllInOneV2 extends Activity {
 					if (text.contains("(")) {
 						int count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
 						int prevCount = settings.getInt("unreadPMCount", 0);
+						
 						if (count > prevCount) {
 							settings.edit().putInt("unreadPMCount", count).apply();
+							if (isDefaultAcc)
+								settings.edit().putInt("notifsUnreadPMCount", count).apply();
+							
 							if (count > 1)
 								Crouton.showText(this, "You have " + count + " unread PMs", croutonStyle, ptrLayout);
 							else
@@ -1945,9 +1955,13 @@ public class AllInOneV2 extends Activity {
 					String text = trackedLink.text();
 					if (text.contains("(")) {
 						int count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
-						int prevCount = settings.getInt("unreadTrackedTopicCount", 0);
+						int prevCount = settings.getInt("unreadTTCount", 0);
+						
 						if (count > prevCount) {
-							settings.edit().putInt("unreadTrackedTopicCount", count).apply();
+							settings.edit().putInt("unreadTTCount", count).apply();
+							if (isDefaultAcc)
+								settings.edit().putInt("notifsUnreadTTCount", count).apply();
+							
 							if (count > 1)
 								Crouton.showText(this, "You have " + count + " unread tracked topics", croutonStyle, ptrLayout);
 							else
