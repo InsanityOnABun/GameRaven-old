@@ -26,8 +26,10 @@ import com.ioabsoftware.gameraven.networking.Session;
 
 public class NotifierService extends IntentService {
 	
-	public static final int NOTIF_ID = 1;
 	public static final String NOTIF_TAG = "GR_NOTIF";
+	public static final int AMP_NOTIF_ID = 1;
+	public static final int PM_NOTIF_ID = 2;
+	public static final int TT_NOTIF_ID = 3;
 	
 	
 	public NotifierService() {
@@ -87,10 +89,11 @@ public class NotifierService extends IntentService {
 				Log.d("notif", "third connection finished");
 
 				if (r.statusCode() != 401) {
-					boolean amp = false, tt = false , pm = false;
 					Log.d("notif", "status is good");
 					pRes = r.parse();
 					Log.d("notif", pRes.title());
+
+					NotificationManager notifManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 					
 					if (prefs.getBoolean("notifsAMPEnable", false)) {
 						Element lPost = pRes.select("td.lastpost").first();
@@ -113,10 +116,11 @@ public class NotifierService extends IntentService {
 							long newTime = newDate.getTime();
 							long oldTime = prefs.getLong("notifsLastPost", 0);
 							if (newTime > oldTime) {
-								amp = true;
+								showNotif("New posts in AMP list found for " + username, AMP_NOTIF_ID, notifManager);
+								
 								Log.d("notif", "time is newer");
 								prefs.edit().putLong("notifsLastPost", newTime)
-										.commit();
+										.apply();
 							}
 						}
 					}
@@ -124,8 +128,20 @@ public class NotifierService extends IntentService {
 					if (prefs.getBoolean("notifsPMEnable", false)) {
 						Element pmInboxLink = pRes.select("div.masthead_user").first().select("a[href=/pm/]").first();
 						if (pmInboxLink != null) {
-							if (!pmInboxLink.text().equals("Inbox")) {
-								pm = true;
+							String text = pmInboxLink.text();
+							if (text.contains("(")) {
+								int count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
+								int prevCount = prefs.getInt("unreadPMCount", 0);
+								if (count > prevCount) {
+									prefs.edit().putInt("unreadPMCount", count).apply();
+									String msg;
+									if (count > 1)
+										msg = "1 new PM found for " + username;
+									else
+										msg = count + "new PMs found for " + username;
+									
+									showNotif(msg, PM_NOTIF_ID, notifManager);
+								}
 							}
 						}
 					}
@@ -133,46 +149,22 @@ public class NotifierService extends IntentService {
 					if (prefs.getBoolean("notifsTTEnable", false)) {
 						Element trackedLink = pRes.select("div.masthead_user").first().select("a[href=/boards/tracked]").first();
 						if (trackedLink != null) {
-							if (!trackedLink.text().equals("Topics")) {
-								tt = true;
+							String text = trackedLink.text();
+							if (text.contains("(")) {
+								int count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
+								int prevCount = prefs.getInt("unreadTrackedTopicCount", 0);
+								if (count > prevCount) {
+									prefs.edit().putInt("unreadTrackedTopicCount", count).apply();
+									String msg;
+									if (count > 1)
+										msg = "1 unread tracked topic found for " + username;
+									else
+										msg = count + " unread tracked topic found for " + username;
+									
+									showNotif(msg, TT_NOTIF_ID, notifManager);
+								}
 							}
 						}
-					}
-					
-					if (amp || pm || tt) {
-						StringBuilder notifText = new StringBuilder("New ");
-						
-						if (pm) {
-							if (amp || tt)
-								notifText.append("PM(s), ");
-							else
-								notifText.append("PM(s)");
-						}
-						if (amp || tt) {
-							notifText.append("post(s) in ");
-							if (amp && tt)
-								notifText.append("AMP list & tracked topics");
-							else if (amp)
-								notifText.append("AMP list");
-							else if (tt)
-								notifText.append("tracked topics");
-						}
-						
-						notifText.append(" found");
-						
-						Notification.Builder notifBuilder = new Notification.Builder(
-								this)
-								.setSmallIcon(R.drawable.ic_notif_small)
-								.setContentTitle("GameRaven")
-								.setContentText(notifText.toString());
-						Intent notifIntent = new Intent(this, AllInOneV2.class);
-						PendingIntent pendingNotif = PendingIntent.getActivity(this, 0, notifIntent, PendingIntent.FLAG_ONE_SHOT);
-						notifBuilder.setContentIntent(pendingNotif);
-						notifBuilder.setAutoCancel(true);
-						notifBuilder.setDefaults(Notification.DEFAULT_ALL);
-						NotificationManager notifManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-						// mId allows you to update the notification later on.
-						notifManager.notify(NOTIF_TAG, NOTIF_ID, notifBuilder.getNotification());
 					}
 				}
 
@@ -187,9 +179,37 @@ public class NotifierService extends IntentService {
 		}
 	}
 	
-	public static void dismissNotif(Context c) {
+	private void showNotif(String msg, int id, NotificationManager notifManager) {
+		Notification.Builder ampNotifBuilder = new Notification.Builder(this)
+				.setSmallIcon(R.drawable.ic_notif_small)
+				.setContentTitle("GameRaven")
+				.setContentText(msg);
+		Intent notifIntent = new Intent(this, AllInOneV2.class);
+		PendingIntent pendingNotif = PendingIntent.getActivity(this, 0, notifIntent, PendingIntent.FLAG_ONE_SHOT);
+		ampNotifBuilder.setContentIntent(pendingNotif);
+		ampNotifBuilder.setAutoCancel(true);
+		ampNotifBuilder.setDefaults(Notification.DEFAULT_ALL);
+		
+		notifManager.notify(NOTIF_TAG, id, ampNotifBuilder.getNotification());
+	}
+	
+	public static void dismissAMPNotif(Context c) {
+		((NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(NOTIF_TAG, AMP_NOTIF_ID);
+	}
+	
+	public static void dismissPMNotif(Context c) {
+		((NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(NOTIF_TAG, PM_NOTIF_ID);
+	}
+	
+	public static void dismissTTNotif(Context c) {
+		((NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(NOTIF_TAG, TT_NOTIF_ID);
+	}
+	
+	public static void dismissAllNotifs(Context c) {
 		NotificationManager notifManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
-		notifManager.cancel(NOTIF_TAG, NOTIF_ID);
+		notifManager.cancel(NOTIF_TAG, AMP_NOTIF_ID);
+		notifManager.cancel(NOTIF_TAG, PM_NOTIF_ID);
+		notifManager.cancel(NOTIF_TAG, TT_NOTIF_ID);
 	}
 
 }

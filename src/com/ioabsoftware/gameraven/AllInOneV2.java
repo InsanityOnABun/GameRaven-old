@@ -906,7 +906,6 @@ public class AllInOneV2 extends Activity {
 			b.create().show();
 		}
 		
-		NotifierService.dismissNotif(this);
 		wtl("onResume finishing");
     }
 	
@@ -1208,6 +1207,9 @@ public class AllInOneV2 extends Activity {
 						updateHeader(headerTitle, firstPage, prevPage, currPage, 
 									 pageCount, nextPage, lastPage, NetDesc.PM_INBOX);
 						
+						if (Session.getUser().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)))
+							NotifierService.dismissPMNotif(this);
+						
 						for (Element row : tbody.getElementsByTag("tr")) {
 							Elements cells = row.children();
 							// [icon] [sender] [subject] [time] [check]
@@ -1296,6 +1298,9 @@ public class AllInOneV2 extends Activity {
 					updateHeader(headerTitle, firstPage, prevPage, currPage, 
 							pageCount, nextPage, lastPage, NetDesc.AMP_LIST);
 					
+					if (Session.getUser().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)))
+						NotifierService.dismissAMPNotif(this);
+					
 					if (!tbody.children().isEmpty()) {
 						if (settings.getBoolean("notifsEnable", false) && 
 								Session.getUser().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT))) {
@@ -1345,6 +1350,10 @@ public class AllInOneV2 extends Activity {
 				case TRACKED_TOPICS:
 					headerTitle = Session.getUser() + "'s Tracked Topics";
 					updateHeaderNoJumper(headerTitle, desc);
+					
+					if (Session.getUser().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)))
+						NotifierService.dismissTTNotif(this);
+					
 					tbody = pRes.getElementsByTag("tbody").first();
 					
 					if (tbody != null) {
