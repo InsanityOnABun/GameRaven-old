@@ -950,6 +950,14 @@ public class AllInOneV2 extends Activity {
 		uiCleanup();
 	}
 	
+	public void noNetworkConnection() {
+		AlertDialog.Builder b = new AlertDialog.Builder(this);
+		b.setTitle("No Network Connection");
+		b.setMessage("Couldn't establish network connection. Check your network settings, then try again.");
+		b.setNegativeButton("Dismiss", null);
+		b.show();
+	}
+	
 	public void timeoutCleanup(NetDesc desc) {
 		String msg = "timeout msg unset";
 		String title = "timeout title unset";

@@ -15,9 +15,12 @@ import org.jsoup.select.Elements;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
@@ -156,6 +159,8 @@ public class Session implements HandlesNetworkResult {
 		aio.wtl("NEW SESSION");
 		aio.disableNavList();
 		
+		netManager = (ConnectivityManager) aio.getSystemService(Context.CONNECTIVITY_SERVICE);
+		
         history = new LinkedList<History>();
         
         user = userIn;
@@ -199,6 +204,7 @@ public class Session implements HandlesNetworkResult {
 		return ROOT + path;
 	}
 	
+	private ConnectivityManager netManager;
 	/**
 	 * Sends a GET request to a specified page.
 	 * @param caller The HandlesNetworkResult making this call.
@@ -207,9 +213,14 @@ public class Session implements HandlesNetworkResult {
 	 * @param data The extra data to send along, pass null if no extra data.
 	 */
 	public void get(NetDesc desc, String path, Map<String, String> data) {
-		lastAttemptedPath = path;
-		lastAttemptedDesc = desc;
-		new NetworkTask(this, desc, Method.GET, cookies, buildURL(path), data).execute();
+		NetworkInfo netInfo = netManager.getActiveNetworkInfo();
+		if (netInfo != null && netInfo.isConnected()) {
+			lastAttemptedPath = path;
+			lastAttemptedDesc = desc;
+			new NetworkTask(this, desc, Method.GET, cookies, buildURL(path), data).execute();
+		}
+		else
+			aio.noNetworkConnection();
 	}
 	
 	/**
@@ -220,7 +231,12 @@ public class Session implements HandlesNetworkResult {
 	 * @param data The extra data to send along.
 	 */
 	public void post(NetDesc desc, String path, Map<String, String> data) {
-		new NetworkTask(this, desc, Method.POST, cookies, buildURL(path), data).execute();
+		NetworkInfo netInfo = netManager.getActiveNetworkInfo();
+		if (netInfo != null && netInfo.isConnected()) {
+			new NetworkTask(this, desc, Method.POST, cookies, buildURL(path), data).execute();
+		}
+		else
+			aio.noNetworkConnection();
 	}
 	
 	public void addCookies(Map<String, String> newCookies)
