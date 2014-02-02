@@ -266,6 +266,23 @@ public class MessageRowData extends BaseRowData {
 			color = Color.BLACK;
 			defTextColor = Color.WHITE;
 		}
+        
+        ssb.append('\n');
+
+		aio.wtl("replacing &gameravenlt; with <");
+        while (ssb.toString().contains("&gameravenlt;")) {
+        	int start = ssb.toString().indexOf("&gameravenlt;");
+        	ssb.replace(start, start + "&gameravenlt;".length(), "<");
+        }
+
+		aio.wtl("replacing &gameravengt; with >");
+        while (ssb.toString().contains("&gameravengt;")) {
+        	int start = ssb.toString().indexOf("&gameravengt;");
+        	ssb.replace(start, start + "&gameravengt;".length(), ">");
+        }
+
+		aio.wtl("linkifying");
+        Linkify.addLinks(ssb, Linkify.WEB_URLS);
 
 		aio.wtl("adding <spoiler> spans");
 		// do spoiler tags manually instead of in the method, as the clickablespan needs
@@ -290,23 +307,6 @@ public class MessageRowData extends BaseRowData {
 			}, start, end, 0);
         	
         }
-        
-        ssb.append('\n');
-
-		aio.wtl("replacing &gameravenlt; with <");
-        while (ssb.toString().contains("&gameravenlt;")) {
-        	int start = ssb.toString().indexOf("&gameravenlt;");
-        	ssb.replace(start, start + "&gameravenlt;".length(), "<");
-        }
-
-		aio.wtl("replacing &gameravengt; with >");
-        while (ssb.toString().contains("&gameravengt;")) {
-        	int start = ssb.toString().indexOf("&gameravengt;");
-        	ssb.replace(start, start + "&gameravengt;".length(), ">");
-        }
-
-		aio.wtl("linkifying");
-        Linkify.addLinks(ssb, Linkify.WEB_URLS);
 
 		aio.wtl("setting spannedMessage");
         spannedMessage = RichTextUtils.replaceAll(ssb, URLSpan.class, new URLSpanConverter());
