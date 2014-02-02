@@ -203,8 +203,13 @@ public class Session implements HandlesNetworkResult {
 		// return absolute path
 		return ROOT + path;
 	}
-	
+
 	private ConnectivityManager netManager;
+	public boolean hasNetworkConnection() {
+		NetworkInfo netInfo = netManager.getActiveNetworkInfo();
+		return netInfo != null && netInfo.isConnected();
+	}
+	
 	/**
 	 * Sends a GET request to a specified page.
 	 * @param caller The HandlesNetworkResult making this call.
@@ -213,8 +218,7 @@ public class Session implements HandlesNetworkResult {
 	 * @param data The extra data to send along, pass null if no extra data.
 	 */
 	public void get(NetDesc desc, String path, Map<String, String> data) {
-		NetworkInfo netInfo = netManager.getActiveNetworkInfo();
-		if (netInfo != null && netInfo.isConnected()) {
+		if (hasNetworkConnection()) {
 			lastAttemptedPath = path;
 			lastAttemptedDesc = desc;
 			new NetworkTask(this, desc, Method.GET, cookies, buildURL(path), data).execute();
@@ -231,8 +235,7 @@ public class Session implements HandlesNetworkResult {
 	 * @param data The extra data to send along.
 	 */
 	public void post(NetDesc desc, String path, Map<String, String> data) {
-		NetworkInfo netInfo = netManager.getActiveNetworkInfo();
-		if (netInfo != null && netInfo.isConnected()) {
+		if (hasNetworkConnection()) {
 			new NetworkTask(this, desc, Method.POST, cookies, buildURL(path), data).execute();
 		}
 		else

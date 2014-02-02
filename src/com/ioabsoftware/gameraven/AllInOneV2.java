@@ -1009,17 +1009,22 @@ public class AllInOneV2 extends Activity {
 		b.setNegativeButton("Dismiss", new OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				try {
-					processContent(session.getLastRes(), session.getLastDesc(), 
-							session.getLastRes().parse(), session.getLastRes().url().toString());
-				} catch (IOException e) {
-					/* THIS SHOULD NEVER CRASH
-					 * No res should be able to get set to lastRes
-					 * if it is unparseable
-					 */
-					e.printStackTrace();
+				switch ((session.getLastRes() == null) ? 1 : 0) {
+				case 0:
+					try {
+						processContent(session.getLastRes(), session.getLastDesc(), 
+								session.getLastRes().parse(), session.getLastRes().url().toString());
+					} catch (IOException e) {
+						/* THIS SHOULD NEVER CRASH
+						 * No res should be able to get set to lastRes
+						 * if it is unparseable
+						 */
+						e.printStackTrace();
+					}
+				case 1:
+					postExecuteCleanup(session.getLastDesc());
+					break;
 				}
-				postExecuteCleanup(session.getLastDesc());
 			}
 		});
 		b.create().show();
@@ -2120,7 +2125,7 @@ public class AllInOneV2 extends Activity {
 	}
 	
 	public void postExecuteCleanup(NetDesc desc) {
-		wtl("GRAIO dPostEC --NEL, desc: " + desc.name());
+		wtl("GRAIO dPostEC --NEL, desc: " + (desc == null ? "null" : desc.name()));
 		
 		if (needToSetNavList) {
 			setNavList(Session.isLoggedIn());
@@ -2683,7 +2688,15 @@ public class AllInOneV2 extends Activity {
 		    	{
 			        String selUser = usernames[item].toString();
 			    	if (!selUser.equals(currUser))
-			        	session = new Session(AllInOneV2.this, selUser, accounts.getString(selUser), session.getLastPath(), session.getLastDesc());
+			        	if (session.hasNetworkConnection()) {
+			        		session = new Session(AllInOneV2.this, 
+	        						  selUser, 
+	        						  accounts.getString(selUser), 
+	        						  session.getLastPath(), 
+	        						  session.getLastDesc());
+			        	}
+			        	else
+			        		noNetworkConnection();
 			    }
 		    	
 		    	dismissDialog(CHANGE_LOGGED_IN_DIALOG);
