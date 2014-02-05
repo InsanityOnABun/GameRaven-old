@@ -735,9 +735,9 @@ public class AllInOneV2 extends Activity {
         	
         case R.id.post:
         	if (pMode == PostMode.ON_BOARD)
-        		postOnBoardSetup();
+        		postSetup(false);
         	else if (pMode == PostMode.ON_TOPIC)
-            	postOnTopicSetup();
+        		postSetup(true);
         	else if (pMode == PostMode.NEW_PM)
         		pmSetup(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
         	
@@ -2216,7 +2216,7 @@ public class AllInOneV2 extends Activity {
 	private void editPostSetup(String msg, String msgID) {
 		postBody.setText(msg);
 		messageIDForEditing = msgID;
-		postOnTopicSetup();
+		postSetup(true);
 	}
 	
 	private void quoteSetup(String user, String msg) {
@@ -2229,40 +2229,34 @@ public class AllInOneV2 extends Activity {
 		postBody.getText().replace(Math.min(start, end), Math.max(start, end), quotedMsg);
 		
 		if (postWrapper.getVisibility() != View.VISIBLE)
-			postOnTopicSetup();
+			postSetup(true);
 		else
 			postBody.setSelection(Math.min(start, end) + quotedMsg.length());
 		
 		wtl("quoteSetup finishing");
 	}
 	
-	private void postOnTopicSetup() {
-		wtl("postOnTopicSetup fired --NEL");
+	private void postSetup(boolean postingOnTopic) {
 		pageJumperWrapper.setVisibility(View.GONE);
-		titleWrapper.setVisibility(View.GONE);
-		postWrapper.setVisibility(View.VISIBLE);
 		postButton.setEnabled(true);
 		cancelButton.setEnabled(true);
-		postBody.requestFocus();
-		postBody.setSelection(postBody.getText().length());
-		postPostUrl = session.getLastPath();
-		if (postPostUrl.contains("#"))
-			postPostUrl = postPostUrl.substring(0, postPostUrl.indexOf('#'));
-	}
-	
-	private void postOnBoardSetup() {
-		wtl("postOnBoardSetup fired --NEL");
-		pageJumperWrapper.setVisibility(View.GONE);
-		titleWrapper.setVisibility(View.VISIBLE);
-		if (Session.getUserLevel() > 29) {
-			pollButton.setEnabled(true);
-			pollButton.setVisibility(View.VISIBLE);
-			pollSep.setVisibility(View.VISIBLE);
+		
+		if (postingOnTopic) {
+			titleWrapper.setVisibility(View.GONE);
+			postBody.requestFocus();
+			postBody.setSelection(postBody.getText().length());
 		}
+		else {
+			titleWrapper.setVisibility(View.VISIBLE);
+			if (Session.getUserLevel() > 29) {
+				pollButton.setEnabled(true);
+				pollButton.setVisibility(View.VISIBLE);
+				pollSep.setVisibility(View.VISIBLE);
+			}
+			postTitle.requestFocus();
+		}
+
 		postWrapper.setVisibility(View.VISIBLE);
-		postButton.setEnabled(true);
-		cancelButton.setEnabled(true);
-		postTitle.requestFocus();
 		postPostUrl = session.getLastPath();
 		if (postPostUrl.contains("#"))
 			postPostUrl = postPostUrl.substring(0, postPostUrl.indexOf('#'));
