@@ -2255,6 +2255,7 @@ public class AllInOneV2 extends Activity {
 		pageJumperWrapper.setVisibility(View.GONE);
 		titleWrapper.setVisibility(View.VISIBLE);
 		if (Session.getUserLevel() > 29) {
+			pollButton.setEnabled(true);
 			pollButton.setVisibility(View.VISIBLE);
 			pollSep.setVisibility(View.VISIBLE);
 		}
