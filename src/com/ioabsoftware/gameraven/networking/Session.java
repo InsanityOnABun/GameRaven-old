@@ -297,6 +297,11 @@ public class Session implements HandlesNetworkResult {
 		try {
 			aio.wtl("checking if res is null or empty");
 			if (res != null && !res.body().equals(AllInOneV2.EMPTY_STRING)) {
+				
+				if (res.body().startsWith("internal_error")) {
+					aio.genError("Internal Server Error", res.body());
+					return;
+				}
 
 				aio.wtl("parsing res");
 				Document pRes = res.parse();
@@ -379,14 +384,14 @@ public class Session implements HandlesNetworkResult {
 					if (err.text().contains("404 Error")) {
 						aio.wtl("status code 404");
 						Elements paragraphs = pRes.getElementsByTag("p");
-						aio.fourOhError(404, paragraphs.get(1).text() + "\n\n"
+						aio.genError("404 Error", paragraphs.get(1).text() + "\n\n"
 								+ paragraphs.get(2).text());
 						return;
 					}
 					else if (err.text().contains("403 Error")) {
 						aio.wtl("status code 403");
 						Elements paragraphs = pRes.getElementsByTag("p");
-						aio.fourOhError(403, paragraphs.get(1).text() + "\n\n"
+						aio.genError("403 Error", paragraphs.get(1).text() + "\n\n"
 								+ paragraphs.get(2).text());
 						return;
 					}
@@ -397,7 +402,7 @@ public class Session implements HandlesNetworkResult {
 							get(NetDesc.BOARD_JUMPER, "/boards", null);
 						} else {
 							Elements paragraphs = pRes.getElementsByTag("p");
-							aio.fourOhError(401, paragraphs.get(1).text()
+							aio.genError("401 Error", paragraphs.get(1).text()
 									+ "\n\n" + paragraphs.get(2).text());
 						}
 						return;
@@ -405,7 +410,7 @@ public class Session implements HandlesNetworkResult {
 				}
 				
 				if (pRes.title().equals("GameFAQs - 503 - Temporarily Unavailable")) {
-					aio.fourOhError(503, "GameFAQs is experiencing some temporary difficulties with " +
+					aio.genError("503 Error", "GameFAQs is experiencing some temporary difficulties with " +
 							"the site. Probably because of something they did. Please wait a few " +
 							"seconds before refreshing this page to try again.");
 					

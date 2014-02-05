@@ -935,17 +935,11 @@ public class AllInOneV2 extends Activity {
 		uiCleanup();
 	}
 	
-	public void fourOhError(int errorNum, String msg) {
+	public void genError(String errorTitle, String errorMsg) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		msg = msg.replace("..", ".");
-		builder.setMessage(msg);
-		builder.setTitle(errorNum + " Error");
-		builder.setPositiveButton("Ok", new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
+		builder.setMessage(errorMsg);
+		builder.setTitle(errorTitle);
+		builder.setPositiveButton("Ok", null);
 		builder.create().show();
 
 		uiCleanup();
