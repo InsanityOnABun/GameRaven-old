@@ -924,12 +924,7 @@ public class AllInOneV2 extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(msg);
 		builder.setTitle("There was a problem with your post...");
-		builder.setPositiveButton("Ok", new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
+		builder.setPositiveButton("Ok", null);
 		builder.create().show();
 
 		uiCleanup();

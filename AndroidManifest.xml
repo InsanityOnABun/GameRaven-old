@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ioabsoftware.gameraven"
     android:installLocation="internalOnly"
-    android:versionCode="11"
+    android:versionCode="12"
     android:versionName="1.1.1.C" >
 
     <uses-sdk
