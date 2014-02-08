@@ -1079,7 +1079,9 @@ public class AllInOneV2 extends Activity {
 	 * START HNR
 	 * ******************************************/
 
-	ArrayList<BaseRowData> adapterRows;
+	ArrayList<BaseRowData> adapterRows = new ArrayList<BaseRowData>();
+	ViewAdapter viewAdapter = new ViewAdapter(this, adapterRows);
+	boolean adapterSet = false;
 	
 	WebView web;
 	String adBaseUrl;
@@ -1106,7 +1108,7 @@ public class AllInOneV2 extends Activity {
 		
 		topicListIcon.setVisible(false);
 		
-		adapterRows = new ArrayList<BaseRowData>();
+		adapterRows.clear();
 		
 		boolean isDefaultAcc;
 		if (Session.getUser() != null && 
@@ -1988,26 +1990,22 @@ public class AllInOneV2 extends Activity {
 				session.goBack(false);
 		}
 		
-		contentList.setAdapter(new ViewAdapter(this, adapterRows));
+		if (!adapterSet) {
+			contentList.setAdapter(viewAdapter);
+			adapterSet = true;
+		}
+		else
+			viewAdapter.notifyDataSetChanged();
 		
 		if (consumeGoToUrlDefinedPost() && !Session.applySavedScroll) {
-			contentList.post(new Runnable() {
-		        @Override
-		        public void run() {
-		        	contentList.setSelection(goToThisIndex);
-		        }
-		    });
+        	contentList.setSelection(goToThisIndex);
 		}
-		
-		wtl("applysavedscroll: " + Session.applySavedScroll + ". savedscrollval: " + Session.savedScrollVal);
-		if (Session.applySavedScroll) {
-			contentList.post(new Runnable() {
-		        @Override
-		        public void run() {
-		        	contentList.setSelectionFromTop(Session.savedScrollVal[0], Session.savedScrollVal[1]);
-		        }
-		    });
+		else if (Session.applySavedScroll) {
+        	contentList.setSelectionFromTop(Session.savedScrollVal[0], Session.savedScrollVal[1]);
 			Session.applySavedScroll = false;
+		}
+		else {
+			contentList.setSelectionAfterHeaderView();
 		}
 		
 		if (ptrLayout.isRefreshing())
