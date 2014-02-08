@@ -296,7 +296,7 @@ public class Session implements HandlesNetworkResult {
 		aio.wtl("session hNR fired, desc: " + desc.name());
 		try {
 			aio.wtl("checking if res is null or empty");
-			if (res != null && !res.body().equals(AllInOneV2.EMPTY_STRING)) {
+			if (res != null && !res.body().isEmpty()) {
 				
 				if (res.body().startsWith("internal_error")) {
 					aio.genError("Internal Server Error", res.body());

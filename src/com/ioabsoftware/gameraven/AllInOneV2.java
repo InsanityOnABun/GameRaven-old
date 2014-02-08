@@ -2047,7 +2047,7 @@ public class AllInOneV2 extends Activity {
 						boardDesc = titleCell.child(2).text();
 					
 					String link = titleCell.children().first().attr("href");
-					if (link.equals(EMPTY_STRING))
+					if (link.isEmpty())
 						link = null;
 					
 					String tCount = null;
@@ -2853,7 +2853,7 @@ public class AllInOneV2 extends Activity {
 
 		            @Override
 		            public void onClick(View view) {
-		            	if (!input.getText().toString().equals(EMPTY_STRING)) {
+		            	if (!input.getText().toString().isEmpty()) {
 			            	Intent i = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "ioabsoftware@gmail.com", null));
 							i.putExtra(Intent.EXTRA_SUBJECT, "GameRaven Error Report");
 							i.putExtra(Intent.EXTRA_TEXT   , "Comment:\n" + input.getText() + emailMsg);
