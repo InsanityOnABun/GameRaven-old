@@ -857,15 +857,9 @@ public class AllInOneV2 extends Activity {
 			drawer.findViewById(R.id.dwrNavSep).setBackgroundColor(accentColor);
 			drawer.findViewById(R.id.dwrFuncSep).setBackgroundColor(accentColor);
 			
-			int tColor;
-			if (isAccentLight)
-				tColor = android.R.color.black;
-			else
-				tColor = android.R.color.white;
-			
 			croutonStyle = new Style.Builder()
 								.setBackgroundColorValue(accentColor)
-								.setTextColor(tColor)
+								.setTextColorValue(accentTextColor)
 								.setConfiguration(croutonShort)
 								.build();
 		}
