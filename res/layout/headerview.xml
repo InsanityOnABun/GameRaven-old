@@ -9,9 +9,7 @@
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp"
         android:layout_marginTop="2dp"
-        android:maxLines="2"
         android:minLines="1"
-        android:text="Header"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@android:color/black" />
 
