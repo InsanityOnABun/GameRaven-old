@@ -1096,6 +1096,8 @@ public class AllInOneV2 extends Activity {
 		wtl("GRAIO hNR fired, desc: " + desc.name());
 		
 		ptrLayout.setEnabled(false);
+		
+		contentList.scrollTo(0, 0);
 
 		searchIcon.setVisible(false);
 		searchIcon.collapseActionView();
