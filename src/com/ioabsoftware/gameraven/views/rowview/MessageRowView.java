@@ -98,12 +98,14 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 		
 		if (myData.hasPoll()) {
 			isShowingPoll = true;
-			pollWrapper.setVisibility(View.VISIBLE);
+			pollWrapper.removeAllViews();
 			pollWrapper.addView(myData.getPoll());
+			pollWrapper.setVisibility(View.VISIBLE);
 		}
 		else if (isShowingPoll) {
 			isShowingPoll = false;
 			pollWrapper.setVisibility(View.GONE);
+			pollWrapper.removeAllViews();
 		}
 		
 		if (myData.getHLColor() == 0) {
