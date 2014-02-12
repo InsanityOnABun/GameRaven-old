@@ -637,6 +637,8 @@ public class Session implements HandlesNetworkResult {
 				case QPOSTMSG_S1:
 				case QEDIT_MSG:
 					
+					//TODO: Completely replace QPOST* NetDescs with userHasAdvancedPosting()
+					
 					aio.wtl("session hNR determined this is post message step 1");
 					String msg1Key = pRes.getElementsByAttributeValue("name", "key").attr("value");
 					
@@ -649,7 +651,7 @@ public class Session implements HandlesNetworkResult {
 					HashMap<String, String> msg1Data = new HashMap<String, String>();
 					msg1Data.put("messagetext", aio.getSavedPostBody());
 					msg1Data.put("custom_sig", sig);
-					msg1Data.put("post", ((desc == NetDesc.POSTMSG_S1) ? "Preview Message" : "Post without Preview"));
+					msg1Data.put("post", (userHasAdvancedPosting() ? "Post without Preview" : "Preview Message"));
 					msg1Data.put("key", msg1Key);
 					
 					Elements msg1Error = pRes.getElementsContainingOwnText("There was an error posting your message:");
@@ -660,10 +662,10 @@ public class Session implements HandlesNetworkResult {
 					}
 					else {
 						aio.wtl("finishing post message step 1, sending step 2");
-						if (desc == NetDesc.POSTMSG_S1)
-							post(NetDesc.POSTMSG_S2, lastPath, msg1Data);
-						else
+						if (userHasAdvancedPosting())
 							post(NetDesc.QPOSTMSG_S3, lastPath, msg1Data);
+						else
+							post(NetDesc.POSTMSG_S2, lastPath, msg1Data);
 					}
 					break;
 					
