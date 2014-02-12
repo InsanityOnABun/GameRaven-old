@@ -2232,7 +2232,7 @@ public class AllInOneV2 extends Activity {
 		}
 		else {
 			titleWrapper.setVisibility(View.VISIBLE);
-			if (Session.getUserLevel() > 29) {
+			if (Session.userHasAdvancedPosting()) {
 				pollButton.setEnabled(true);
 				pollButton.setVisibility(View.VISIBLE);
 				pollSep.setVisibility(View.VISIBLE);
@@ -2306,10 +2306,10 @@ public class AllInOneV2 extends Activity {
 				path += "&poll=1";
 				session.get(NetDesc.POSTTPC_S1, path, null);
 			}
-			else if (Session.getUserLevel() < 30)
-				session.get(NetDesc.POSTTPC_S1, path, null);
-			else
+			else if (Session.userHasAdvancedPosting())
 				session.get(NetDesc.QPOSTTPC_S1, path, null);
+			else
+				session.get(NetDesc.POSTTPC_S1, path, null);
 		}
 		
 		else {
@@ -2327,10 +2327,10 @@ public class AllInOneV2 extends Activity {
 			cancelButton.setEnabled(false);
 			if (messageIDForEditing != null)
 				session.get(NetDesc.QEDIT_MSG, path, null);
-			else if (Session.getUserLevel() < 30)
-				session.get(NetDesc.POSTMSG_S1, path, null);
-			else
+			else if (Session.userHasAdvancedPosting())
 				session.get(NetDesc.QPOSTMSG_S1, path, null);
+			else
+				session.get(NetDesc.POSTMSG_S1, path, null);
 		}
 	}
 	
@@ -2488,12 +2488,12 @@ public class AllInOneV2 extends Activity {
 			if (postIcon.isVisible())
 				listBuilder.add("Quote");
 			if (Session.getUser().trim().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
-				if (Session.getUserLevel() > 29 && clickedMsg.isEditable())
+				if (Session.userCanEditMsgs() && clickedMsg.isEditable())
 					listBuilder.add("Edit");
-				if (clickedMsg.getMessageID() != null)
+				if (Session.userCanDeleteClose() && clickedMsg.getMessageID() != null)
 					listBuilder.add("Delete");
 			}
-			else
+			else if (Session.userCanMarkMsgs())
 				listBuilder.add("Report");
 		}
 			

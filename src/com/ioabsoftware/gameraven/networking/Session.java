@@ -87,8 +87,19 @@ public class Session implements HandlesNetworkResult {
 	{return user != null;}
 
 	private static int userLevel = 0;
-	public static int getUserLevel()
-	{return userLevel;}
+//	public static int getUserLevel()
+//	{return userLevel;}
+	public static boolean userCanDeleteClose()
+	{return userLevel > 13;}
+	public static boolean userCanViewAMP() 
+	{return userLevel > 14;}
+	public static boolean userCanMarkMsgs()
+	{return userLevel > 19;}
+	public static boolean userCanEditMsgs()
+	{return userLevel > 24;}
+	/** Quickpost and create poll topics */
+	public static boolean userHasAdvancedPosting()
+	{return userLevel > 29;}
 	
 	public static boolean applySavedScroll;
 	public static int[] savedScrollVal;
@@ -605,13 +616,13 @@ public class Session implements HandlesNetworkResult {
 					
 				case LOGIN_S2:
 					aio.wtl("session hNR determined this is login step 2");
-					aio.setAMPLinkVisible(userLevel > 19);
+					aio.setAMPLinkVisible(userCanViewAMP());
 					
 					if (initUrl != null) {
 						aio.wtl("loading previous page");
 						get(initDesc, initUrl, null);
 					}
-					else if (AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false) && userLevel > 19) {
+					else if (userCanViewAMP() && AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false)) {
 						aio.wtl("loading AMP");
 						get(NetDesc.AMP_LIST, AllInOneV2.buildAMPLink(), null);
 					}
