@@ -1097,8 +1097,6 @@ public class AllInOneV2 extends Activity {
 		wtl("GRAIO hNR fired, desc: " + desc.name());
 		
 		ptrLayout.setEnabled(false);
-		
-		contentList.scrollTo(0, 0);
 
 		searchIcon.setVisible(false);
 		searchIcon.collapseActionView();
@@ -2000,14 +1998,31 @@ public class AllInOneV2 extends Activity {
 			viewAdapter.notifyDataSetChanged();
 		
 		if (consumeGoToUrlDefinedPost() && !Session.applySavedScroll) {
-        	contentList.setSelection(goToThisIndex);
+			contentList.post(new Runnable() {
+				@Override
+				public void run() {
+					contentList.setSelection(goToThisIndex);
+				}
+			});
+        	
 		}
 		else if (Session.applySavedScroll) {
-        	contentList.setSelectionFromTop(Session.savedScrollVal[0], Session.savedScrollVal[1]);
-			Session.applySavedScroll = false;
+			contentList.post(new Runnable() {
+				@Override
+				public void run() {
+					contentList.setSelectionFromTop(Session.savedScrollVal[0], Session.savedScrollVal[1]);
+					Session.applySavedScroll = false;
+				}
+			});
+        	
 		}
 		else {
-			contentList.setSelectionAfterHeaderView();
+			contentList.post(new Runnable() {
+				@Override
+				public void run() {
+					contentList.setSelectionAfterHeaderView();
+				}
+			});
 		}
 		
 		if (ptrLayout.isRefreshing())
