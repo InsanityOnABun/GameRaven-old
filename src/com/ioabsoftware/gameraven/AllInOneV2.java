@@ -74,6 +74,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.SearchView;
@@ -2684,8 +2685,34 @@ public class AllInOneV2 extends Activity {
 		
 		accountChanger.setNegativeButton("Cancel", null);
 		
+		accountChanger.setPositiveButton("Manage Accounts", new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				startActivity(new Intent(AllInOneV2.this, SettingsAccount.class));
+			}
+		});
 		
-		Dialog d = accountChanger.create();
+		
+		final AlertDialog d = accountChanger.create();
+		d.setOnShowListener(new OnShowListener() {
+
+		    @Override
+		    public void onShow(DialogInterface dialog) {
+		        Button posButton = d.getButton(DialogInterface.BUTTON_POSITIVE);
+		        Button negButton = d.getButton(DialogInterface.BUTTON_NEGATIVE);
+
+		        LayoutParams posParams = (LayoutParams) posButton.getLayoutParams();
+		        posParams.weight = 1;
+		        posParams.width = LayoutParams.MATCH_PARENT;
+
+		        LayoutParams negParams = (LayoutParams) negButton.getLayoutParams();
+		        negParams.weight = 1;
+		        negParams.width = LayoutParams.MATCH_PARENT;
+
+		        posButton.setLayoutParams(posParams);
+		        negButton.setLayoutParams(negParams);
+		    }
+		});
 		d.setOnDismissListener(new DialogInterface.OnDismissListener() {
 			public void onDismiss(DialogInterface dialog) {
 				removeDialog(CHANGE_LOGGED_IN_DIALOG);
