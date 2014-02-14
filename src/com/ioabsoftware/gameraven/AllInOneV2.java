@@ -221,8 +221,13 @@ public class AllInOneV2 extends Activity {
     private View pageJumperWrapper;
 	
 	public int[] getScrollerVertLoc() {
-		int firstVis = contentList.getFirstVisiblePosition();
-		return new int[] {firstVis, contentList.getChildAt(0).getTop()};
+		try {
+			int firstVis = contentList.getFirstVisiblePosition();
+			return new int[] {firstVis, contentList.getChildAt(0).getTop()};
+		}
+		catch (NullPointerException npe) {
+			return new int[] {0, 0};
+		}
 	}
 	
 	private static boolean usingLightTheme;
