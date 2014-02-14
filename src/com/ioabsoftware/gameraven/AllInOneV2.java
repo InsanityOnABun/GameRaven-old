@@ -1894,7 +1894,7 @@ public class AllInOneV2 extends Activity {
 								// cells = [platform] [title] [faqs] [codes] [saves] [revs] [mygames] [q&a] [pics] [vids] [board]
 								String platform = cells.get(0).text();
 								String bName = cells.get(1).text();
-								String bUrl = cells.get(10).child(0).attr("href");
+								String bUrl = cells.get(9).child(0).attr("href");
 								
 								if (platform.codePointAt(0) == ('\u00A0')) {
 									platform = prevPlatform;
