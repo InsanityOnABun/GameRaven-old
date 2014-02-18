@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
 
     <application
         android:name="MyApplication"
@@ -44,6 +45,12 @@
         </activity>
         <activity android:name="com.ioabsoftware.gameraven.About" >
         </activity>
+        <activity
+            android:name="org.acra.CrashReportDialog"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleInstance"
+            android:theme="@android:style/Theme.Holo.Dialog" />
 
         <service
             android:name="com.ioabsoftware.gameraven.NotifierService"

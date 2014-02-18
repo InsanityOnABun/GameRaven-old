@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.acra.ACRA;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
@@ -943,7 +944,7 @@ public class Session implements HandlesNetworkResult {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			aio.tryCaught(res.url().toString(), desc.toString(), ExceptionUtils.getStackTrace(e), res.body());
+			aio.tryCaught(res.url().toString(), desc.toString(), e, res.body());
 		}
 
 		aio.wtl("session hNR finishing, desc: " + desc.name());
