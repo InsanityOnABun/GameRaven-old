@@ -137,9 +137,9 @@ public class NotifierService extends IntentService {
 								if (count > prevCount) {
 									String msg;
 									if (count > 1)
-										msg = "1 new PM found for " + username;
+										msg = count + " new PMs found for " + username;
 									else
-										msg = count + "new PMs found for " + username;
+										msg = "1 new PM found for " + username;
 									
 									showNotif(msg, PM_NOTIF_ID, notifManager);
 								}
@@ -161,9 +161,9 @@ public class NotifierService extends IntentService {
 								if (count > prevCount) {
 									String msg;
 									if (count > 1)
-										msg = "1 unread tracked topic found for " + username;
-									else
 										msg = count + " unread tracked topic found for " + username;
+									else
+										msg = "1 unread tracked topic found for " + username;
 									
 									showNotif(msg, TT_NOTIF_ID, notifManager);
 								}
