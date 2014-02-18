@@ -1935,6 +1935,7 @@ public class AllInOneV2 extends Activity {
 				contentList.post(loadAds);
 				
 				Element pmInboxLink = pRes.select("div.masthead_user").first().select("a[href=/pm/]").first();
+				String pmButtonLabel = getResources().getString(R.string.pm_inbox);
 				if (pmInboxLink != null) {
 					String text = pmInboxLink.text();
 					int count = 0;
@@ -1949,6 +1950,8 @@ public class AllInOneV2 extends Activity {
 							else
 								Crouton.showText(this, "You have 1 unread PM", croutonStyle);
 						}
+						
+						pmButtonLabel += " (" + count + ")";
 					}
 					
 					settings.edit().putInt("unreadPMCount", count).apply();
@@ -1956,7 +1959,10 @@ public class AllInOneV2 extends Activity {
 						settings.edit().putInt("notifsUnreadPMCount", count).apply();
 				}
 				
+				((Button) findViewById(R.id.dwrPMInbox)).setText(pmButtonLabel);
+				
 				Element trackedLink = pRes.select("div.masthead_user").first().select("a[href=/boards/tracked]").first();
+				String ttButtonLabel = getResources().getString(R.string.tracked_topics);
 				if (trackedLink != null) {
 					String text = trackedLink.text();
 					int count = 0;
@@ -1971,12 +1977,16 @@ public class AllInOneV2 extends Activity {
 							else
 								Crouton.showText(this, "You have 1 unread tracked topic", croutonStyle, ptrLayout);
 						}
+						
+						ttButtonLabel += " (" + count + ")";
 					}
 					
 					settings.edit().putInt("unreadTTCount", count).apply();
 					if (isDefaultAcc)
 						settings.edit().putInt("notifsUnreadTTCount", count).apply();
 				}
+				
+				((Button) findViewById(R.id.dwrTrackedTopics)).setText(ttButtonLabel);
 
 				ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
 				
