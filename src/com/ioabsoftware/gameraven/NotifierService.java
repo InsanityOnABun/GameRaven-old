@@ -129,11 +129,12 @@ public class NotifierService extends IntentService {
 						Element pmInboxLink = pRes.select("div.masthead_user").first().select("a[href=/pm/]").first();
 						if (pmInboxLink != null) {
 							String text = pmInboxLink.text();
+							int count = 0;
+							
 							if (text.contains("(")) {
-								int count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
+								count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
 								int prevCount = prefs.getInt("notifsUnreadPMCount", 0);
 								if (count > prevCount) {
-									prefs.edit().putInt("notifsUnreadPMCount", count).apply();
 									String msg;
 									if (count > 1)
 										msg = "1 new PM found for " + username;
@@ -143,6 +144,8 @@ public class NotifierService extends IntentService {
 									showNotif(msg, PM_NOTIF_ID, notifManager);
 								}
 							}
+
+							prefs.edit().putInt("notifsUnreadPMCount", count).apply();
 						}
 					}
 					
@@ -150,11 +153,12 @@ public class NotifierService extends IntentService {
 						Element trackedLink = pRes.select("div.masthead_user").first().select("a[href=/boards/tracked]").first();
 						if (trackedLink != null) {
 							String text = trackedLink.text();
+							int count = 0;
+							
 							if (text.contains("(")) {
-								int count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
+								count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
 								int prevCount = prefs.getInt("notifsUnreadTTCount", 0);
 								if (count > prevCount) {
-									prefs.edit().putInt("notifsUnreadTTCount", count).apply();
 									String msg;
 									if (count > 1)
 										msg = "1 unread tracked topic found for " + username;
@@ -164,6 +168,8 @@ public class NotifierService extends IntentService {
 									showNotif(msg, TT_NOTIF_ID, notifManager);
 								}
 							}
+
+							prefs.edit().putInt("notifsUnreadTTCount", count).apply();
 						}
 					}
 				}

@@ -178,8 +178,8 @@ public class Session implements HandlesNetworkResult {
 		password = passwordIn;
 		
 		// reset the Session unread PM and TT counters
-		AllInOneV2.getSettingsPref().edit().putInt("unreadPMCount", 0);
-		AllInOneV2.getSettingsPref().edit().putInt("unreadTTCount", 0);
+		AllInOneV2.getSettingsPref().edit().putInt("unreadPMCount", 0).apply();
+		AllInOneV2.getSettingsPref().edit().putInt("unreadTTCount", 0).apply();
 		
 		if (user == null) {
 			aio.wtl("session constructor, user is null, starting logged out session");

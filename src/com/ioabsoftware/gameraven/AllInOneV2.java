@@ -1937,41 +1937,45 @@ public class AllInOneV2 extends Activity {
 				Element pmInboxLink = pRes.select("div.masthead_user").first().select("a[href=/pm/]").first();
 				if (pmInboxLink != null) {
 					String text = pmInboxLink.text();
+					int count = 0;
+					
 					if (text.contains("(")) {
-						int count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
+						count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
 						int prevCount = settings.getInt("unreadPMCount", 0);
 						
 						if (count > prevCount) {
-							settings.edit().putInt("unreadPMCount", count).apply();
-							if (isDefaultAcc)
-								settings.edit().putInt("notifsUnreadPMCount", count).apply();
-							
 							if (count > 1)
 								Crouton.showText(this, "You have " + count + " unread PMs", croutonStyle, ptrLayout);
 							else
 								Crouton.showText(this, "You have 1 unread PM", croutonStyle, ptrLayout);
 						}
 					}
+					
+					settings.edit().putInt("unreadPMCount", count).apply();
+					if (isDefaultAcc)
+						settings.edit().putInt("notifsUnreadPMCount", count).apply();
 				}
 				
 				Element trackedLink = pRes.select("div.masthead_user").first().select("a[href=/boards/tracked]").first();
 				if (trackedLink != null) {
 					String text = trackedLink.text();
+					int count = 0;
+					
 					if (text.contains("(")) {
-						int count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
+						count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
 						int prevCount = settings.getInt("unreadTTCount", 0);
 						
 						if (count > prevCount) {
-							settings.edit().putInt("unreadTTCount", count).apply();
-							if (isDefaultAcc)
-								settings.edit().putInt("notifsUnreadTTCount", count).apply();
-							
 							if (count > 1)
 								Crouton.showText(this, "You have " + count + " unread tracked topics", croutonStyle, ptrLayout);
 							else
 								Crouton.showText(this, "You have 1 unread tracked topic", croutonStyle, ptrLayout);
 						}
 					}
+					
+					settings.edit().putInt("unreadTTCount", count).apply();
+					if (isDefaultAcc)
+						settings.edit().putInt("notifsUnreadTTCount", count).apply();
 				}
 
 				ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
