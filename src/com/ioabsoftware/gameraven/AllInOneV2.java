@@ -351,7 +351,7 @@ public class AllInOneV2 extends Activity {
                 
                 clipboard.setPrimaryClip(android.content.ClipData.newPlainText("simple text", session.getLastPath()));
 				drawer.closeMenu(true);
-				Crouton.showText(AllInOneV2.this, "URL copied to clipboard.", croutonStyle, ptrLayout);
+				Crouton.showText(AllInOneV2.this, "URL copied to clipboard.", croutonStyle);
 			}
 		});
         
@@ -1945,9 +1945,9 @@ public class AllInOneV2 extends Activity {
 						
 						if (count > prevCount) {
 							if (count > 1)
-								Crouton.showText(this, "You have " + count + " unread PMs", croutonStyle, ptrLayout);
+								Crouton.showText(this, "You have " + count + " unread PMs", croutonStyle);
 							else
-								Crouton.showText(this, "You have 1 unread PM", croutonStyle, ptrLayout);
+								Crouton.showText(this, "You have 1 unread PM", croutonStyle);
 						}
 					}
 					
@@ -2561,7 +2561,7 @@ public class AllInOneV2 extends Activity {
 					session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink(), null);
 				}
 				else {
-					Crouton.showText(AllInOneV2.this, "not recognized: " + selected, croutonStyle, ptrLayout);
+					Crouton.showText(AllInOneV2.this, "not recognized: " + selected, croutonStyle);
 				}
 				
 				dismissDialog(MESSAGE_ACTION_DIALOG);
@@ -2771,7 +2771,7 @@ public class AllInOneV2 extends Activity {
     
 	public void pmCleanup(boolean wasSuccessful, String error) {
     	if (wasSuccessful) {
-			Crouton.showText(this, "PM sent.", croutonStyle, ptrLayout);
+			Crouton.showText(this, "PM sent.", croutonStyle);
 			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).
 					hideSoftInputFromWindow(pmSending.getWindowToken(), 0);
 			
@@ -2910,7 +2910,7 @@ public class AllInOneV2 extends Activity {
 							try {
 							    startActivity(Intent.createChooser(i, "Send mail..."));
 							} catch (android.content.ActivityNotFoundException ex) {
-								Crouton.showText(AllInOneV2.this, "There are no email clients installed.", croutonStyle, ptrLayout);
+								Crouton.showText(AllInOneV2.this, "There are no email clients installed.", croutonStyle);
 							}
 							
 							d.dismiss();
