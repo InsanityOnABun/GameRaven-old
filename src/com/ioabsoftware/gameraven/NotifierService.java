@@ -175,10 +175,6 @@ public class NotifierService extends IntentService {
 				}
 
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				Toast.makeText(this,
-						"There was an error checking for new messages",
-						Toast.LENGTH_SHORT).show();
 				Log.d("notif", "exception raised in notifierservice");
 				e.printStackTrace();
 			}
