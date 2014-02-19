@@ -993,22 +993,13 @@ public class AllInOneV2 extends Activity {
 		b.setNegativeButton("Dismiss", new OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				switch ((session.getLastRes() == null) ? 1 : 0) {
-				case 0:
-					try {
-						processContent(session.getLastRes(), session.getLastDesc(), 
-								session.getLastRes().parse(), session.getLastRes().url().toString());
-					} catch (IOException e) {
-						/* THIS SHOULD NEVER CRASH
-						 * No res should be able to get set to lastRes
-						 * if it is unparseable
-						 */
-						e.printStackTrace();
-					}
-				case 1:
+//				switch ((session.getLastDoc() == null) ? 1 : 0) {
+//				case 0:
+//					processContent(session.getLastDesc(), session.getLastDoc(), session.getLastPath());
+//				case 1:
 					postExecuteCleanup(session.getLastDesc());
-					break;
-				}
+//					break;
+//				}
 			}
 		});
 		b.create().show();
@@ -1091,7 +1082,7 @@ public class AllInOneV2 extends Activity {
 		public void run() {web.loadDataWithBaseURL(adBaseUrl, adBuilder.toString(), null, "iso-8859-1", null);}
 	};
 	@SuppressLint("SetJavaScriptEnabled")
-	public void processContent(Response res, NetDesc desc, Document pRes, String resUrl) {
+	public void processContent(NetDesc desc, Document doc, String resUrl) {
 		
 		wtl("GRAIO hNR fired, desc: " + desc.name());
 		
@@ -1115,893 +1106,872 @@ public class AllInOneV2 extends Activity {
 			isDefaultAcc = true;
 		else
 			isDefaultAcc = false;
+
+		wtl("setting board, topic, message id to null");
+		boardID = null;
+		topicID = null;
+		messageIDForEditing = null;
 		
+		Element tbody;
+		Element pj = null;
+		String headerTitle;
+		String firstPage = null;
+		String prevPage = null;
+		String currPage = "1";
+		String pageCount = "1";
+		String nextPage = null;
+		String lastPage = null;
 		
-		try {
-			if (res != null) {
-				wtl("res is not null");
+		String bgcolor;
+		if (usingLightTheme)
+        	bgcolor = "#ffffff";
+		else
+			bgcolor = "#000000";
+		
+		adBuilder.setLength(0);
+		adBuilder.append("<html>");
+		adBuilder.append(doc.head().outerHtml());
+		adBuilder.append("<body bgcolor=\"" + bgcolor + "\">");
+		for (Element e : doc.getElementsByClass("ad")) {
+			adBuilder.append(e.outerHtml());
+			e.remove();
+		}
+		for (Element e : doc.getElementsByTag("script")) {
+			adBuilder.append(e.outerHtml());
+		}
+		adBuilder.append("</body></html>");
+		
+		adBaseUrl = resUrl;
+		
+		if (web == null)
+			web = new WebView(this);
+		
+		web.getSettings().setJavaScriptEnabled(AllInOneV2.getSettingsPref().getBoolean("enableJS", true));
+		
+		switch (desc) {
+		case BOARD_JUMPER:
+		case LOGIN_S2:
+			updateHeaderNoJumper("Board Jumper", NetDesc.BOARD_JUMPER);
+			adapterRows.add(new HeaderRowData("Announcements"));
+			
+			searchIcon.setVisible(true);
+			
+			processBoards(doc, true);
+			break;
+			
+		case BOARD_LIST:
+			updateHeaderNoJumper(doc.getElementsByTag("th").get(4).text(), NetDesc.BOARD_LIST);
+			processBoards(doc, true);
+			break;
+			
+		case PM_INBOX:
+			tbody = doc.getElementsByTag("tbody").first();
 
-				wtl("setting board, topic, message id to null");
-				boardID = null;
-				topicID = null;
-				messageIDForEditing = null;
+			headerTitle = Session.getUser() + "'s PM Inbox";
+			
+			if (tbody != null) {
+				pj = doc.select("ul.paginate").first();
 				
-				Element tbody;
-				Element pj = null;
-				String headerTitle;
-				String firstPage = null;
-				String prevPage = null;
-				String currPage = "1";
-				String pageCount = "1";
-				String nextPage = null;
-				String lastPage = null;
-				
-				String bgcolor;
-				if (usingLightTheme)
-		        	bgcolor = "#ffffff";
-				else
-					bgcolor = "#000000";
-				
-				adBuilder.setLength(0);
-				adBuilder.append("<html>");
-				adBuilder.append(pRes.head().outerHtml());
-				adBuilder.append("<body bgcolor=\"" + bgcolor + "\">");
-				for (Element e : pRes.getElementsByClass("ad")) {
-					adBuilder.append(e.outerHtml());
-					e.remove();
-				}
-				for (Element e : pRes.getElementsByTag("script")) {
-					adBuilder.append(e.outerHtml());
-				}
-				adBuilder.append("</body></html>");
-				
-				adBaseUrl = res.url().toString();
-				
-				if (web == null)
-					web = new WebView(this);
-				
-				web.getSettings().setJavaScriptEnabled(AllInOneV2.getSettingsPref().getBoolean("enableJS", true));
-				
-				switch (desc) {
-				case BOARD_JUMPER:
-				case LOGIN_S2:
-					updateHeaderNoJumper("Board Jumper", NetDesc.BOARD_JUMPER);
-					adapterRows.add(new HeaderRowData("Announcements"));
-					
-					searchIcon.setVisible(true);
-					
-					processBoards(pRes, true);
-					break;
-					
-				case BOARD_LIST:
-					updateHeaderNoJumper(pRes.getElementsByTag("th").get(4).text(), NetDesc.BOARD_LIST);
-					processBoards(pRes, true);
-					break;
-					
-				case PM_INBOX:
-					tbody = pRes.getElementsByTag("tbody").first();
-
-					headerTitle = Session.getUser() + "'s PM Inbox";
-					
-					if (tbody != null) {
-						pj = pRes.select("ul.paginate").first();
-						
-						if (pj != null) {
-							String pjText = pj.child(0).text();
-							if (pjText.contains("Previous"))
-								pjText = pj.child(1).text();
-							//Page 1 of 5
-							int currPageStart = 5;
-							int ofIndex = pjText.indexOf(" of ");
-							currPage = pjText.substring(currPageStart, ofIndex);
-							int pageCountEnd = pjText.length();
-							pageCount = pjText.substring(ofIndex + 4, pageCountEnd);
-							int currPageNum = Integer.parseInt(currPage);
-							int pageCountNum = Integer.parseInt(pageCount);
-							
-							if (currPageNum > 1) {
-								firstPage = "/pm/";
-								prevPage = "/pm/?page=" + (currPageNum - 2);
-							}
-							if (currPageNum != pageCountNum) {
-								nextPage = "/pm/?page=" + currPageNum;
-								lastPage = "/pm/?page=" + (pageCountNum - 1);
-							}
-						}
-						
-						updateHeader(headerTitle, firstPage, prevPage, currPage, 
-									 pageCount, nextPage, lastPage, NetDesc.PM_INBOX);
-						
-						if (isDefaultAcc)
-							NotifierService.dismissPMNotif(this);
-						
-						for (Element row : tbody.getElementsByTag("tr")) {
-							Elements cells = row.children();
-							// [icon] [sender] [subject] [time] [check]
-							boolean isOld = true;
-							if (cells.get(0).children().first().hasClass("icon-circle"))
-								isOld = false;
-							String sender = cells.get(1).text();
-							Element subjectLinkElem = cells.get(2).children().first();
-							String subject = subjectLinkElem.text();
-							String link = subjectLinkElem.attr("href");
-							String time = cells.get(3).text();
-							
-							adapterRows.add(new PMRowData(subject, sender, time, link, isOld));
-						}
-					}
-					else {
-						updateHeaderNoJumper(headerTitle, NetDesc.PM_INBOX);
-						adapterRows.add(new HeaderRowData("You have no private messages at this time."));
-					}
-					
-					postIcon.setVisible(true);
-					pMode = PostMode.NEW_PM;
-					break;
-					
-				case PM_DETAIL:
-					headerTitle = pRes.select("h2.title").first().text();
-					String pmTitle = headerTitle;
-					if (!pmTitle.startsWith("Re: "))
-						pmTitle = "Re: " + pmTitle;
-
-					String pmMessage = pRes.select("div.body").first().outerHtml();
-					
-					Element foot = pRes.select("div.foot").first();
-					foot.child(1).remove();
-					String pmFoot = foot.outerHtml();
-					
-					//Sent by: P4wn4g3 on 6/1/2013 2:15:55 PM
-					String footText = foot.text();
-					
-					String sender = footText.substring(9, footText.indexOf(" on "));
-					
-					updateHeaderNoJumper(pmTitle, NetDesc.PM_DETAIL);
-					
-					adapterRows.add(new PMDetailRowData(sender, pmTitle, pmMessage + pmFoot));
-					break;
-					
-				case AMP_LIST:
-					wtl("GRAIO hNR determined this is an amp response");
-					
-					tbody = pRes.getElementsByTag("tbody").first();
-					
-					headerTitle = Session.getUser() + "'s Active Messages";
-					
-					if (pRes.select("ul.paginate").size() > 1) {
-						pj = pRes.select("ul.paginate").get(1);
-						if (pj != null && !pj.hasClass("user")
-								&& !pj.hasClass("tsort")) {
-							int x = 0;
-							String pjText = pj.child(x).text();
-							while (pjText.contains("First")
-									|| pjText.contains("Previous")) {
-								x++;
-								pjText = pj.child(x).text();
-							}
-							// Page 2 of 3
-							int currPageStart = 5;
-							int ofIndex = pjText.indexOf(" of ");
-							currPage = pjText.substring(currPageStart, ofIndex);
-							int pageCountEnd = pjText.length();
-							pageCount = pjText.substring(ofIndex + 4,
-									pageCountEnd);
-							int currPageNum = Integer.parseInt(currPage);
-							int pageCountNum = Integer.parseInt(pageCount);
-
-							String amp = buildAMPLink();
-							if (currPageNum > 1) {
-								firstPage = amp;
-								prevPage = amp + "&page=" + (currPageNum - 2);
-							}
-							if (currPageNum != pageCountNum) {
-								nextPage = amp + "&page=" + currPageNum;
-								lastPage = amp + "&page=" + (pageCountNum - 1);
-							}
-						}
-					}
-					updateHeader(headerTitle, firstPage, prevPage, currPage, 
-							pageCount, nextPage, lastPage, NetDesc.AMP_LIST);
-					
-					if (isDefaultAcc)
-						NotifierService.dismissAMPNotif(this);
-					
-					if (!tbody.children().isEmpty()) {
-						if (settings.getBoolean("notifsEnable", false) && isDefaultAcc) {
-							Element lPost = pRes.select("td.lastpost").first();
-							if (lPost != null) {
-								String lTime = lPost.text();
-								Date newDate;
-								lTime = lTime.replace("Last:", EMPTY_STRING);
-								if (lTime.contains("AM") || lTime.contains("PM"))
-									newDate = new SimpleDateFormat("MM'/'dd hh':'mmaa", Locale.US).parse(lTime);
-								else
-									newDate = new SimpleDateFormat("MM'/'dd'/'yyyy", Locale.US).parse(lTime);
-								
-								long newTime = newDate.getTime();
-								long oldTime = settings.getLong("notifsLastPost", 0);
-								if (newTime > oldTime) {
-									wtl("time is newer");
-									settings.edit().putLong("notifsLastPost", newTime).commit();
-								}
-							}
-						}
-						
-						for (Element row : tbody.children()) {
-							// [board] [title] [msg] [last post] [your last post]
-							Elements cells = row.children();
-							String board = cells.get(0).text();
-							Element titleLinkElem = cells.get(1).child(0);
-							String title = titleLinkElem.text();
-							String link = titleLinkElem.attr("href");
-							String mCount = cells.get(2).textNodes().get(0).text().trim();
-							Element lPostLinkElem = cells.get(3).child(1);
-							String lPost = lPostLinkElem.text();
-							String lPostLink = lPostLinkElem.attr("href");
-							String ylpLink = cells.get(4).child(1).attr("href");
-							
-							adapterRows.add(new AMPRowData(title, board, lPost, mCount, link,
-									lPostLink, ylpLink));
-						}
-					}
-					else {
-						adapterRows.add(new HeaderRowData("You have no active messages at this time."));
-					}
-					
-					wtl("amp response block finished");
-					break;
-					
-				case TRACKED_TOPICS:
-					headerTitle = Session.getUser() + "'s Tracked Topics";
-					updateHeaderNoJumper(headerTitle, desc);
-					
-					if (isDefaultAcc)
-						NotifierService.dismissTTNotif(this);
-					
-					tbody = pRes.getElementsByTag("tbody").first();
-					
-					if (tbody != null) {
-						for (Element row : tbody.children()) {
-							// [remove] [title] [board name] [msgs] [last [pst]
-							Elements cells = row.children();
-							String removeLink = cells.get(0).child(0)
-									.attr("href");
-							String topicLink = cells.get(1).child(0)
-									.attr("href");
-							String topicText = cells.get(1).text();
-							String board = cells.get(2).text();
-							String msgs = cells.get(3).text();
-							String lPostLink = cells.get(4).child(0)
-									.attr("href");
-							String lPostText = cells.get(4).text();
-							
-							adapterRows.add(new TrackedTopicRowData(board, topicText, lPostText, 
-									msgs, topicLink, removeLink, lPostLink));
-						}
-					}
-					else {
-						adapterRows.add(new HeaderRowData("You have no tracked topics at this time."));
-					}
-					break;
-					
-				case BOARD:
-					wtl("GRAIO hNR determined this is a board response");
-					
-					wtl("setting board id");
-					boardID = parseBoardID(resUrl);
-					
-					boolean isSplitList = false;
-					if (pRes.getElementsByTag("th").first() != null) {
-						if (pRes.getElementsByTag("th").first().text().equals("Board Title")) {
-							wtl("is actually a split board list");
-							
-							updateHeaderNoJumper(pRes.select("h1.page-title").first().text(), NetDesc.BOARD);
-							
-							processBoards(pRes, false);
-							
-							isSplitList = true;
-						}
-					}
-					
-					if (!isSplitList) {
-						String url = resUrl;
-						String searchQuery = EMPTY_STRING;
-						String searchPJAddition = EMPTY_STRING;
-						if (url.contains("search=")) {
-							wtl("board search url: " + url);
-							searchQuery = url.substring(url.indexOf("search=") + 7);
-							int i = searchQuery.indexOf('&');
-							if (i != -1)
-								searchQuery.replace(searchQuery.substring(i), EMPTY_STRING);
-							
-							searchPJAddition = "&search=" + searchQuery;
-							searchQuery = URLDecoder.decode(searchQuery);
-						}
-						
-						Element headerElem = pRes.getElementsByClass("page-title").first();
-						if (headerElem != null)
-							headerTitle = headerElem.text();
-						else
-							headerTitle = "GFAQs Cache Error, Board Title Not Found";
-						
-						if (searchQuery.length() > 0) 
-							headerTitle += " (search: " + searchQuery + ")";
-						
-						if (pRes.select("ul.paginate").size() > 1) {
-							pj = pRes.select("ul.paginate").get(1);
-							if (pj != null && !pj.hasClass("user")) {
-								int x = 0;
-								String pjText = pj.child(x).text();
-								while (pjText.contains("First")
-										|| pjText.contains("Previous")) {
-									x++;
-									pjText = pj.child(x).text();
-								}
-								// Page [dropdown] of 3
-								// Page 1 of 3
-								int ofIndex = pjText.indexOf(" of ");
-								int currPageStart = 5;
-								if (pj.getElementsByTag("select").isEmpty())
-									currPage = pjText.substring(currPageStart,
-											ofIndex);
-								else
-									currPage = pj
-											.select("option[selected=selected]")
-											.first().text();
-
-								int pageCountEnd = pjText.length();
-								pageCount = pjText.substring(ofIndex + 4,
-										pageCountEnd);
-								int currPageNum = Integer.parseInt(currPage);
-								int pageCountNum = Integer.parseInt(pageCount);
-
-								if (currPageNum > 1) {
-									firstPage = "boards/" + boardID + "?page=0"
-											+ searchPJAddition;
-									prevPage = "boards/" + boardID + "?page="
-											+ (currPageNum - 2)
-											+ searchPJAddition;
-								}
-								if (currPageNum != pageCountNum) {
-									nextPage = "boards/" + boardID + "?page="
-											+ currPageNum + searchPJAddition;
-									lastPage = "boards/" + boardID + "?page="
-											+ (pageCountNum - 1)
-											+ searchPJAddition;
-								}
-							}
-						}
-						updateHeader(headerTitle, firstPage, prevPage, currPage, 
-								pageCount, nextPage, lastPage, NetDesc.BOARD);
-						
-						searchIcon.setVisible(true);
-						
-						if (Session.isLoggedIn()) {
-							String favtext = pRes.getElementsByClass("user").first().text().toLowerCase(Locale.US);
-							if (favtext.contains("add to favorites")) {
-								addFavIcon.setVisible(true);
-								fMode = FavMode.ON_BOARD;
-							}
-							else if (favtext.contains("remove favorite")) {
-								remFavIcon.setVisible(true);
-								fMode = FavMode.ON_BOARD;
-							}
-
-							updatePostingRights(pRes, false);
-						}
-						
-						Element splitList = pRes.select("p:contains(this is a split board)").first();
-						if (splitList != null) {
-							String splitListLink = splitList.child(0).attr("href");
-							adapterRows.add(new BoardRowData("This is a Split Board.", "Click here to return to the Split List.", 
-									null, null, null, splitListLink, BoardType.SPLIT));
-						}
-						
-						Element table = pRes.select("table.board").first();
-						if (table != null) {
-							
-							table.getElementsByTag("col").get(2).remove();
-							table.getElementsByTag("th").get(2).remove();
-							table.getElementsByTag("col").get(0).remove();
-							table.getElementsByTag("th").get(0).remove();
-							
-							wtl("board row parsing start");
-							boolean skipFirst = true;
-							Set<String> hlUsers = hlDB.getHighlightedUsers().keySet();
-							for (Element row : table.getElementsByTag("tr")) {
-								if (!skipFirst) {
-									Elements cells = row.getElementsByTag("td");
-									// cells = [image] [title] [author] [post count] [last post]
-									String tImg = cells.get(0).child(0).className();
-									Element titleLinkElem = cells.get(1).child(0);
-									String title = titleLinkElem.text();
-									String tUrl = titleLinkElem.attr("href");
-									String tc = cells.get(2).text();
-									Element lPostLinkElem = cells.get(4).child(0);
-									String lastPost = lPostLinkElem.text();
-									String lpUrl = lPostLinkElem.attr("href");
-									String mCount = cells.get(3).text();
-									
-									TopicType type = TopicType.NORMAL;
-									if (tImg.contains("poll"))
-										type = TopicType.POLL;
-									else if (tImg.contains("sticky"))
-										type = TopicType.PINNED;
-									else if (tImg.contains("closed"))
-										type = TopicType.LOCKED;
-									else if (tImg.contains("archived"))
-										type = TopicType.ARCHIVED;
-									
-									wtl(tImg + ", " + type.name());
-									
-									ReadStatus status = ReadStatus.UNREAD;
-									if (tImg.endsWith("_read"))
-										status = ReadStatus.READ;
-									else if (tImg.endsWith("_unread"))
-										status = ReadStatus.NEW_POST;
-									
-									int hlColor = 0;
-									if (hlUsers.contains(tc.toLowerCase(Locale.US))) {
-										HighlightedUser hUser = hlDB.getHighlightedUsers().get(tc.toLowerCase(Locale.US));
-										hlColor = hUser.getColor();
-										tc += " (" + hUser.getLabel() + ")";
-									}
-									
-									adapterRows.add(new TopicRowData(title, tc, lastPost, mCount, tUrl,
-																	 lpUrl, type, status, hlColor));
-								}
-								else
-									skipFirst = false;
-							}
-							wtl("board row parsing end");
-						}
-						else {
-							adapterRows.add(new HeaderRowData("There are no topics at this time."));
-						}
-					}
-					
-					wtl("board response block finished");
-					break;
-					
-				case TOPIC:
-					boardID = parseBoardID(resUrl);
-					topicID = parseTopicID(resUrl);
-
-					tlUrl = "boards/" + boardID;
-					wtl(tlUrl);
-					topicListIcon.setVisible(true);
-					
-					Element headerElem = pRes.getElementsByClass("title").first();
-					if (headerElem != null)
-						headerTitle = headerElem.text();
-					else
-						headerTitle = "GFAQs Cache Error, Title Not Found";
-					
-					if (headerTitle.equals("Log In to GameFAQs")) {
-						headerElem = pRes.getElementsByClass("title").get(1);
-						if (headerElem != null)
-							headerTitle = headerElem.text();
-					}
-
-					if (pRes.select("ul.paginate").size() > 1) {
-						pj = pRes.select("ul.paginate").get(1);
-						if (pj != null && !pj.hasClass("user")) {
-							int x = 0;
-							String pjText = pj.child(x).text();
-							while (pjText.contains("First")
-									|| pjText.contains("Previous")) {
-								x++;
-								pjText = pj.child(x).text();
-							}
-							// Page [dropdown] of 3
-							// Page 1 of 3
-							int ofIndex = pjText.indexOf(" of ");
-							int currPageStart = 5;
-							if (pj.getElementsByTag("select").isEmpty())
-								currPage = pjText.substring(currPageStart,
-										ofIndex);
-							else
-								currPage = pj
-										.select("option[selected=selected]")
-										.first().text();
-
-							int pageCountEnd = pjText.length();
-							pageCount = pjText.substring(ofIndex + 4,
-									pageCountEnd);
-							int currPageNum = Integer.parseInt(currPage);
-							int pageCountNum = Integer.parseInt(pageCount);
-
-							if (currPageNum > 1) {
-								firstPage = "boards/" + boardID + "/" + topicID;
-								prevPage = "boards/" + boardID + "/" + topicID
-										+ "?page=" + (currPageNum - 2);
-							}
-							if (currPageNum != pageCountNum) {
-								nextPage = "boards/" + boardID + "/" + topicID
-										+ "?page=" + currPageNum;
-								lastPage = "boards/" + boardID + "/" + topicID
-										+ "?page=" + (pageCountNum - 1);
-							}
-						}
-					}
-					updateHeader(headerTitle, firstPage, prevPage, currPage, 
-							pageCount, nextPage, lastPage, NetDesc.TOPIC);
-					
-					if (Session.isLoggedIn()) {
-						String favtext = pRes.getElementsByClass("user").first().text().toLowerCase(Locale.US);
-						if (favtext.contains("track topic")) {
-							addFavIcon.setVisible(true);
-							fMode = FavMode.ON_TOPIC;
-						}
-						else if (favtext.contains("stop tracking")) {
-							remFavIcon.setVisible(true);
-							fMode = FavMode.ON_TOPIC;
-						}
-						
-						updatePostingRights(pRes, true);
-					}
-					
-					String goToThisPost = null;
-					if (goToUrlDefinedPost) {
-						String url = res.url().toString();
-						goToThisPost = url.substring(url.indexOf('#') + 1);
-					}
-					
-					Elements rows = pRes.select("table.board").first().getElementsByTag("tr");
-					int rowCount = rows.size();
-					
-					int msgIndex = 0;
-					
-					Set<String> hlUsers = hlDB.getHighlightedUsers().keySet();
-					for (int x = 0; x < rowCount; x++) {
-						Element row = rows.get(x);
-						
-						String user = null;
-						String postNum = null;
-						String mID = null;
-						String userTitles = EMPTY_STRING;
-						String postTimeText = EMPTY_STRING;
-						String postTime = EMPTY_STRING;
-						Element msgBody = null;
-						
-						if (row.hasClass("left")) {
-							// message poster display set to left of message
-							
-							Elements authorData = row.getElementsByClass("author_data");
-							user = row.getElementsByTag("b").first().text();
-							postNum = row.getElementsByTag("a").first().attr("name");
-							
-							for (int i = 1; i < authorData.size(); i++) {
-								Element e = authorData.get(i);
-								String t = e.text();
-								if (t.startsWith("("))
-									userTitles += " " + t;
-								
-								else if (e.hasClass("tag"))
-									userTitles += " (tagged as " + t + ")";
-								
-								else if (t.startsWith("Posted"))
-									postTime = t;
-								
-								else if (t.equals("message detail"))
-									mID = parseMessageID(e.child(0).attr("href"));
-							}
-							
-							msgBody = row.child(1).child(0);
-						}
-						else {
-							// message poster display set to above message
-							
-							List<TextNode> textNodes = row.child(0).child(0).textNodes();
-							Elements elements = row.child(0).child(0).children();
-							
-							int textNodesSize = textNodes.size();
-							for (int y = 0; y < textNodesSize; y++) {
-								String text = textNodes.get(y).text();
-								if (text.startsWith("Posted"))
-									postTimeText = text;
-								else if (text.contains("(")) {
-									userTitles += " " + text.substring(text.indexOf('('), text.lastIndexOf(')') + 1);
-								}
-							}
-							
-							user = elements.get(0).text();
-							int anchorCount = row.getElementsByTag("a").size();
-							postNum = row.getElementsByTag("a").get((anchorCount > 1 ? 1 : 0)).attr("name");
-							int elementsSize = elements.size();
-							for (int y = 0; y < elementsSize; y++) {
-								Element e = elements.get(y);
-								if (e.hasClass("tag"))
-									userTitles += " (tagged as " + e.text() + ")";
-								
-								else if (e.text().equals("message detail"))
-									mID = parseMessageID(e.attr("href"));
-							}
-							//Posted 11/15/2012 11:20:27&nbsp;AM | (edited) [if archived]
-							if (postTimeText.contains("(edited)"))
-								userTitles +=  " (edited)";
-							
-							int endPoint = postTimeText.indexOf('|') - 1;
-							if (endPoint < 0)
-								endPoint = postTimeText.length();
-							postTime = postTimeText.substring(0, endPoint);
-							
-							x++;
-							msgBody = rows.get(x).child(0).child(0);
-						}
-						
-						int hlColor = 0;
-						if (hlUsers.contains(user.toLowerCase(Locale.US))) {
-							HighlightedUser hUser = hlDB
-									.getHighlightedUsers().get(
-											user.toLowerCase(Locale.US));
-							hlColor = hUser.getColor();
-							userTitles += " (" + hUser.getLabel() + ")";
-						}
-						
-						if (goToUrlDefinedPost) {
-							if (postNum.equals(goToThisPost))
-								goToThisIndex = msgIndex;
-						}
-						
-						wtl("creating messagerowdata object");
-						adapterRows.add(new MessageRowData(user, userTitles, postNum, 
-								postTime, msgBody, boardID, topicID, mID, hlColor));
-						
-						msgIndex++;
-					}
-					
-					break;
-					
-				case MESSAGE_DETAIL:
-					updateHeaderNoJumper("Message Detail", NetDesc.MESSAGE_DETAIL);
-					
-					boardID = parseBoardID(resUrl);
-					topicID = parseTopicID(resUrl);
-					
-					Elements msgDRows = pRes.getElementsByTag("tr");
-					
-					String user = msgDRows.first().child(0).child(0).text();
-					
-					adapterRows.add(new HeaderRowData("Current Version"));
-					
-					Element currRow, body;
-					MessageRowData msg;
-					String postTime;
-					String mID = parseMessageID(resUrl);
-					for (int x = 0; x < msgDRows.size(); x++) {
-						if (x == 1)
-						adapterRows.add(new HeaderRowData("Previous Version(s)"));
-						else {
-							currRow = msgDRows.get(x);
-							
-							if (currRow.child(0).textNodes().size() > 1)
-								postTime = currRow.child(0).textNodes().get(1).text();
-							else
-								postTime = currRow.child(0).textNodes().get(0).text();
-							
-							body = currRow.child(1);
-							msg = new MessageRowData(user, null, null, postTime, body, boardID, topicID, mID, 0);
-							msg.disableTopClick();
-							adapterRows.add(msg);
-						}
-					}
-					
-					break;
-					
-				case USER_DETAIL:
-					wtl("starting user detail processing");
-					tbody = pRes.select("table.board").first().getElementsByTag("tbody").first();
-					Log.d("udtb", tbody.outerHtml());
-					String name = null;
-					String ID = null;
-					String level = null;
-					String creation = null;
-					String lVisit = null;
-					String sig = null;
-					String karma = null;
-					String AMP = null;
-					for (Element row : tbody.children()) {
-						String label = row.child(0).text().toLowerCase(Locale.US);
-						wtl("user detail row label: " + label);
-						if (label.equals("user name"))
-							name = row.child(1).text();
-						else if (label.equals("user id"))
-							ID = row.child(1).text();
-						else if (label.equals("board user level")) {
-							level = row.child(1).html();
-							wtl("set level: " + level);
-						}
-						else if (label.equals("account created"))
-							creation = row.child(1).text();
-						else if (label.equals("last visit"))
-							lVisit = row.child(1).text();
-						else if (label.equals("signature"))
-							sig = row.child(1).html();
-						else if (label.equals("karma"))
-							karma = row.child(1).text();
-						else if (label.equals("active messages posted"))
-							AMP = row.child(1).text();
-					}
-					
-					updateHeaderNoJumper(name + "'s Details", NetDesc.USER_DETAIL);
-					
-					adapterRows.add(new UserDetailRowData(name, ID, level, creation, lVisit, sig, karma, AMP));
-					break;
-					
-				case GAME_SEARCH:
-					wtl("GRAIO hNR determined this is a game search response");
-
-					String url = resUrl;
-					wtl("game search url: " + url);
-					
-					String searchQuery = url.substring(url.indexOf("game=") + 5);
-					int i = searchQuery.indexOf("&");
-					if (i != -1)
-						searchQuery = searchQuery.replace(searchQuery.substring(i), EMPTY_STRING);
-					
-					int pageIndex = url.indexOf("page=");
-					if (pageIndex != -1) {
-						currPage = url.substring(pageIndex + 5);
-						i = currPage.indexOf("&");
-						if (i != -1)
-							currPage = currPage.replace(currPage.substring(i), EMPTY_STRING);
-					}
-					else {
-						currPage = "0";
-					}
-
+				if (pj != null) {
+					String pjText = pj.child(0).text();
+					if (pjText.contains("Previous"))
+						pjText = pj.child(1).text();
+					//Page 1 of 5
+					int currPageStart = 5;
+					int ofIndex = pjText.indexOf(" of ");
+					currPage = pjText.substring(currPageStart, ofIndex);
+					int pageCountEnd = pjText.length();
+					pageCount = pjText.substring(ofIndex + 4, pageCountEnd);
 					int currPageNum = Integer.parseInt(currPage);
+					int pageCountNum = Integer.parseInt(pageCount);
 					
-					Element nextPageElem = null;
-					
-					if (!pRes.getElementsContainingOwnText("Next Page").isEmpty())
-						nextPageElem = pRes.getElementsContainingOwnText("Next Page").first();
-					
-					pageCount = "???";
-					if (nextPageElem != null) {
-						nextPage = "/search/index.html?game=" + searchQuery + "&page=" + (currPageNum + 1);
+					if (currPageNum > 1) {
+						firstPage = "/pm/";
+						prevPage = "/pm/?page=" + (currPageNum - 2);
 					}
-					if (currPageNum > 0) {
-						prevPage = "/search/index.html?game=" + searchQuery + "&page=" + (currPageNum - 1);
-						firstPage = "/search/index.html?game=" + searchQuery + "&page=0";
+					if (currPageNum != pageCountNum) {
+						nextPage = "/pm/?page=" + currPageNum;
+						lastPage = "/pm/?page=" + (pageCountNum - 1);
 					}
-					
-					headerTitle = "Searching games: " + URLDecoder.decode(searchQuery) + EMPTY_STRING;
-					
-					updateHeader(headerTitle, firstPage, prevPage, Integer.toString(currPageNum + 1), 
-								 pageCount, nextPage, lastPage, NetDesc.GAME_SEARCH);
-					
-					searchIcon.setVisible(true);
-					
-					Elements gameSearchTables = pRes.select("table.results");
-					int tCount = gameSearchTables.size();
-					int tCounter = 0;
-					if (!gameSearchTables.isEmpty()) {
-						for (Element table : gameSearchTables) {
-							tCounter++;
-							if (tCounter < tCount)
-								adapterRows.add(new HeaderRowData("Best Matches"));
-							else
-								adapterRows.add(new HeaderRowData("Good Matches"));
-							
-							String prevPlatform = EMPTY_STRING;
-							
-							wtl("board row parsing start");
-							for (Element row : table.getElementsByTag("tr")) {
-								Elements cells = row.getElementsByTag("td");
-								// cells = [platform] [title] [faqs] [codes] [saves] [revs] [mygames] [q&a] [pics] [vids] [board]
-								String platform = cells.get(0).text();
-								String bName = cells.get(1).text();
-								String bUrl = cells.get(9).child(0).attr("href");
-								
-								if (platform.codePointAt(0) == ('\u00A0')) {
-									platform = prevPlatform;
-								}
-								else {
-									prevPlatform = platform;
-								}
-								
-								adapterRows.add(new GameSearchRowData(bName, platform, bUrl));
-							}
-							
-							wtl("board row parsing end");
-						}
-					}
-					else {
-						adapterRows.add(new HeaderRowData("No results."));
-					}
-					
-					wtl("game search response block finished");
-					break;
-					
-				default:
-					wtl("GRAIO hNR determined response type is unhandled");
-					title.setText("Page unhandled - " + resUrl);
-					break;
 				}
 				
-				try {
-					((ViewGroup) web.getParent()).removeView(web);
-				} catch (Exception e1) {}
+				updateHeader(headerTitle, firstPage, prevPage, currPage, 
+							 pageCount, nextPage, lastPage, NetDesc.PM_INBOX);
 				
-				adapterRows.add(new AdRowData(web));
-				contentList.post(loadAds);
+				if (isDefaultAcc)
+					NotifierService.dismissPMNotif(this);
 				
-				Element pmInboxLink = pRes.select("div.masthead_user").first().select("a[href=/pm/]").first();
-				String pmButtonLabel = getResources().getString(R.string.pm_inbox);
-				if (pmInboxLink != null) {
-					String text = pmInboxLink.text();
-					int count = 0;
+				for (Element row : tbody.getElementsByTag("tr")) {
+					Elements cells = row.children();
+					// [icon] [sender] [subject] [time] [check]
+					boolean isOld = true;
+					if (cells.get(0).children().first().hasClass("icon-circle"))
+						isOld = false;
+					String sender = cells.get(1).text();
+					Element subjectLinkElem = cells.get(2).children().first();
+					String subject = subjectLinkElem.text();
+					String link = subjectLinkElem.attr("href");
+					String time = cells.get(3).text();
 					
-					if (text.contains("(")) {
-						count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
-						int prevCount = settings.getInt("unreadPMCount", 0);
-						
-						if (count > prevCount) {
-							if (count > 1)
-								Crouton.showText(this, "You have " + count + " unread PMs", croutonStyle);
-							else
-								Crouton.showText(this, "You have 1 unread PM", croutonStyle);
-						}
-						
-						pmButtonLabel += " (" + count + ")";
-					}
-					
-					settings.edit().putInt("unreadPMCount", count).apply();
-					if (isDefaultAcc)
-						settings.edit().putInt("notifsUnreadPMCount", count).apply();
+					adapterRows.add(new PMRowData(subject, sender, time, link, isOld));
 				}
-				
-				((Button) findViewById(R.id.dwrPMInbox)).setText(pmButtonLabel);
-				
-				Element trackedLink = pRes.select("div.masthead_user").first().select("a[href=/boards/tracked]").first();
-				String ttButtonLabel = getResources().getString(R.string.tracked_topics);
-				if (trackedLink != null) {
-					String text = trackedLink.text();
-					int count = 0;
-					
-					if (text.contains("(")) {
-						count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
-						int prevCount = settings.getInt("unreadTTCount", 0);
-						
-						if (count > prevCount) {
-							if (count > 1)
-								Crouton.showText(this, "You have " + count + " unread tracked topics", croutonStyle, ptrLayout);
-							else
-								Crouton.showText(this, "You have 1 unread tracked topic", croutonStyle, ptrLayout);
-						}
-						
-						ttButtonLabel += " (" + count + ")";
-					}
-					
-					settings.edit().putInt("unreadTTCount", count).apply();
-					if (isDefaultAcc)
-						settings.edit().putInt("notifsUnreadTTCount", count).apply();
-				}
-				
-				((Button) findViewById(R.id.dwrTrackedTopics)).setText(ttButtonLabel);
-
-				ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
-				
 			}
 			else {
-				wtl("res is null");
-				adapterRows.add(new HeaderRowData("You broke it. Somehow processContent was called with a null response."));
+				updateHeaderNoJumper(headerTitle, NetDesc.PM_INBOX);
+				adapterRows.add(new HeaderRowData("You have no private messages at this time."));
 			}
+			
+			postIcon.setVisible(true);
+			pMode = PostMode.NEW_PM;
+			break;
+			
+		case PM_DETAIL:
+			headerTitle = doc.select("h2.title").first().text();
+			String pmTitle = headerTitle;
+			if (!pmTitle.startsWith("Re: "))
+				pmTitle = "Re: " + pmTitle;
+
+			String pmMessage = doc.select("div.body").first().outerHtml();
+			
+			Element foot = doc.select("div.foot").first();
+			foot.child(1).remove();
+			String pmFoot = foot.outerHtml();
+			
+			//Sent by: P4wn4g3 on 6/1/2013 2:15:55 PM
+			String footText = foot.text();
+			
+			String sender = footText.substring(9, footText.indexOf(" on "));
+			
+			updateHeaderNoJumper(pmTitle, NetDesc.PM_DETAIL);
+			
+			adapterRows.add(new PMDetailRowData(sender, pmTitle, pmMessage + pmFoot));
+			break;
+			
+		case AMP_LIST:
+			wtl("GRAIO hNR determined this is an amp response");
+			
+			tbody = doc.getElementsByTag("tbody").first();
+			
+			headerTitle = Session.getUser() + "'s Active Messages";
+			
+			if (doc.select("ul.paginate").size() > 1) {
+				pj = doc.select("ul.paginate").get(1);
+				if (pj != null && !pj.hasClass("user")
+						&& !pj.hasClass("tsort")) {
+					int x = 0;
+					String pjText = pj.child(x).text();
+					while (pjText.contains("First")
+							|| pjText.contains("Previous")) {
+						x++;
+						pjText = pj.child(x).text();
+					}
+					// Page 2 of 3
+					int currPageStart = 5;
+					int ofIndex = pjText.indexOf(" of ");
+					currPage = pjText.substring(currPageStart, ofIndex);
+					int pageCountEnd = pjText.length();
+					pageCount = pjText.substring(ofIndex + 4,
+							pageCountEnd);
+					int currPageNum = Integer.parseInt(currPage);
+					int pageCountNum = Integer.parseInt(pageCount);
+
+					String amp = buildAMPLink();
+					if (currPageNum > 1) {
+						firstPage = amp;
+						prevPage = amp + "&page=" + (currPageNum - 2);
+					}
+					if (currPageNum != pageCountNum) {
+						nextPage = amp + "&page=" + currPageNum;
+						lastPage = amp + "&page=" + (pageCountNum - 1);
+					}
+				}
+			}
+			updateHeader(headerTitle, firstPage, prevPage, currPage, 
+					pageCount, nextPage, lastPage, NetDesc.AMP_LIST);
+			
+			if (isDefaultAcc)
+				NotifierService.dismissAMPNotif(this);
+			
+			if (!tbody.children().isEmpty()) {
+				if (settings.getBoolean("notifsEnable", false) && isDefaultAcc) {
+					Element lPost = doc.select("td.lastpost").first();
+					if (lPost != null) {
+						try {
+							String lTime = lPost.text();
+							Date newDate;
+							lTime = lTime.replace("Last:", EMPTY_STRING);
+							if (lTime.contains("AM") || lTime.contains("PM"))
+								newDate = new SimpleDateFormat("MM'/'dd hh':'mmaa", Locale.US).parse(lTime);
+							else
+								newDate = new SimpleDateFormat("MM'/'dd'/'yyyy", Locale.US).parse(lTime);
+							long newTime = newDate.getTime();
+							long oldTime = settings.getLong("notifsLastPost", 0);
+							if (newTime > oldTime) {
+								wtl("time is newer");
+								settings.edit().putLong("notifsLastPost", newTime).apply();
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				
+				for (Element row : tbody.children()) {
+					// [board] [title] [msg] [last post] [your last post]
+					Elements cells = row.children();
+					String board = cells.get(0).text();
+					Element titleLinkElem = cells.get(1).child(0);
+					String title = titleLinkElem.text();
+					String link = titleLinkElem.attr("href");
+					String mCount = cells.get(2).textNodes().get(0).text().trim();
+					Element lPostLinkElem = cells.get(3).child(1);
+					String lPost = lPostLinkElem.text();
+					String lPostLink = lPostLinkElem.attr("href");
+					String ylpLink = cells.get(4).child(1).attr("href");
+					
+					adapterRows.add(new AMPRowData(title, board, lPost, mCount, link,
+							lPostLink, ylpLink));
+				}
+			}
+			else {
+				adapterRows.add(new HeaderRowData("You have no active messages at this time."));
+			}
+			
+			wtl("amp response block finished");
+			break;
+			
+		case TRACKED_TOPICS:
+			headerTitle = Session.getUser() + "'s Tracked Topics";
+			updateHeaderNoJumper(headerTitle, desc);
+			
+			if (isDefaultAcc)
+				NotifierService.dismissTTNotif(this);
+			
+			tbody = doc.getElementsByTag("tbody").first();
+			
+			if (tbody != null) {
+				for (Element row : tbody.children()) {
+					// [remove] [title] [board name] [msgs] [last [pst]
+					Elements cells = row.children();
+					String removeLink = cells.get(0).child(0)
+							.attr("href");
+					String topicLink = cells.get(1).child(0)
+							.attr("href");
+					String topicText = cells.get(1).text();
+					String board = cells.get(2).text();
+					String msgs = cells.get(3).text();
+					String lPostLink = cells.get(4).child(0)
+							.attr("href");
+					String lPostText = cells.get(4).text();
+					
+					adapterRows.add(new TrackedTopicRowData(board, topicText, lPostText, 
+							msgs, topicLink, removeLink, lPostLink));
+				}
+			}
+			else {
+				adapterRows.add(new HeaderRowData("You have no tracked topics at this time."));
+			}
+			break;
+			
+		case BOARD:
+			wtl("GRAIO hNR determined this is a board response");
+			
+			wtl("setting board id");
+			boardID = parseBoardID(resUrl);
+			
+			boolean isSplitList = false;
+			if (doc.getElementsByTag("th").first() != null) {
+				if (doc.getElementsByTag("th").first().text().equals("Board Title")) {
+					wtl("is actually a split board list");
+					
+					updateHeaderNoJumper(doc.select("h1.page-title").first().text(), NetDesc.BOARD);
+					
+					processBoards(doc, false);
+					
+					isSplitList = true;
+				}
+			}
+			
+			if (!isSplitList) {
+				String url = resUrl;
+				String searchQuery = EMPTY_STRING;
+				String searchPJAddition = EMPTY_STRING;
+				if (url.contains("search=")) {
+					wtl("board search url: " + url);
+					searchQuery = url.substring(url.indexOf("search=") + 7);
+					int i = searchQuery.indexOf('&');
+					if (i != -1)
+						searchQuery.replace(searchQuery.substring(i), EMPTY_STRING);
+					
+					searchPJAddition = "&search=" + searchQuery;
+					searchQuery = URLDecoder.decode(searchQuery);
+				}
+				
+				Element headerElem = doc.getElementsByClass("page-title").first();
+				if (headerElem != null)
+					headerTitle = headerElem.text();
+				else
+					headerTitle = "GFAQs Cache Error, Board Title Not Found";
+				
+				if (searchQuery.length() > 0) 
+					headerTitle += " (search: " + searchQuery + ")";
+				
+				if (doc.select("ul.paginate").size() > 1) {
+					pj = doc.select("ul.paginate").get(1);
+					if (pj != null && !pj.hasClass("user")) {
+						int x = 0;
+						String pjText = pj.child(x).text();
+						while (pjText.contains("First")
+								|| pjText.contains("Previous")) {
+							x++;
+							pjText = pj.child(x).text();
+						}
+						// Page [dropdown] of 3
+						// Page 1 of 3
+						int ofIndex = pjText.indexOf(" of ");
+						int currPageStart = 5;
+						if (pj.getElementsByTag("select").isEmpty())
+							currPage = pjText.substring(currPageStart,
+									ofIndex);
+						else
+							currPage = pj
+									.select("option[selected=selected]")
+									.first().text();
+
+						int pageCountEnd = pjText.length();
+						pageCount = pjText.substring(ofIndex + 4,
+								pageCountEnd);
+						int currPageNum = Integer.parseInt(currPage);
+						int pageCountNum = Integer.parseInt(pageCount);
+
+						if (currPageNum > 1) {
+							firstPage = "boards/" + boardID + "?page=0"
+									+ searchPJAddition;
+							prevPage = "boards/" + boardID + "?page="
+									+ (currPageNum - 2)
+									+ searchPJAddition;
+						}
+						if (currPageNum != pageCountNum) {
+							nextPage = "boards/" + boardID + "?page="
+									+ currPageNum + searchPJAddition;
+							lastPage = "boards/" + boardID + "?page="
+									+ (pageCountNum - 1)
+									+ searchPJAddition;
+						}
+					}
+				}
+				updateHeader(headerTitle, firstPage, prevPage, currPage, 
+						pageCount, nextPage, lastPage, NetDesc.BOARD);
+				
+				searchIcon.setVisible(true);
+				
+				if (Session.isLoggedIn()) {
+					String favtext = doc.getElementsByClass("user").first().text().toLowerCase(Locale.US);
+					if (favtext.contains("add to favorites")) {
+						addFavIcon.setVisible(true);
+						fMode = FavMode.ON_BOARD;
+					}
+					else if (favtext.contains("remove favorite")) {
+						remFavIcon.setVisible(true);
+						fMode = FavMode.ON_BOARD;
+					}
+
+					updatePostingRights(doc, false);
+				}
+				
+				Element splitList = doc.select("p:contains(this is a split board)").first();
+				if (splitList != null) {
+					String splitListLink = splitList.child(0).attr("href");
+					adapterRows.add(new BoardRowData("This is a Split Board.", "Click here to return to the Split List.", 
+							null, null, null, splitListLink, BoardType.SPLIT));
+				}
+				
+				Element table = doc.select("table.board").first();
+				if (table != null) {
+					
+					table.getElementsByTag("col").get(2).remove();
+					table.getElementsByTag("th").get(2).remove();
+					table.getElementsByTag("col").get(0).remove();
+					table.getElementsByTag("th").get(0).remove();
+					
+					wtl("board row parsing start");
+					boolean skipFirst = true;
+					Set<String> hlUsers = hlDB.getHighlightedUsers().keySet();
+					for (Element row : table.getElementsByTag("tr")) {
+						if (!skipFirst) {
+							Elements cells = row.getElementsByTag("td");
+							// cells = [image] [title] [author] [post count] [last post]
+							String tImg = cells.get(0).child(0).className();
+							Element titleLinkElem = cells.get(1).child(0);
+							String title = titleLinkElem.text();
+							String tUrl = titleLinkElem.attr("href");
+							String tc = cells.get(2).text();
+							Element lPostLinkElem = cells.get(4).child(0);
+							String lastPost = lPostLinkElem.text();
+							String lpUrl = lPostLinkElem.attr("href");
+							String mCount = cells.get(3).text();
+							
+							TopicType type = TopicType.NORMAL;
+							if (tImg.contains("poll"))
+								type = TopicType.POLL;
+							else if (tImg.contains("sticky"))
+								type = TopicType.PINNED;
+							else if (tImg.contains("closed"))
+								type = TopicType.LOCKED;
+							else if (tImg.contains("archived"))
+								type = TopicType.ARCHIVED;
+							
+							wtl(tImg + ", " + type.name());
+							
+							ReadStatus status = ReadStatus.UNREAD;
+							if (tImg.endsWith("_read"))
+								status = ReadStatus.READ;
+							else if (tImg.endsWith("_unread"))
+								status = ReadStatus.NEW_POST;
+							
+							int hlColor = 0;
+							if (hlUsers.contains(tc.toLowerCase(Locale.US))) {
+								HighlightedUser hUser = hlDB.getHighlightedUsers().get(tc.toLowerCase(Locale.US));
+								hlColor = hUser.getColor();
+								tc += " (" + hUser.getLabel() + ")";
+							}
+							
+							adapterRows.add(new TopicRowData(title, tc, lastPost, mCount, tUrl,
+															 lpUrl, type, status, hlColor));
+						}
+						else
+							skipFirst = false;
+					}
+					wtl("board row parsing end");
+				}
+				else {
+					adapterRows.add(new HeaderRowData("There are no topics at this time."));
+				}
+			}
+			
+			wtl("board response block finished");
+			break;
+			
+		case TOPIC:
+			boardID = parseBoardID(resUrl);
+			topicID = parseTopicID(resUrl);
+
+			tlUrl = "boards/" + boardID;
+			wtl(tlUrl);
+			topicListIcon.setVisible(true);
+			
+			Element headerElem = doc.getElementsByClass("title").first();
+			if (headerElem != null)
+				headerTitle = headerElem.text();
+			else
+				headerTitle = "GFAQs Cache Error, Title Not Found";
+			
+			if (headerTitle.equals("Log In to GameFAQs")) {
+				headerElem = doc.getElementsByClass("title").get(1);
+				if (headerElem != null)
+					headerTitle = headerElem.text();
+			}
+
+			if (doc.select("ul.paginate").size() > 1) {
+				pj = doc.select("ul.paginate").get(1);
+				if (pj != null && !pj.hasClass("user")) {
+					int x = 0;
+					String pjText = pj.child(x).text();
+					while (pjText.contains("First")
+							|| pjText.contains("Previous")) {
+						x++;
+						pjText = pj.child(x).text();
+					}
+					// Page [dropdown] of 3
+					// Page 1 of 3
+					int ofIndex = pjText.indexOf(" of ");
+					int currPageStart = 5;
+					if (pj.getElementsByTag("select").isEmpty())
+						currPage = pjText.substring(currPageStart,
+								ofIndex);
+					else
+						currPage = pj
+								.select("option[selected=selected]")
+								.first().text();
+
+					int pageCountEnd = pjText.length();
+					pageCount = pjText.substring(ofIndex + 4,
+							pageCountEnd);
+					int currPageNum = Integer.parseInt(currPage);
+					int pageCountNum = Integer.parseInt(pageCount);
+
+					if (currPageNum > 1) {
+						firstPage = "boards/" + boardID + "/" + topicID;
+						prevPage = "boards/" + boardID + "/" + topicID
+								+ "?page=" + (currPageNum - 2);
+					}
+					if (currPageNum != pageCountNum) {
+						nextPage = "boards/" + boardID + "/" + topicID
+								+ "?page=" + currPageNum;
+						lastPage = "boards/" + boardID + "/" + topicID
+								+ "?page=" + (pageCountNum - 1);
+					}
+				}
+			}
+			updateHeader(headerTitle, firstPage, prevPage, currPage, 
+					pageCount, nextPage, lastPage, NetDesc.TOPIC);
+			
+			if (Session.isLoggedIn()) {
+				String favtext = doc.getElementsByClass("user").first().text().toLowerCase(Locale.US);
+				if (favtext.contains("track topic")) {
+					addFavIcon.setVisible(true);
+					fMode = FavMode.ON_TOPIC;
+				}
+				else if (favtext.contains("stop tracking")) {
+					remFavIcon.setVisible(true);
+					fMode = FavMode.ON_TOPIC;
+				}
+				
+				updatePostingRights(doc, true);
+			}
+			
+			String goToThisPost = null;
+			if (goToUrlDefinedPost) {
+				String url = resUrl;
+				goToThisPost = url.substring(url.indexOf('#') + 1);
+			}
+			
+			Elements rows = doc.select("table.board").first().getElementsByTag("tr");
+			int rowCount = rows.size();
+			
+			int msgIndex = 0;
+			
+			Set<String> hlUsers = hlDB.getHighlightedUsers().keySet();
+			for (int x = 0; x < rowCount; x++) {
+				Element row = rows.get(x);
+				
+				String user = null;
+				String postNum = null;
+				String mID = null;
+				String userTitles = EMPTY_STRING;
+				String postTimeText = EMPTY_STRING;
+				String postTime = EMPTY_STRING;
+				Element msgBody = null;
+				
+				if (row.hasClass("left")) {
+					// message poster display set to left of message
+					
+					Elements authorData = row.getElementsByClass("author_data");
+					user = row.getElementsByTag("b").first().text();
+					postNum = row.getElementsByTag("a").first().attr("name");
+					
+					for (int i = 1; i < authorData.size(); i++) {
+						Element e = authorData.get(i);
+						String t = e.text();
+						if (t.startsWith("("))
+							userTitles += " " + t;
+						
+						else if (e.hasClass("tag"))
+							userTitles += " (tagged as " + t + ")";
+						
+						else if (t.startsWith("Posted"))
+							postTime = t;
+						
+						else if (t.equals("message detail"))
+							mID = parseMessageID(e.child(0).attr("href"));
+					}
+					
+					msgBody = row.child(1).child(0);
+				}
+				else {
+					// message poster display set to above message
+					
+					List<TextNode> textNodes = row.child(0).child(0).textNodes();
+					Elements elements = row.child(0).child(0).children();
+					
+					int textNodesSize = textNodes.size();
+					for (int y = 0; y < textNodesSize; y++) {
+						String text = textNodes.get(y).text();
+						if (text.startsWith("Posted"))
+							postTimeText = text;
+						else if (text.contains("(")) {
+							userTitles += " " + text.substring(text.indexOf('('), text.lastIndexOf(')') + 1);
+						}
+					}
+					
+					user = elements.get(0).text();
+					int anchorCount = row.getElementsByTag("a").size();
+					postNum = row.getElementsByTag("a").get((anchorCount > 1 ? 1 : 0)).attr("name");
+					int elementsSize = elements.size();
+					for (int y = 0; y < elementsSize; y++) {
+						Element e = elements.get(y);
+						if (e.hasClass("tag"))
+							userTitles += " (tagged as " + e.text() + ")";
+						
+						else if (e.text().equals("message detail"))
+							mID = parseMessageID(e.attr("href"));
+					}
+					//Posted 11/15/2012 11:20:27&nbsp;AM | (edited) [if archived]
+					if (postTimeText.contains("(edited)"))
+						userTitles +=  " (edited)";
+					
+					int endPoint = postTimeText.indexOf('|') - 1;
+					if (endPoint < 0)
+						endPoint = postTimeText.length();
+					postTime = postTimeText.substring(0, endPoint);
+					
+					x++;
+					msgBody = rows.get(x).child(0).child(0);
+				}
+				
+				int hlColor = 0;
+				if (hlUsers.contains(user.toLowerCase(Locale.US))) {
+					HighlightedUser hUser = hlDB
+							.getHighlightedUsers().get(
+									user.toLowerCase(Locale.US));
+					hlColor = hUser.getColor();
+					userTitles += " (" + hUser.getLabel() + ")";
+				}
+				
+				if (goToUrlDefinedPost) {
+					if (postNum.equals(goToThisPost))
+						goToThisIndex = msgIndex;
+				}
+				
+				wtl("creating messagerowdata object");
+				adapterRows.add(new MessageRowData(user, userTitles, postNum, 
+						postTime, msgBody, boardID, topicID, mID, hlColor));
+				
+				msgIndex++;
+			}
+			
+			break;
+			
+		case MESSAGE_DETAIL:
+			updateHeaderNoJumper("Message Detail", NetDesc.MESSAGE_DETAIL);
+			
+			boardID = parseBoardID(resUrl);
+			topicID = parseTopicID(resUrl);
+			
+			Elements msgDRows = doc.getElementsByTag("tr");
+			
+			String user = msgDRows.first().child(0).child(0).text();
+			
+			adapterRows.add(new HeaderRowData("Current Version"));
+			
+			Element currRow, body;
+			MessageRowData msg;
+			String postTime;
+			String mID = parseMessageID(resUrl);
+			for (int x = 0; x < msgDRows.size(); x++) {
+				if (x == 1)
+				adapterRows.add(new HeaderRowData("Previous Version(s)"));
+				else {
+					currRow = msgDRows.get(x);
+					
+					if (currRow.child(0).textNodes().size() > 1)
+						postTime = currRow.child(0).textNodes().get(1).text();
+					else
+						postTime = currRow.child(0).textNodes().get(0).text();
+					
+					body = currRow.child(1);
+					msg = new MessageRowData(user, null, null, postTime, body, boardID, topicID, mID, 0);
+					msg.disableTopClick();
+					adapterRows.add(msg);
+				}
+			}
+			
+			break;
+			
+		case USER_DETAIL:
+			wtl("starting user detail processing");
+			tbody = doc.select("table.board").first().getElementsByTag("tbody").first();
+			Log.d("udtb", tbody.outerHtml());
+			String name = null;
+			String ID = null;
+			String level = null;
+			String creation = null;
+			String lVisit = null;
+			String sig = null;
+			String karma = null;
+			String AMP = null;
+			for (Element row : tbody.children()) {
+				String label = row.child(0).text().toLowerCase(Locale.US);
+				wtl("user detail row label: " + label);
+				if (label.equals("user name"))
+					name = row.child(1).text();
+				else if (label.equals("user id"))
+					ID = row.child(1).text();
+				else if (label.equals("board user level")) {
+					level = row.child(1).html();
+					wtl("set level: " + level);
+				}
+				else if (label.equals("account created"))
+					creation = row.child(1).text();
+				else if (label.equals("last visit"))
+					lVisit = row.child(1).text();
+				else if (label.equals("signature"))
+					sig = row.child(1).html();
+				else if (label.equals("karma"))
+					karma = row.child(1).text();
+				else if (label.equals("active messages posted"))
+					AMP = row.child(1).text();
+			}
+			
+			updateHeaderNoJumper(name + "'s Details", NetDesc.USER_DETAIL);
+			
+			adapterRows.add(new UserDetailRowData(name, ID, level, creation, lVisit, sig, karma, AMP));
+			break;
+			
+		case GAME_SEARCH:
+			wtl("GRAIO hNR determined this is a game search response");
+
+			String url = resUrl;
+			wtl("game search url: " + url);
+			
+			String searchQuery = url.substring(url.indexOf("game=") + 5);
+			int i = searchQuery.indexOf("&");
+			if (i != -1)
+				searchQuery = searchQuery.replace(searchQuery.substring(i), EMPTY_STRING);
+			
+			int pageIndex = url.indexOf("page=");
+			if (pageIndex != -1) {
+				currPage = url.substring(pageIndex + 5);
+				i = currPage.indexOf("&");
+				if (i != -1)
+					currPage = currPage.replace(currPage.substring(i), EMPTY_STRING);
+			}
+			else {
+				currPage = "0";
+			}
+
+			int currPageNum = Integer.parseInt(currPage);
+			
+			Element nextPageElem = null;
+			
+			if (!doc.getElementsContainingOwnText("Next Page").isEmpty())
+				nextPageElem = doc.getElementsContainingOwnText("Next Page").first();
+			
+			pageCount = "???";
+			if (nextPageElem != null) {
+				nextPage = "/search/index.html?game=" + searchQuery + "&page=" + (currPageNum + 1);
+			}
+			if (currPageNum > 0) {
+				prevPage = "/search/index.html?game=" + searchQuery + "&page=" + (currPageNum - 1);
+				firstPage = "/search/index.html?game=" + searchQuery + "&page=0";
+			}
+			
+			headerTitle = "Searching games: " + URLDecoder.decode(searchQuery) + EMPTY_STRING;
+			
+			updateHeader(headerTitle, firstPage, prevPage, Integer.toString(currPageNum + 1), 
+						 pageCount, nextPage, lastPage, NetDesc.GAME_SEARCH);
+			
+			searchIcon.setVisible(true);
+			
+			Elements gameSearchTables = doc.select("table.results");
+			int tCount = gameSearchTables.size();
+			int tCounter = 0;
+			if (!gameSearchTables.isEmpty()) {
+				for (Element table : gameSearchTables) {
+					tCounter++;
+					if (tCounter < tCount)
+						adapterRows.add(new HeaderRowData("Best Matches"));
+					else
+						adapterRows.add(new HeaderRowData("Good Matches"));
+					
+					String prevPlatform = EMPTY_STRING;
+					
+					wtl("board row parsing start");
+					for (Element row : table.getElementsByTag("tr")) {
+						Elements cells = row.getElementsByTag("td");
+						// cells = [platform] [title] [faqs] [codes] [saves] [revs] [mygames] [q&a] [pics] [vids] [board]
+						String platform = cells.get(0).text();
+						String bName = cells.get(1).text();
+						String bUrl = cells.get(9).child(0).attr("href");
+						
+						if (platform.codePointAt(0) == ('\u00A0')) {
+							platform = prevPlatform;
+						}
+						else {
+							prevPlatform = platform;
+						}
+						
+						adapterRows.add(new GameSearchRowData(bName, platform, bUrl));
+					}
+					
+					wtl("board row parsing end");
+				}
+			}
+			else {
+				adapterRows.add(new HeaderRowData("No results."));
+			}
+			
+			wtl("game search response block finished");
+			break;
+			
+		default:
+			wtl("GRAIO hNR determined response type is unhandled");
+			title.setText("Page unhandled - " + resUrl);
+			break;
 		}
-		catch (Exception e) {
-			e.printStackTrace();
-			tryCaught(res.url().toString(), desc.toString(), e, res.body());
-			if (session.canGoBack())
-				session.goBack(false);
+		
+		try {
+			((ViewGroup) web.getParent()).removeView(web);
+		} catch (Exception e1) {}
+		
+		adapterRows.add(new AdRowData(web));
+		contentList.post(loadAds);
+		
+		Element pmInboxLink = doc.select("div.masthead_user").first().select("a[href=/pm/]").first();
+		String pmButtonLabel = getResources().getString(R.string.pm_inbox);
+		if (pmInboxLink != null) {
+			String text = pmInboxLink.text();
+			int count = 0;
+			
+			if (text.contains("(")) {
+				count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
+				int prevCount = settings.getInt("unreadPMCount", 0);
+				
+				if (count > prevCount) {
+					if (count > 1)
+						Crouton.showText(this, "You have " + count + " unread PMs", croutonStyle);
+					else
+						Crouton.showText(this, "You have 1 unread PM", croutonStyle);
+				}
+				
+				pmButtonLabel += " (" + count + ")";
+			}
+			
+			settings.edit().putInt("unreadPMCount", count).apply();
+			if (isDefaultAcc)
+				settings.edit().putInt("notifsUnreadPMCount", count).apply();
 		}
-		catch (StackOverflowError e) {
-			e.printStackTrace();
-			tryCaught(res.url().toString(), desc.toString(), e, res.body());
-			if (session.canGoBack())
-				session.goBack(false);
+		
+		((Button) findViewById(R.id.dwrPMInbox)).setText(pmButtonLabel);
+		
+		Element trackedLink = doc.select("div.masthead_user").first().select("a[href=/boards/tracked]").first();
+		String ttButtonLabel = getResources().getString(R.string.tracked_topics);
+		if (trackedLink != null) {
+			String text = trackedLink.text();
+			int count = 0;
+			
+			if (text.contains("(")) {
+				count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
+				int prevCount = settings.getInt("unreadTTCount", 0);
+				
+				if (count > prevCount) {
+					if (count > 1)
+						Crouton.showText(this, "You have " + count + " unread tracked topics", croutonStyle, ptrLayout);
+					else
+						Crouton.showText(this, "You have 1 unread tracked topic", croutonStyle, ptrLayout);
+				}
+				
+				ttButtonLabel += " (" + count + ")";
+			}
+			
+			settings.edit().putInt("unreadTTCount", count).apply();
+			if (isDefaultAcc)
+				settings.edit().putInt("notifsUnreadTTCount", count).apply();
 		}
+		
+		((Button) findViewById(R.id.dwrTrackedTopics)).setText(ttButtonLabel);
+
+		ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
 		
 		if (!adapterSet) {
 			contentList.setAdapter(viewAdapter);
