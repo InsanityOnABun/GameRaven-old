@@ -6,8 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.acra.ACRA;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
