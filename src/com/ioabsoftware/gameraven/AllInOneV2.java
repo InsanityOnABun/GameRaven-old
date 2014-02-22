@@ -1953,9 +1953,9 @@ public class AllInOneV2 extends Activity {
 				
 				if (count > prevCount) {
 					if (count > 1)
-						Crouton.showText(this, "You have " + count + " unread tracked topics", croutonStyle, ptrLayout);
+						Crouton.showText(this, "You have " + count + " unread tracked topics", croutonStyle);
 					else
-						Crouton.showText(this, "You have 1 unread tracked topic", croutonStyle, ptrLayout);
+						Crouton.showText(this, "You have 1 unread tracked topic", croutonStyle);
 				}
 				
 				ttButtonLabel += " (" + count + ")";
