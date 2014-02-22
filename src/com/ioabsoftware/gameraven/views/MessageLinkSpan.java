@@ -55,6 +55,9 @@ public class MessageLinkSpan extends ClickableSpan {
 				else if (url.contains("boardlist.php")) {
 					aio.getSession().get(NetDesc.BOARD_LIST, url, null);
 				}
+				else if (url.contains("modhist.php")) {
+					aio.genError("Page Unsupported", "The moderation history page is currently unsupported in-app. Sorry.");
+				}
 				else {
 					String boardUrl = url.substring(url.indexOf("boards"));
 					if (boardUrl.contains("/")) {
@@ -65,6 +68,9 @@ public class MessageLinkSpan extends ClickableSpan {
 						 }
 						 else {
 							 // should be a board
+							 if (url.matches(".*\\d$")) {
+								 url += "-";
+							 }
 							 aio.getSession().get(NetDesc.BOARD, url, null);
 						 }
 					 }
