@@ -1001,7 +1001,7 @@ public class Session implements HandlesNetworkResult {
 			lastDesc = h.getDesc();
 			lastDoc = h.getDoc();
 			lastPath = h.getPath();
-			aio.processContent(lastDesc, lastDoc, lastPath);
+			aio.processContent(lastDesc, lastDoc.clone(), lastPath);
 		}
 	}
 	
