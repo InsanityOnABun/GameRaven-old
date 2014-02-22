@@ -3,7 +3,6 @@ package com.ioabsoftware.gameraven.db;
 import org.jsoup.nodes.Document;
 
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult;
-import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 
 
 public class History {
