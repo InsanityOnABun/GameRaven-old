@@ -2069,7 +2069,7 @@ public class AllInOneV2 extends Activity {
 			}
 		}
 		
-		if (includeBoardCategories) {
+		if (includeBoardCategories && homeTables.size() > 1) {
 			int rowX = 0;
 			for (Element row : homeTables.get(1).getElementsByTag("tr")) {
 				rowX++;
