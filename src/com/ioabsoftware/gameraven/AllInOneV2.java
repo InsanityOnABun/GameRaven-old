@@ -1,7 +1,6 @@
 package com.ioabsoftware.gameraven;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,8 +19,6 @@ import net.simonvt.menudrawer.MenuDrawer.Type;
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
