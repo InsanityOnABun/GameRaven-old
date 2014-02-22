@@ -1,4 +1,4 @@
-package com.ioabsoftware.gameraven;
+package com.ioabsoftware.gameraven.views;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -6,6 +6,7 @@ import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.View;
 
+import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
 

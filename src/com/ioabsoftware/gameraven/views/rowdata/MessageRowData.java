@@ -42,7 +42,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
-import com.ioabsoftware.gameraven.MessageLinkSpan;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.RichTextUtils;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
@@ -50,6 +49,7 @@ import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.ClickableLinksTextView;
 import com.ioabsoftware.gameraven.views.GRQuoteSpan;
+import com.ioabsoftware.gameraven.views.MessageLinkSpan;
 import com.ioabsoftware.gameraven.views.RowType;
 
 public class MessageRowData extends BaseRowData {
