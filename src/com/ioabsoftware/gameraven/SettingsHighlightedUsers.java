@@ -56,6 +56,8 @@ public class SettingsHighlightedUsers extends Activity implements HlUDDismissLis
 		outerWrapper.addView(addUser);
 		outerWrapper.addView(scroller);
 		setContentView(outerWrapper, lp);
+
+    	AllInOneV2.colorOverscroll(this, AllInOneV2.getAccentColor());
 		
 		updateList();
 	}

@@ -22,6 +22,8 @@ public class About extends Activity {
     	
     	setContentView(R.layout.about);
     	
+    	AllInOneV2.colorOverscroll(this, AllInOneV2.getAccentColor());
+    	
     	Drawable aBarDrawable;
 		if (AllInOneV2.getUsingLightTheme())
 			aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);

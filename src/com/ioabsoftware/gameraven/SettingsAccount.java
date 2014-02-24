@@ -68,6 +68,8 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
         
         addPreferencesFromResource(R.xml.settingsaccount);
 
+    	AllInOneV2.colorOverscroll(this, AllInOneV2.getAccentColor());
+
         Drawable aBarDrawable;
 		if (AllInOneV2.getUsingLightTheme())
 			aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);

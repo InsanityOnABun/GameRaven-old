@@ -73,6 +73,8 @@ public class SettingsMain extends PreferenceActivity {
         }
 		
 		super.onCreate(savedInstanceState);
+		
+    	AllInOneV2.colorOverscroll(this, AllInOneV2.getAccentColor());
         
         addPreferencesFromResource(R.xml.settingsmain);
         

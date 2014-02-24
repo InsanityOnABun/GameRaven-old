@@ -263,7 +263,7 @@ public class AllInOneV2 extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
 		me = this;
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		accentColor = 0;
+		accentColor = settings.getInt("accentColor", (getResources().getColor(R.color.holo_blue)));
         
 		usingLightTheme = settings.getBoolean("useLightTheme", false);
         if (usingLightTheme) {
@@ -273,6 +273,8 @@ public class AllInOneV2 extends Activity {
     	super.onCreate(savedInstanceState);
     	
         setContentView(R.layout.allinonev2);
+        
+        colorOverscroll(this, accentColor);
         
         aBar = getActionBar();
         aBar.setDisplayHomeAsUpEnabled(true);
@@ -542,7 +544,7 @@ public class AllInOneV2 extends Activity {
 			Crouton.showText(this, "Page not recognized: " + url, croutonStyle);
 	}
 	
-	private boolean firstSession = true;
+	private boolean firstResume = true;
     private float htBase, btBase, ttBase, pjbBase, pjlBase;
 	@Override
 	protected void onResume() {
@@ -583,7 +585,7 @@ public class AllInOneV2 extends Activity {
 		
     	int oldColor = accentColor;
 		accentColor = settings.getInt("accentColor", (getResources().getColor(R.color.holo_blue)));
-		if (accentColor != oldColor) {
+		if (accentColor != oldColor || firstResume) {
 			float[] hsv = new float[3];
 			Color.colorToHSV(accentColor, hsv);
 			if (settings.getBoolean("useWhiteAccentText", false)) {
@@ -653,7 +655,7 @@ public class AllInOneV2 extends Activity {
 		else {
 			String initUrl = null;
 			NetDesc initDesc = null;
-			if (firstSession) {
+			if (firstResume) {
 				Uri uri = getIntent().getData();
 				if (uri != null && uri.getScheme() != null && uri.getHost() != null) {
 					if (uri.getScheme().equals("http") && uri.getHost().contains("gamefaqs.com")) {
@@ -689,6 +691,8 @@ public class AllInOneV2 extends Activity {
 			b.setNegativeButton("No", null);
 			b.create().show();
 		}
+
+		firstResume = false;
 		
 		wtl("onResume finishing");
     }
@@ -697,6 +701,17 @@ public class AllInOneV2 extends Activity {
 	protected void onDestroy() {
 		Crouton.clearCroutonsForActivity(this);
 		super.onDestroy();
+	}
+	
+	static void colorOverscroll(Context context, int brandColor) {
+	      //glow
+	      int glowDrawableId = context.getResources().getIdentifier("overscroll_glow", "drawable", "android");
+	      Drawable androidGlow = context.getResources().getDrawable(glowDrawableId);
+	      androidGlow.setColorFilter(brandColor, PorterDuff.Mode.SRC_IN);
+	      //edge
+	      int edgeDrawableId = context.getResources().getIdentifier("overscroll_edge", "drawable", "android");
+	      Drawable androidEdge = context.getResources().getDrawable(edgeDrawableId);
+	      androidEdge.setColorFilter(brandColor, PorterDuff.Mode.SRC_IN);
 	}
 
 	private boolean needToSetNavList = true;
