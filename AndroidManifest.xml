@@ -42,6 +42,14 @@
                     android:scheme="http" />
                 <data
                     android:host="gamefaqs.com"
+                    android:pathPattern="/users/.*/boards"
+                    android:scheme="http" />
+                <data
+                    android:host="www.gamefaqs.com"
+                    android:pathPattern="/users/.*/boards"
+                    android:scheme="http" />
+                <data
+                    android:host="gamefaqs.com"
                     android:pathPrefix="/pm"
                     android:scheme="http" />
                 <data
