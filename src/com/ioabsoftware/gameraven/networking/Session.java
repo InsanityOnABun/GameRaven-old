@@ -126,25 +126,26 @@ public class Session implements HandlesNetworkResult {
 	 */
 	public Session(AllInOneV2 aioIn)
 	{
-		finalConstructor(aioIn, null, null);
+		this(aioIn, null, null);
 	}
 	
 	/**
 	 * Construct a new session for the specified user, 
-	 * using the specified password, that redirects to
+	 * using the specified password, that finishes on
 	 * the GFAQs homepage.
 	 * @param userIn The user for this session.
 	 * @param passwordIn The password for this session.
 	 */
 	public Session(AllInOneV2 aioIn, String userIn, String passwordIn)
 	{
-		finalConstructor(aioIn, userIn, passwordIn);
+		this(aioIn, userIn, passwordIn, null, null);
 	}
 	
 	/**
 	 * Construct a new session for the specified user, 
-	 * using the specified password, that redirects to
-	 * the GFAQs homepage.
+	 * using the specified password, that finishes on
+	 * initUrlIn using initDescIn. Passing null for
+	 * initUrlIn will finish on the GFAQs homepage.
 	 * @param userIn The user for this session.
 	 * @param passwordIn The password for this session.
 	 * @param initUrlIn The URL to load once successfully logged in.
@@ -201,8 +202,14 @@ public class Session implements HandlesNetworkResult {
 	 * @return The correct absolute URL for the specified
 	 * path.
 	 */
-	private String buildURL(String path)
-	{
+	public static String buildURL(String path, NetDesc desc) {
+		if (!path.contains("www.gamefaqs.com") && path.contains("gamefaqs.com"))
+			path = path.replace("gamefaqs.com", "www.gamefaqs.com");
+		
+		 if (desc == NetDesc.BOARD && path.matches(".*\\d$")) {
+			 path += "-";
+		 }
+			
 		// path is absolute, return it
 		if (path.startsWith("http"))
 			return path;
@@ -230,9 +237,14 @@ public class Session implements HandlesNetworkResult {
 	 */
 	public void get(NetDesc desc, String path, Map<String, String> data) {
 		if (hasNetworkConnection()) {
-			lastAttemptedPath = path;
-			lastAttemptedDesc = desc;
-			new NetworkTask(this, desc, Method.GET, cookies, buildURL(path), data).execute();
+			if (desc != NetDesc.MODHIST) {
+				lastAttemptedPath = path;
+				lastAttemptedDesc = desc;
+				new NetworkTask(this, desc, Method.GET, cookies, buildURL(path, desc), data).execute();
+			}
+			else
+				aio.genError("Page Unsupported", "The moderation history page is currently unsupported in-app. Sorry.");
+			
 		}
 		else
 			aio.noNetworkConnection();
@@ -247,7 +259,12 @@ public class Session implements HandlesNetworkResult {
 	 */
 	public void post(NetDesc desc, String path, Map<String, String> data) {
 		if (hasNetworkConnection()) {
-			new NetworkTask(this, desc, Method.POST, cookies, buildURL(path), data).execute();
+			if (desc != NetDesc.MODHIST) {
+				new NetworkTask(this, desc, Method.POST, cookies, buildURL(path, desc), data).execute();
+			}
+			else
+				aio.genError("Page Unsupported", "The moderation history page is currently unsupported in-app. Sorry.");
+			
 		}
 		else
 			aio.noNetworkConnection();
@@ -270,6 +287,7 @@ public class Session implements HandlesNetworkResult {
 		case BOARD_LIST:
 		case MESSAGE_DETAIL:
 		case USER_DETAIL:
+		case MODHIST:
 		case PM_INBOX:
 		case PM_DETAIL:
 		case MARKMSG_S1:
@@ -440,6 +458,7 @@ public class Session implements HandlesNetworkResult {
 				case BOARD_LIST:
 				case MESSAGE_DETAIL:
 				case USER_DETAIL:
+				case MODHIST:
 				case PM_INBOX:
 				case PM_DETAIL:
 				case UNSPECIFIED:
@@ -485,6 +504,7 @@ public class Session implements HandlesNetworkResult {
 						case BOARD_LIST:
 						case MESSAGE_DETAIL:
 						case USER_DETAIL:
+						case MODHIST:
 						case PM_INBOX:
 						case PM_DETAIL:
 						case UNSPECIFIED:
@@ -533,6 +553,7 @@ public class Session implements HandlesNetworkResult {
 				case BOARD_LIST:
 				case MESSAGE_DETAIL:
 				case USER_DETAIL:
+				case MODHIST:
 				case PM_INBOX:
 				case PM_DETAIL:
 				case UNSPECIFIED:
@@ -910,6 +931,7 @@ public class Session implements HandlesNetworkResult {
 				case BOARD_JUMPER:
 				case UNSPECIFIED:
 				case USER_DETAIL:
+				case MODHIST:
 				case PM_INBOX:
 				case PM_DETAIL:
 				case VERIFY_ACCOUNT_S1:
@@ -943,6 +965,7 @@ public class Session implements HandlesNetworkResult {
 		case TOPIC:
 		case MESSAGE_DETAIL:
 		case USER_DETAIL:
+		case MODHIST:
 		case PM_INBOX:
 		case PM_DETAIL:
 		case CLOSE_TOPIC:
@@ -1057,4 +1080,59 @@ public class Session implements HandlesNetworkResult {
     	
 		aio.wtl("user level: " + userLevel);
     }
+	
+	public static NetDesc determineNetDesc(String url) {
+		url = Session.buildURL(url, NetDesc.UNSPECIFIED);
+		
+		if (url.startsWith(Session.ROOT)) {
+			
+			// check if PM
+			if(url.equals(Session.ROOT + "/pm"))
+				url += "/";
+			if (url.contains("/pm/")) {
+				if (url.contains("?id=")) {
+					return NetDesc.PM_DETAIL;
+				}
+				else {
+					return NetDesc.PM_INBOX;
+				}
+			}
+			// check if AMP
+			else if (url.contains("myposts.php")) {
+				return NetDesc.AMP_LIST;
+			}
+			// check if this is a board or topic url
+			else if (url.contains("/boards")) {
+				if (url.contains("/users/")) {
+					return NetDesc.USER_DETAIL;
+				}
+				else if (url.contains("boardlist.php")) {
+					return NetDesc.BOARD_LIST;
+				}
+				else if (url.contains("modhist.php")) {
+					return NetDesc.MODHIST;
+				}
+				else {
+					String boardUrl = url.substring(url.indexOf("boards"));
+					if (boardUrl.contains("/")) {
+						 String slashUrl = boardUrl.substring(boardUrl.indexOf("/") + 1);
+						 if (slashUrl.contains("/")) {
+							 // should be a topic
+							 return NetDesc.TOPIC;
+						 }
+						 else {
+							 // should be a board
+							 return NetDesc.BOARD;
+						 }
+					 }
+					 else {
+						 // should be home
+						 return NetDesc.BOARD_JUMPER;
+					 }
+				}
+			}
+		}
+		
+		return NetDesc.UNSPECIFIED;
+	}
 }

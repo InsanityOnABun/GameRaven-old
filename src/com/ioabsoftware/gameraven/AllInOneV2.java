@@ -534,9 +534,15 @@ public class AllInOneV2 extends Activity {
 	
 	@Override
 	protected void onNewIntent(Intent intent) {
-		
+		String url = intent.getData().getPath();
+		NetDesc desc = Session.determineNetDesc(url);
+		if (desc != NetDesc.UNSPECIFIED)
+			session.get(desc, url, null);
+		else
+			Crouton.showText(this, "Page not recognized: " + url, croutonStyle);
 	}
 	
+	private boolean firstSession = true;
     private float htBase, btBase, ttBase, pjbBase, pjlBase;
 	@Override
 	protected void onResume() {
@@ -645,14 +651,25 @@ public class AllInOneV2 extends Activity {
 			}
     	}
 		else {
+			String initUrl = null;
+			NetDesc initDesc = null;
+			if (firstSession) {
+				Uri uri = getIntent().getData();
+				if (uri != null && uri.getScheme() != null && uri.getHost() != null) {
+					if (uri.getScheme().equals("http") && uri.getHost().contains("gamefaqs.com")) {
+						initUrl = uri.getPath();
+						initDesc = Session.determineNetDesc(initUrl);
+					}
+				}
+			}
     		String defaultAccount = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
     		if (accounts.containsKey(defaultAccount)) {
 				wtl("starting new session from onResume, logged in");
-    			session = new Session(this, defaultAccount, accounts.getString(defaultAccount));
+    			session = new Session(this, defaultAccount, accounts.getString(defaultAccount), initUrl, initDesc);
     		}
     		else {
 				wtl("starting new session from onResume, no login");
-    			session = new Session(this);
+    			session = new Session(this, null, null, initUrl, initDesc);
     		}
     	}
 		
