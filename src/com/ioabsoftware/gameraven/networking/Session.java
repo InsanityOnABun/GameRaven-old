@@ -1081,6 +1081,7 @@ public class Session implements HandlesNetworkResult {
 		aio.wtl("user level: " + userLevel);
     }
 	
+    //TODO: Need to handle everything possible (pm outbox, friends, etc.)
 	public static NetDesc determineNetDesc(String url) {
 		url = Session.buildURL(url, NetDesc.UNSPECIFIED);
 		
