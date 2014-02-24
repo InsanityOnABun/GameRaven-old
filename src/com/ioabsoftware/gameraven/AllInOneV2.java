@@ -536,12 +536,14 @@ public class AllInOneV2 extends Activity {
 	
 	@Override
 	protected void onNewIntent(Intent intent) {
-		String url = intent.getData().getPath();
-		NetDesc desc = Session.determineNetDesc(url);
-		if (desc != NetDesc.UNSPECIFIED)
-			session.get(desc, url, null);
-		else
-			Crouton.showText(this, "Page not recognized: " + url, croutonStyle);
+		if (intent.getData() != null && intent.getData().getPath() != null) {
+			String url = intent.getData().getPath();
+			NetDesc desc = Session.determineNetDesc(url);
+			if (desc != NetDesc.UNSPECIFIED)
+				session.get(desc, url, null);
+			else
+				Crouton.showText(this, "Page not recognized: " + url, croutonStyle);
+		}
 	}
 	
 	private boolean firstResume = true;
