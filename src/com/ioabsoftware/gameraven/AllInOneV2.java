@@ -2846,77 +2846,14 @@ public class AllInOneV2 extends Activity {
 	
 	public void tryCaught(String url, String desc, Throwable e, String source) {
 		ACRAConfiguration config = ACRA.getConfig();
+		config.setResToastText(R.string.bug_toast_text);
+		
 		ACRA.getErrorReporter().putCustomData("URL", url);
 		ACRA.getErrorReporter().putCustomData("NetDesc", desc);
 		ACRA.getErrorReporter().putCustomData("Page Source", StringEscapeUtils.escapeJava(source));
 		ACRA.getErrorReporter().handleException(e);
-//		String ver;
-//		try {
-//			ver = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-//		} catch (NameNotFoundException e) {
-//			ver = "version not set";
-//		}
-//		final String emailMsg = "\n\nVersion:\n" + ver + 
-//								"\n\nURL:\n" + url + 
-//								"\n\nDesc:\n" + desc +
-//								"\n\nStack trace:\n" + stacktrace + 
-//								"\n\nPage source:\n" + source;
-//		
-//    	AlertDialog.Builder b = new AlertDialog.Builder(this);
-//    	b.setTitle("Send Bug Report");
-//    	if (stacktrace.equals(ON_DEMAND_BUG_REPORT))
-//    		b.setMessage("NOTICE! Please include a comment on why you are sending this bug report in the text box " +
-//    				"below! On demand bug reports do not include any crash information, so we can't determine the " +
-//    				"bug without your input! Thanks!");
-//    	else
-//    		b.setMessage("You've run into a bug! Would you like to email debug information to the developer? The email will contain " + 
-//    				 "details on the crash itself, the url the server responded with, and the source for the page. " +
-//    				 "If so, please include a brief comment below on what you were trying to do.");
-//    	
-//    	final EditText input = new EditText(this);
-//    	LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-//    	        LinearLayout.LayoutParams.MATCH_PARENT,
-//    	        LinearLayout.LayoutParams.MATCH_PARENT);
-//    	input.setLayoutParams(lp);
-//    	input.setHint("Enter comment here...");
-//    	b.setView(input);
-//    	
-//    	b.setNegativeButton("Cancel", null);
-//    	b.setPositiveButton("Email to dev", null);
-//    	
-//    	final AlertDialog d = b.create();
-//    	d.setOnShowListener(new OnShowListener() {
-//			@Override
-//			public void onShow(DialogInterface dialog) {
-//				d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-//
-//		            @Override
-//		            public void onClick(View view) {
-//		            	if (!input.getText().toString().isEmpty()) {
-//			            	Intent i = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "ioabsoftware@gmail.com", null));
-//							i.putExtra(Intent.EXTRA_SUBJECT, "GameRaven Error Report");
-//							i.putExtra(Intent.EXTRA_TEXT   , "Comment:\n" + input.getText() + emailMsg);
-//							try {
-//							    startActivity(Intent.createChooser(i, "Send mail..."));
-//							} catch (android.content.ActivityNotFoundException ex) {
-//								Crouton.showText(AllInOneV2.this, "There are no email clients installed.", croutonStyle);
-//							}
-//							
-//							d.dismiss();
-//		            	}
-//		            	else {
-//		            		input.requestFocus();
-//							Crouton.showText(AllInOneV2.this, 
-//									"Please include a brief comment in the provided text box.", 
-//									croutonStyle, 
-//									(ViewGroup) input.getParent());
-//		            	}
-//		            }
-//		        });
-//			}
-//		});
-//    	
-//    	d.show();
+
+		config.setResToastText(R.string.crash_toast_text);
     }
 	
 	private String parseBoardID(String url) {

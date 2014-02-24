@@ -946,7 +946,7 @@ public class Session implements HandlesNetworkResult {
 				aio.wtl("res was null in session hNR");
 				aio.timeoutCleanup(desc);
 			}
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			aio.tryCaught(res.url().toString(), desc.toString(), e, res.body());
 		}
