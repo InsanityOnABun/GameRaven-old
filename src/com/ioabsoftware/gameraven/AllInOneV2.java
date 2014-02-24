@@ -260,7 +260,7 @@ public class AllInOneV2 extends Activity {
 	 **********************************************/
 	
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
 		me = this;
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		accentColor = 0;
@@ -531,6 +531,156 @@ public class AllInOneV2 extends Activity {
     	
 		wtl("onCreate finishing");
     }
+	
+	@Override
+	protected void onNewIntent(Intent intent) {
+		
+	}
+	
+    private float htBase, btBase, ttBase, pjbBase, pjlBase;
+	@Override
+	protected void onResume() {
+    	wtl("onResume fired");
+    	super.onResume();
+		
+    	ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
+    	
+    	float oldScale = textScale;
+    	textScale = settings.getInt("textScale", 100) / 100f;
+    	if (textScale != oldScale) {
+    		int px = TypedValue.COMPLEX_UNIT_PX;
+    		
+    		title.setTextSize(px, ttBase * getTextScale());
+    		
+    		firstPage.setTextSize(px, pjbBase * getTextScale());
+    		prevPage.setTextSize(px, pjbBase * getTextScale());
+    		nextPage.setTextSize(px, pjbBase * getTextScale());
+    		lastPage.setTextSize(px, pjbBase * getTextScale());
+    		pageLabel.setTextSize(px, pjlBase * getTextScale());
+    		
+    		float htSize = htBase * getTextScale();
+    		float btSize = btBase * getTextScale();
+    		
+    		((TextView) drawer.findViewById(R.id.dwrChangeAccHeader)).setTextSize(px, htSize);
+    		((TextView) drawer.findViewById(R.id.dwrChangeAcc)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrNavHeader)).setTextSize(px, htSize);
+    		((TextView) drawer.findViewById(R.id.dwrBoardJumper)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrAMPList)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrTrackedTopics)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrPMInbox)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrFuncHeader)).setTextSize(px, htSize);
+    		((TextView) drawer.findViewById(R.id.dwrCopyCurrURL)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrHighlightList)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrSettings)).setTextSize(px, btSize);
+    		((TextView) drawer.findViewById(R.id.dwrExit)).setTextSize(px, btSize);
+    	}
+		
+    	int oldColor = accentColor;
+		accentColor = settings.getInt("accentColor", (getResources().getColor(R.color.holo_blue)));
+		if (accentColor != oldColor) {
+			float[] hsv = new float[3];
+			Color.colorToHSV(accentColor, hsv);
+			if (settings.getBoolean("useWhiteAccentText", false)) {
+				// color is probably dark
+				if (hsv[2] > 0)
+					hsv[2] *= 1.2f;
+				else
+					hsv[2] = 0.2f;
+				
+				accentTextColor = Color.WHITE;
+				isAccentLight = false;
+			}
+			else {
+				// color is probably bright
+				hsv[2] *= 0.8f;
+				accentTextColor = Color.BLACK;
+				isAccentLight = true;
+			}
+			
+			Drawable aBarDrawable;
+			if (usingLightTheme)
+				aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);
+			else
+				aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_light_holo);
+			
+			aBarDrawable.setColorFilter(accentColor, PorterDuff.Mode.SRC_ATOP);
+			aBar.setBackgroundDrawable(aBarDrawable);
+			
+			((DefaultHeaderTransformer) ptrLayout.getHeaderTransformer()).setProgressBarColor(accentColor);
+			
+			
+			findViewById(R.id.aioPJTopSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioFirstPrevSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioNextLastSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioPostWrapperSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioPostTitleSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioPostBodySep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioBoldSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioItalicSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioCodeSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioSpoilerSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioCiteSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioHTMLSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioPostButtonSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioPollSep).setBackgroundColor(accentColor);
+			findViewById(R.id.aioPostSep).setBackgroundColor(accentColor);
+			drawer.findViewById(R.id.dwrCAHSep).setBackgroundColor(accentColor);
+			drawer.findViewById(R.id.dwrNavSep).setBackgroundColor(accentColor);
+			drawer.findViewById(R.id.dwrFuncSep).setBackgroundColor(accentColor);
+			
+			croutonStyle = new Style.Builder()
+								.setBackgroundColorValue(accentColor)
+								.setTextColorValue(accentTextColor)
+								.setConfiguration(croutonShort)
+								.build();
+		}
+		
+		
+		if (session != null) {
+			if (settings.getBoolean("reloadOnResume", false)) {
+				wtl("session exists, reload on resume is true, refreshing page");
+				isRoR = true;
+	    		session.refresh();
+			}
+    	}
+		else {
+    		String defaultAccount = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
+    		if (accounts.containsKey(defaultAccount)) {
+				wtl("starting new session from onResume, logged in");
+    			session = new Session(this, defaultAccount, accounts.getString(defaultAccount));
+    		}
+    		else {
+				wtl("starting new session from onResume, no login");
+    			session = new Session(this);
+    		}
+    	}
+		
+		title.setSelected(true);
+		
+		if (!settings.contains("beenWelcomed")) {
+			settings.edit().putBoolean("beenWelcomed", true).apply();
+			AlertDialog.Builder b = new AlertDialog.Builder(this);
+			b.setTitle("Welcome!");
+			b.setMessage("Would you like to view the quick start help files? This dialog won't be shown again.");
+			b.setPositiveButton("Yes", new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/InsanityOnABun/GameRaven/wiki")));
+				}
+			});
+			b.setNegativeButton("No", null);
+			b.create().show();
+		}
+		
+		wtl("onResume finishing");
+    }
+	
+	@Override
+	protected void onDestroy() {
+		Crouton.clearCroutonsForActivity(this);
+		super.onDestroy();
+	}
 
 	private boolean needToSetNavList = true;
 	public void disableNavList() {
@@ -576,8 +726,7 @@ public class AllInOneV2 extends Activity {
         refreshIcon = menu.getItem(5);
         
         SearchView searchView = (SearchView) searchIcon.getActionView();
-        if (searchView != null)
-        {
+        if (searchView != null) {
             SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));  
             
@@ -761,151 +910,6 @@ public class AllInOneV2 extends Activity {
             return super.onOptionsItemSelected(item);
         }
     }
-	
-    private float htBase, btBase, ttBase, pjbBase, pjlBase;
-	@Override
-    public void onResume() {
-    	wtl("onResume fired");
-    	super.onResume();
-		
-    	ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
-    	
-    	float oldScale = textScale;
-    	textScale = settings.getInt("textScale", 100) / 100f;
-    	if (textScale != oldScale) {
-    		int px = TypedValue.COMPLEX_UNIT_PX;
-    		
-    		title.setTextSize(px, ttBase * getTextScale());
-    		
-    		firstPage.setTextSize(px, pjbBase * getTextScale());
-    		prevPage.setTextSize(px, pjbBase * getTextScale());
-    		nextPage.setTextSize(px, pjbBase * getTextScale());
-    		lastPage.setTextSize(px, pjbBase * getTextScale());
-    		pageLabel.setTextSize(px, pjlBase * getTextScale());
-    		
-    		float htSize = htBase * getTextScale();
-    		float btSize = btBase * getTextScale();
-    		
-    		((TextView) drawer.findViewById(R.id.dwrChangeAccHeader)).setTextSize(px, htSize);
-    		((TextView) drawer.findViewById(R.id.dwrChangeAcc)).setTextSize(px, btSize);
-    		((TextView) drawer.findViewById(R.id.dwrNavHeader)).setTextSize(px, htSize);
-    		((TextView) drawer.findViewById(R.id.dwrBoardJumper)).setTextSize(px, btSize);
-    		((TextView) drawer.findViewById(R.id.dwrAMPList)).setTextSize(px, btSize);
-    		((TextView) drawer.findViewById(R.id.dwrTrackedTopics)).setTextSize(px, btSize);
-    		((TextView) drawer.findViewById(R.id.dwrPMInbox)).setTextSize(px, btSize);
-    		((TextView) drawer.findViewById(R.id.dwrFuncHeader)).setTextSize(px, htSize);
-    		((TextView) drawer.findViewById(R.id.dwrCopyCurrURL)).setTextSize(px, btSize);
-    		((TextView) drawer.findViewById(R.id.dwrHighlightList)).setTextSize(px, btSize);
-    		((TextView) drawer.findViewById(R.id.dwrSettings)).setTextSize(px, btSize);
-    		((TextView) drawer.findViewById(R.id.dwrExit)).setTextSize(px, btSize);
-    	}
-		
-    	int oldColor = accentColor;
-		accentColor = settings.getInt("accentColor", (getResources().getColor(R.color.holo_blue)));
-		if (accentColor != oldColor) {
-			float[] hsv = new float[3];
-			Color.colorToHSV(accentColor, hsv);
-			if (settings.getBoolean("useWhiteAccentText", false)) {
-				// color is probably dark
-				if (hsv[2] > 0)
-					hsv[2] *= 1.2f;
-				else
-					hsv[2] = 0.2f;
-				
-				accentTextColor = Color.WHITE;
-				isAccentLight = false;
-			}
-			else {
-				// color is probably bright
-				hsv[2] *= 0.8f;
-				accentTextColor = Color.BLACK;
-				isAccentLight = true;
-			}
-			
-			Drawable aBarDrawable;
-			if (usingLightTheme)
-				aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);
-			else
-				aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_light_holo);
-			
-			aBarDrawable.setColorFilter(accentColor, PorterDuff.Mode.SRC_ATOP);
-			aBar.setBackgroundDrawable(aBarDrawable);
-			
-			((DefaultHeaderTransformer) ptrLayout.getHeaderTransformer()).setProgressBarColor(accentColor);
-			
-			
-			findViewById(R.id.aioPJTopSep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioFirstPrevSep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioNextLastSep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioSep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioPostWrapperSep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioPostTitleSep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioPostBodySep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioBoldSep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioItalicSep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioCodeSep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioSpoilerSep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioCiteSep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioHTMLSep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioPostButtonSep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioPollSep).setBackgroundColor(accentColor);
-			findViewById(R.id.aioPostSep).setBackgroundColor(accentColor);
-			drawer.findViewById(R.id.dwrCAHSep).setBackgroundColor(accentColor);
-			drawer.findViewById(R.id.dwrNavSep).setBackgroundColor(accentColor);
-			drawer.findViewById(R.id.dwrFuncSep).setBackgroundColor(accentColor);
-			
-			croutonStyle = new Style.Builder()
-								.setBackgroundColorValue(accentColor)
-								.setTextColorValue(accentTextColor)
-								.setConfiguration(croutonShort)
-								.build();
-		}
-		
-		
-		if (session != null) {
-			if (settings.getBoolean("reloadOnResume", false)) {
-				wtl("session exists, reload on resume is true, refreshing page");
-				isRoR = true;
-	    		session.refresh();
-			}
-    	}
-		else {
-    		String defaultAccount = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
-    		if (accounts.containsKey(defaultAccount)) {
-				wtl("starting new session from onResume, logged in");
-    			session = new Session(this, defaultAccount, accounts.getString(defaultAccount));
-    		}
-    		else {
-				wtl("starting new session from onResume, no login");
-    			session = new Session(this);
-    		}
-    	}
-		
-		title.setSelected(true);
-		
-		if (!settings.contains("beenWelcomed")) {
-			settings.edit().putBoolean("beenWelcomed", true).apply();
-			AlertDialog.Builder b = new AlertDialog.Builder(this);
-			b.setTitle("Welcome!");
-			b.setMessage("Would you like to view the quick start help files? This dialog won't be shown again.");
-			b.setPositiveButton("Yes", new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/InsanityOnABun/GameRaven/wiki")));
-				}
-			});
-			b.setNegativeButton("No", null);
-			b.create().show();
-		}
-		
-		wtl("onResume finishing");
-    }
-	
-	@Override
-	public void onDestroy() {
-		Crouton.clearCroutonsForActivity(this);
-		super.onDestroy();
-	}
 	
 	public void setLoginName(String name) {
 		((TextView) findViewById(R.id.dwrChangeAcc)).setText(name + " (Click to Change)");
