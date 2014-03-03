@@ -49,7 +49,6 @@ import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.ClickableLinksTextView;
 import com.ioabsoftware.gameraven.views.GRQuoteSpan;
-import com.ioabsoftware.gameraven.views.MessageLinkSpan;
 import com.ioabsoftware.gameraven.views.RowType;
 import com.ioabsoftware.gameraven.views.UrlSpanConverter;
 
