@@ -732,7 +732,7 @@ public class AllInOneV2 extends Activity {
 	
 	@Override
     public boolean onSearchRequested() {
-    	if (searchIcon.isVisible())
+    	if (searchIcon != null && searchIcon.isVisible())
     		searchIcon.expandActionView();
     	
 		return false;
@@ -944,6 +944,11 @@ public class AllInOneV2 extends Activity {
             return super.onOptionsItemSelected(item);
         }
     }
+    
+    private void setMenuItemVisible(MenuItem item, boolean visible) {
+    	if (item != null)
+    		item.setVisible(visible);
+    }
 	
 	public void setLoginName(String name) {
 		((TextView) findViewById(R.id.dwrChangeAcc)).setText(name + " (Click to Change)");
@@ -1042,32 +1047,24 @@ public class AllInOneV2 extends Activity {
 
 	private void uiCleanup() {
 		ptrLayout.setRefreshing(false);
-		if (refreshIcon != null)
-			refreshIcon.setVisible(true);
+		setMenuItemVisible(refreshIcon, true);
 		if (postWrapper.getVisibility() == View.VISIBLE) {
 			postButton.setEnabled(true);
 			cancelButton.setEnabled(true);
 			pollButton.setEnabled(true);
-			if (postIcon != null)
-				postIcon.setVisible(true);
+			setMenuItemVisible(postIcon, true);
 		}
 	}
 	
 	public void preExecuteSetup(NetDesc desc) {
 		wtl("GRAIO dPreES fired --NEL, desc: " + desc.name());
 		ptrLayout.setRefreshing(true);
-		if (refreshIcon != null)
-			refreshIcon.setVisible(false);
-		if (searchIcon != null)
-			searchIcon.setVisible(false);
-		if (postIcon != null)
-			postIcon.setVisible(false);
-		if (addFavIcon != null)
-			addFavIcon.setVisible(false);
-		if (remFavIcon != null)
-			remFavIcon.setVisible(false);
-		if (topicListIcon != null)
-			topicListIcon.setVisible(false);
+		setMenuItemVisible(refreshIcon, false);
+		setMenuItemVisible(searchIcon, false);
+		setMenuItemVisible(postIcon, false);
+		setMenuItemVisible(addFavIcon, false);
+		setMenuItemVisible(remFavIcon, false);
+		setMenuItemVisible(topicListIcon, false);
 		
 		if (desc != NetDesc.POSTMSG_S1 && desc != NetDesc.POSTTPC_S1 &&
 			desc != NetDesc.QPOSTMSG_S1 && desc != NetDesc.QPOSTTPC_S1 &&
@@ -1123,15 +1120,16 @@ public class AllInOneV2 extends Activity {
 		
 		ptrLayout.setEnabled(false);
 
-		searchIcon.setVisible(false);
-		searchIcon.collapseActionView();
-		
-		postIcon.setVisible(false);
-		
-		addFavIcon.setVisible(false);
-		remFavIcon.setVisible(false);
-		
-		topicListIcon.setVisible(false);
+		setMenuItemVisible(searchIcon, false);
+		if (searchIcon != null)
+			searchIcon.collapseActionView();
+
+		setMenuItemVisible(postIcon, false);
+
+		setMenuItemVisible(addFavIcon, false);
+		setMenuItemVisible(remFavIcon, false);
+
+		setMenuItemVisible(topicListIcon, false);
 		
 		adapterRows.clear();
 		
@@ -1189,7 +1187,7 @@ public class AllInOneV2 extends Activity {
 			updateHeaderNoJumper("Board Jumper", NetDesc.BOARD_JUMPER);
 			adapterRows.add(new HeaderRowData("Announcements"));
 			
-			searchIcon.setVisible(true);
+			setMenuItemVisible(searchIcon, true);
 			
 			processBoards(doc, true);
 			break;
@@ -1256,7 +1254,7 @@ public class AllInOneV2 extends Activity {
 				adapterRows.add(new HeaderRowData("You have no private messages at this time."));
 			}
 			
-			postIcon.setVisible(true);
+			setMenuItemVisible(postIcon, true);
 			pMode = PostMode.NEW_PM;
 			break;
 			
@@ -1498,16 +1496,16 @@ public class AllInOneV2 extends Activity {
 				updateHeader(headerTitle, firstPage, prevPage, currPage, 
 						pageCount, nextPage, lastPage, NetDesc.BOARD);
 				
-				searchIcon.setVisible(true);
+				setMenuItemVisible(searchIcon, true);
 				
 				if (Session.isLoggedIn()) {
 					String favtext = doc.getElementsByClass("user").first().text().toLowerCase(Locale.US);
 					if (favtext.contains("add to favorites")) {
-						addFavIcon.setVisible(true);
+						setMenuItemVisible(addFavIcon, true);
 						fMode = FavMode.ON_BOARD;
 					}
 					else if (favtext.contains("remove favorite")) {
-						remFavIcon.setVisible(true);
+						setMenuItemVisible(remFavIcon, true);
 						fMode = FavMode.ON_BOARD;
 					}
 
@@ -1593,7 +1591,7 @@ public class AllInOneV2 extends Activity {
 
 			tlUrl = "boards/" + boardID;
 			wtl(tlUrl);
-			topicListIcon.setVisible(true);
+			setMenuItemVisible(topicListIcon, true);
 			
 			Element headerElem = doc.getElementsByClass("title").first();
 			if (headerElem != null)
@@ -1654,11 +1652,11 @@ public class AllInOneV2 extends Activity {
 			if (Session.isLoggedIn()) {
 				String favtext = doc.getElementsByClass("user").first().text().toLowerCase(Locale.US);
 				if (favtext.contains("track topic")) {
-					addFavIcon.setVisible(true);
+					setMenuItemVisible(addFavIcon, true);
 					fMode = FavMode.ON_TOPIC;
 				}
 				else if (favtext.contains("stop tracking")) {
-					remFavIcon.setVisible(true);
+					setMenuItemVisible(remFavIcon, true);
 					fMode = FavMode.ON_TOPIC;
 				}
 				
@@ -1896,7 +1894,7 @@ public class AllInOneV2 extends Activity {
 			updateHeader(headerTitle, firstPage, prevPage, Integer.toString(currPageNum + 1), 
 						 pageCount, nextPage, lastPage, NetDesc.GAME_SEARCH);
 			
-			searchIcon.setVisible(true);
+			setMenuItemVisible(searchIcon, true);
 			
 			Elements gameSearchTables = doc.select("table.results");
 			int tCount = gameSearchTables.size();
@@ -2129,13 +2127,13 @@ public class AllInOneV2 extends Activity {
 	private void updatePostingRights(Document pRes, boolean onTopic) {
 		if (onTopic) {
 			if (pRes.getElementsByClass("user").first().text().contains("Post New Message")) {
-				postIcon.setVisible(true);
+				setMenuItemVisible(postIcon, true);
 				pMode = PostMode.ON_TOPIC;
 			}
 		}
 		else {
 			if (pRes.getElementsByClass("user").first().text().contains("New Topic")) {
-				postIcon.setVisible(true);
+				setMenuItemVisible(postIcon, true);
 				pMode = PostMode.ON_BOARD;
 			}
 		}
@@ -2150,8 +2148,7 @@ public class AllInOneV2 extends Activity {
 		}
 		
 		ptrLayout.setRefreshing(false);
-		if (refreshIcon != null)
-			refreshIcon.setVisible(true);
+		setMenuItemVisible(refreshIcon, true);
 		if (desc == NetDesc.BOARD || desc == NetDesc.TOPIC)
 			postCleanup();
 		
@@ -2519,7 +2516,7 @@ public class AllInOneV2 extends Activity {
 			listBuilder.add("View Previous Version(s)");
 		
 		if (Session.isLoggedIn()) {
-			if (postIcon.isVisible())
+			if (postIcon != null && postIcon.isVisible())
 				listBuilder.add("Quote");
 			if (Session.getUser().trim().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
 				if (Session.userCanEditMsgs() && clickedMsg.isEditable())
@@ -2932,7 +2929,7 @@ public class AllInOneV2 extends Activity {
     
     @Override
 	public void onBackPressed() {
-    	if (searchIcon.isActionViewExpanded()) {
+    	if (searchIcon != null && searchIcon.isActionViewExpanded()) {
     		searchIcon.collapseActionView();
     	}
     	else if (drawer.isMenuVisible()) {
