@@ -948,7 +948,20 @@ public class Session implements HandlesNetworkResult {
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
-			aio.tryCaught(res.url().toString(), desc.toString(), e, res.body());
+			String url, netdesc, body;
+			if (res != null) {
+				url = res.url().toString();
+				body = res.body();
+			}
+			else
+				url = body = "res is null";
+			
+			if (desc != null)
+				netdesc = desc.toString();
+			else
+				netdesc = "desc is null";
+			
+			aio.tryCaught(url, netdesc, e, body);
 		}
 
 		aio.wtl("session hNR finishing, desc: " + desc.name());
