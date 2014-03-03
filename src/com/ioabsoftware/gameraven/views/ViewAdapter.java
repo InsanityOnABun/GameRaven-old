@@ -51,7 +51,10 @@ public class ViewAdapter extends BaseAdapter {
 	
 	@Override
 	public int getItemViewType(int position) {
-		return rows.get(position).getRowType().ordinal();
+		if (position < rows.size())
+			return rows.get(position).getRowType().ordinal();
+		else
+			return IGNORE_ITEM_VIEW_TYPE;
 	}
 
 	@Override
