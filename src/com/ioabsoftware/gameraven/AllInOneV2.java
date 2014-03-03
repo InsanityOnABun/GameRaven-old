@@ -2865,6 +2865,8 @@ public class AllInOneV2 extends Activity {
 		ACRA.getErrorReporter().putCustomData("URL", url);
 		ACRA.getErrorReporter().putCustomData("NetDesc", desc);
 		ACRA.getErrorReporter().putCustomData("Page Source", StringEscapeUtils.escapeJava(source));
+		ACRA.getErrorReporter().putCustomData("Last Attempted Path", session.getLastAttemptedPath());
+		ACRA.getErrorReporter().putCustomData("Last Attempted Desc", session.getLastAttemptedDesc().toString());
 		ACRA.getErrorReporter().handleException(e);
 
 		config.setResToastText(R.string.crash_toast_text);
