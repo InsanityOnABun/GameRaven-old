@@ -51,6 +51,7 @@ import com.ioabsoftware.gameraven.views.ClickableLinksTextView;
 import com.ioabsoftware.gameraven.views.GRQuoteSpan;
 import com.ioabsoftware.gameraven.views.MessageLinkSpan;
 import com.ioabsoftware.gameraven.views.RowType;
+import com.ioabsoftware.gameraven.views.UrlSpanConverter;
 
 public class MessageRowData extends BaseRowData {
 
@@ -309,7 +310,7 @@ public class MessageRowData extends BaseRowData {
         }
 
 		aio.wtl("setting spannedMessage");
-        spannedMessage = RichTextUtils.replaceAll(ssb, URLSpan.class, new URLSpanConverter());
+        spannedMessage = RichTextUtils.replaceAll(ssb, URLSpan.class, new UrlSpanConverter());
 	}
 	
 	public boolean isEdited() {
@@ -400,13 +401,6 @@ public class MessageRowData extends BaseRowData {
 		finalBody = StringEscapeUtils.unescapeHtml4(finalBody);
 		
 		return finalBody;
-	}
-	
-	class URLSpanConverter implements RichTextUtils.SpanConverter<URLSpan, MessageLinkSpan> {
-		@Override
-		public MessageLinkSpan convert(URLSpan span) {
-			return(new MessageLinkSpan(span.getURL(), AllInOneV2.get()));
-		}
 	}
 	
 	class HeaderView extends LinearLayout {
