@@ -14,7 +14,7 @@ public class MessageLinkSpan extends ClickableSpan {
 	String url;
 	AllInOneV2 aio;
 	public MessageLinkSpan(String urlIn, AllInOneV2 aioIn) {
-		url = urlIn;
+		url = Session.buildURL(urlIn, NetDesc.UNSPECIFIED);
 		aio = aioIn;
 	}
 
