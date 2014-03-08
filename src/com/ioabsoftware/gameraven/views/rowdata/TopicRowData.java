@@ -10,10 +10,6 @@ public class TopicRowData extends BaseRowData {
 		NORMAL, POLL, LOCKED, ARCHIVED, PINNED
 	}
 	
-	public static enum ReadStatus {
-		UNREAD, READ, NEW_POST
-	}
-	
 	String title, tc, lastPost, mCount, url, lPostUrl;
 	public String getTitle() {return title;}
 	public String getTC() {return tc;}

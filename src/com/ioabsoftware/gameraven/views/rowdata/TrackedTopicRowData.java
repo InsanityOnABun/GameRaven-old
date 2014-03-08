@@ -15,13 +15,16 @@ public class TrackedTopicRowData extends BaseRowData {
 	public String getRemoveUrl() {return removeUrl;}
 	public String getLastPostUrl() {return lastPostUrl;}
 	
+	private ReadStatus readStatus;
+	public ReadStatus getStatus() {return readStatus;}
+	
 	@Override
 	public RowType getRowType() {
 		return RowType.TRACKED_TOPIC;
 	}
 	
 	public TrackedTopicRowData(String boardIn, String titleIn, String lastPostIn, 
-			String msgsIn, String urlIn, String removeUrlIn, String lastPostUrlIn) {
+			String msgsIn, String urlIn, String removeUrlIn, String lastPostUrlIn, ReadStatus rs) {
 		board = boardIn;
 		title = titleIn;
 		lastPost = lastPostIn;
@@ -29,6 +32,7 @@ public class TrackedTopicRowData extends BaseRowData {
 		url = urlIn;
 		removeUrl = removeUrlIn;
 		lastPostUrl = lastPostUrlIn;
+		readStatus = rs;
 	}
 
 }

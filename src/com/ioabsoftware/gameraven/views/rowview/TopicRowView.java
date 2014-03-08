@@ -14,10 +14,10 @@ import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 import com.ioabsoftware.gameraven.views.BaseRowData;
+import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
-import com.ioabsoftware.gameraven.views.rowdata.TopicRowData.ReadStatus;
 
 public class TopicRowView extends BaseRowView {
 	

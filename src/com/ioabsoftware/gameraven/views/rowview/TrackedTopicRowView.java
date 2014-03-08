@@ -1,6 +1,8 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -13,15 +15,24 @@ import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
+import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
 import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 
 public class TrackedTopicRowView extends BaseRowView {
 
-	TextView boardName;
+	TextView board;
     TextView title;
     TextView msgLP;
+    TextView lpLink;
+    TextView removeLink;
     
     TrackedTopicRowData myData;
+
+    private int defaultBoardColor;
+    private int defaultTitleColor;
+    private int defaultMsgLPColor;
+    private int defaultLPLinkColor;
+    private int defaultRemoveLinkColor;
     
 	public TrackedTopicRowView(Context context) {
 		super(context);
@@ -41,11 +52,19 @@ public class TrackedTopicRowView extends BaseRowView {
 		setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.trackedtopicview, this, true);
         
-        boardName = (TextView) findViewById(R.id.ttBoardName);
+        board = (TextView) findViewById(R.id.ttBoardName);
         title = (TextView) findViewById(R.id.ttTitle);
         msgLP = (TextView) findViewById(R.id.ttMessageCountLastPost);
+        lpLink = (TextView) findViewById(R.id.ttLastPostLink);
+        removeLink = (TextView) findViewById(R.id.ttStopTracking);
+
+        defaultBoardColor = board.getCurrentTextColor();
+        defaultTitleColor = title.getCurrentTextColor();
+        defaultMsgLPColor = msgLP.getCurrentTextColor();
+        defaultLPLinkColor = lpLink.getCurrentTextColor();
+        defaultRemoveLinkColor = removeLink.getCurrentTextColor();
         
-        boardName.setTextSize(TypedValue.COMPLEX_UNIT_PX, boardName.getTextSize() * AllInOneV2.getTextScale());
+        board.setTextSize(TypedValue.COMPLEX_UNIT_PX, board.getTextSize() * AllInOneV2.getTextScale());
         title.setTextSize(TypedValue.COMPLEX_UNIT_PX, title.getTextSize() * AllInOneV2.getTextScale());
         msgLP.setTextSize(TypedValue.COMPLEX_UNIT_PX, msgLP.getTextSize() * AllInOneV2.getTextScale());
         
@@ -71,10 +90,9 @@ public class TrackedTopicRowView extends BaseRowView {
 			}
 		});
         
-        TextView lPostLink = (TextView) findViewById(R.id.ttLastPostLink);
-        lPostLink.setBackgroundDrawable(getSelector());
-        lPostLink.setTextSize(TypedValue.COMPLEX_UNIT_PX, lPostLink.getTextSize() * AllInOneV2.getTextScale());
-        lPostLink.setOnClickListener(new OnClickListener() {
+        lpLink.setBackgroundDrawable(getSelector());
+        lpLink.setTextSize(TypedValue.COMPLEX_UNIT_PX, lpLink.getTextSize() * AllInOneV2.getTextScale());
+        lpLink.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				AllInOneV2.get().enableGoToUrlDefinedPost();
@@ -82,7 +100,6 @@ public class TrackedTopicRowView extends BaseRowView {
 			}
 		});
         
-        TextView removeLink = (TextView) findViewById(R.id.ttStopTracking);
         removeLink.setBackgroundDrawable(getSelector());
         removeLink.setTextSize(TypedValue.COMPLEX_UNIT_PX, removeLink.getTextSize() * AllInOneV2.getTextScale());
         removeLink.setOnClickListener(new OnClickListener() {
@@ -100,7 +117,39 @@ public class TrackedTopicRowView extends BaseRowView {
 		
 		myData = (TrackedTopicRowData) data;
 		
-		boardName.setText(myData.getBoard());
+		if (myData.getStatus() == ReadStatus.READ) {
+        	int readColor = AllInOneV2.getUsingLightTheme() ? Color.LTGRAY : Color.DKGRAY;
+        	board.setTextColor(readColor);
+        	title.setTextColor(readColor);
+        	msgLP.setTextColor(readColor);
+        	lpLink.setTextColor(readColor);
+        	removeLink.setTextColor(readColor);
+        }
+        else {
+        	board.setTextColor(defaultBoardColor);
+        	title.setTextColor(defaultTitleColor);
+        	msgLP.setTextColor(defaultMsgLPColor);
+        	lpLink.setTextColor(defaultLPLinkColor);
+        	removeLink.setTextColor(defaultRemoveLinkColor);
+        }
+        
+        if (myData.getStatus() == ReadStatus.NEW_POST) {
+        	board.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
+        	title.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
+        	msgLP.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
+        	lpLink.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
+        	removeLink.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
+        }
+        else {
+        	
+        	board.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+        	title.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+        	msgLP.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+        	lpLink.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+        	removeLink.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+        }
+		
+		board.setText(myData.getBoard());
         title.setText(myData.getTitle());
         msgLP.setText(myData.getMsgs() + " Msgs, Last: " + myData.getLastPost());
 	}

@@ -85,6 +85,7 @@ import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.views.BaseRowData;
+import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
 import com.ioabsoftware.gameraven.views.ViewAdapter;
 import com.ioabsoftware.gameraven.views.rowdata.AMPRowData;
 import com.ioabsoftware.gameraven.views.rowdata.AdRowData;
@@ -96,7 +97,6 @@ import com.ioabsoftware.gameraven.views.rowdata.MessageRowData;
 import com.ioabsoftware.gameraven.views.rowdata.PMDetailRowData;
 import com.ioabsoftware.gameraven.views.rowdata.PMRowData;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
-import com.ioabsoftware.gameraven.views.rowdata.TopicRowData.ReadStatus;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData.TopicType;
 import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
@@ -1386,19 +1386,33 @@ public class AllInOneV2 extends Activity {
 				for (Element row : tbody.children()) {
 					// [remove] [title] [board name] [msgs] [last [pst]
 					Elements cells = row.children();
+					
+					int rsMod = 0;
+					if (cells.size() == 6)
+						rsMod = 1;
+					
 					String removeLink = cells.get(0).child(0)
 							.attr("href");
-					String topicLink = cells.get(1).child(0)
+					String topicLink = cells.get(1 + rsMod).child(0)
 							.attr("href");
-					String topicText = cells.get(1).text();
-					String board = cells.get(2).text();
-					String msgs = cells.get(3).text();
-					String lPostLink = cells.get(4).child(0)
+					String topicText = cells.get(1 + rsMod).text();
+					String board = cells.get(2 + rsMod).text();
+					String msgs = cells.get(3 + rsMod).text();
+					String lPostLink = cells.get(4 + rsMod).child(0)
 							.attr("href");
-					String lPostText = cells.get(4).text();
+					String lPostText = cells.get(4 + rsMod).text();
+
+					ReadStatus status = ReadStatus.UNREAD;
+					if (rsMod == 1) {
+						String tImg = cells.get(1).child(0).className();
+						if (tImg.endsWith("_read"))
+							status = ReadStatus.READ;
+						else if (tImg.endsWith("_unread"))
+							status = ReadStatus.NEW_POST;
+					}
 					
 					adapterRows.add(new TrackedTopicRowData(board, topicText, lPostText, 
-							msgs, topicLink, removeLink, lPostLink));
+							msgs, topicLink, removeLink, lPostLink, status));
 				}
 			}
 			else {
