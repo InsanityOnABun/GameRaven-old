@@ -1925,20 +1925,19 @@ public class AllInOneV2 extends Activity {
 					
 					wtl("board row parsing start");
 					for (Element row : table.getElementsByTag("tr")) {
-						Elements cells = row.getElementsByTag("td");
-						// cells = [platform] [title] [faqs] [codes] [saves] [revs] [mygames] [q&a] [pics] [vids] [board]
-						String platform = cells.get(0).text();
-						String bName = cells.get(1).text();
-						String bUrl = cells.get(9).child(0).attr("href");
-						
-						if (platform.codePointAt(0) == ('\u00A0')) {
-							platform = prevPlatform;
+						if (row.parent().tagName().equals("tbody")) {
+							Elements cells = row.getElementsByTag("td");
+							// cells = [platform] [title] [faqs] [codes] [saves] [revs] [mygames] [q&a] [pics] [vids] [board]
+							String platform = cells.get(0).text();
+							String bName = cells.get(1).text();
+							String bUrl = cells.get(9).child(0).attr("href");
+							if (platform.codePointAt(0) == ('\u00A0')) {
+								platform = prevPlatform;
+							} else {
+								prevPlatform = platform;
+							}
+							adapterRows.add(new GameSearchRowData(bName, platform, bUrl));
 						}
-						else {
-							prevPlatform = platform;
-						}
-						
-						adapterRows.add(new GameSearchRowData(bName, platform, bUrl));
 					}
 					
 					wtl("board row parsing end");
