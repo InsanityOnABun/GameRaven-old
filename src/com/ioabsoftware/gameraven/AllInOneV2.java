@@ -1259,10 +1259,7 @@ public class AllInOneV2 extends Activity {
 			break;
 			
 		case PM_DETAIL:
-			headerTitle = doc.select("h2.title").first().text();
-			String pmTitle = headerTitle;
-			if (!pmTitle.startsWith("Re: "))
-				pmTitle = "Re: " + pmTitle;
+			String pmTitle = doc.select("h2.title").first().text();
 
 			String pmMessage = doc.select("div.body").first().outerHtml();
 			
@@ -1275,7 +1272,7 @@ public class AllInOneV2 extends Activity {
 			
 			String sender = footText.substring(9, footText.indexOf(" on "));
 			
-			updateHeaderNoJumper(headerTitle, NetDesc.PM_DETAIL);
+			updateHeaderNoJumper(pmTitle, NetDesc.PM_DETAIL);
 			
 			adapterRows.add(new PMDetailRowData(sender, pmTitle, pmMessage + pmFoot));
 			break;

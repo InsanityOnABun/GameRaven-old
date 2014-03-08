@@ -20,5 +20,12 @@ public class PMDetailRowData extends BaseRowData {
 		title = titleIn;
 		message = messageIn;
 	}
+	
+	public String getReplyTitle() {
+		if (!title.startsWith("Re: "))
+			return "Re: " + title;
+		else
+			return title;
+	}
 
 }
