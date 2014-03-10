@@ -334,10 +334,7 @@ public class Session implements HandlesNetworkResult {
 				}
 
 				aio.wtl("parsing res");
-				Document cleanDoc = res.parse();
-
-				aio.wtl("cloning pRes");
-				Document clonedDoc = cleanDoc.clone();
+				Document doc = res.parse();
 				String resUrl = res.url().toString();
 
 				aio.wtl("checking if res does not start with root");
@@ -363,10 +360,10 @@ public class Session implements HandlesNetworkResult {
 				}
 
 				aio.wtl("checking if pRes contains captcha");
-				if (!clonedDoc.select("header.page_header:contains(CAPTCHA)").isEmpty()) {
+				if (!doc.select("header.page_header:contains(CAPTCHA)").isEmpty()) {
 					
-					String captcha = clonedDoc.select("iframe").outerHtml();
-					final String key = clonedDoc.getElementsByAttributeValue("name", "key").attr("value");
+					String captcha = doc.select("iframe").outerHtml();
+					final String key = doc.getElementsByAttributeValue("name", "key").attr("value");
 					
 					AlertDialog.Builder b = new AlertDialog.Builder(aio);
 					b.setTitle("CAPTCHA Required");
@@ -409,18 +406,18 @@ public class Session implements HandlesNetworkResult {
 				}
 				
 				aio.wtl("status: " + res.statusCode() + ", " + res.statusMessage());
-				Element err = clonedDoc.select("h1.page-title").first();
+				Element err = doc.select("h1.page-title").first();
 				if (err != null && err.text().contains("Error")) {
 					if (err.text().contains("404 Error")) {
 						aio.wtl("status code 404");
-						Elements paragraphs = clonedDoc.getElementsByTag("p");
+						Elements paragraphs = doc.getElementsByTag("p");
 						aio.genError("404 Error", paragraphs.get(1).text() + "\n\n"
 								+ paragraphs.get(2).text());
 						return;
 					}
 					else if (err.text().contains("403 Error")) {
 						aio.wtl("status code 403");
-						Elements paragraphs = clonedDoc.getElementsByTag("p");
+						Elements paragraphs = doc.getElementsByTag("p");
 						aio.genError("403 Error", paragraphs.get(1).text() + "\n\n"
 								+ paragraphs.get(2).text());
 						return;
@@ -431,7 +428,7 @@ public class Session implements HandlesNetworkResult {
 							skipAIOCleanup = true;
 							get(NetDesc.BOARD_JUMPER, "/boards", null);
 						} else {
-							Elements paragraphs = clonedDoc.getElementsByTag("p");
+							Elements paragraphs = doc.getElementsByTag("p");
 							aio.genError("401 Error", paragraphs.get(1).text()
 									+ "\n\n" + paragraphs.get(2).text());
 						}
@@ -439,7 +436,7 @@ public class Session implements HandlesNetworkResult {
 					}
 				}
 				
-				if (clonedDoc.title().equals("GameFAQs - 503 - Temporarily Unavailable")) {
+				if (doc.title().equals("GameFAQs - 503 - Temporarily Unavailable")) {
 					aio.genError("503 Error", "GameFAQs is experiencing some temporary difficulties with " +
 							"the site. Probably because of something they did. Please wait a few " +
 							"seconds before refreshing this page to try again.");
@@ -447,7 +444,7 @@ public class Session implements HandlesNetworkResult {
 					return;
 				}
 				
-				updateUserLevel(clonedDoc);
+				updateUserLevel(doc);
 				
 				switch (desc) {
 				case AMP_LIST:
@@ -606,7 +603,7 @@ public class Session implements HandlesNetworkResult {
 				switch (desc) {
 				case LOGIN_S1:
 					aio.wtl("session hNR determined this is login step 1");
-					String loginKey = clonedDoc.getElementsByAttributeValue("name", "key").attr("value");
+					String loginKey = doc.getElementsByAttributeValue("name", "key").attr("value");
 					
 					HashMap<String, String> loginData = new HashMap<String, String>();
 					// "EMAILADDR", user, "PASSWORD", password, "path", lastPath, "key", key
@@ -645,7 +642,7 @@ public class Session implements HandlesNetworkResult {
 					//TODO: Completely replace QPOST* NetDescs with userHasAdvancedPosting()
 					
 					aio.wtl("session hNR determined this is post message step 1");
-					String msg1Key = clonedDoc.getElementsByAttributeValue("name", "key").attr("value");
+					String msg1Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 					
 					String sig;
 					if (desc == NetDesc.QEDIT_MSG)
@@ -659,7 +656,7 @@ public class Session implements HandlesNetworkResult {
 					msg1Data.put("post", (userHasAdvancedPosting() ? "Post without Preview" : "Preview Message"));
 					msg1Data.put("key", msg1Key);
 					
-					Elements msg1Error = clonedDoc.getElementsContainingOwnText("There was an error posting your message:");
+					Elements msg1Error = doc.getElementsContainingOwnText("There was an error posting your message:");
 					if (!msg1Error.isEmpty()) {
 						aio.wtl("there was an error in post msg step 1, ending early");
 						aio.postError(msg1Error.first().parent().parent().text());
@@ -676,9 +673,9 @@ public class Session implements HandlesNetworkResult {
 					
 				case POSTMSG_S2:
 					aio.wtl("session hNR determined this is post message step 2");
-					String msg2Key = clonedDoc.getElementsByAttributeValue("name", "key").attr("value");
-					String msgPost_id = clonedDoc.getElementsByAttributeValue("name", "post_id").attr("value");
-					String msgUid = clonedDoc.getElementsByAttributeValue("name", "uid").attr("value");
+					String msg2Key = doc.getElementsByAttributeValue("name", "key").attr("value");
+					String msgPost_id = doc.getElementsByAttributeValue("name", "post_id").attr("value");
+					String msgUid = doc.getElementsByAttributeValue("name", "uid").attr("value");
 					
 					HashMap<String, String> msg2Data = new HashMap<String, String>();
 					msg2Data.put("post", "Post Message");
@@ -686,8 +683,8 @@ public class Session implements HandlesNetworkResult {
 					msg2Data.put("post_id", msgPost_id);
 					msg2Data.put("uid", msgUid);
 					
-					Elements msg2Error = clonedDoc.getElementsContainingOwnText("There was an error posting your message:");
-					Elements msg2AutoFlag = clonedDoc.getElementsContainingOwnText("There were one or more potential problems with your message:");
+					Elements msg2Error = doc.getElementsContainingOwnText("There was an error posting your message:");
+					Elements msg2AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
 					if (!msg2Error.isEmpty()) {
 						aio.wtl("there was an error in post msg step 2, ending early");
 						aio.postError(msg2Error.first().parent().parent().text());
@@ -709,8 +706,8 @@ public class Session implements HandlesNetworkResult {
 					aio.wtl("session hNR determined this is post message step 3 (if jumping from 1 to 3, then app is quick posting)");
 					aio.wtl("finishing post message step 3, sending step 4");
 
-					Elements msg3AutoFlag = clonedDoc.getElementsContainingOwnText("There were one or more potential problems with your message:");
-					Elements msg3Error = clonedDoc.getElementsContainingOwnText("There was an error posting your message:");
+					Elements msg3AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
+					Elements msg3Error = doc.getElementsContainingOwnText("There was an error posting your message:");
 					if (!msg3Error.isEmpty()) {
 						aio.wtl("there was an error in post msg step 3, ending early");
 						aio.postError(msg3Error.first().parent().parent().text());
@@ -720,9 +717,9 @@ public class Session implements HandlesNetworkResult {
 						aio.wtl("autoflag got tripped in post msg step 3, getting data and showing autoflag dialog");
 						String msg = msg3AutoFlag.first().parent().parent().text();
 						
-						String msg3Key = clonedDoc.getElementsByAttributeValue("name", "key").attr("value");
-						String msg3Post_id = clonedDoc.getElementsByAttributeValue("name", "post_id").attr("value");
-						String msg3Uid = clonedDoc.getElementsByAttributeValue("name", "uid").attr("value");
+						String msg3Key = doc.getElementsByAttributeValue("name", "key").attr("value");
+						String msg3Post_id = doc.getElementsByAttributeValue("name", "post_id").attr("value");
+						String msg3Uid = doc.getElementsByAttributeValue("name", "uid").attr("value");
 						
 						HashMap<String, String> msg3Data = new HashMap<String, String>();
 						msg3Data.put("post", "Post Message");
@@ -740,7 +737,7 @@ public class Session implements HandlesNetworkResult {
 				case POSTTPC_S1:
 				case QPOSTTPC_S1:
 					aio.wtl("session hNR determined this is post topic step 1");
-					String tpc1Key = clonedDoc.getElementsByAttributeValue("name", "key").attr("value");
+					String tpc1Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 					
 					HashMap<String, String> tpc1Data = new HashMap<String, String>();
 					tpc1Data.put("topictitle", aio.getSavedPostTitle());
@@ -760,7 +757,7 @@ public class Session implements HandlesNetworkResult {
 						tpc1Data.put("min_level", aio.getPollMinLevel());
 					}
 					
-					Elements tpc1Error = clonedDoc.getElementsContainingOwnText("There was an error posting your message:");
+					Elements tpc1Error = doc.getElementsContainingOwnText("There was an error posting your message:");
 					if (!tpc1Error.isEmpty()) {
 						aio.wtl("there was an error in post topic step 1, ending early");
 						aio.postError(tpc1Error.first().parent().parent().text());
@@ -774,9 +771,9 @@ public class Session implements HandlesNetworkResult {
 					
 				case POSTTPC_S2:
 					aio.wtl("session hNR determined this is post topic step 2");
-					String tpc2Key = clonedDoc.getElementsByAttributeValue("name", "key").attr("value");
-					String tpcPost_id = clonedDoc.getElementsByAttributeValue("name", "post_id").attr("value");
-					String tpcUid = clonedDoc.getElementsByAttributeValue("name", "uid").attr("value");
+					String tpc2Key = doc.getElementsByAttributeValue("name", "key").attr("value");
+					String tpcPost_id = doc.getElementsByAttributeValue("name", "post_id").attr("value");
+					String tpcUid = doc.getElementsByAttributeValue("name", "uid").attr("value");
 					
 					HashMap<String, String> tpc2Data = new HashMap<String, String>();
 					tpc2Data.put("post", "Post Message");
@@ -795,8 +792,8 @@ public class Session implements HandlesNetworkResult {
 						tpc2Data.put("min_level", aio.getPollMinLevel());
 					}
 					
-					Elements tpc2Error = clonedDoc.getElementsContainingOwnText("There was an error posting your message:");
-					Elements tpc2AutoFlag = clonedDoc.getElementsContainingOwnText("There were one or more potential problems with your message:");
+					Elements tpc2Error = doc.getElementsContainingOwnText("There was an error posting your message:");
+					Elements tpc2AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
 					if (!tpc2Error.isEmpty()) {
 						aio.wtl("there was an error in post topic step 2, ending early");
 						aio.postError(tpc2Error.first().parent().parent().text());
@@ -818,8 +815,8 @@ public class Session implements HandlesNetworkResult {
 					aio.wtl("session hNR determined this is post topic step 3 (if jumping from 1 to 3, then app is quick posting)");
 					aio.wtl("finishing post topic step 3, sending step 4");
 
-					Elements tpc3AutoFlag = clonedDoc.getElementsContainingOwnText("There were one or more potential problems with your message:");
-					Elements tpc3Error = clonedDoc.getElementsContainingOwnText("There was an error posting your message:");
+					Elements tpc3AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
+					Elements tpc3Error = doc.getElementsContainingOwnText("There was an error posting your message:");
 					if (!tpc3Error.isEmpty()) {
 						aio.wtl("there was an error in post topic step 3, ending early");
 						aio.postError(tpc3Error.first().parent().parent().text());
@@ -829,9 +826,9 @@ public class Session implements HandlesNetworkResult {
 						aio.wtl("autoflag got tripped in post msg step 3, getting data and showing autoflag dialog");
 						String msg = tpc3AutoFlag.first().parent().parent().text();
 						
-						String tpc3Key = clonedDoc.getElementsByAttributeValue("name", "key").attr("value");
-						String tpc3Post_id = clonedDoc.getElementsByAttributeValue("name", "post_id").attr("value");
-						String tpc3Uid = clonedDoc.getElementsByAttributeValue("name", "uid").attr("value");
+						String tpc3Key = doc.getElementsByAttributeValue("name", "key").attr("value");
+						String tpc3Post_id = doc.getElementsByAttributeValue("name", "post_id").attr("value");
+						String tpc3Uid = doc.getElementsByAttributeValue("name", "uid").attr("value");
 						
 						HashMap<String, String> tpc3Data = new HashMap<String, String>();
 						tpc3Data.put("post", "Post Message");
@@ -848,22 +845,22 @@ public class Session implements HandlesNetworkResult {
 					
 				case TOPIC:
 					aio.wtl("session hNR determined this is a topic");
-					if (!clonedDoc.select("p:contains(no longer available for viewing)").isEmpty()) {
+					if (!doc.select("p:contains(no longer available for viewing)").isEmpty()) {
 						Crouton.showText(aio, "The topic you selected is no longer available for viewing.", AllInOneV2.getCroutonStyle());
 						aio.wtl("topic is no longer available, treat response as a board");
-						aio.processContent(NetDesc.BOARD, clonedDoc, resUrl);
+						aio.processContent(NetDesc.BOARD, doc, resUrl);
 					}
 					else {
 						aio.wtl("handle the topic in AIO");
-						aio.processContent(desc, clonedDoc, resUrl);
+						aio.processContent(desc, doc, resUrl);
 					}
 					break;
 					
 				case MARKMSG_S1:
-					if (clonedDoc.select("p:contains(you selected is no longer available for viewing.)").isEmpty()) {
+					if (doc.select("p:contains(you selected is no longer available for viewing.)").isEmpty()) {
 						HashMap<String, String> markData = new HashMap<String, String>();
 						markData.put("reason", aio.getReportCode());
-						markData.put("key", clonedDoc.select("input[name=key]").first().attr("value"));
+						markData.put("key", doc.select("input[name=key]").first().attr("value"));
 						post(NetDesc.MARKMSG_S2, resUrl + "?action=mod", markData);
 					}
 					else
@@ -873,7 +870,7 @@ public class Session implements HandlesNetworkResult {
 					
 				case MARKMSG_S2:
 					//This message has been marked for moderation.
-					if (!clonedDoc.select("p:contains(This message has been marked for moderation.)").isEmpty())
+					if (!doc.select("p:contains(This message has been marked for moderation.)").isEmpty())
 						Crouton.showText(aio, "Message marked successfully.", AllInOneV2.getCroutonStyle());
 					else
 						Crouton.showText(aio, "There was an error marking the message.", AllInOneV2.getCroutonStyle());
@@ -882,7 +879,7 @@ public class Session implements HandlesNetworkResult {
 					break;
 					
 				case DLTMSG_S1:
-					String delKey = clonedDoc.getElementsByAttributeValue("name", "key").attr("value");
+					String delKey = doc.getElementsByAttributeValue("name", "key").attr("value");
 					HashMap<String, String> delData = new HashMap<String, String>();
 					delData.put("YES", "Delete this Post");
 					delData.put("key", delKey);
@@ -901,7 +898,7 @@ public class Session implements HandlesNetworkResult {
 					
 
 				case SEND_PM_S1:
-					String pmKey = clonedDoc.getElementsByAttributeValue("name", "key").attr("value");
+					String pmKey = doc.getElementsByAttributeValue("name", "key").attr("value");
 					
 					HashMap<String, String> pmData = new HashMap<String, String>();
 					pmData.put("key", pmKey);
@@ -914,11 +911,11 @@ public class Session implements HandlesNetworkResult {
 					break;
 					
 				case SEND_PM_S2:
-					if (clonedDoc.select("input[name=subject]").isEmpty()) {
+					if (doc.select("input[name=subject]").isEmpty()) {
 						aio.pmCleanup(true, null);
 					}
 					else {
-						String error = clonedDoc.select("form[action=/pm/new]").first().previousElementSibling().text();
+						String error = doc.select("form[action=/pm/new]").first().previousElementSibling().text();
 						aio.pmCleanup(false, error);
 					}
 					break;
@@ -938,7 +935,7 @@ public class Session implements HandlesNetworkResult {
 				case VERIFY_ACCOUNT_S1:
 				case VERIFY_ACCOUNT_S2:
 					aio.wtl("session hNR determined this should be handled by AIO");
-					aio.processContent(desc, clonedDoc, resUrl);
+					aio.processContent(desc, doc, resUrl);
 					break;
 				}
 			}
