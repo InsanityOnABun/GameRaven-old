@@ -1155,31 +1155,41 @@ public class AllInOneV2 extends Activity {
 		String pageCount = "1";
 		String nextPage = null;
 		String lastPage = null;
-		
+
+		wtl("setting bgcolor");
 		String bgcolor;
 		if (usingLightTheme)
         	bgcolor = "#ffffff";
 		else
 			bgcolor = "#000000";
-		
+
+		wtl("initial adbuilder appending");
 		adBuilder.setLength(0);
 		adBuilder.append("<html>");
 		adBuilder.append(doc.head().outerHtml());
 		adBuilder.append("<body bgcolor=\"" + bgcolor + "\">");
+
+		wtl("appending ad elements to adbuilder");
 		for (Element e : doc.getElementsByClass("ad")) {
 			adBuilder.append(e.outerHtml());
 			e.remove();
 		}
+
+		wtl("appending script elements to adbuilder");
 		for (Element e : doc.getElementsByTag("script")) {
 			adBuilder.append(e.outerHtml());
 		}
+
+		wtl("appending closing tags to adbuilder");
 		adBuilder.append("</body></html>");
 		
 		adBaseUrl = resUrl;
-		
+
+		wtl("checking if webView is null, creating if so");
 		if (web == null)
 			web = new WebView(this);
-		
+
+		wtl("enabling javascript");
 		web.getSettings().setJavaScriptEnabled(AllInOneV2.getSettingsPref().getBoolean("enableJS", true));
 		
 		switch (desc) {
