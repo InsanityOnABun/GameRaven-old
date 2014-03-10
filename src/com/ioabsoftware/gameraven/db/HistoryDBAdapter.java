@@ -15,7 +15,7 @@ import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 public class HistoryDBAdapter {
 
 	private static final String DATABASE_NAME = "history.db";
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 
 	public static final String TABLE_HISTORY = "history";
 	public static final String COLUMN_HIST_ID = "_id";
@@ -30,7 +30,7 @@ public class HistoryDBAdapter {
 			COLUMN_HIST_ID + " integer primary key autoincrement, " +
 			COLUMN_HIST_PATH + " text not null, " + 
 			COLUMN_HIST_DESC + " text not null, " +
-			COLUMN_HIST_SRC + " text not null, " +
+			COLUMN_HIST_SRC + " blob not null, " +
 			COLUMN_HIST_VLOC_FIRSTVIS + " integer not null, " +
 			COLUMN_HIST_VLOC_OFFSET + " integer not null);";
 	
@@ -79,7 +79,7 @@ public class HistoryDBAdapter {
 		updateHasHistory();
 	}
 	
-	public void insertHistory(String pathIn, String descIn, String srcIn, int vLocFirstVisIn, int vLocOffsetIn) {
+	public void insertHistory(String pathIn, String descIn, byte[] srcIn, int vLocFirstVisIn, int vLocOffsetIn) {
 		if (!lastAddedPath.equals(pathIn)) {
 			aio.wtl("starting insert history method");
 			lastAddedPath = pathIn;
@@ -107,7 +107,7 @@ public class HistoryDBAdapter {
 		String path = cur.getString(1);
 		History h = new History(path, 
 				NetDesc.valueOf(cur.getString(2)), 
-				Jsoup.parse(cur.getString(3), path), 
+				cur.getBlob(3), 
 				new int[] {cur.getInt(4), cur.getInt(5)});
 		
 		if (cur.moveToNext())

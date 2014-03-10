@@ -1,7 +1,5 @@
 package com.ioabsoftware.gameraven.db;
 
-import org.jsoup.nodes.Document;
-
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult;
 
 
@@ -16,20 +14,20 @@ public class History {
 	public HandlesNetworkResult.NetDesc getDesc() {
 		return desc;}
 
-
-	private Document doc;
-	public Document getDoc() {
-		return doc;}
+	
+	private byte[] resBodyAsBytes;
+	public byte[] getResBodyAsBytes() {
+		return resBodyAsBytes;}
 
 
 	private int vertPos[];
 	public int[] getVertPos() {
 		return vertPos;}
 
-	public History(String pathIn, HandlesNetworkResult.NetDesc descIn, Document docIn, int vertPosIn[]) {
+	public History(String pathIn, HandlesNetworkResult.NetDesc descIn, byte[] resBodyAsBytesIn, int vertPosIn[]) {
 		path = pathIn;
 		desc = descIn;
-		doc = docIn;
+		resBodyAsBytes = resBodyAsBytesIn;
 		vertPos = vertPosIn;
 	}
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -64,17 +65,17 @@ public class Session implements HandlesNetworkResult {
 			return lastPath;
 	}
 	
+	/** The latest Response body as an array of bytes. */
+	private byte[] lastResBodyAsBytes = null;
+	/** Get's the Response body as an array of bytes from the latest page. */
+	public byte[] getLastResBodyAsBytes()
+	{return lastResBodyAsBytes;}
+	
 	/** The latest description. */
 	private NetDesc lastDesc = null;
 	/** Get's the description of the latest page. */
 	public NetDesc getLastDesc()
 	{return lastDesc;}
-	
-	/** The latest Document. */
-	private Document lastDoc = null;
-	/** Get's the Document from the latest page. */
-	public Document getLastDoc()
-	{return lastDoc;}
 	
 	/** The name of the user for this session. */
 	private static String user = null;
@@ -510,7 +511,7 @@ public class Session implements HandlesNetworkResult {
 						case UNSPECIFIED:
 							aio.wtl("beginning history addition");
 							int[] vLoc = aio.getScrollerVertLoc();
-							hAdapter.insertHistory(lastPath, lastDesc.name(), lastDoc.outerHtml(), vLoc[0], vLoc[1]);
+							hAdapter.insertHistory(lastPath, lastDesc.name(), lastResBodyAsBytes, vLoc[0], vLoc[1]);
 							aio.wtl("finished history addition");
 							break;
 							
@@ -574,7 +575,7 @@ public class Session implements HandlesNetworkResult {
 				case VERIFY_ACCOUNT_S2:
 					aio.wtl("beginning lastDesc, lastRes, etc. setting");
 					lastDesc = desc;
-					lastDoc = cleanDoc;
+					lastResBodyAsBytes = res.bodyAsBytes();
 					lastPath = resUrl;
 					aio.wtl("finishing lastDesc, lastRes, etc. setting");
 					break;
@@ -1030,9 +1031,10 @@ public class Session implements HandlesNetworkResult {
 		else {
 			aio.wtl("going back in history: " + h.getDesc().name() + " " + h.getPath());
 			lastDesc = h.getDesc();
-			lastDoc = h.getDoc();
+			lastResBodyAsBytes = h.getResBodyAsBytes();
 			lastPath = h.getPath();
-			aio.processContent(lastDesc, lastDoc.clone(), lastPath);
+			
+			aio.processContent(lastDesc, Jsoup.parse(new String(lastResBodyAsBytes), lastPath), lastPath);
 		}
 	}
 	
