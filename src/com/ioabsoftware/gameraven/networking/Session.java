@@ -26,7 +26,7 @@ import android.widget.LinearLayout;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.db.History;
-import com.ioabsoftware.gameraven.db.HistoryDBHelper;
+import com.ioabsoftware.gameraven.db.HistoryDBAdapter;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
@@ -110,7 +110,7 @@ public class Session implements HandlesNetworkResult {
 	private AllInOneV2 aio;
 
     private boolean addToHistory = true;
-	private HistoryDBHelper historyDB;
+	private HistoryDBAdapter hAdapter;
 	
 	private String initUrl = null;
 	private NetDesc initDesc = null;
@@ -172,8 +172,8 @@ public class Session implements HandlesNetworkResult {
 		
 		netManager = (ConnectivityManager) aio.getSystemService(Context.CONNECTIVITY_SERVICE);
 		
-		historyDB = new HistoryDBHelper(aio);
-		historyDB.clearTable();
+		hAdapter = new HistoryDBAdapter(aio);
+		hAdapter.open();
         
         user = userIn;
 		password = passwordIn;
@@ -510,7 +510,7 @@ public class Session implements HandlesNetworkResult {
 						case UNSPECIFIED:
 							aio.wtl("beginning history addition");
 							int[] vLoc = aio.getScrollerVertLoc();
-							historyDB.insertHistory(lastPath, lastDesc.name(), lastDoc.outerHtml(), vLoc[0], vLoc[1]);
+							hAdapter.insertHistory(lastPath, lastDesc.name(), lastDoc.outerHtml(), vLoc[0], vLoc[1]);
 							aio.wtl("finished history addition");
 							break;
 							
@@ -1013,11 +1013,11 @@ public class Session implements HandlesNetworkResult {
 	}
 	
 	public boolean canGoBack() {
-		return historyDB.hasHistory();
+		return hAdapter.hasHistory();
 	}
 	
 	public void goBack(boolean forceReload) {
-		History h = historyDB.pullHistory();
+		History h = hAdapter.pullHistory();
 		
 		applySavedScroll = true;
 		savedScrollVal = h.getVertPos();
@@ -1034,6 +1034,10 @@ public class Session implements HandlesNetworkResult {
 			lastPath = h.getPath();
 			aio.processContent(lastDesc, lastDoc.clone(), lastPath);
 		}
+	}
+	
+	public void closeHistoryDB() {
+		hAdapter.close();
 	}
 	
 	public void refresh() {

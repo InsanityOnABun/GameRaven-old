@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
 
-public class HistoryDBHelper extends SQLiteOpenHelper {
+public class HistoryDBAdapter {
 
 	private static final String DATABASE_NAME = "history.db";
 	private static final int DATABASE_VERSION = 1;
@@ -37,49 +37,69 @@ public class HistoryDBHelper extends SQLiteOpenHelper {
 	private boolean hasHistory = false;
 	private String lastAddedPath = AllInOneV2.EMPTY_STRING;
 	
-	Context c;
+	private DatabaseHelper dbHelper;
+	private SQLiteDatabase db;
+	private final AllInOneV2 aio;
 	
-	public HistoryDBHelper(Context context) {
-		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		c = context;
+	private static class DatabaseHelper extends SQLiteOpenHelper {
+
+		DatabaseHelper(Context context) {
+			super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		}
+		
+		@Override
+		public void onCreate(SQLiteDatabase db) {
+			db.execSQL(CREATE_TABLE_HISTORY);
+		}
+		
+		@Override
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			db.execSQL("DROP TABLE IF EXISTS " + TABLE_HISTORY);
+			onCreate(db);
+		}
 	}
 	
-	@Override
-	public void onCreate(SQLiteDatabase db) {
-		db.execSQL(CREATE_TABLE_HISTORY);
+	public HistoryDBAdapter(AllInOneV2 aioIn) {
+		aio = aioIn;
 	}
-
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// TODO Auto-generated method stub
-
+	
+	public HistoryDBAdapter open() {
+		dbHelper = new DatabaseHelper(aio);
+		db = dbHelper.getWritableDatabase();
+		clearTable();
+		return this;
+	}
+	
+	public void close() {
+		dbHelper.close();
 	}
 	
 	public void clearTable() {
-		SQLiteDatabase db = getWritableDatabase();
 		db.delete(TABLE_HISTORY, null, null);
-		updateHasHistory(db);
-		db.close();
+		updateHasHistory();
 	}
 	
 	public void insertHistory(String pathIn, String descIn, String srcIn, int vLocFirstVisIn, int vLocOffsetIn) {
 		if (!lastAddedPath.equals(pathIn)) {
+			aio.wtl("starting insert history method");
 			lastAddedPath = pathIn;
-			SQLiteDatabase db = getWritableDatabase();
+			aio.wtl("creating content vals obj");
 			ContentValues vals = new ContentValues();
+			aio.wtl("putting content vals");
 			vals.put(COLUMN_HIST_PATH, pathIn);
 			vals.put(COLUMN_HIST_DESC, descIn);
 			vals.put(COLUMN_HIST_SRC, srcIn);
 			vals.put(COLUMN_HIST_VLOC_FIRSTVIS, vLocFirstVisIn);
 			vals.put(COLUMN_HIST_VLOC_OFFSET, vLocOffsetIn);
+			aio.wtl("inserting row");
 			db.insert(TABLE_HISTORY, null, vals);
-			updateHasHistory(db);
-			db.close();
+			aio.wtl("updating hasHistory");
+			updateHasHistory();
+			aio.wtl("insert history method completing");
 		}
 	}
 	
 	public History pullHistory() {
-		SQLiteDatabase db = getWritableDatabase();
 		Cursor cur = db.query(TABLE_HISTORY, null, null, null, null, null, COLUMN_HIST_ID + " DESC", "2");
 		
 		cur.moveToFirst();
@@ -98,13 +118,12 @@ public class HistoryDBHelper extends SQLiteOpenHelper {
 		cur.close();
 		
 		db.delete(TABLE_HISTORY, COLUMN_HIST_ID + " = " + id, null);
-		updateHasHistory(db);
-		db.close();
+		updateHasHistory();
 		
 		return h;
 	}
 	
-	private void updateHasHistory(SQLiteDatabase db) {
+	private void updateHasHistory() {
 		hasHistory = DatabaseUtils.queryNumEntries(db, TABLE_HISTORY) > 0;
 	}
 	
