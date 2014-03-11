@@ -198,6 +198,8 @@ public class AllInOneV2 extends Activity {
 	private ActionBar aBar;
 	private MenuItem refreshIcon;
 	private MenuItem postIcon;
+	private MenuItem pmInboxIcon;
+	private MenuItem pmOutboxIcon;
 	private MenuItem addFavIcon;
 	private MenuItem remFavIcon;
 	private MenuItem searchIcon;
@@ -757,8 +759,10 @@ public class AllInOneV2 extends Activity {
         topicListIcon = menu.getItem(1);
         addFavIcon = menu.getItem(2);
         remFavIcon = menu.getItem(3);
-        postIcon = menu.getItem(4);
-        refreshIcon = menu.getItem(5);
+        pmInboxIcon = menu.getItem(4);
+        pmOutboxIcon = menu.getItem(5);
+        postIcon = menu.getItem(6);
+        refreshIcon = menu.getItem(7);
         
         SearchView searchView = (SearchView) searchIcon.getActionView();
         if (searchView != null) {
@@ -916,6 +920,14 @@ public class AllInOneV2 extends Activity {
         	session.get(NetDesc.BOARD, tlUrl, null);
         	return true;
         	
+        case R.id.pmInbox:
+        	session.get(NetDesc.PM_INBOX, "/pm/", null);
+        	return true;
+        	
+        case R.id.pmOutbox:
+        	session.get(NetDesc.PM_OUTBOX, "/pm/sent", null);
+        	return true;
+        	
         case R.id.post:
         	if (pMode == PostMode.ON_BOARD)
         		postSetup(false);
@@ -1063,6 +1075,8 @@ public class AllInOneV2 extends Activity {
 		setMenuItemVisible(refreshIcon, false);
 		setMenuItemVisible(searchIcon, false);
 		setMenuItemVisible(postIcon, false);
+		setMenuItemVisible(pmInboxIcon, false);
+		setMenuItemVisible(pmOutboxIcon, false);
 		setMenuItemVisible(addFavIcon, false);
 		setMenuItemVisible(remFavIcon, false);
 		setMenuItemVisible(topicListIcon, false);
@@ -1209,9 +1223,17 @@ public class AllInOneV2 extends Activity {
 			break;
 			
 		case PM_INBOX:
+		case PM_OUTBOX:
 			tbody = doc.getElementsByTag("tbody").first();
+			
+			boolean isInbox = false;
+			if (desc == NetDesc.PM_INBOX)
+				isInbox = true;
 
-			headerTitle = Session.getUser() + "'s PM Inbox";
+			if (isInbox)
+				headerTitle = Session.getUser() + "'s PM Inbox";
+			else
+				headerTitle = Session.getUser() + "'s PM Outbox";
 			
 			if (tbody != null) {
 				pj = doc.select("ul.paginate").first();
@@ -1229,20 +1251,26 @@ public class AllInOneV2 extends Activity {
 					int currPageNum = Integer.parseInt(currPage);
 					int pageCountNum = Integer.parseInt(pageCount);
 					
+					String pmPagePrefix;
+					if (isInbox)
+						pmPagePrefix = "/pm/";
+					else
+						pmPagePrefix = "/pm/sent";
+					
 					if (currPageNum > 1) {
-						firstPage = "/pm/";
-						prevPage = "/pm/?page=" + (currPageNum - 2);
+						firstPage = pmPagePrefix;
+						prevPage = pmPagePrefix + "?page=" + (currPageNum - 2);
 					}
 					if (currPageNum != pageCountNum) {
-						nextPage = "/pm/?page=" + currPageNum;
-						lastPage = "/pm/?page=" + (pageCountNum - 1);
+						nextPage = pmPagePrefix + "?page=" + currPageNum;
+						lastPage = pmPagePrefix + "?page=" + (pageCountNum - 1);
 					}
 				}
 				
 				updateHeader(headerTitle, firstPage, prevPage, currPage, 
-							 pageCount, nextPage, lastPage, NetDesc.PM_INBOX);
+							 pageCount, nextPage, lastPage, desc);
 				
-				if (isDefaultAcc)
+				if (isDefaultAcc && isInbox)
 					NotifierService.dismissPMNotif(this);
 				
 				for (Element row : tbody.getElementsByTag("tr")) {
@@ -1257,19 +1285,30 @@ public class AllInOneV2 extends Activity {
 					String link = subjectLinkElem.attr("href");
 					String time = cells.get(3).text();
 					
-					adapterRows.add(new PMRowData(subject, sender, time, link, isOld));
+					adapterRows.add(new PMRowData(subject, sender, time, link, isOld, isInbox));
 				}
 			}
 			else {
-				updateHeaderNoJumper(headerTitle, NetDesc.PM_INBOX);
-				adapterRows.add(new HeaderRowData("You have no private messages at this time."));
+				updateHeaderNoJumper(headerTitle, desc);
+				adapterRows.add(new HeaderRowData("There are no private messages here at this time."));
 			}
 			
 			setMenuItemVisible(postIcon, true);
 			pMode = PostMode.NEW_PM;
+			
+			if (isInbox)
+				setMenuItemVisible(pmOutboxIcon, true);
+			else
+				setMenuItemVisible(pmInboxIcon, true);
+			
 			break;
 			
-		case PM_DETAIL:
+		case PM_INBOX_DETAIL:
+		case PM_OUTBOX_DETAIL:
+			boolean isFromInbox = false;
+			if (desc == NetDesc.PM_INBOX_DETAIL)
+				isFromInbox = true;
+			
 			String pmTitle = doc.select("h2.title").first().text();
 
 			String pmMessage = doc.select("div.body").first().outerHtml();
@@ -1283,9 +1322,9 @@ public class AllInOneV2 extends Activity {
 			
 			String sender = footText.substring(9, footText.indexOf(" on "));
 			
-			updateHeaderNoJumper(pmTitle, NetDesc.PM_DETAIL);
+			updateHeaderNoJumper(pmTitle, desc);
 			
-			adapterRows.add(new PMDetailRowData(sender, pmTitle, pmMessage + pmFoot));
+			adapterRows.add(new PMDetailRowData(sender, pmTitle, pmMessage + pmFoot, isFromInbox));
 			break;
 			
 		case AMP_LIST:

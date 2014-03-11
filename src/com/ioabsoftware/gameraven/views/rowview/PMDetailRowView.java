@@ -25,7 +25,8 @@ import com.ioabsoftware.gameraven.views.rowdata.PMDetailRowData;
 
 public class PMDetailRowView extends BaseRowView {
 	
-	TextView messageView;
+	View replyLabelSep;
+	TextView replyLabel, messageView;
 	
 	PMDetailRowData myData;
 	
@@ -47,7 +48,8 @@ public class PMDetailRowView extends BaseRowView {
 		setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.pmdetailview, this, true);
 
-        TextView replyLabel = (TextView) findViewById(R.id.pmdReplyLabel);
+        replyLabelSep = findViewById(R.id.pmdMidSep);
+        replyLabel = (TextView) findViewById(R.id.pmdReplyLabel);
         
         messageView = (TextView) findViewById(R.id.pmdMessage);
         
@@ -75,6 +77,11 @@ public class PMDetailRowView extends BaseRowView {
 			throw new IllegalArgumentException("data RowType does not match myType");
 		
 		myData = (PMDetailRowData) data;
+		
+		if (!myData.isFromInbox()) {
+			replyLabel.setVisibility(View.GONE);
+			replyLabelSep.setVisibility(View.GONE);
+		}
         
         messageView.setText(RichTextUtils.replaceAll(linkifyHtml(myData.getMessage(), Linkify.WEB_URLS), URLSpan.class, new UrlSpanConverter()));
         

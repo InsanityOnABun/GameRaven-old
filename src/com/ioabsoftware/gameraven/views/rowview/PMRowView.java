@@ -60,7 +60,10 @@ public class PMRowView extends BaseRowView {
         setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				AllInOneV2.get().getSession().get(NetDesc.PM_DETAIL, myData.getUrl(), null);
+				if (myData.isFromInbox())
+					AllInOneV2.get().getSession().get(NetDesc.PM_INBOX_DETAIL, myData.getUrl(), null);
+				else
+					AllInOneV2.get().getSession().get(NetDesc.PM_OUTBOX_DETAIL, myData.getUrl(), null);
 			}
 		});
         

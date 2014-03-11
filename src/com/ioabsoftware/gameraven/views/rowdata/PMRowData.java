@@ -14,12 +14,16 @@ public class PMRowData extends BaseRowData {
 	private boolean isOld;
 	public boolean isOld() {return isOld;}
 	
-	public PMRowData(String subjectIn, String senderIn, String timeIn, String urlIn, boolean isOldIn) {
+	private boolean isFromInbox;
+	public boolean isFromInbox() {return isFromInbox;}
+	
+	public PMRowData(String subjectIn, String senderIn, String timeIn, String urlIn, boolean isOldIn, boolean isFromInboxIn) {
 		subject = subjectIn;
 		sender = senderIn;
 		time = timeIn;
 		url = urlIn;
 		isOld = isOldIn;
+		isFromInbox = isFromInboxIn;
 	}
 	
 	@Override

@@ -62,5 +62,6 @@
     <string name="color4_title">Color 4</string>
     <string name="color4_summary">color set with HEX code in xml</string>
     <!-- End Color Picker Strings -->
+    <string name="pm_outbox">PM Outbox</string>
 
 </resources>

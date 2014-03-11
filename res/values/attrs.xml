@@ -8,6 +8,8 @@
         <attr name="themedAddFavIcon" format="reference" />
         <attr name="themedRemFavIcon" format="reference" />
         <attr name="themedTopicListIcon" format="reference" />
+        <attr name="themedPMInboxIcon" format="reference" />
+        <attr name="themedPMOutboxIcon" format="reference" />
         <attr name="themedPostIcon" format="reference" />
         <attr name="themedRefreshIcon" format="reference" />
         <attr name="themedPostInfoIcon" format="reference" />

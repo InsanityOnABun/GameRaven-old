@@ -290,7 +290,9 @@ public class Session implements HandlesNetworkResult {
 		case USER_DETAIL:
 		case MODHIST:
 		case PM_INBOX:
-		case PM_DETAIL:
+		case PM_INBOX_DETAIL:
+		case PM_OUTBOX:
+		case PM_OUTBOX_DETAIL:
 		case MARKMSG_S1:
 		case CLOSE_TOPIC:
 		case DLTMSG_S1:
@@ -458,7 +460,9 @@ public class Session implements HandlesNetworkResult {
 				case USER_DETAIL:
 				case MODHIST:
 				case PM_INBOX:
-				case PM_DETAIL:
+				case PM_INBOX_DETAIL:
+				case PM_OUTBOX:
+				case PM_OUTBOX_DETAIL:
 				case UNSPECIFIED:
 				case LOGIN_S1:
 				case LOGIN_S2:
@@ -504,7 +508,9 @@ public class Session implements HandlesNetworkResult {
 						case USER_DETAIL:
 						case MODHIST:
 						case PM_INBOX:
-						case PM_DETAIL:
+						case PM_INBOX_DETAIL:
+						case PM_OUTBOX:
+						case PM_OUTBOX_DETAIL:
 						case UNSPECIFIED:
 							aio.wtl("beginning history addition");
 							int[] vLoc = aio.getScrollerVertLoc();
@@ -553,7 +559,9 @@ public class Session implements HandlesNetworkResult {
 				case USER_DETAIL:
 				case MODHIST:
 				case PM_INBOX:
-				case PM_DETAIL:
+				case PM_INBOX_DETAIL:
+				case PM_OUTBOX:
+				case PM_OUTBOX_DETAIL:
 				case UNSPECIFIED:
 				case LOGIN_S1:
 				case LOGIN_S2:
@@ -931,7 +939,9 @@ public class Session implements HandlesNetworkResult {
 				case USER_DETAIL:
 				case MODHIST:
 				case PM_INBOX:
-				case PM_DETAIL:
+				case PM_INBOX_DETAIL:
+				case PM_OUTBOX:
+				case PM_OUTBOX_DETAIL:
 				case VERIFY_ACCOUNT_S1:
 				case VERIFY_ACCOUNT_S2:
 					aio.wtl("session hNR determined this should be handled by AIO");
@@ -973,7 +983,9 @@ public class Session implements HandlesNetworkResult {
 		case USER_DETAIL:
 		case MODHIST:
 		case PM_INBOX:
-		case PM_DETAIL:
+		case PM_INBOX_DETAIL:
+		case PM_OUTBOX:
+		case PM_OUTBOX_DETAIL:
 		case CLOSE_TOPIC:
 		case GAME_SEARCH:
 		case BOARD_LIST:
@@ -1102,8 +1114,14 @@ public class Session implements HandlesNetworkResult {
 			if(url.equals(Session.ROOT + "/pm"))
 				url += "/";
 			if (url.contains("/pm/")) {
-				if (url.contains("?id=")) {
-					return NetDesc.PM_DETAIL;
+				if (url.contains("/pm/sent?id=")) {
+					return NetDesc.PM_OUTBOX_DETAIL;
+				}
+				else if (url.contains("/pm/sent")) {
+					return NetDesc.PM_OUTBOX;
+				}
+				else if (url.contains("?id=")) {
+					return NetDesc.PM_INBOX_DETAIL;
 				}
 				else {
 					return NetDesc.PM_INBOX;
