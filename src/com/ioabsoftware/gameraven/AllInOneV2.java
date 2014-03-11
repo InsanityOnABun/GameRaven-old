@@ -1013,10 +1013,6 @@ public class AllInOneV2 extends Activity {
 		case POSTTPC_S1:
 		case POSTTPC_S2:
 		case POSTTPC_S3:
-		case QPOSTMSG_S1:
-		case QPOSTMSG_S3:
-		case QPOSTTPC_S1:
-		case QPOSTTPC_S3:
 			title = "Post Timeout";
 			msg = "Post timed out. Press refresh to check if your post made it through.";
 			posButtonText = "Refresh";
@@ -1081,9 +1077,7 @@ public class AllInOneV2 extends Activity {
 		setMenuItemVisible(remFavIcon, false);
 		setMenuItemVisible(topicListIcon, false);
 		
-		if (desc != NetDesc.POSTMSG_S1 && desc != NetDesc.POSTTPC_S1 &&
-			desc != NetDesc.QPOSTMSG_S1 && desc != NetDesc.QPOSTTPC_S1 &&
-			desc != NetDesc.QEDIT_MSG)
+		if (desc != NetDesc.POSTMSG_S1 && desc != NetDesc.POSTTPC_S1 && desc != NetDesc.EDIT_MSG)
 				postCleanup();
 	}
 
@@ -2393,14 +2387,10 @@ public class AllInOneV2 extends Activity {
 			postButton.setEnabled(false);
 			pollButton.setEnabled(false);
 			cancelButton.setEnabled(false);
-			if (pollUse) {
+			if (pollUse)
 				path += "&poll=1";
-				session.get(NetDesc.POSTTPC_S1, path, null);
-			}
-			else if (Session.userHasAdvancedPosting())
-				session.get(NetDesc.QPOSTTPC_S1, path, null);
-			else
-				session.get(NetDesc.POSTTPC_S1, path, null);
+			
+			session.get(NetDesc.POSTTPC_S1, path, null);
 		}
 		
 		else {
@@ -2417,9 +2407,7 @@ public class AllInOneV2 extends Activity {
 			postButton.setEnabled(false);
 			cancelButton.setEnabled(false);
 			if (messageIDForEditing != null)
-				session.get(NetDesc.QEDIT_MSG, path, null);
-			else if (Session.userHasAdvancedPosting())
-				session.get(NetDesc.QPOSTMSG_S1, path, null);
+				session.get(NetDesc.EDIT_MSG, path, null);
 			else
 				session.get(NetDesc.POSTMSG_S1, path, null);
 		}

@@ -297,11 +297,9 @@ public class Session implements HandlesNetworkResult {
 		case CLOSE_TOPIC:
 		case DLTMSG_S1:
 		case LOGIN_S1:
-		case QEDIT_MSG:
+		case EDIT_MSG:
 		case POSTMSG_S1:
 		case POSTTPC_S1:
-		case QPOSTMSG_S1:
-		case QPOSTTPC_S1:
 		case UNSPECIFIED:
 			aio.preExecuteSetup(desc);
 			break;
@@ -309,8 +307,6 @@ public class Session implements HandlesNetworkResult {
 		case LOGIN_S2:
 		case MARKMSG_S2:
 		case DLTMSG_S2:
-		case QPOSTMSG_S3:
-		case QPOSTTPC_S3:
 		case POSTMSG_S2:
 		case POSTMSG_S3:
 		case POSTTPC_S2:
@@ -468,11 +464,7 @@ public class Session implements HandlesNetworkResult {
 				case LOGIN_S2:
 				case DLTMSG_S1:
 				case DLTMSG_S2:
-				case QEDIT_MSG:
-				case QPOSTMSG_S1:
-				case QPOSTMSG_S3:
-				case QPOSTTPC_S1:
-				case QPOSTTPC_S3:
+				case EDIT_MSG:
 				case POSTMSG_S1:
 				case POSTMSG_S2:
 				case POSTMSG_S3:
@@ -525,11 +517,7 @@ public class Session implements HandlesNetworkResult {
 						case DLTMSG_S2:
 						case LOGIN_S1:
 						case LOGIN_S2:
-						case QEDIT_MSG:
-						case QPOSTMSG_S1:
-						case QPOSTMSG_S3:
-						case QPOSTTPC_S1:
-						case QPOSTTPC_S3:
+						case EDIT_MSG:
 						case POSTMSG_S1:
 						case POSTMSG_S2:
 						case POSTMSG_S3:
@@ -565,11 +553,7 @@ public class Session implements HandlesNetworkResult {
 				case UNSPECIFIED:
 				case LOGIN_S1:
 				case LOGIN_S2:
-				case QEDIT_MSG:
-				case QPOSTMSG_S1:
-				case QPOSTMSG_S3:
-				case QPOSTTPC_S1:
-				case QPOSTTPC_S3:
+				case EDIT_MSG:
 				case POSTMSG_S1:
 				case POSTMSG_S2:
 				case POSTMSG_S3:
@@ -644,16 +628,12 @@ public class Session implements HandlesNetworkResult {
 					break;
 					
 				case POSTMSG_S1:
-				case QPOSTMSG_S1:
-				case QEDIT_MSG:
-					
-					//TODO: Completely replace QPOST* NetDescs with userHasAdvancedPosting()
-					
+				case EDIT_MSG:
 					aio.wtl("session hNR determined this is post message step 1");
 					String msg1Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 					
 					String sig;
-					if (desc == NetDesc.QEDIT_MSG)
+					if (desc == NetDesc.EDIT_MSG)
 						sig = AllInOneV2.EMPTY_STRING;
 					else
 						sig = aio.getSig();
@@ -672,10 +652,7 @@ public class Session implements HandlesNetworkResult {
 					}
 					else {
 						aio.wtl("finishing post message step 1, sending step 2");
-						if (userHasAdvancedPosting())
-							post(NetDesc.QPOSTMSG_S3, lastPath, msg1Data);
-						else
-							post(NetDesc.POSTMSG_S2, lastPath, msg1Data);
+						post((userHasAdvancedPosting() ? NetDesc.POSTMSG_S3 : NetDesc.POSTMSG_S2), lastPath, msg1Data);
 					}
 					break;
 					
@@ -710,9 +687,7 @@ public class Session implements HandlesNetworkResult {
 					break;
 					
 				case POSTMSG_S3:
-				case QPOSTMSG_S3:
 					aio.wtl("session hNR determined this is post message step 3 (if jumping from 1 to 3, then app is quick posting)");
-					aio.wtl("finishing post message step 3, sending step 4");
 
 					Elements msg3AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
 					Elements msg3Error = doc.getElementsContainingOwnText("There was an error posting your message:");
@@ -738,12 +713,12 @@ public class Session implements HandlesNetworkResult {
 						showAutoFlagWarning(lastPath, msg3Data, NetDesc.POSTMSG_S3, msg);
 					}
 					else {
+						aio.wtl("finishing post message step 3, refreshing topic");
 						goBack(true);
 					}
 					break;
 					
 				case POSTTPC_S1:
-				case QPOSTTPC_S1:
 					aio.wtl("session hNR determined this is post topic step 1");
 					String tpc1Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 					
@@ -751,7 +726,7 @@ public class Session implements HandlesNetworkResult {
 					tpc1Data.put("topictitle", aio.getSavedPostTitle());
 					tpc1Data.put("messagetext", aio.getSavedPostBody());
 					tpc1Data.put("custom_sig", aio.getSig());
-					tpc1Data.put("post", ((desc == NetDesc.POSTTPC_S1) ? "Preview Message" : "Post without Preview"));
+					tpc1Data.put("post", (userHasAdvancedPosting() ? "Post without Preview" : "Preview Message"));
 					tpc1Data.put("key", tpc1Key);
 					
 					if (aio.isUsingPoll()) {
@@ -773,7 +748,7 @@ public class Session implements HandlesNetworkResult {
 					}
 					else {
 						aio.wtl("finishing post topic step 1, sending step 2");
-						post(((desc == NetDesc.QPOSTTPC_S1) ? NetDesc.QPOSTTPC_S3 : NetDesc.POSTTPC_S2), lastPath, tpc1Data);
+						post((userHasAdvancedPosting() ? NetDesc.POSTTPC_S3 : NetDesc.POSTTPC_S2), lastPath, tpc1Data);
 					}
 					break;
 					
@@ -819,9 +794,7 @@ public class Session implements HandlesNetworkResult {
 					break;
 					
 				case POSTTPC_S3:
-				case QPOSTTPC_S3:
 					aio.wtl("session hNR determined this is post topic step 3 (if jumping from 1 to 3, then app is quick posting)");
-					aio.wtl("finishing post topic step 3, sending step 4");
 
 					Elements tpc3AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
 					Elements tpc3Error = doc.getElementsContainingOwnText("There was an error posting your message:");
@@ -847,6 +820,7 @@ public class Session implements HandlesNetworkResult {
 						showAutoFlagWarning(lastPath, tpc3Data, NetDesc.POSTTPC_S3, msg);
 					}
 					else {
+						aio.wtl("finishing post topic step 3, refreshing board");
 						goBack(true);
 					}
 					break;
@@ -1001,17 +975,13 @@ public class Session implements HandlesNetworkResult {
 		case MARKMSG_S2:
 		case DLTMSG_S1:
 		case DLTMSG_S2:
-		case QEDIT_MSG:
+		case EDIT_MSG:
 		case POSTMSG_S1:
 		case POSTMSG_S2:
 		case POSTMSG_S3:
 		case POSTTPC_S1:
 		case POSTTPC_S2:
 		case POSTTPC_S3:
-		case QPOSTMSG_S1:
-		case QPOSTMSG_S3:
-		case QPOSTTPC_S1:
-		case QPOSTTPC_S3:
 		case VERIFY_ACCOUNT_S1:
 		case VERIFY_ACCOUNT_S2:
 		case SEND_PM_S1:
