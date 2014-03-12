@@ -108,7 +108,7 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 
 public class AllInOneV2 extends Activity {
 	
-	public static boolean isReleaseBuild = false;
+	public static boolean isReleaseBuild = true;
 	
 	public static final int SEND_PM_DIALOG = 102;
 	public static final int MESSAGE_ACTION_DIALOG = 103;
