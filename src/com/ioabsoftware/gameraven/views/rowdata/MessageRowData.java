@@ -60,7 +60,6 @@ public class MessageRowData extends BaseRowData {
 	
 	private LinearLayout poll = null;
 	
-	private static SpannableStringBuilder ssb = null;
 	private Spannable spannedMessage;
 	
 	private int hlColor;
@@ -217,15 +216,8 @@ public class MessageRowData extends BaseRowData {
         	}
         }
 
-		if (ssb == null) {
-			aio.wtl("creating ssb");
-			ssb = new SpannableStringBuilder(processContent(false, true));
-		}
-		else {
-			aio.wtl("ssb exists, clearing and appending");
-			ssb.clear();
-			ssb.append(processContent(false, true));
-		}
+		aio.wtl("creating ssb");
+		SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false, true));
 
 		aio.wtl("adding <b> spans");
         addSpan(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
