@@ -718,6 +718,7 @@ public class Session implements HandlesNetworkResult {
 						aio.wtl("finishing post message step 3, refreshing topic");
 						lastDesc = NetDesc.TOPIC;
 						aio.enableGoToUrlDefinedPost();
+						Crouton.showText(aio, "Message posted.", AllInOneV2.getCroutonStyle());
 						processTopic(doc, resUrl);
 					}
 					break;
@@ -827,6 +828,7 @@ public class Session implements HandlesNetworkResult {
 					else {
 						aio.wtl("finishing post topic step 3, refreshing board");
 						lastDesc = NetDesc.BOARD;
+						Crouton.showText(aio, "Topic posted.", AllInOneV2.getCroutonStyle());
 						aio.processContent(NetDesc.BOARD, doc, resUrl);
 					}
 					break;
