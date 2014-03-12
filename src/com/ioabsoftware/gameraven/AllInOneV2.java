@@ -1027,7 +1027,7 @@ public class AllInOneV2 extends Activity {
 		}
 		final boolean retry = retrySub;
 		
-		AlertDialog.Builder b = new AlertDialog.Builder(this);
+		AlertDialog.Builder b = new AlertDialog.Builder(AllInOneV2.this);
 		b.setTitle(title);
 		b.setMessage(msg);
 		b.setPositiveButton(posButtonText, new OnClickListener() {
