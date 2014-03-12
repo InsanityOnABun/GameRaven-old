@@ -334,6 +334,7 @@ public class Session implements HandlesNetworkResult {
 				aio.wtl("parsing res");
 				Document doc = res.parse();
 				String resUrl = res.url().toString();
+				aio.wtl("resUrl: " + resUrl);
 
 				aio.wtl("checking if res does not start with root");
 				if (!resUrl.startsWith(ROOT)) {
@@ -711,10 +712,13 @@ public class Session implements HandlesNetworkResult {
 						msg3Data.put("uid", msg3Uid);
 						
 						showAutoFlagWarning(lastPath, msg3Data, NetDesc.POSTMSG_S3, msg);
+						postErrorDetected = true;
 					}
 					else {
 						aio.wtl("finishing post message step 3, refreshing topic");
-						goBack(true);
+						lastDesc = NetDesc.TOPIC;
+						aio.enableGoToUrlDefinedPost();
+						processTopic(doc, resUrl);
 					}
 					break;
 					
@@ -818,24 +822,18 @@ public class Session implements HandlesNetworkResult {
 						tpc3Data.put("uid", tpc3Uid);
 						
 						showAutoFlagWarning(lastPath, tpc3Data, NetDesc.POSTTPC_S3, msg);
+						postErrorDetected = true;
 					}
 					else {
 						aio.wtl("finishing post topic step 3, refreshing board");
-						goBack(true);
+						lastDesc = NetDesc.BOARD;
+						aio.processContent(NetDesc.BOARD, doc, resUrl);
 					}
 					break;
 					
 				case TOPIC:
 					aio.wtl("session hNR determined this is a topic");
-					if (!doc.select("p:contains(no longer available for viewing)").isEmpty()) {
-						Crouton.showText(aio, "The topic you selected is no longer available for viewing.", AllInOneV2.getCroutonStyle());
-						aio.wtl("topic is no longer available, treat response as a board");
-						aio.processContent(NetDesc.BOARD, doc, resUrl);
-					}
-					else {
-						aio.wtl("handle the topic in AIO");
-						aio.processContent(desc, doc, resUrl);
-					}
+					processTopic(doc, resUrl);
 					break;
 					
 				case MARKMSG_S1:
@@ -943,8 +941,21 @@ public class Session implements HandlesNetworkResult {
 
 		aio.wtl("session hNR finishing, desc: " + desc.name());
 	}
+	
+	private void processTopic(Document doc, String resUrl) {
+		if (!doc.select("p:contains(no longer available for viewing)").isEmpty()) {
+			Crouton.showText(aio, "The topic you selected is no longer available for viewing.", AllInOneV2.getCroutonStyle());
+			aio.wtl("topic is no longer available, treat response as a board");
+			aio.processContent(NetDesc.BOARD, doc, resUrl);
+		}
+		else {
+			aio.wtl("handle the topic in AIO");
+			aio.processContent(NetDesc.TOPIC, doc, resUrl);
+		}
+	}
 
 	private boolean skipAIOCleanup = false;
+	private boolean postErrorDetected = false;
 	@Override
 	public void postExecuteCleanup(NetDesc desc) {
 		switch (desc) {
@@ -968,6 +979,13 @@ public class Session implements HandlesNetworkResult {
 				aio.postExecuteCleanup(desc);
 			
 			break;
+
+		case POSTMSG_S3:
+		case POSTTPC_S3:
+			if (!postErrorDetected)
+				aio.postExecuteCleanup((desc == NetDesc.POSTMSG_S3 ? NetDesc.TOPIC : NetDesc.BOARD));
+			
+			break;
 			
 		case LOGIN_S1:
 		case LOGIN_S2:
@@ -978,10 +996,8 @@ public class Session implements HandlesNetworkResult {
 		case EDIT_MSG:
 		case POSTMSG_S1:
 		case POSTMSG_S2:
-		case POSTMSG_S3:
 		case POSTTPC_S1:
 		case POSTTPC_S2:
-		case POSTTPC_S3:
 		case VERIFY_ACCOUNT_S1:
 		case VERIFY_ACCOUNT_S2:
 		case SEND_PM_S1:
@@ -990,6 +1006,7 @@ public class Session implements HandlesNetworkResult {
 		}
 		
 		skipAIOCleanup = false;
+		postErrorDetected = false;
 	}
 	
 	public boolean canGoBack() {
