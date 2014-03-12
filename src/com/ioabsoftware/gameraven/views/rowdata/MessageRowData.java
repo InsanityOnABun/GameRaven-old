@@ -60,6 +60,7 @@ public class MessageRowData extends BaseRowData {
 	
 	private LinearLayout poll = null;
 	
+	private static SpannableStringBuilder ssb = null;
 	private Spannable spannedMessage;
 	
 	private int hlColor;
@@ -101,6 +102,8 @@ public class MessageRowData extends BaseRowData {
 		return Session.ROOT + "/users/" + username.replace(' ', '+') + "/boards";
 	}
 	
+	private static AllInOneV2 aio = null;
+	
 	@Override
 	public RowType getRowType() {
 		return RowType.MESSAGE;
@@ -108,7 +111,9 @@ public class MessageRowData extends BaseRowData {
 	
 	public MessageRowData(String userIn, String userTitlesIn, String postNumIn, String postTimeIn,
 			Element messageIn, String BID, String TID, String MID, int hlColorIn) {
-		AllInOneV2 aio = AllInOneV2.get();
+		
+		if (aio == null)
+			aio = AllInOneV2.get();
 		
 		aio.wtl("setting values");
 		username = userIn;
@@ -212,8 +217,15 @@ public class MessageRowData extends BaseRowData {
         	}
         }
 
-		aio.wtl("creating ssb");
-		SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false, true));
+		if (ssb == null) {
+			aio.wtl("creating ssb");
+			ssb = new SpannableStringBuilder(processContent(false, true));
+		}
+		else {
+			aio.wtl("ssb exists, clearing and appending");
+			ssb.clear();
+			ssb.append(processContent(false, true));
+		}
 
 		aio.wtl("adding <b> spans");
         addSpan(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
@@ -370,35 +382,45 @@ public class MessageRowData extends BaseRowData {
 	}
 	
 	private String processContent(boolean removeSig, boolean ignoreLtGt) {
+		aio.wtl("getting messageElemNoPoll.html()");
 		String finalBody = messageElemNoPoll.html();
-		
+
+		aio.wtl("replacing spoiler spans with spoiler tags");
 		finalBody = finalBody.replace("<span class=\"fspoiler\">", "<spoiler>").replace("</span>", "</spoiler>");
-		
+
+		aio.wtl("beginning opening anchor tag removal");
 		while (finalBody.contains("<a href")) {
 			int start = finalBody.indexOf("<a href");
 			int end = finalBody.indexOf(">", start) + 1;
 			finalBody = finalBody.replace(finalBody.substring(start, end),
 					"");
 		}
-		
+
+		aio.wtl("removing closing anchor tags");
 		finalBody = finalBody.replace("</a>", "");
-		
+
+		aio.wtl("removing existing \\n, replacing linebreak tags with \\n");
 		if (finalBody.endsWith("<br />"))
 			finalBody = finalBody.substring(0, finalBody.length() - 6);
 		finalBody = finalBody.replace("\n", "");
 		finalBody = finalBody.replace("<br />", "\n");
 
 		if (removeSig) {
+			aio.wtl("removing sig");
 			int sigStart = finalBody.lastIndexOf("\n---\n");
 			if (sigStart != -1)
 				finalBody = finalBody.substring(0, sigStart);
 		}
 
-		if (ignoreLtGt)
+		if (ignoreLtGt) {
+			aio.wtl("ignoring less than / greater than");
 			finalBody = finalBody.replace("&lt;", "&gameravenlt;").replace("&gt;", "&gameravengt;");
+		}
 		
+		aio.wtl("unescaping finalbody html");
 		finalBody = StringEscapeUtils.unescapeHtml4(finalBody);
-		
+
+		aio.wtl("returning finalbody");
 		return finalBody;
 	}
 	
