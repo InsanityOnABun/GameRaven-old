@@ -849,10 +849,10 @@ public class Session implements HandlesNetworkResult {
 						postErrorDetected = true;
 					}
 					else {
-						aio.wtl("finishing post topic step 3, refreshing board");
-						lastDesc = NetDesc.BOARD;
+						aio.wtl("finishing post topic step 3, processing new topic");
+						lastDesc = NetDesc.TOPIC;
 						Crouton.showText(aio, "Topic posted.", AllInOneV2.getCroutonStyle());
-						aio.processContent(NetDesc.BOARD, doc, resUrl);
+						processTopic(doc, resUrl);
 					}
 					break;
 					
