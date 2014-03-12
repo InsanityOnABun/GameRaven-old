@@ -3,7 +3,10 @@ package com.ioabsoftware.gameraven.networking;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.acra.ACRA;
+import org.acra.ACRAConfiguration;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
@@ -26,6 +29,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
+import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.db.History;
 import com.ioabsoftware.gameraven.db.HistoryDBAdapter;
 
@@ -258,9 +262,28 @@ public class Session implements HandlesNetworkResult {
 	 * @param path The path to send the request to.
 	 * @param data The extra data to send along.
 	 */
-	public void post(NetDesc desc, String path, Map<String, String> data) {
+	public void post(NetDesc desc, String path, HashMap<String, String> data) {
 		if (hasNetworkConnection()) {
 			if (desc != NetDesc.MODHIST) {
+				for (Entry<String, String> e : data.entrySet()) {
+					if (e.getValue() == null) {
+						ACRAConfiguration config = ACRA.getConfig();
+						config.setResToastText(R.string.bug_toast_text);
+						
+						ACRA.getErrorReporter().putCustomData("path", path);
+						ACRA.getErrorReporter().putCustomData("desc", desc.toString());
+						ACRA.getErrorReporter().putCustomData("Last Attempted Path", getLastAttemptedPath());
+						ACRA.getErrorReporter().putCustomData("Last Attempted Desc", getLastAttemptedDesc().toString());
+						for (Entry<String, String> i : data.entrySet()) {
+							ACRA.getErrorReporter().putCustomData(i.getKey(), (i.getValue() != null ? i.getValue() : "NULL"));
+						}
+						ACRA.getErrorReporter().handleException(new Exception("data set passed to Session.post contains null value"));
+
+						config.setResToastText(R.string.crash_toast_text);
+						return;
+					}
+				}
+				
 				new NetworkTask(this, desc, Method.POST, cookies, buildURL(path, desc), data).execute();
 			}
 			else
@@ -1059,7 +1082,7 @@ public class Session implements HandlesNetworkResult {
 		get(lastDesc, trimmedPath, null);
 	}
 	
-	private void showAutoFlagWarning(final String path, final Map<String, String> data, final NetDesc desc, String msg) {
+	private void showAutoFlagWarning(final String path, final HashMap<String, String> data, final NetDesc desc, String msg) {
 		AlertDialog.Builder b = new AlertDialog.Builder(aio);
 		b.setTitle("Post Warning");
 		b.setMessage(msg);
