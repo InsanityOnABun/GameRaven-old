@@ -704,7 +704,10 @@ public class AllInOneV2 extends Activity {
 	@Override
 	protected void onDestroy() {
 		Crouton.clearCroutonsForActivity(this);
-		session.closeHistoryDB();
+		
+		if (session != null)
+			session.closeHistoryDB();
+		
 		super.onDestroy();
 	}
 	
@@ -1198,7 +1201,7 @@ public class AllInOneV2 extends Activity {
 			web = new WebView(this);
 
 		wtl("enabling javascript");
-		web.getSettings().setJavaScriptEnabled(AllInOneV2.getSettingsPref().getBoolean("enableJS", true));
+		web.getSettings().setJavaScriptEnabled(settings.getBoolean("enableJS", true));
 		
 		switch (desc) {
 		case BOARD_JUMPER:
@@ -1545,6 +1548,14 @@ public class AllInOneV2 extends Activity {
 							lastPage = "boards/" + boardID + "?page="
 									+ (pageCountNum - 1)
 									+ searchPJAddition;
+							
+							if (currPageNum > pageCountNum) {
+								session.forceNoHistoryAddition();
+								session.forceSkipAIOCleanup();
+								Crouton.showText(this, "Page count higher than page amount, going to last page...", croutonStyle);
+								session.get(NetDesc.BOARD, lastPage, null);
+								return;
+							}
 						}
 					}
 				}
@@ -1687,7 +1698,7 @@ public class AllInOneV2 extends Activity {
 							pageCountEnd);
 					int currPageNum = Integer.parseInt(currPage);
 					int pageCountNum = Integer.parseInt(pageCount);
-
+					
 					if (currPageNum > 1) {
 						firstPage = "boards/" + boardID + "/" + topicID;
 						prevPage = "boards/" + boardID + "/" + topicID
@@ -1698,6 +1709,14 @@ public class AllInOneV2 extends Activity {
 								+ "?page=" + currPageNum;
 						lastPage = "boards/" + boardID + "/" + topicID
 								+ "?page=" + (pageCountNum - 1);
+
+						if (currPageNum > pageCountNum) {
+							session.forceNoHistoryAddition();
+							session.forceSkipAIOCleanup();
+							Crouton.showText(this, "Page count higher than page amount, going to last page...", croutonStyle);
+							session.get(NetDesc.TOPIC, lastPage, null);
+							return;
+						}
 					}
 				}
 			}
@@ -2717,13 +2736,14 @@ public class AllInOneV2 extends Activity {
 		return d;
 	}
 	
+	private static final String LOG_OUT_LABEL = "*Log Out*";
 	private Dialog createChangeLoggedInDialog() {
 		AlertDialog.Builder accountChanger = new AlertDialog.Builder(this);
 		
 		String[] keys = accounts.getKeys();
 		
 		final String[] usernames = new String[keys.length + 1];
-		usernames[0] = "Log Out";
+		usernames[0] = LOG_OUT_LABEL;
 		for (int i = 1; i < usernames.length; i++)
 			usernames[i] = keys[i - 1].toString();
 		
@@ -2739,13 +2759,13 @@ public class AllInOneV2 extends Activity {
 		accountChanger.setTitle("Pick an Account");
 		accountChanger.setSingleChoiceItems(usernames, selected, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
-		    	if (item == 0 && currUser != null)
+		        String selUser = usernames[item].toString();
+		    	if (selUser.equals(LOG_OUT_LABEL) && currUser != null)
 		    		session = new Session(AllInOneV2.this);
 		    	
 		    	else
 		    	{
-			        String selUser = usernames[item].toString();
-			    	if (!selUser.equals(currUser))
+			    	if (!selUser.equals(currUser) && !selUser.equals(LOG_OUT_LABEL))
 			        	if (session.hasNetworkConnection()) {
 			        		session = new Session(AllInOneV2.this, 
 	        						  selUser, 

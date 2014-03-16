@@ -23,6 +23,7 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -59,7 +60,7 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		settings = AllInOneV2.getSettingsPref();
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		if (AllInOneV2.getUsingLightTheme()) {
         	setTheme(R.style.MyThemes_LightTheme);
         }
@@ -155,6 +156,7 @@ public class SettingsAccount extends PreferenceActivity implements HandlesNetwor
     	case VERIFY_ACCOUNT_DIALOG:
     		ProgressDialog d = new ProgressDialog(this);
     		d.setTitle("Verifying Account...");
+    		d.setCancelable(false);
     		dialog = d;
     		break;
     	case MODIFY_ACCOUNT_DIALOG:

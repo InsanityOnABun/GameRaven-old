@@ -115,6 +115,10 @@ public class Session implements HandlesNetworkResult {
 	private AllInOneV2 aio;
 
     private boolean addToHistory = true;
+    public void forceNoHistoryAddition() {
+    	aio.wtl("forcing history addition off");
+    	addToHistory = false;
+    }
 	private HistoryDBAdapter hAdapter;
 	
 	private String initUrl = null;
@@ -178,7 +182,7 @@ public class Session implements HandlesNetworkResult {
 		netManager = (ConnectivityManager) aio.getSystemService(Context.CONNECTIVITY_SERVICE);
 		
 		hAdapter = new HistoryDBAdapter(aio);
-		hAdapter.open();
+		openHistoryDB();
         
         user = userIn;
 		password = passwordIn;
@@ -428,26 +432,26 @@ public class Session implements HandlesNetworkResult {
 				}
 				
 				aio.wtl("status: " + res.statusCode() + ", " + res.statusMessage());
-				Element err = doc.select("h1.page-title").first();
-				if (err != null && err.text().contains("Error")) {
-					if (err.text().contains("404 Error")) {
+				Element gfaqsError = doc.select("h1.page-title").first();
+				if (gfaqsError != null && gfaqsError.text().contains("Error")) {
+					if (gfaqsError.text().contains("404 Error")) {
 						aio.wtl("status code 404");
 						Elements paragraphs = doc.getElementsByTag("p");
 						aio.genError("404 Error", paragraphs.get(1).text() + "\n\n"
 								+ paragraphs.get(2).text());
 						return;
 					}
-					else if (err.text().contains("403 Error")) {
+					else if (gfaqsError.text().contains("403 Error")) {
 						aio.wtl("status code 403");
 						Elements paragraphs = doc.getElementsByTag("p");
 						aio.genError("403 Error", paragraphs.get(1).text() + "\n\n"
 								+ paragraphs.get(2).text());
 						return;
 					}
-					else if (err.text().contains("401 Error")) {
+					else if (gfaqsError.text().contains("401 Error")) {
 						aio.wtl("status code 401");
 						if (lastDesc == NetDesc.LOGIN_S2) {
-							skipAIOCleanup = true;
+							forceSkipAIOCleanup();
 							get(NetDesc.BOARD_JUMPER, "/boards", null);
 						} else {
 							Elements paragraphs = doc.getElementsByTag("p");
@@ -456,6 +460,13 @@ public class Session implements HandlesNetworkResult {
 						}
 						return;
 					}
+				}
+				
+				Element firstHeader = doc.getElementsByTag("h1").first();
+				if (firstHeader != null && firstHeader.text().equals("408 Request Time-out")) {
+					aio.wtl("status code 408");
+					aio.genError("408 Error", "Your browser didn't send a complete request in time.");
+					return;
 				}
 				
 				if (doc.title().equals("GameFAQs - 503 - Temporarily Unavailable")) {
@@ -497,7 +508,7 @@ public class Session implements HandlesNetworkResult {
 				case POSTTPC_S3:
 				case VERIFY_ACCOUNT_S1:
 				case VERIFY_ACCOUNT_S2:
-					aio.wtl("addToHistory = true");
+					aio.wtl("addToHistory unchanged: " + addToHistory);
 					break;
 
 				case MARKMSG_S1:
@@ -505,7 +516,7 @@ public class Session implements HandlesNetworkResult {
 				case CLOSE_TOPIC:
 				case SEND_PM_S1:
 				case SEND_PM_S2:
-					aio.wtl("addToHistory = false");
+					aio.wtl("setting addToHistory to false based on current NetDesc");
 					addToHistory = false;
 					break;
 				}
@@ -742,7 +753,7 @@ public class Session implements HandlesNetworkResult {
 						lastDesc = NetDesc.TOPIC;
 						aio.enableGoToUrlDefinedPost();
 						Crouton.showText(aio, "Message posted.", AllInOneV2.getCroutonStyle());
-						processTopic(doc, resUrl);
+						processTopicsAndMessages(doc, resUrl, NetDesc.TOPIC);
 					}
 					break;
 					
@@ -852,13 +863,8 @@ public class Session implements HandlesNetworkResult {
 						aio.wtl("finishing post topic step 3, processing new topic");
 						lastDesc = NetDesc.TOPIC;
 						Crouton.showText(aio, "Topic posted.", AllInOneV2.getCroutonStyle());
-						processTopic(doc, resUrl);
+						processTopicsAndMessages(doc, resUrl, NetDesc.TOPIC);
 					}
-					break;
-					
-				case TOPIC:
-					aio.wtl("session hNR determined this is a topic");
-					processTopic(doc, resUrl);
 					break;
 					
 				case MARKMSG_S1:
@@ -924,10 +930,19 @@ public class Session implements HandlesNetworkResult {
 						aio.pmCleanup(false, error);
 					}
 					break;
+					
+				case TOPIC:
+					aio.wtl("session hNR determined this is a topic");
+					processTopicsAndMessages(doc, resUrl, NetDesc.TOPIC);
+					break;
+					
+				case MESSAGE_DETAIL:
+					aio.wtl("session hNR determined this is a message");
+					processTopicsAndMessages(doc, resUrl, NetDesc.MESSAGE_DETAIL);
+					break;
 
 				case GAME_SEARCH:
 				case BOARD_LIST:
-				case MESSAGE_DETAIL:
 				case AMP_LIST:
 				case TRACKED_TOPICS:
 				case BOARD:
@@ -967,19 +982,27 @@ public class Session implements HandlesNetworkResult {
 		aio.wtl("session hNR finishing, desc: " + desc.name());
 	}
 	
-	private void processTopic(Document doc, String resUrl) {
+	private void processTopicsAndMessages(Document doc, String resUrl, NetDesc successDesc) {
 		if (!doc.select("p:contains(no longer available for viewing)").isEmpty()) {
-			Crouton.showText(aio, "The topic you selected is no longer available for viewing.", AllInOneV2.getCroutonStyle());
-			aio.wtl("topic is no longer available, treat response as a board");
+			if (successDesc == NetDesc.TOPIC)
+				Crouton.showText(aio, "The topic you selected is no longer available for viewing.", AllInOneV2.getCroutonStyle());
+			else if (successDesc == NetDesc.MESSAGE_DETAIL)
+				Crouton.showText(aio, "The message you selected is no longer available for viewing.", AllInOneV2.getCroutonStyle());
+			
+			aio.wtl("topic or message is no longer available, treat response as a board");
 			aio.processContent(NetDesc.BOARD, doc, resUrl);
 		}
 		else {
-			aio.wtl("handle the topic in AIO");
-			aio.processContent(NetDesc.TOPIC, doc, resUrl);
+			aio.wtl("handle the topic or message in AIO");
+			aio.processContent(successDesc, doc, resUrl);
 		}
 	}
 
 	private boolean skipAIOCleanup = false;
+	public void forceSkipAIOCleanup() {
+		aio.wtl("forcing AIO cleanup skip");
+		skipAIOCleanup = true;
+	}
 	private boolean postErrorDetected = false;
 	@Override
 	public void postExecuteCleanup(NetDesc desc) {
@@ -1045,7 +1068,7 @@ public class Session implements HandlesNetworkResult {
 		savedScrollVal = h.getVertPos();
 		
 		if (forceReload || AllInOneV2.getSettingsPref().getBoolean("reloadOnBack", false)) {
-			addToHistory = false;
+			forceNoHistoryAddition();
 			aio.wtl("going back in history, refreshing: " + h.getDesc().name() + " " + h.getPath());
 			get(h.getDesc(), h.getPath(), null);
 		}
@@ -1059,12 +1082,16 @@ public class Session implements HandlesNetworkResult {
 		}
 	}
 	
+	public void openHistoryDB() {
+		hAdapter.open();
+	}
+	
 	public void closeHistoryDB() {
 		hAdapter.close();
 	}
 	
 	public void refresh() {
-		addToHistory = false;
+		forceNoHistoryAddition();
 		aio.wtl("refreshing: " + lastDesc.name() + " " + lastPath);
 		applySavedScroll = true;
 		savedScrollVal = aio.getScrollerVertLoc();
@@ -1116,7 +1143,7 @@ public class Session implements HandlesNetworkResult {
 		aio.wtl("user level: " + userLevel);
     }
 	
-    //TODO: Need to handle everything possible (pm outbox, friends, etc.)
+    //TODO: Need to handle everything possible (friends, etc.)
 	public static NetDesc determineNetDesc(String url) {
 		url = Session.buildURL(url, NetDesc.UNSPECIFIED);
 		
@@ -1157,10 +1184,17 @@ public class Session implements HandlesNetworkResult {
 				else {
 					String boardUrl = url.substring(url.indexOf("boards"));
 					if (boardUrl.contains("/")) {
-						 String slashUrl = boardUrl.substring(boardUrl.indexOf("/") + 1);
-						 if (slashUrl.contains("/")) {
-							 // should be a topic
-							 return NetDesc.TOPIC;
+						 String checkForTopicSep = boardUrl.substring(boardUrl.indexOf("/") + 1);
+						 if (checkForTopicSep.contains("/")) {
+							 String checkForMsgSep = checkForTopicSep.substring(checkForTopicSep.indexOf("/") + 1);
+							 if (checkForMsgSep.contains("/")) {
+								 // should be a message
+								 return NetDesc.MESSAGE_DETAIL;
+							 }
+							 else {
+								 // should be a topic
+								 return NetDesc.TOPIC;
+							 }
 						 }
 						 else {
 							 // should be a board

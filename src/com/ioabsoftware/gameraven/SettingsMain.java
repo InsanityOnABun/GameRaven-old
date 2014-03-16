@@ -33,6 +33,7 @@ import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
@@ -66,7 +67,7 @@ public class SettingsMain extends PreferenceActivity {
 	SharedPreferences settings;
 	
 	protected void onCreate(Bundle savedInstanceState) {
-		settings = AllInOneV2.getSettingsPref();
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
         
         if (AllInOneV2.getUsingLightTheme()) {
         	setTheme(R.style.MyThemes_LightTheme);
