@@ -41,7 +41,7 @@ public class NetworkTask extends AsyncTask<Void, Void, Response> {
 	@Override
 	protected Response doInBackground(Void... params) {
 		Response r;
-    	
+		
     	if (method.equals(Method.POST))
     		r = post(path, data);
     	else

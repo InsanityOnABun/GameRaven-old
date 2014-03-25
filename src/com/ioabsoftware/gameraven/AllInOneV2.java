@@ -3014,7 +3014,7 @@ public class AllInOneV2 extends Activity {
 	}
 
 	private void goBack() {
-		if (session.canGoBack()) {
+		if (session != null && session.canGoBack()) {
 			wtl("back pressed, history exists, going back");
 			session.goBack(false);
 		}
