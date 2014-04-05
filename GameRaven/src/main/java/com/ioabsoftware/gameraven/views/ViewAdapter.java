@@ -6,7 +6,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.ioabsoftware.gameraven.views.rowview.AMPRowView;
-import com.ioabsoftware.gameraven.views.rowview.AdRowView;
+import com.ioabsoftware.gameraven.views.rowview.AdGFAQsRowView;
+import com.ioabsoftware.gameraven.views.rowview.AdmobRowView;
 import com.ioabsoftware.gameraven.views.rowview.BoardRowView;
 import com.ioabsoftware.gameraven.views.rowview.GameSearchRowView;
 import com.ioabsoftware.gameraven.views.rowview.HeaderRowView;
@@ -96,8 +97,11 @@ public class ViewAdapter extends BaseAdapter {
                 case USER_DETAIL:
                     view = new UserDetailRowView(context);
                     break;
-                case AD:
-                    view = new AdRowView(context, data);
+                case GFAQS_AD:
+                    view = new AdGFAQsRowView(context, data);
+                    break;
+                case ADMOB_AD:
+                    view = new AdmobRowView(context);
                     break;
                 default:
                     throw new IllegalArgumentException("row type not handled in ViewAdapter: " + data.getRowType().toString());

@@ -60,7 +60,8 @@ import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
 import com.ioabsoftware.gameraven.views.ViewAdapter;
 import com.ioabsoftware.gameraven.views.rowdata.AMPRowData;
-import com.ioabsoftware.gameraven.views.rowdata.AdRowData;
+import com.ioabsoftware.gameraven.views.rowdata.AdGFAQsRowData;
+import com.ioabsoftware.gameraven.views.rowdata.AdmobRowData;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData.BoardType;
 import com.ioabsoftware.gameraven.views.rowdata.GameSearchRowData;
@@ -72,6 +73,7 @@ import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData.TopicType;
 import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
+import com.ioabsoftware.gameraven.views.rowview.AdmobRowView;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 
 import net.simonvt.menudrawer.MenuDrawer;
@@ -551,6 +553,8 @@ public class AllInOneV2 extends Activity {
         wtl("onResume fired");
         super.onResume();
 
+        AdmobRowView.resumeAd();
+
         ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
 
         if (Theming.updateTextScale(settings.getInt("textScale", 100) / 100f)) {
@@ -666,8 +670,15 @@ public class AllInOneV2 extends Activity {
     }
 
     @Override
+    protected void onPause() {
+        AdmobRowView.pauseAd();
+        super.onPause();
+    }
+
+    @Override
     protected void onDestroy() {
         Crouton.clearCroutonsForActivity(this);
+        AdmobRowView.destroyAd();
 
         if (session != null)
             session.closeHistoryDB();
@@ -1993,7 +2004,8 @@ public class AllInOneV2 extends Activity {
         } catch (Exception e1) {
         }
 
-        adapterRows.add(new AdRowData(web));
+        adapterRows.add(new AdmobRowData());
+        adapterRows.add(new AdGFAQsRowData(web));
         contentList.post(loadAds);
 
         Element pmInboxLink = doc.select("div.masthead_user").first().select("a[href=/pm/]").first();

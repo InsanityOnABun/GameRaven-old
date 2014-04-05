@@ -7,35 +7,35 @@ import android.util.AttributeSet;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
-import com.ioabsoftware.gameraven.views.rowdata.AdRowData;
+import com.ioabsoftware.gameraven.views.rowdata.AdGFAQsRowData;
 
-public class AdRowView extends BaseRowView {
+public class AdGFAQsRowView extends BaseRowView {
 
-    public AdRowView(Context context, BaseRowData data) {
+    public AdGFAQsRowView(Context context, BaseRowData data) {
         super(context);
 
         if (data.getRowType() != myType)
             throw new IllegalArgumentException("data RowType does not match myType");
 
-        addView(((AdRowData) data).getWebView());
+        addView(((AdGFAQsRowData) data).getWebView());
     }
 
-    public AdRowView(Context context) {
+    public AdGFAQsRowView(Context context) {
         super(context);
     }
 
-    public AdRowView(Context context, AttributeSet attrs) {
+    public AdGFAQsRowView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public AdRowView(Context context, AttributeSet attrs, int defStyle) {
+    public AdGFAQsRowView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void init(Context context) {
-        myType = RowType.AD;
+        myType = RowType.GFAQS_AD;
         setOrientation(VERTICAL);
     }
 

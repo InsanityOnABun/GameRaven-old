@@ -5,6 +5,8 @@ repositories {
 }
 
 dependencies {
+    compile 'com.android.support:appcompat-v7:+'
+    compile 'com.google.android.gms:play-services:+'
     compile 'ch.acra:acra:4.5.0'
     compile 'com.github.chrisbanes.actionbarpulltorefresh:library:+'
     compile 'net.simonvt.menudrawer:menudrawer:+'
@@ -19,8 +21,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 19
-        versionCode 30
-        versionName "2.0"
+        versionCode 31
+        versionName "1.3.3"
     }
     signingConfigs {
         release {

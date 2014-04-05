@@ -5,7 +5,7 @@ import android.webkit.WebView;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.RowType;
 
-public class AdRowData extends BaseRowData {
+public class AdGFAQsRowData extends BaseRowData {
 
     private WebView web;
 
@@ -15,10 +15,10 @@ public class AdRowData extends BaseRowData {
 
     @Override
     public RowType getRowType() {
-        return RowType.AD;
+        return RowType.GFAQS_AD;
     }
 
-    public AdRowData(WebView webIn) {
+    public AdGFAQsRowData(WebView webIn) {
         web = webIn;
     }
 

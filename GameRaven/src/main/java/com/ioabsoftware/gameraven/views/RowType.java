@@ -11,5 +11,6 @@ public enum RowType {
     AMP_TOPIC,
     TRACKED_TOPIC,
     USER_DETAIL,
-    AD
+    ADMOB_AD,
+    GFAQS_AD
 }
