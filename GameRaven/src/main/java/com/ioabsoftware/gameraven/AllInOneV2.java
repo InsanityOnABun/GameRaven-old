@@ -675,17 +675,6 @@ public class AllInOneV2 extends Activity {
         super.onDestroy();
     }
 
-    static void colorOverscroll(Context context, int brandColor) {
-        //glow
-        int glowDrawableId = context.getResources().getIdentifier("overscroll_glow", "drawable", "android");
-        Drawable androidGlow = context.getResources().getDrawable(glowDrawableId);
-        androidGlow.setColorFilter(brandColor, PorterDuff.Mode.SRC_IN);
-        //edge
-        int edgeDrawableId = context.getResources().getIdentifier("overscroll_edge", "drawable", "android");
-        Drawable androidEdge = context.getResources().getDrawable(edgeDrawableId);
-        androidEdge.setColorFilter(brandColor, PorterDuff.Mode.SRC_IN);
-    }
-
     private boolean needToSetNavList = true;
 
     public void disableNavList() {

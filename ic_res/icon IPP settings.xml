@@ -1,31 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ImageProcessorProSettings>
   <input source="bridge"/>
-  <output path="C:\Users\Charles\SkyDrive\Development\Android Projects\GameRaven\res" subfolder="true" keepStructure="false"/>
+  <output path="C:\Users\Charles\Desktop\GameRaven\GameRaven\src\debug\res" subfolder="true" keepStructure="false"/>
   <taskList>
     <task enabled="true" subfolderName="drawable-xhdpi" colorProfile="Same as Source">
       <saveOptions fileSaveType="png" pngInterlaced="false" saveForWeb="false"/>
       <resizeOptions enabled="true" dontEnlarge="false" width="96" widthUnits="pixels" height="96" heightUnits="pixels" resolution="72" resolutionUnits="pixels/inch" scale="true" resampleMethod="bicubicsharper"/>
       <action enabled="false" when="After Image Resize" set="Default Actions" name="Vignette (selection)"/>
-      <namingOptions startingSerial="1">gr_launcher,lowerCaseExtension</namingOptions>
+      <namingOptions startingSerial="1">ic_launcher,lowerCaseExtension</namingOptions>
     </task>
     <task enabled="true" subfolderName="drawable-hdpi" colorProfile="Same as Source">
       <saveOptions fileSaveType="png" pngInterlaced="false" saveForWeb="false"/>
       <resizeOptions enabled="true" dontEnlarge="false" width="72" widthUnits="pixels" height="72" heightUnits="pixels" resolution="72" resolutionUnits="pixels/inch" scale="true" resampleMethod="bicubicsharper"/>
       <action enabled="false" when="After Image Resize" set="Default Actions" name="Vignette (selection)"/>
-      <namingOptions startingSerial="1">gr_launcher,lowerCaseExtension</namingOptions>
+      <namingOptions startingSerial="1">ic_launcher,lowerCaseExtension</namingOptions>
     </task>
     <task enabled="true" subfolderName="drawable-mdpi" colorProfile="Same as Source">
       <saveOptions fileSaveType="png" pngInterlaced="false" saveForWeb="false"/>
       <resizeOptions enabled="true" dontEnlarge="false" width="48" widthUnits="pixels" height="48" heightUnits="pixels" resolution="72" resolutionUnits="pixels/inch" scale="true" resampleMethod="bicubicsharper"/>
       <action enabled="false" when="After Image Resize" set="Default Actions" name="Vignette (selection)"/>
-      <namingOptions startingSerial="1">gr_launcher,lowerCaseExtension</namingOptions>
-    </task>
-    <task enabled="true" subfolderName="drawable-ldpi" colorProfile="Same as Source">
-      <saveOptions fileSaveType="png" pngInterlaced="false" saveForWeb="false"/>
-      <resizeOptions enabled="true" dontEnlarge="false" width="36" widthUnits="pixels" height="36" heightUnits="pixels" resolution="72" resolutionUnits="pixels/inch" scale="true" resampleMethod="bicubicsharper"/>
-      <action enabled="false" when="After Image Resize" set="Default Actions" name="Vignette (selection)"/>
-      <namingOptions startingSerial="1">gr_launcher,lowerCaseExtension</namingOptions>
+      <namingOptions startingSerial="1">ic_launcher,lowerCaseExtension</namingOptions>
     </task>
   </taskList>
   <preferences/>
