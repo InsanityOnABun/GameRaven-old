@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="customAttrs">
+        <attr name="themedTextColor" format="reference" />
+        <attr name="themedPageJumperColor" format="reference" />
+        <attr name="themedSearchIcon" format="reference" />
+        <attr name="themedAddFavIcon" format="reference" />
+        <attr name="themedRemFavIcon" format="reference" />
+        <attr name="themedTopicListIcon" format="reference" />
+        <attr name="themedPMInboxIcon" format="reference" />
+        <attr name="themedPMOutboxIcon" format="reference" />
+        <attr name="themedPostIcon" format="reference" />
+        <attr name="themedReplyIcon" format="reference" />
+        <attr name="themedRefreshIcon" format="reference" />
+        <attr name="themedPostInfoIcon" format="reference" />
+        <attr name="themedPostBackground" format="reference" />
+        <attr name="themedDrawerHeaderColor" format="reference" />
+    </declare-styleable>
+
+</resources>

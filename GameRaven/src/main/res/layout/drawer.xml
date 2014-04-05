@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dwrScroller"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fadeScrollbars="false"
+    android:scrollbarStyle="outsideOverlay"
+    android:verticalScrollbarPosition="left">
+
+    <LinearLayout
+        android:id="@+id/dwrGlobalWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/dwrChangeAccHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="9dp"
+            android:paddingLeft="6dp"
+            android:text="@string/logged_in_as"
+            android:textAllCaps="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?attr/themedDrawerHeaderColor" />
+
+        <View
+            android:id="@+id/dwrCAHSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#33B5E5"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/dwrChangeAcc"
+            style="@android:style/Widget.Holo.ActionButton"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:gravity="left|center_vertical"
+            android:text="@string/change_acc_default" />
+
+        <View
+            android:id="@+id/dwrChangeAccSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#555555"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/dwrNavWrapper"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/dwrNavHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginTop="9dp"
+                android:text="@string/navigation"
+                android:textAllCaps="true"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/themedDrawerHeaderColor" />
+
+            <View
+                android:id="@+id/dwrNavSep"
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="3dp"
+                android:background="#33B5E5"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/dwrBoardJumper"
+                style="@android:style/Widget.Holo.ActionButton"
+                android:layout_width="match_parent"
+                android:layout_height="?android:attr/listPreferredItemHeight"
+                android:gravity="left|center_vertical"
+                android:text="@string/board_jumper" />
+
+            <View
+                android:id="@+id/dwrBJSep"
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="3dp"
+                android:background="#555555"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/dwrLoggedInNav"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/dwrAMPWrapper"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/dwrAMPList"
+                        style="@android:style/Widget.Holo.ActionButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="?android:attr/listPreferredItemHeight"
+                        android:gravity="left|center_vertical"
+                        android:text="@string/amp_list" />
+
+                    <View
+                        android:id="@+id/dwrAMPSep"
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="3dp"
+                        android:background="#555555"
+                        android:visibility="visible" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/dwrTrackedTopics"
+                    style="@android:style/Widget.Holo.ActionButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="?android:attr/listPreferredItemHeight"
+                    android:gravity="left|center_vertical"
+                    android:text="@string/tracked_topics" />
+
+                <View
+                    android:id="@+id/dwrTTSep"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="3dp"
+                    android:background="#555555"
+                    android:visibility="visible" />
+
+                <Button
+                    android:id="@+id/dwrPMInbox"
+                    style="@android:style/Widget.Holo.ActionButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="?android:attr/listPreferredItemHeight"
+                    android:gravity="left|center_vertical"
+                    android:text="@string/pm_inbox" />
+
+                <View
+                    android:id="@+id/dwrPMSep"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="3dp"
+                    android:background="#555555"
+                    android:visibility="visible" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/dwrFuncHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="9dp"
+            android:text="@string/functions"
+            android:textAllCaps="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?attr/themedDrawerHeaderColor" />
+
+        <View
+            android:id="@+id/dwrFuncSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#33B5E5"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/dwrCopyCurrURL"
+            style="@android:style/Widget.Holo.ActionButton"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:gravity="left|center_vertical"
+            android:text="@string/copy_curr_page" />
+
+        <View
+            android:id="@+id/dwrOPiBSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#555555"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/dwrHighlightList"
+            style="@android:style/Widget.Holo.ActionButton"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:gravity="left|center_vertical"
+            android:text="@string/manage_highlight_list" />
+
+        <View
+            android:id="@+id/dwrHLSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#555555"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/dwrSettings"
+            style="@android:style/Widget.Holo.ActionButton"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:gravity="left|center_vertical"
+            android:text="@string/settings" />
+
+        <View
+            android:id="@+id/dwrSettingsSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#555555"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/dwrExit"
+            style="@android:style/Widget.Holo.ActionButton"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:gravity="left|center_vertical"
+            android:text="@string/exit_gameraven" />
+
+        <View
+            android:id="@+id/dwrExitSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="#555555"
+            android:visibility="visible" />
+    </LinearLayout>
+
+</ScrollView>

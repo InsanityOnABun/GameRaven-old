@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="holo_blue">#33B5E5</color>
+    <color name="holo_blue_dark">#0099CC</color>
+    <color name="white">#ffffff</color>
+    <color name="gray">#808080</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="nearlytransparent">#01000000</color>
+    <color name="drawerHeader">#999999</color>
+    <color name="drawerHeaderLight">#555555</color>
+    <color name="test">#bebebe</color>
+</resources>

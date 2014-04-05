@@ -1,0 +1,39 @@
+apply plugin: 'android'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'ch.acra:acra:4.5.0'
+    compile 'com.github.chrisbanes.actionbarpulltorefresh:library:+'
+    compile 'net.simonvt.menudrawer:menudrawer:+'
+    compile 'de.keyboardsurfer.android.widget:crouton:+'
+    compile 'com.koushikdutta.ion:ion:+'
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.3"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 19
+        versionCode 30
+        versionName "2.0"
+    }
+    buildTypes {
+        debug {
+            packageNameSuffix '.debug'
+            versionNameSuffix '-SNAPSHOT'
+        }
+        release {
+            runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}

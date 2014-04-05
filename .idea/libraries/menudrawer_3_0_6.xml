@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="menudrawer-3.0.6">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/GameRaven/build/exploded-bundles/NetSimonvtMenudrawerMenudrawer306.aar/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/GameRaven/build/exploded-bundles/NetSimonvtMenudrawerMenudrawer306.aar/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
