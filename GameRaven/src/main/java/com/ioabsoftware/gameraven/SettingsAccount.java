@@ -30,14 +30,23 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.ioabsoftware.gameraven.networking.HandlesNetworkResult;
+import com.ioabsoftware.gameraven.networking.NetDesc;
+import com.ioabsoftware.gameraven.networking.NetworkTask;
+import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.util.AccountManager;
 import com.ioabsoftware.gameraven.util.Theming;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.jsoup.Connection;
+import org.jsoup.nodes.Document;
+
+import java.io.IOException;
+import java.util.HashMap;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public class SettingsAccount extends PreferenceActivity {
+public class SettingsAccount extends PreferenceActivity implements HandlesNetworkResult {
 
     public static final int ADD_ACCOUNT_DIALOG = 300;
     public static final int VERIFY_ACCOUNT_DIALOG = 301;
@@ -192,12 +201,11 @@ public class SettingsAccount extends PreferenceActivity {
                         verifyPass = ((TextView) v.findViewById(R.id.addaccPassword)).getText().toString();
 
                         if (verifyUser.indexOf('@') == -1) {
-//							showDialog(VERIFY_ACCOUNT_DIALOG);
-//							new NetworkTask(SettingsAccount.this,
-//									NetDesc.VERIFY_ACCOUNT_S1, Method.GET,
-//									new HashMap<String, String>(), Session.ROOT, null)
-//									.execute();
-                            //TODO: verify entered user credentials
+							showDialog(VERIFY_ACCOUNT_DIALOG);
+							new NetworkTask(SettingsAccount.this,
+									NetDesc.VERIFY_ACCOUNT_S1, Connection.Method.GET,
+									new HashMap<String, String>(), Session.ROOT, null)
+									.execute();
                         } else {
                             Crouton.showText(SettingsAccount.this,
                                     "Please use your username, not your email address.",
@@ -363,57 +371,56 @@ public class SettingsAccount extends PreferenceActivity {
         return d;
     }
 
-    //TODO: verify user credentials
-//    @Override
-//	public void handleNetworkResult(Response res, NetDesc desc) {
-//		if (res != null) {
-//			Document pRes = null;
-//			try {
-//				pRes = res.parse();
-//			} catch (IOException e) {
-//				// should never fail
-//				e.printStackTrace();
-//			}
-//			if (desc == NetDesc.VERIFY_ACCOUNT_S1) {
-//				String loginKey = pRes.getElementsByAttributeValue("name",
-//						"key").attr("value");
-//				HashMap<String, String> loginData = new HashMap<String, String>();
-//				// "EMAILADDR", user, "PASSWORD", password, "path", lastPath, "key", key
-//				loginData.put("EMAILADDR", verifyUser);
-//				loginData.put("PASSWORD", verifyPass);
-//				loginData.put("path", Session.ROOT);
-//				loginData.put("key", loginKey);
-//				new NetworkTask(SettingsAccount.this, NetDesc.VERIFY_ACCOUNT_S2,
-//						Method.POST, res.cookies(), Session.ROOT
-//								+ "/user/login.html", loginData).execute();
-//			}
-//			else if (desc == NetDesc.VERIFY_ACCOUNT_S2) {
-//				if (!res.url().toString().equals(Session.ROOT + "/user/login.html")) {
-//					AllInOneV2.getAccounts().put(verifyUser, verifyPass);
-//		    		dismissDialog(VERIFY_ACCOUNT_DIALOG);
-//					removeDialog(ADD_ACCOUNT_DIALOG);
-//					Crouton.showText(this, "Verification succeeded.", Theming.croutonStyle());
-//				}
-//				else {
-//					dismissDialog(VERIFY_ACCOUNT_DIALOG);
-//					Crouton.showText(this,
-//							"Verification failed. Check your username and password and try again.",
-//                            Theming.croutonStyle(),
-//							addAccWrapper);
-//				}
-//			}
-//		}
-//		else {
-//			dismissDialog(VERIFY_ACCOUNT_DIALOG);
-//			Crouton.showText(this, "Network connection failed. Check your network settings.", Theming.croutonStyle(), addAccWrapper);
-//		}
-//	}
-//
-//	@Override
-//	public void preExecuteSetup(NetDesc desc) {}
-//
-//	@Override
-//	public void postExecuteCleanup(NetDesc desc) {
-//		updateAccountList();
-//	}
+    @Override
+	public void handleNetworkResult(Connection.Response res, NetDesc desc) {
+		if (res != null) {
+			Document pRes = null;
+			try {
+				pRes = res.parse();
+			} catch (IOException e) {
+				// should never fail
+				e.printStackTrace();
+			}
+			if (desc == NetDesc.VERIFY_ACCOUNT_S1) {
+				String loginKey = pRes.getElementsByAttributeValue("name",
+						"key").attr("value");
+				HashMap<String, String> loginData = new HashMap<String, String>();
+				// "EMAILADDR", user, "PASSWORD", password, "path", lastPath, "key", key
+				loginData.put("EMAILADDR", verifyUser);
+				loginData.put("PASSWORD", verifyPass);
+				loginData.put("path", Session.ROOT);
+				loginData.put("key", loginKey);
+				new NetworkTask(SettingsAccount.this, NetDesc.VERIFY_ACCOUNT_S2,
+						Connection.Method.POST, res.cookies(), Session.ROOT
+								+ "/user/login.html", loginData).execute();
+			}
+			else if (desc == NetDesc.VERIFY_ACCOUNT_S2) {
+				if (!res.url().toString().equals(Session.ROOT + "/user/login.html")) {
+					AccountManager.addUser(SettingsAccount.this, verifyUser, verifyPass);
+		    		dismissDialog(VERIFY_ACCOUNT_DIALOG);
+					removeDialog(ADD_ACCOUNT_DIALOG);
+					Crouton.showText(this, "Verification succeeded.", Theming.croutonStyle());
+				}
+				else {
+					dismissDialog(VERIFY_ACCOUNT_DIALOG);
+					Crouton.showText(this,
+							"Verification failed. Check your username and password and try again.",
+                            Theming.croutonStyle(),
+							addAccWrapper);
+				}
+			}
+		}
+		else {
+			dismissDialog(VERIFY_ACCOUNT_DIALOG);
+			Crouton.showText(this, "Network connection failed. Check your network settings.", Theming.croutonStyle(), addAccWrapper);
+		}
+	}
+
+	@Override
+	public void preExecuteSetup(NetDesc desc) {}
+
+	@Override
+	public void postExecuteCleanup(NetDesc desc) {
+		updateAccountList();
+	}
 }

@@ -1,6 +1,6 @@
 package com.ioabsoftware.gameraven.db;
 
-import com.ioabsoftware.gameraven.networking.HandlesNetworkResult;
+import com.ioabsoftware.gameraven.networking.NetDesc;
 
 
 public class History {
@@ -12,9 +12,9 @@ public class History {
     }
 
 
-    private HandlesNetworkResult.NetDesc desc;
+    private NetDesc desc;
 
-    public HandlesNetworkResult.NetDesc getDesc() {
+    public NetDesc getDesc() {
         return desc;
     }
 
@@ -32,7 +32,7 @@ public class History {
         return vertPos;
     }
 
-    public History(String pathIn, HandlesNetworkResult.NetDesc descIn, byte[] resBodyAsBytesIn, int vertPosIn[]) {
+    public History(String pathIn, NetDesc descIn, byte[] resBodyAsBytesIn, int vertPosIn[]) {
         path = pathIn;
         desc = descIn;
         resBodyAsBytes = resBodyAsBytesIn;

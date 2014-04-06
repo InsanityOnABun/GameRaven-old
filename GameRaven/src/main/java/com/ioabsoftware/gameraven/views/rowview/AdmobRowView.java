@@ -39,7 +39,7 @@ public class AdmobRowView extends BaseRowView {
 
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)        // Emulator
-                .addTestDevice("7A613198BE05ED33B6053F18AFD3A209")  // My Phone
+//                .addTestDevice("7A613198BE05ED33B6053F18AFD3A209")  // My Phone
                 .build();
 
         adView.loadAd(adRequest);

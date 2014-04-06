@@ -13,12 +13,12 @@ public class NetworkTask extends AsyncTask<Void, Void, Response> {
 
     private Method method;
     private String path;
-    private HandlesNetworkResult.NetDesc desc;
+    private NetDesc desc;
     private Map<String, String> cookies, data;
     private HandlesNetworkResult handler;
 
     public NetworkTask(HandlesNetworkResult handlerIn,
-                       HandlesNetworkResult.NetDesc descIn,
+                       NetDesc descIn,
                        Method methodIn,
                        Map<String, String> cookiesIn,
                        String pathIn,

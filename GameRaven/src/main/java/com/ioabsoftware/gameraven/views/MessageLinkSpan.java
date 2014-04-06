@@ -6,7 +6,7 @@ import android.text.style.ClickableSpan;
 import android.view.View;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
-import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
+import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
 
 public class MessageLinkSpan extends ClickableSpan {

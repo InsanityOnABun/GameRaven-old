@@ -89,9 +89,8 @@ public class SettingsMain extends PreferenceActivity {
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-//        Intent notifierIntent = new Intent(this, NotifierService.class);
-//        notifPendingIntent = PendingIntent.getService(this, 0, notifierIntent, 0);
-        //TODO: uncomment once notif system is back in
+        Intent notifierIntent = new Intent(this, NotifierService.class);
+        notifPendingIntent = PendingIntent.getService(this, 0, notifierIntent, 0);
 
         ACCEPTED_KEYS.add("timezone");
         ACCEPTED_KEYS.add("notifsEnable");

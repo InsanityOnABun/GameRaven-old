@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
-import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
+import com.ioabsoftware.gameraven.networking.NetDesc;
 
 public class HistoryDBAdapter {
 

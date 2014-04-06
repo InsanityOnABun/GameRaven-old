@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
-import com.ioabsoftware.gameraven.networking.HandlesNetworkResult.NetDesc;
+import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.views.RowType;
 import com.ioabsoftware.gameraven.views.rowdata.AMPRowData;
 

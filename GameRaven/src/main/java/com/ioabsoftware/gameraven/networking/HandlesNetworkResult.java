@@ -10,24 +10,6 @@ import org.jsoup.Connection.Response;
 public interface HandlesNetworkResult {
 
     /**
-     * Enum for every kind of network request this app can send.
-     * Used to identify responses when they arrive.
-     *
-     * @author Charles
-     */
-    public static enum NetDesc {
-        UNSPECIFIED, MODHIST,
-        VERIFY_ACCOUNT_S1, VERIFY_ACCOUNT_S2,
-        BOARD_JUMPER, GAME_SEARCH, BOARD_LIST, AMP_LIST, TRACKED_TOPICS, BOARD, TOPIC, MESSAGE_DETAIL, USER_DETAIL,
-        PM_INBOX, PM_OUTBOX, PM_INBOX_DETAIL, PM_OUTBOX_DETAIL, SEND_PM_S1, SEND_PM_S2,
-        MARKMSG_S1, MARKMSG_S2, DLTMSG_S1, DLTMSG_S2, CLOSE_TOPIC,
-        EDIT_MSG,
-        LOGIN_S1, LOGIN_S2,
-        POSTMSG_S1, POSTMSG_S2, POSTMSG_S3,
-        POSTTPC_S1, POSTTPC_S2, POSTTPC_S3
-    }
-
-    /**
      * Method fired when there is a response to a network request.
      *
      * @param res  The response from the network
