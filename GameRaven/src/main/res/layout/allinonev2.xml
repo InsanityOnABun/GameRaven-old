@@ -8,7 +8,7 @@
 
     <LinearLayout
         android:id="@+id/aioHeader"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
@@ -16,13 +16,13 @@
 
         <RelativeLayout
             android:id="@+id/aioMainWrapper"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/aioTitle"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
@@ -139,7 +139,7 @@
 
         <View
             android:id="@+id/aioSep"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="3dp"
             android:background="@color/holo_blue"
@@ -156,8 +156,8 @@
 
         <ListView
             android:id="@+id/aioMainList"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:fastScrollEnabled="true"
             android:smoothScrollbar="true" />
     </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
@@ -173,7 +173,7 @@
 
         <View
             android:id="@+id/aioPostWrapperSep"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="3dp"
             android:background="#33B5E5"
@@ -221,7 +221,7 @@
 
             <View
                 android:id="@+id/aioPostTitleSep"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginBottom="3dp"
                 android:background="#33B5E5"
