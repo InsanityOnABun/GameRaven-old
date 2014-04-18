@@ -274,7 +274,7 @@ public class AllInOneV2 extends Activity {
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.allinonev2);
 
         Theming.colorOverscroll(this);
 
@@ -287,7 +287,7 @@ public class AllInOneV2 extends Activity {
         aBar.setDisplayShowTitleEnabled(false);
 
         drawer = MenuDrawer.attach(this, Type.OVERLAY);
-        drawer.setContentView(R.layout.activity_main);
+        drawer.setContentView(R.layout.allinonev2);
         drawer.setMenuView(R.layout.drawer);
 
         drawer.setOnDrawerStateChangeListener(new OnDrawerStateChangeListener() {
