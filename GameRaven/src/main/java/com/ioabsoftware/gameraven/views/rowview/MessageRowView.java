@@ -80,7 +80,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 
         retheme(Theming.accentColor(), Theming.textScale());
 
-        if (Theming.usingLightTheme())
+        if (Theming.isAccentLight())
             ((ImageView) findViewById(R.id.mvMessageMenuIcon)).setImageResource(R.drawable.ic_info_light);
     }
 
