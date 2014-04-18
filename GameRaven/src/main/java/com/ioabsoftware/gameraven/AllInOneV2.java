@@ -89,6 +89,7 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1112,10 +1113,11 @@ public class AllInOneV2 extends Activity {
     WebView web;
     String adBaseUrl;
     StringBuilder adBuilder = new StringBuilder();
-    Runnable loadAds = new Runnable() {
+    Runnable postProcessRunnable = new Runnable() {
         @Override
         public void run() {
             web.loadDataWithBaseURL(adBaseUrl, adBuilder.toString(), null, "iso-8859-1", null);
+            setMarqueeSpeed(title, 4, false);
         }
     };
 
@@ -2006,7 +2008,7 @@ public class AllInOneV2 extends Activity {
 
         adapterRows.add(new AdmobRowData());
         adapterRows.add(new AdGFAQsRowData(web));
-        contentList.post(loadAds);
+        contentList.post(postProcessRunnable);
 
         Element pmInboxLink = doc.select("div.masthead_user").first().select("a[href=/pm/]").first();
         String pmButtonLabel = getResources().getString(R.string.pm_inbox);
@@ -3032,6 +3034,31 @@ public class AllInOneV2 extends Activity {
             insert = open + close;
 
         postBody.getText().replace(Math.min(start, end), Math.max(start, end), insert, 0, insert.length());
+    }
+
+    private boolean marqueeSpeedSet = false;
+    private void setMarqueeSpeed(TextView tv, float speed, boolean speedIsMultiplier) {
+        if (!marqueeSpeedSet) {
+            try {
+                Field f = tv.getClass().getDeclaredField("mMarquee");
+                f.setAccessible(true);
+                Object marquee = f.get(tv);
+                if (marquee != null) {
+                    Field mf = marquee.getClass().getDeclaredField("mScrollUnit");
+                    mf.setAccessible(true);
+                    float newSpeed = speed;
+                    float curSpeed = mf.getFloat(marquee);
+                    if (speedIsMultiplier) {
+                        newSpeed = curSpeed * speed;
+                    }
+                    mf.setFloat(marquee, newSpeed);
+                    wtl("marquee speed set to " + newSpeed + ", from " + curSpeed);
+                    marqueeSpeedSet = true;
+                }
+            } catch (Exception e) {
+                // ignore, not implemented in current API level
+            }
+        }
     }
 
     private static final String[] bannedList = {
