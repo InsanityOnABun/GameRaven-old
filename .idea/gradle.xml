@@ -7,8 +7,8 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/GameRaven" />
+            <option value="C:\Users\Charles\Desktop\GameRaven" />
+            <option value="C:\Users\Charles\Desktop\GameRaven\GameRaven" />
           </set>
         </option>
       </GradleProjectSettings>
