@@ -48,8 +48,10 @@ import org.jsoup.select.Elements;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -234,10 +236,11 @@ public class MessageRowData extends BaseRowData {
                     x++;
                     Button b = new Button(AllInOneV2.get());
                     b.setText(e.nextElementSibling().text());
-                    final HashMap<String, String> data = new HashMap<String, String>();
-                    data.put("key", key);
-                    data.put("poll_vote", Integer.toString(x));
-                    data.put("submit", "Vote");
+                    final HashMap<String, List<String>> data = new HashMap<String, List<String>>();
+                    data.put("key", Arrays.asList(key));
+                    data.put("poll_vote", Arrays.asList(Integer.toString(x)));
+                    data.put("submit", Arrays.asList("Vote"));
+
                     b.setOnClickListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {

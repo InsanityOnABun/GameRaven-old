@@ -34,6 +34,7 @@ import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.util.AccountManager;
 import com.ioabsoftware.gameraven.util.DocumentParser;
+import com.ioabsoftware.gameraven.util.FinalDoc;
 import com.ioabsoftware.gameraven.util.Theming;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
@@ -48,7 +49,7 @@ import java.util.List;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public class SettingsAccount extends PreferenceActivity implements FutureCallback<Response<Document>> {
+public class SettingsAccount extends PreferenceActivity implements FutureCallback<Response<FinalDoc>> {
 
     private static final String ION_INSTANCE = "AccountVerifier";
     private Ion accountVerifier;
@@ -391,9 +392,9 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
      * @param result Result returned from the operation
      */
     @Override
-    public void onCompleted(Exception e, Response<Document> result) {
+    public void onCompleted(Exception e, Response<FinalDoc> result) {
         if (e == null && result != null) {
-            Document doc = result.getResult();
+            Document doc = result.getResult().doc;
 
             if (currentDesc == NetDesc.VERIFY_ACCOUNT_S1) {
                 String loginKey = doc.getElementsByAttributeValue("name", "key").attr("value");

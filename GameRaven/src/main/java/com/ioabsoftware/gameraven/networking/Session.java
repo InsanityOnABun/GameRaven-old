@@ -15,24 +15,26 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
-import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.db.History;
 import com.ioabsoftware.gameraven.db.HistoryDBAdapter;
+import com.ioabsoftware.gameraven.util.DocumentParser;
+import com.ioabsoftware.gameraven.util.FinalDoc;
 import com.ioabsoftware.gameraven.util.Theming;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.Response;
 
-import org.acra.ACRA;
-import org.acra.ACRAConfiguration;
-import org.jsoup.Connection.Method;
-import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.concurrent.TimeoutException;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
@@ -41,7 +43,7 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
  *
  * @author Charles Rosaaen, Insanity On A Bun Software
  */
-public class Session implements HandlesNetworkResult {
+public class Session implements FutureCallback<Response<FinalDoc>> {
 
     /**
      * The root of GFAQs.
@@ -245,6 +247,9 @@ public class Session implements HandlesNetworkResult {
         AllInOneV2.getSettingsPref().edit().putInt("unreadPMCount", 0).apply();
         AllInOneV2.getSettingsPref().edit().putInt("unreadTTCount", 0).apply();
 
+        // clear out cookies
+        Ion.getDefault(aio).getCookieMiddleware().clear();
+
         if (user == null) {
             AllInOneV2.wtl("session constructor, user is null, starting logged out session");
             get(NetDesc.BOARD_JUMPER, ROOT + "/boards", null);
@@ -304,7 +309,13 @@ public class Session implements HandlesNetworkResult {
             if (desc != NetDesc.MODHIST) {
                 lastAttemptedPath = path;
                 lastAttemptedDesc = desc;
-                new NetworkTask(this, desc, Method.GET, cookies, buildURL(path, desc), data).execute();
+
+                preExecuteSetup(desc);
+                Ion.with(aio)
+                        .load("GET", buildURL(path, desc))
+                        .as(new DocumentParser())
+                        .withResponse()
+                        .setCallback(this);
             } else
                 aio.genError("Page Unsupported", "The moderation history page is currently unsupported in-app. Sorry.");
 
@@ -319,29 +330,17 @@ public class Session implements HandlesNetworkResult {
      * @param path The path to send the request to.
      * @param data The extra data to send along.
      */
-    public void post(NetDesc desc, String path, HashMap<String, String> data) {
+    public void post(NetDesc desc, String path, Map<String, List<String>> data) {
         if (hasNetworkConnection()) {
             if (desc != NetDesc.MODHIST) {
-                for (Entry<String, String> e : data.entrySet()) {
-                    if (e.getValue() == null) {
-                        ACRAConfiguration config = ACRA.getConfig();
-                        config.setResToastText(R.string.bug_toast_text);
 
-                        ACRA.getErrorReporter().putCustomData("path", path);
-                        ACRA.getErrorReporter().putCustomData("desc", desc.toString());
-                        ACRA.getErrorReporter().putCustomData("Last Attempted Path", getLastAttemptedPath());
-                        ACRA.getErrorReporter().putCustomData("Last Attempted Desc", getLastAttemptedDesc().toString());
-                        for (Entry<String, String> i : data.entrySet()) {
-                            ACRA.getErrorReporter().putCustomData(i.getKey(), (i.getValue() != null ? i.getValue() : "NULL"));
-                        }
-                        ACRA.getErrorReporter().handleException(new Exception("data set passed to Session.post contains null value"));
-
-                        config.setResToastText(R.string.crash_toast_text);
-                        return;
-                    }
-                }
-
-                new NetworkTask(this, desc, Method.POST, cookies, buildURL(path, desc), data).execute();
+                preExecuteSetup(desc);
+                Ion.with(aio)
+                        .load("POST", buildURL(path, desc))
+                        .setBodyParameters(data)
+                        .as(new DocumentParser())
+                        .withResponse()
+                        .setCallback(this);
             } else
                 aio.genError("Page Unsupported", "The moderation history page is currently unsupported in-app. Sorry.");
 
@@ -349,8 +348,22 @@ public class Session implements HandlesNetworkResult {
             aio.noNetworkConnection();
     }
 
+    private NetDesc currentDesc;
+    /**
+     * onCompleted is called by the Future with the result or exception of the asynchronous operation.
+     *
+     * @param e      Exception encountered by the operation
+     * @param result Result returned from the operation
+     */
     @Override
+    public void onCompleted(Exception e, Response<FinalDoc> result) {
+        NetDesc thisDesc = currentDesc;
+        handleNetworkResult(e, thisDesc, result);
+        postExecuteCleanup(thisDesc);
+    }
+
     public void preExecuteSetup(NetDesc desc) {
+        currentDesc = desc;
         switch (desc) {
             case AMP_LIST:
             case TRACKED_TOPICS:
@@ -392,21 +405,17 @@ public class Session implements HandlesNetworkResult {
         }
     }
 
-    @Override
-    public void handleNetworkResult(Response res, NetDesc desc) {
+    public void handleNetworkResult(Exception e, NetDesc desc, Response<FinalDoc> result) {
         AllInOneV2.wtl("session hNR fired, desc: " + desc.name());
         try {
-            AllInOneV2.wtl("checking if res is null or empty");
-            if (res != null && !res.body().isEmpty()) {
+            if (e != null)
+                throw e;
 
-                if (res.body().startsWith("internal_error")) {
-                    aio.genError("Internal Server Error", res.body());
-                    return;
-                }
+            if (result != null) {
 
                 AllInOneV2.wtl("parsing res");
-                Document doc = res.parse();
-                String resUrl = res.url().toString();
+                Document doc = result.getResult().doc;
+                String resUrl = result.getRequest().getUri().toString();
                 AllInOneV2.wtl("resUrl: " + resUrl);
 
                 AllInOneV2.wtl("checking if res does not start with root");
@@ -460,14 +469,14 @@ public class Session implements HandlesNetworkResult {
                     b.setPositiveButton("Login", new OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            HashMap<String, String> loginData = new HashMap<String, String>();
+                            HashMap<String, List<String>> loginData = new HashMap<String, List<String>>();
                             // "EMAILADDR", user, "PASSWORD", password, "path", lastPath, "key", key
-                            loginData.put("EMAILADDR", user);
-                            loginData.put("PASSWORD", password);
-                            loginData.put("path", ROOT);
-                            loginData.put("key", key);
-                            loginData.put("recaptcha_challenge_field", form.getText().toString());
-                            loginData.put("recaptcha_response_field", "manual_challenge");
+                            loginData.put("EMAILADDR", Arrays.asList(user));
+                            loginData.put("PASSWORD", Arrays.asList(password));
+                            loginData.put("path", Arrays.asList(ROOT));
+                            loginData.put("key", Arrays.asList(key));
+                            loginData.put("recaptcha_challenge_field", Arrays.asList(form.getText().toString()));
+                            loginData.put("recaptcha_response_field", Arrays.asList("manual_challenge"));
 
                             post(NetDesc.LOGIN_S2, "/user/login_captcha.html", loginData);
                         }
@@ -477,7 +486,6 @@ public class Session implements HandlesNetworkResult {
                     return;
                 }
 
-                AllInOneV2.wtl("status: " + res.statusCode() + ", " + res.statusMessage());
                 Element gfaqsError = doc.select("h1.page-title").first();
                 if (gfaqsError != null && gfaqsError.text().contains("Error")) {
                     if (gfaqsError.text().contains("404 Error")) {
@@ -643,7 +651,7 @@ public class Session implements HandlesNetworkResult {
                     case VERIFY_ACCOUNT_S2:
                         AllInOneV2.wtl("beginning lastDesc, lastRes, etc. setting");
                         lastDesc = desc;
-                        lastResBodyAsBytes = res.bodyAsBytes();
+                        lastResBodyAsBytes = result.getResult().bytes;
                         lastPath = resUrl;
                         AllInOneV2.wtl("finishing lastDesc, lastRes, etc. setting");
                         break;
@@ -664,24 +672,17 @@ public class Session implements HandlesNetworkResult {
                 // reset history flag
                 addToHistory = true;
 
-                AllInOneV2.wtl("attempting cookie addition");
-                try {
-                    cookies.putAll(res.cookies());
-                    AllInOneV2.wtl("cookies added");
-                } catch (Exception e) {
-                    AllInOneV2.wtl("cookie addition failed");
-                }
                 switch (desc) {
                     case LOGIN_S1:
                         AllInOneV2.wtl("session hNR determined this is login step 1");
                         String loginKey = doc.getElementsByAttributeValue("name", "key").attr("value");
 
-                        HashMap<String, String> loginData = new HashMap<String, String>();
+                        HashMap<String, List<String>> loginData = new HashMap<String, List<String>>();
                         // "EMAILADDR", user, "PASSWORD", password, "path", lastPath, "key", key
-                        loginData.put("EMAILADDR", user);
-                        loginData.put("PASSWORD", password);
-                        loginData.put("path", lastPath);
-                        loginData.put("key", loginKey);
+                        loginData.put("EMAILADDR", Arrays.asList(user));
+                        loginData.put("PASSWORD", Arrays.asList(password));
+                        loginData.put("path", Arrays.asList(lastPath));
+                        loginData.put("key", Arrays.asList(loginKey));
 
                         AllInOneV2.wtl("finishing login step 1, sending step 2");
                         post(NetDesc.LOGIN_S2, "/user/login.html", loginData);
@@ -715,11 +716,11 @@ public class Session implements HandlesNetworkResult {
                         else
                             sig = aio.getSig();
 
-                        HashMap<String, String> msg1Data = new HashMap<String, String>();
-                        msg1Data.put("messagetext", aio.getSavedPostBody());
-                        msg1Data.put("custom_sig", sig);
-                        msg1Data.put("post", (userHasAdvancedPosting() ? "Post without Preview" : "Preview Message"));
-                        msg1Data.put("key", msg1Key);
+                        HashMap<String, List<String>> msg1Data = new HashMap<String, List<String>>();
+                        msg1Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
+                        msg1Data.put("custom_sig", Arrays.asList(sig));
+                        msg1Data.put("post", Arrays.asList((userHasAdvancedPosting() ? "Post without Preview" : "Preview Message")));
+                        msg1Data.put("key", Arrays.asList(msg1Key));
 
                         Elements msg1Error = doc.getElementsContainingOwnText("There was an error posting your message:");
                         if (!msg1Error.isEmpty()) {
@@ -738,11 +739,11 @@ public class Session implements HandlesNetworkResult {
                         String msgPost_id = doc.getElementsByAttributeValue("name", "post_id").attr("value");
                         String msgUid = doc.getElementsByAttributeValue("name", "uid").attr("value");
 
-                        HashMap<String, String> msg2Data = new HashMap<String, String>();
-                        msg2Data.put("post", "Post Message");
-                        msg2Data.put("key", msg2Key);
-                        msg2Data.put("post_id", msgPost_id);
-                        msg2Data.put("uid", msgUid);
+                        HashMap<String, List<String>> msg2Data = new HashMap<String, List<String>>();
+                        msg2Data.put("post", Arrays.asList("Post Message"));
+                        msg2Data.put("key", Arrays.asList(msg2Key));
+                        msg2Data.put("post_id", Arrays.asList(msgPost_id));
+                        msg2Data.put("uid", Arrays.asList(msgUid));
 
                         Elements msg2Error = doc.getElementsContainingOwnText("There was an error posting your message:");
                         Elements msg2AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
@@ -777,11 +778,11 @@ public class Session implements HandlesNetworkResult {
                             String msg3Post_id = doc.getElementsByAttributeValue("name", "post_id").attr("value");
                             String msg3Uid = doc.getElementsByAttributeValue("name", "uid").attr("value");
 
-                            HashMap<String, String> msg3Data = new HashMap<String, String>();
-                            msg3Data.put("post", "Post Message");
-                            msg3Data.put("key", msg3Key);
-                            msg3Data.put("post_id", msg3Post_id);
-                            msg3Data.put("uid", msg3Uid);
+                            HashMap<String, List<String>> msg3Data = new HashMap<String, List<String>>();
+                            msg3Data.put("post", Arrays.asList("Post Message"));
+                            msg3Data.put("key", Arrays.asList(msg3Key));
+                            msg3Data.put("post_id", Arrays.asList(msg3Post_id));
+                            msg3Data.put("uid", Arrays.asList(msg3Uid));
 
                             showAutoFlagWarning(lastPath, msg3Data, NetDesc.POSTMSG_S3, msg);
                             postErrorDetected = true;
@@ -798,22 +799,22 @@ public class Session implements HandlesNetworkResult {
                         AllInOneV2.wtl("session hNR determined this is post topic step 1");
                         String tpc1Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 
-                        HashMap<String, String> tpc1Data = new HashMap<String, String>();
-                        tpc1Data.put("topictitle", aio.getSavedPostTitle());
-                        tpc1Data.put("messagetext", aio.getSavedPostBody());
-                        tpc1Data.put("custom_sig", aio.getSig());
-                        tpc1Data.put("post", (userHasAdvancedPosting() ? "Post without Preview" : "Preview Message"));
-                        tpc1Data.put("key", tpc1Key);
+                        HashMap<String, List<String>> tpc1Data = new HashMap<String, List<String>>();
+                        tpc1Data.put("topictitle", Arrays.asList(aio.getSavedPostTitle()));
+                        tpc1Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
+                        tpc1Data.put("custom_sig", Arrays.asList(aio.getSig()));
+                        tpc1Data.put("post", Arrays.asList((userHasAdvancedPosting() ? "Post without Preview" : "Preview Message")));
+                        tpc1Data.put("key", Arrays.asList(tpc1Key));
 
                         if (aio.isUsingPoll()) {
-                            tpc1Data.put("poll_text", aio.getPollTitle());
+                            tpc1Data.put("poll_text", Arrays.asList(aio.getPollTitle()));
                             for (int x = 0; x < 10; x++) {
                                 if (aio.getPollOptions()[x].length() != 0)
-                                    tpc1Data.put("poll_option_" + (x + 1), aio.getPollOptions()[x]);
+                                    tpc1Data.put("poll_option_" + (x + 1), Arrays.asList(aio.getPollOptions()[x]));
                                 else
                                     x = 11;
                             }
-                            tpc1Data.put("min_level", aio.getPollMinLevel());
+                            tpc1Data.put("min_level", Arrays.asList(aio.getPollMinLevel()));
                         }
 
                         Elements tpc1Error = doc.getElementsContainingOwnText("There was an error posting your message:");
@@ -833,21 +834,21 @@ public class Session implements HandlesNetworkResult {
                         String tpcPost_id = doc.getElementsByAttributeValue("name", "post_id").attr("value");
                         String tpcUid = doc.getElementsByAttributeValue("name", "uid").attr("value");
 
-                        HashMap<String, String> tpc2Data = new HashMap<String, String>();
-                        tpc2Data.put("post", "Post Message");
-                        tpc2Data.put("key", tpc2Key);
-                        tpc2Data.put("post_id", tpcPost_id);
-                        tpc2Data.put("uid", tpcUid);
+                        HashMap<String, List<String>> tpc2Data = new HashMap<String, List<String>>();
+                        tpc2Data.put("post", Arrays.asList("Post Message"));
+                        tpc2Data.put("key", Arrays.asList(tpc2Key));
+                        tpc2Data.put("post_id", Arrays.asList(tpcPost_id));
+                        tpc2Data.put("uid", Arrays.asList(tpcUid));
 
                         if (aio.isUsingPoll()) {
-                            tpc2Data.put("poll_text", aio.getPollTitle());
+                            tpc2Data.put("poll_text", Arrays.asList(aio.getPollTitle()));
                             for (int x = 0; x < 10; x++) {
                                 if (aio.getPollOptions()[x].length() != 0)
-                                    tpc2Data.put("poll_option_" + (x + 1), aio.getPollOptions()[x]);
+                                    tpc2Data.put("poll_option_" + (x + 1), Arrays.asList(aio.getPollOptions()[x]));
                                 else
                                     x = 11;
                             }
-                            tpc2Data.put("min_level", aio.getPollMinLevel());
+                            tpc2Data.put("min_level", Arrays.asList(aio.getPollMinLevel()));
                         }
 
                         Elements tpc2Error = doc.getElementsContainingOwnText("There was an error posting your message:");
@@ -883,11 +884,11 @@ public class Session implements HandlesNetworkResult {
                             String tpc3Post_id = doc.getElementsByAttributeValue("name", "post_id").attr("value");
                             String tpc3Uid = doc.getElementsByAttributeValue("name", "uid").attr("value");
 
-                            HashMap<String, String> tpc3Data = new HashMap<String, String>();
-                            tpc3Data.put("post", "Post Message");
-                            tpc3Data.put("key", tpc3Key);
-                            tpc3Data.put("post_id", tpc3Post_id);
-                            tpc3Data.put("uid", tpc3Uid);
+                            HashMap<String, List<String>> tpc3Data = new HashMap<String, List<String>>();
+                            tpc3Data.put("post", Arrays.asList("Post Message"));
+                            tpc3Data.put("key", Arrays.asList(tpc3Key));
+                            tpc3Data.put("post_id", Arrays.asList(tpc3Post_id));
+                            tpc3Data.put("uid", Arrays.asList(tpc3Uid));
 
                             showAutoFlagWarning(lastPath, tpc3Data, NetDesc.POSTTPC_S3, msg);
                             postErrorDetected = true;
@@ -901,9 +902,10 @@ public class Session implements HandlesNetworkResult {
 
                     case MARKMSG_S1:
                         if (doc.select("p:contains(you selected is no longer available for viewing.)").isEmpty()) {
-                            HashMap<String, String> markData = new HashMap<String, String>();
-                            markData.put("reason", aio.getReportCode());
-                            markData.put("key", doc.select("input[name=key]").first().attr("value"));
+                            HashMap<String, List<String>> markData = new HashMap<String, List<String>>();
+                            markData.put("reason", Arrays.asList(aio.getReportCode()));
+                            markData.put("key", Arrays.asList(doc.select("input[name=key]").first().attr("value")));
+
                             post(NetDesc.MARKMSG_S2, resUrl + "?action=mod", markData);
                         } else
                             Crouton.showText(aio, "The topic has already been removed!", Theming.croutonStyle());
@@ -922,9 +924,9 @@ public class Session implements HandlesNetworkResult {
 
                     case DLTMSG_S1:
                         String delKey = doc.getElementsByAttributeValue("name", "key").attr("value");
-                        HashMap<String, String> delData = new HashMap<String, String>();
-                        delData.put("YES", "Delete this Post");
-                        delData.put("key", delKey);
+                        HashMap<String, List<String>> delData = new HashMap<String, List<String>>();
+                        delData.put("YES", Arrays.asList("Delete this Post"));
+                        delData.put("key", Arrays.asList(delKey));
 
                         post(NetDesc.DLTMSG_S2, resUrl + "?action=delete", delData);
                         break;
@@ -942,12 +944,12 @@ public class Session implements HandlesNetworkResult {
                     case SEND_PM_S1:
                         String pmKey = doc.getElementsByAttributeValue("name", "key").attr("value");
 
-                        HashMap<String, String> pmData = new HashMap<String, String>();
-                        pmData.put("key", pmKey);
-                        pmData.put("to", aio.savedTo);
-                        pmData.put("subject", aio.savedSubject);
-                        pmData.put("message", aio.savedMessage);
-                        pmData.put("submit", "Send Message");
+                        HashMap<String, List<String>> pmData = new HashMap<String, List<String>>();
+                        pmData.put("key", Arrays.asList(pmKey));
+                        pmData.put("to", Arrays.asList(aio.savedTo));
+                        pmData.put("subject", Arrays.asList(aio.savedSubject));
+                        pmData.put("message", Arrays.asList(aio.savedMessage));
+                        pmData.put("submit", Arrays.asList("Send Message"));
 
                         post(NetDesc.SEND_PM_S2, "/pm/new", pmData);
                         break;
@@ -995,12 +997,14 @@ public class Session implements HandlesNetworkResult {
                 AllInOneV2.wtl("res was null in session hNR");
                 aio.timeoutCleanup(desc);
             }
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (TimeoutException ex) {
+            aio.timeoutCleanup(desc);
+        } catch (Throwable ex) {
+            ex.printStackTrace();
             String url, body;
-            if (res != null) {
-                url = res.url().toString();
-                body = res.body();
+            if (result != null) {
+                url = result.getRequest().getUri().toString();
+                body = new String(result.getResult().bytes);
             } else
                 url = body = "res is null";
 
@@ -1034,7 +1038,6 @@ public class Session implements HandlesNetworkResult {
 
     private boolean postErrorDetected = false;
 
-    @Override
     public void postExecuteCleanup(NetDesc desc) {
         switch (desc) {
             case AMP_LIST:
@@ -1138,7 +1141,7 @@ public class Session implements HandlesNetworkResult {
         get(lastDesc, trimmedPath, null);
     }
 
-    private void showAutoFlagWarning(final String path, final HashMap<String, String> data, final NetDesc desc, String msg) {
+    private void showAutoFlagWarning(final String path, final HashMap<String, List<String>> data, final NetDesc desc, String msg) {
         AlertDialog.Builder b = new AlertDialog.Builder(aio);
         b.setTitle("Post Warning");
         b.setMessage(msg);
@@ -1167,7 +1170,8 @@ public class Session implements HandlesNetworkResult {
         String sc = doc.getElementsByTag("head").first().getElementsByTag("script").html();
         int start = sc.indexOf("UserLevel','") + 12;
         int end = sc.indexOf('\'', start + 1);
-        userLevel = Integer.parseInt(sc.substring(start, end));
+        if (end > start)
+            userLevel = Integer.parseInt(sc.substring(start, end));
 
         AllInOneV2.wtl("user level: " + userLevel);
     }
