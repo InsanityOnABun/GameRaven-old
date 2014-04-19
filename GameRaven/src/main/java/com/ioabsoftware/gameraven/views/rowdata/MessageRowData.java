@@ -43,7 +43,6 @@ import com.ioabsoftware.gameraven.views.RowType;
 import net.margaritov.preference.colorpicker.ColorPickerPreference;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -346,7 +345,7 @@ public class MessageRowData extends BaseRowData {
                 }
 
                 @Override
-                public void updateDrawState(@NotNull TextPaint ds) {
+                public void updateDrawState(TextPaint ds) {
                     ds.setColor(defTextColor);
                     ds.setUnderlineText(false);
                 }
