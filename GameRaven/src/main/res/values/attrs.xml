@@ -2,8 +2,9 @@
 <resources>
 
     <declare-styleable name="customAttrs">
-        <attr name="themedTextColor" format="reference" />
-        <attr name="themedPageJumperColor" format="reference" />
+        <attr name="themedBackground" format="color" />
+        <attr name="themedTextColor" format="color" />
+        <attr name="themedPageJumperColor" format="color" />
         <attr name="themedSearchIcon" format="reference" />
         <attr name="themedAddFavIcon" format="reference" />
         <attr name="themedRemFavIcon" format="reference" />
@@ -14,8 +15,8 @@
         <attr name="themedReplyIcon" format="reference" />
         <attr name="themedRefreshIcon" format="reference" />
         <attr name="themedPostInfoIcon" format="reference" />
-        <attr name="themedPostBackground" format="reference" />
-        <attr name="themedDrawerHeaderColor" format="reference" />
+        <attr name="themedPostBackground" format="color" />
+        <attr name="themedDrawerHeaderColor" format="color" />
     </declare-styleable>
 
 </resources>
