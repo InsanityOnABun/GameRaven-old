@@ -52,7 +52,10 @@ public class StateDrawable extends LayerDrawable {
         if (isClicked) {
             super.setColorFilter(myClickedColor, PorterDuff.Mode.SRC);
         } else {
-            super.setColorFilter(myColor, PorterDuff.Mode.SRC);
+            if (myColor == Color.TRANSPARENT)
+                super.clearColorFilter();
+            else
+                super.setColorFilter(myColor, PorterDuff.Mode.SRC);
         }
 
         return super.onStateChange(states);
