@@ -161,4 +161,18 @@ public final class Theming {
         androidEdge.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
     }
 
+    /**
+     * Converts a DP value into a PX value, based on the current device's density
+     *
+     * @param c  Context needed to find the display density.
+     * @param dp The DP value to convert to PX
+     * @return
+     */
+    public static int convertDPtoPX(Context c, float dp) {
+        // Get the screen's density scale
+        final float scale = c.getResources().getDisplayMetrics().density;
+        // Convert the dps to pixels, based on density scale
+        return ((int) (dp * scale + 0.5f));
+    }
+
 }
