@@ -25,6 +25,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/bvName"
+            android:gravity="center_vertical"
+            android:minLines="2"
             android:text="Description"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textSize="10sp" />
