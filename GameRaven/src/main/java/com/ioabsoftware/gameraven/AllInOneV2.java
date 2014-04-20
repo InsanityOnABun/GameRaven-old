@@ -195,7 +195,6 @@ public class AllInOneV2 extends Activity {
     private PullToRefreshLayout ptrLayout;
     private ListView contentList;
 
-    private ActionBar aBar;
     private MenuItem refreshIcon;
     private MenuItem postIcon;
     private MenuItem replyIcon;
@@ -279,8 +278,7 @@ public class AllInOneV2 extends Activity {
 
         AccountManager.init(this);
 
-        //TODO: if aBar stays unaltered in new theme, move aBar to local scope
-        aBar = getActionBar();
+        ActionBar aBar = getActionBar();
         assert aBar != null : "Action bar is null";
 
         aBar.setDisplayHomeAsUpEnabled(true);
@@ -587,15 +585,6 @@ public class AllInOneV2 extends Activity {
         boolean whiteText = settings.getBoolean("useWhiteAccentText", false);
 
         if (Theming.updateAccentColor(color, whiteText) || firstResume) {
-            //TODO: remove once new theme is complete
-//            Drawable aBarDrawable;
-//            if (Theming.usingLightTheme())
-//                aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);
-//            else
-//                aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_light_holo);
-//
-//            aBarDrawable.setColorFilter(Theming.accentColor(), PorterDuff.Mode.SRC_ATOP);
-//            aBar.setBackgroundDrawable(aBarDrawable);
 
             ((DefaultHeaderTransformer) ptrLayout.getHeaderTransformer()).setProgressBarColor(Theming.accentColor());
 

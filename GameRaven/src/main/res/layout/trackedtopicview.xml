@@ -3,11 +3,10 @@
     android:id="@+id/ttGlobalWrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="2dp"
-    android:orientation="vertical" >
+    android:background="@drawable/item_selector" >
 
     <RelativeLayout
-        android:id="@+id/ttRelativeWrapper"
+        android:id="@+id/ttMainWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="3dp"
@@ -15,8 +14,9 @@
 
         <TextView
             android:id="@+id/ttStopTracking"
-            style="@android:style/Widget.Holo.ActionButton"
+            android:background="@drawable/item_selector"
             android:layout_width="30dp"
+            android:layout_alignTop="@+id/ttMessageCountLastPost"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/ttTitle"
             android:gravity="center"
@@ -28,16 +28,11 @@
 
         <View
             android:id="@+id/ttSTSep"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/ttStopTracking"
-            android:layout_alignTop="@+id/ttStopTracking"
-            android:layout_marginBottom="3dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_marginRight="3dp"
-            android:layout_marginTop="3dp"
             android:layout_toRightOf="@+id/ttStopTracking"
-            android:background="#33B5E5"
-            android:visibility="visible" />
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/ttBoardName"
@@ -74,7 +69,7 @@
 
         <TextView
             android:id="@+id/ttLastPostLink"
-            style="@android:style/Widget.Holo.ActionButton"
+            android:background="@drawable/item_selector"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/ttTitle"
@@ -86,24 +81,10 @@
 
         <View
             android:id="@+id/ttLPSep"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/ttLastPostLink"
-            android:layout_alignTop="@+id/ttLastPostLink"
-            android:layout_marginBottom="3dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_marginLeft="3dp"
-            android:layout_marginTop="3dp"
             android:layout_toLeftOf="@+id/ttLastPostLink"
-            android:background="#33B5E5"
-            android:visibility="visible" />
+            android:visibility="invisible" />
     </RelativeLayout>
-
-    <View
-        android:id="@+id/ttSep"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="2dp"
-        android:background="#33B5E5"
-        android:visibility="visible" />
-
 </LinearLayout>

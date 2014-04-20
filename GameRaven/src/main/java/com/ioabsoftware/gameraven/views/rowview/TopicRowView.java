@@ -99,12 +99,6 @@ public class TopicRowView extends BaseRowView {
         tc.setTextSize(PX, tcTextSize * scale);
         msgLP.setTextSize(PX, msgLPTextSize * scale);
         lpLink.setTextSize(PX, lpLinkTextSize * scale);
-
-        findViewById(R.id.tvSep).setBackgroundColor(color);
-        findViewById(R.id.tvLPSep).setBackgroundColor(color);
-
-        setBackgroundDrawable(getSelector());
-        lpLink.setBackgroundDrawable(getSelector());
     }
 
     @Override

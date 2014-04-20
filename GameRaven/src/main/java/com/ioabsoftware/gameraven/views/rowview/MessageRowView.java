@@ -37,6 +37,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
     MessageRowData myData;
 
     StateDrawable headerSelector;
+    private static Drawable bodyBackground;
 
     boolean isHighlighted = false;
     boolean isShowingPoll = false;

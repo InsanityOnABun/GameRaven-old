@@ -78,10 +78,6 @@ public class PMRowView extends BaseRowView {
         subject.setTextSize(PX, subjectTextSize * scale);
         sender.setTextSize(PX, senderTextSize * scale);
         time.setTextSize(PX, timeTextSize * scale);
-
-        findViewById(R.id.pmSep).setBackgroundColor(color);
-
-        setBackgroundDrawable(getSelector());
     }
 
     @Override
