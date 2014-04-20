@@ -13,6 +13,6 @@
     <color name="drawerHeader">#999999</color>
     <color name="drawerHeaderLight">#555555</color>
 
-    <color name="background">#1d1d1d</color>
+    <color name="background">#ff121212</color>
     <color name="background_light">#f2f2f2</color>
 </resources>

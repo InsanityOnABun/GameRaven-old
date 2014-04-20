@@ -85,10 +85,6 @@ public class BoardRowView extends BaseRowView {
         lastPost.setTextSize(PX, lpTextSize * scale);
         tpcMsgDetails.setTextSize(PX, detailsTextSize * scale);
         name.setTextSize(PX, nameTextSize * scale);
-
-        findViewById(R.id.bvSep).setBackgroundColor(color);
-
-        setBackgroundDrawable(getSelector());
     }
 
     @Override

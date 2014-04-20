@@ -116,14 +116,6 @@ public class TrackedTopicRowView extends BaseRowView {
         msgLP.setTextSize(PX, msgLPTextSize * scale);
         lpLink.setTextSize(PX, lpLinkTextSize * scale);
         removeLink.setTextSize(PX, removeLinkTextSize * scale);
-
-        findViewById(R.id.ttSep).setBackgroundColor(color);
-        findViewById(R.id.ttSTSep).setBackgroundColor(color);
-        findViewById(R.id.ttLPSep).setBackgroundColor(color);
-
-        setBackgroundDrawable(getSelector());
-        lpLink.setBackgroundDrawable(getSelector());
-        removeLink.setBackgroundDrawable(getSelector());
     }
 
     @Override

@@ -59,8 +59,6 @@ public class PMDetailRowView extends BaseRowView {
         messageView.setTextSize(PX, messageTextSize * size);
 
         messageView.setLinkTextColor(Theming.accentColor());
-
-        findViewById(R.id.pmdBotSep).setBackgroundColor(Theming.accentColor());
     }
 
     @Override

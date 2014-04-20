@@ -15,7 +15,6 @@
         <attr name="themedReplyIcon" format="reference" />
         <attr name="themedRefreshIcon" format="reference" />
         <attr name="themedPostInfoIcon" format="reference" />
-        <attr name="themedPostBackground" format="color" />
         <attr name="themedDrawerHeaderColor" format="color" />
     </declare-styleable>
 

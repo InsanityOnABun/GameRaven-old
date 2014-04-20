@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bvGlobalWrapper"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/item_selector" >
 
     <RelativeLayout
         android:id="@+id/bvTopWrapper"
@@ -52,15 +57,6 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textSize="10sp" />
 
-        <View
-            android:id="@+id/bvSep"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/bvDesc"
-            android:layout_marginTop="2dp"
-            android:background="#33B5E5"
-            android:visibility="visible" />
-
     </RelativeLayout>
 
-</merge>
+</LinearLayout>

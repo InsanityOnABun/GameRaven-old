@@ -2,12 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/pmGlobalWrapper"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="2dp"
-    android:orientation="vertical" >
+    android:layout_height="wrap_content"
+    android:background="@drawable/item_selector">
 
     <RelativeLayout
-        android:id="@+id/pmRelativeWrapper"
+        android:id="@+id/pmMainWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="3dp"
@@ -44,13 +43,4 @@
             android:text="man fan died at the room shot up to 97 degrees"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>
-
-    <View
-        android:id="@+id/pmSep"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="2dp"
-        android:background="#33B5E5"
-        android:visibility="visible" />
-
 </LinearLayout>

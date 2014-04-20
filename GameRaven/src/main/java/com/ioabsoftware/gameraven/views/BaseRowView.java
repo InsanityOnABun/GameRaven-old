@@ -1,13 +1,10 @@
 package com.ioabsoftware.gameraven.views;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.widget.LinearLayout;
 
-import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.util.Theming;
 
 public abstract class BaseRowView extends LinearLayout {
@@ -38,12 +35,6 @@ public abstract class BaseRowView extends LinearLayout {
         myColor = Theming.accentColor();
         myScale = Theming.textScale();
         init(c);
-    }
-
-    protected Drawable getSelector() {
-        StateDrawable s = new StateDrawable(new Drawable[]{getResources().getDrawable(R.drawable.selector)});
-        s.setMyColor(Color.TRANSPARENT);
-        return s;
     }
 
     public void beginShowingView(BaseRowData data) {

@@ -64,10 +64,6 @@ public class GameSearchRowView extends BaseRowView {
     protected void retheme(int color, float scale) {
         name.setTextSize(PX, nameTextSize * scale);
         platform.setTextSize(PX, platformTextSize * scale);
-
-        findViewById(R.id.gsSep).setBackgroundColor(color);
-
-        setBackgroundDrawable(getSelector());
     }
 
     @Override

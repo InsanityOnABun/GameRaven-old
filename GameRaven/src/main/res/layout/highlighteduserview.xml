@@ -4,6 +4,7 @@
     android:id="@+id/hvTopWrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/item_selector"
     android:orientation="vertical" >
 
     <LinearLayout
@@ -53,13 +54,5 @@
             android:minWidth="48dp"
             android:orientation="vertical" />
     </LinearLayout>
-
-    <View
-        android:id="@+id/hvSep"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="2dp"
-        android:background="#33B5E5"
-        android:visibility="visible" />
 
 </LinearLayout>

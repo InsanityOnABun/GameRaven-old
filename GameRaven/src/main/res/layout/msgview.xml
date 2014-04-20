@@ -3,14 +3,15 @@
     android:id="@+id/mvGlobalWrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="2dp"
+    android:background="@drawable/item_selector"
+    android:clickable="false"
     android:orientation="vertical" >
 
     <RelativeLayout
         android:id="@+id/mvTopWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
+        android:background="@drawable/msghead"
         android:clickable="true"
         android:paddingRight="3dp" >
 
@@ -29,6 +30,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@android:color/black"
+                android:text="User"
                 android:textSize="12sp" />
 
             <TextView
@@ -37,6 +39,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@android:color/black"
+                android:text="#500, Posted 1/1/2014 12:00 AM"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -66,6 +69,7 @@
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="This is a big long post. Man fan died room 97 etc.\n---\nThis is a sig."
         android:textSize="15sp" />
 
 </LinearLayout>
