@@ -1,7 +1,8 @@
 <resources>
 
     <style name="MyThemes.DarkTheme" parent="android:Theme.Holo">
-        <item name="android:actionBarStyle">@style/MyThemes.DarkTheme.ActionBar.FullyTransparent</item>
+        <item name="android:actionBarStyle">@android:style/Widget.Holo.ActionBar.Solid</item>
+        <item name="themedBackground">@color/background</item>
         <item name="themedSearchIcon">@drawable/ic_search</item>
         <item name="themedAddFavIcon">@drawable/ic_addfav</item>
         <item name="themedRemFavIcon">@drawable/ic_remfav</item>
@@ -19,8 +20,9 @@
     </style>
 
     <style name="MyThemes.LightTheme" parent="android:Theme.Holo.Light">
-        <item name="android:actionBarStyle">@style/MyThemes.LightTheme.ActionBar.FullyTransparent</item>
-        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:actionBarStyle">@android:style/Widget.Holo.Light.ActionBar.Solid</item>
+        <!--<item name="android:windowContentOverlay">@null</item>-->
+        <item name="themedBackground">@color/background_light</item>
         <item name="themedSearchIcon">@drawable/ic_search_light</item>
         <item name="themedAddFavIcon">@drawable/ic_addfav_light</item>
         <item name="themedRemFavIcon">@drawable/ic_remfav_light</item>
@@ -35,14 +37,6 @@
         <item name="themedPostInfoIcon">@drawable/ic_info_light</item>
         <item name="themedPostBackground">@color/white</item>
         <item name="themedDrawerHeaderColor">@color/drawerHeaderLight</item>
-    </style>
-
-    <style name="MyThemes.DarkTheme.ActionBar.FullyTransparent" parent="android:Widget.Holo.ActionBar">
-        <item name="android:background">@color/transparent</item>
-    </style>
-
-    <style name="MyThemes.LightTheme.ActionBar.FullyTransparent" parent="android:Widget.Holo.Light.ActionBar">
-        <item name="android:background">@color/transparent</item>
     </style>
 
 </resources>
