@@ -14,8 +14,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -281,6 +279,7 @@ public class AllInOneV2 extends Activity {
 
         AccountManager.init(this);
 
+        //TODO: if aBar stays unaltered in new theme, move aBar to local scope
         aBar = getActionBar();
         assert aBar != null : "Action bar is null";
 
@@ -290,6 +289,7 @@ public class AllInOneV2 extends Activity {
         drawer = MenuDrawer.attach(this, Type.OVERLAY);
         drawer.setContentView(R.layout.allinonev2);
         drawer.setMenuView(R.layout.drawer);
+        drawer.setMenuSize(Theming.convertDPtoPX(this, 300));
 
         drawer.setOnDrawerStateChangeListener(new OnDrawerStateChangeListener() {
 
@@ -587,14 +587,15 @@ public class AllInOneV2 extends Activity {
         boolean whiteText = settings.getBoolean("useWhiteAccentText", false);
 
         if (Theming.updateAccentColor(color, whiteText) || firstResume) {
-            Drawable aBarDrawable;
-            if (Theming.usingLightTheme())
-                aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);
-            else
-                aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_light_holo);
-
-            aBarDrawable.setColorFilter(Theming.accentColor(), PorterDuff.Mode.SRC_ATOP);
-            aBar.setBackgroundDrawable(aBarDrawable);
+            //TODO: remove once new theme is complete
+//            Drawable aBarDrawable;
+//            if (Theming.usingLightTheme())
+//                aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);
+//            else
+//                aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_light_holo);
+//
+//            aBarDrawable.setColorFilter(Theming.accentColor(), PorterDuff.Mode.SRC_ATOP);
+//            aBar.setBackgroundDrawable(aBarDrawable);
 
             ((DefaultHeaderTransformer) ptrLayout.getHeaderTransformer()).setProgressBarColor(Theming.accentColor());
 
