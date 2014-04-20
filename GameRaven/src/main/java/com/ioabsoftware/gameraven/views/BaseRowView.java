@@ -21,23 +21,23 @@ public abstract class BaseRowView extends LinearLayout {
 
     public BaseRowView(Context context) {
         super(context);
-        myColor = Theming.accentColor();
-        myScale = Theming.textScale();
-        init(context);
+        preInit(context);
     }
 
     public BaseRowView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        myColor = Theming.accentColor();
-        myScale = Theming.textScale();
-        init(context);
+        preInit(context);
     }
 
     public BaseRowView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        preInit(context);
+    }
+
+    private void preInit(Context c) {
         myColor = Theming.accentColor();
         myScale = Theming.textScale();
-        init(context);
+        init(c);
     }
 
     protected Drawable getSelector() {
