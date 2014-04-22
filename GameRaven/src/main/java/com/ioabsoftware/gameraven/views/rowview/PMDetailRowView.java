@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.util.RichTextUtils;
-import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.util.UrlSpanConverter;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
@@ -50,15 +49,13 @@ public class PMDetailRowView extends BaseRowView {
 
         if (messageTextSize == 0)
             messageTextSize = messageView.getTextSize();
-
-        retheme(Theming.accentColor(), Theming.textScale());
     }
 
     @Override
-    protected void retheme(int color, float size) {
-        messageView.setTextSize(PX, messageTextSize * size);
+    protected void retheme() {
+        messageView.setTextSize(PX, messageTextSize * myScale);
 
-        messageView.setLinkTextColor(Theming.accentColor());
+        messageView.setLinkTextColor(myColor);
     }
 
     @Override

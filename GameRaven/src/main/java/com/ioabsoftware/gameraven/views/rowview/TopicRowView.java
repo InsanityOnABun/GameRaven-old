@@ -17,6 +17,7 @@ import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
+import com.ioabsoftware.gameraven.views.SelectorDrawable;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
 
 public class TopicRowView extends BaseRowView {
@@ -75,6 +76,9 @@ public class TopicRowView extends BaseRowView {
             lpLinkTextSize = lpLink.getTextSize();
         }
 
+        int tenDP = Theming.convertDPtoPX(context, 10);
+        lpLink.setBackgroundDrawable(new SelectorDrawable(context));
+        lpLink.setPadding(tenDP, lpLink.getPaddingTop(), tenDP, lpLink.getPaddingBottom());
         lpLink.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,16 +93,14 @@ public class TopicRowView extends BaseRowView {
                 AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getUrl(), null);
             }
         });
-
-        retheme(Theming.accentColor(), Theming.textScale());
     }
 
     @Override
-    protected void retheme(int color, float scale) {
-        title.setTextSize(PX, titleTextSize * scale);
-        tc.setTextSize(PX, tcTextSize * scale);
-        msgLP.setTextSize(PX, msgLPTextSize * scale);
-        lpLink.setTextSize(PX, lpLinkTextSize * scale);
+    protected void retheme() {
+        title.setTextSize(PX, titleTextSize * myScale);
+        tc.setTextSize(PX, tcTextSize * myScale);
+        msgLP.setTextSize(PX, msgLPTextSize * myScale);
+        lpLink.setTextSize(PX, lpLinkTextSize * myScale);
     }
 
     @Override

@@ -69,7 +69,7 @@ public class HighlightedUserView extends BaseRowView implements OnClickListener 
     }
 
     @Override
-    protected void retheme(int color, float scale) {
+    protected void retheme() {
         // nada
     }
 

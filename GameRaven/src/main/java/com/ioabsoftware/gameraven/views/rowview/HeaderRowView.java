@@ -39,16 +39,14 @@ public class HeaderRowView extends BaseRowView {
 
         if (tSize == 0)
             tSize = tView.getTextSize();
-
-        retheme(Theming.accentColor(), Theming.textScale());
     }
 
     @Override
-    protected void retheme(int color, float scale) {
-        tView.setTextSize(PX, tSize * scale);
+    protected void retheme() {
+        tView.setTextSize(PX, tSize * myScale);
         tView.setTextColor(Theming.accentTextColor());
 
-        setBackgroundColor(color);
+        setBackgroundColor(myColor);
     }
 
     @Override

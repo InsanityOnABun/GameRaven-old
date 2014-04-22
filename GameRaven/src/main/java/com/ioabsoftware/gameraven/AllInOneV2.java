@@ -74,6 +74,7 @@ import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
 import com.ioabsoftware.gameraven.views.rowview.AdmobRowView;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 
+import net.margaritov.preference.colorpicker.ColorPickerPreference;
 import net.simonvt.menudrawer.MenuDrawer;
 import net.simonvt.menudrawer.MenuDrawer.OnDrawerStateChangeListener;
 import net.simonvt.menudrawer.MenuDrawer.Type;
@@ -1150,15 +1151,15 @@ public class AllInOneV2 extends Activity {
         wtl("setting bgcolor");
         String bgcolor;
         if (Theming.usingLightTheme())
-            bgcolor = "#ffffff";
+            bgcolor = ColorPickerPreference.convertToRGB(getResources().getColor(R.color.background));
         else
-            bgcolor = "#000000";
+            bgcolor = ColorPickerPreference.convertToRGB(getResources().getColor(R.color.background_light));
 
         wtl("initial adbuilder appending");
         adBuilder.setLength(0);
         adBuilder.append("<html>");
         adBuilder.append(doc.head().outerHtml());
-        adBuilder.append("<body bgcolor=\"" + bgcolor + "\">");
+        adBuilder.append("<body style=\"background-color:" + bgcolor + " !important\">");
 
         wtl("appending ad elements to adbuilder");
         for (Element e : doc.getElementsByClass("ad")) {

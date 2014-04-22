@@ -3,7 +3,6 @@
     android:id="@+id/tvGlobalWrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/item_selector"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -48,14 +47,13 @@
 
         <TextView
             android:id="@+id/tvLastPostLink"
-            android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:layout_centerVertical="true"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:background="@drawable/item_selector"
+            android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
             android:text="@string/last_post"
             android:textColor="?attr/themedTextColor"
             android:textSize="12sp" />

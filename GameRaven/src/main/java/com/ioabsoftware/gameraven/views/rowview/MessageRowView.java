@@ -79,24 +79,21 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
         topWrapper.setBackgroundDrawable(headerSelector);
         topWrapper.setOnClickListener(this);
 
-        retheme(Theming.accentColor(), Theming.textScale());
-
         if (Theming.isAccentLight())
             ((ImageView) findViewById(R.id.mvMessageMenuIcon)).setImageResource(R.drawable.ic_info_light);
     }
 
     @Override
-    protected void retheme(int color, float scale) {
-        user.setTextSize(PX, userTextSize * scale);
-        post.setTextSize(PX, postTextSize * scale);
-        message.setTextSize(PX, messageTextSize * scale);
+    protected void retheme() {
+        user.setTextSize(PX, userTextSize * myScale);
+        post.setTextSize(PX, postTextSize * myScale);
+        message.setTextSize(PX, messageTextSize * myScale);
 
-        message.setLinkTextColor(color);
+        message.setLinkTextColor(myColor);
+        headerSelector.setMyColor(myColor);
 
         post.setTextColor(Theming.accentTextColor());
         user.setTextColor(Theming.accentTextColor());
-
-        headerSelector.setMyColor(Theming.accentColor());
     }
 
     @Override
