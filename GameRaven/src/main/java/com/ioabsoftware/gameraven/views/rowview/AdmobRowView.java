@@ -9,6 +9,7 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
+import com.ioabsoftware.gameraven.views.RowType;
 
 public class AdmobRowView extends BaseRowView {
 
@@ -27,6 +28,7 @@ public class AdmobRowView extends BaseRowView {
     }
     @Override
     protected void init(Context context) {
+        myType = RowType.ADMOB_AD;
         adView = new AdView(getContext());
         adView.setAdSize(AdSize.SMART_BANNER);
         adView.setAdUnitId("ca-app-pub-3449574924284542/6675970914");
@@ -61,7 +63,7 @@ public class AdmobRowView extends BaseRowView {
     }
 
     @Override
-    protected void retheme(int color, float scale) {
+    protected void retheme() {
         // nada
     }
 

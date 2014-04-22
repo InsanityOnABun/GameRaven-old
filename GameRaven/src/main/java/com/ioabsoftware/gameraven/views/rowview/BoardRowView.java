@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.NetDesc;
-import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
@@ -56,8 +55,6 @@ public class BoardRowView extends BaseRowView {
             descTextSize = desc.getTextSize();
         }
 
-        retheme(Theming.accentColor(), Theming.textScale());
-
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,11 +77,11 @@ public class BoardRowView extends BaseRowView {
     }
 
     @Override
-    protected void retheme(int color, float scale) {
-        desc.setTextSize(PX, descTextSize * scale);
-        lastPost.setTextSize(PX, lpTextSize * scale);
-        tpcMsgDetails.setTextSize(PX, detailsTextSize * scale);
-        name.setTextSize(PX, nameTextSize * scale);
+    protected void retheme() {
+        desc.setTextSize(PX, descTextSize * myScale);
+        lastPost.setTextSize(PX, lpTextSize * myScale);
+        tpcMsgDetails.setTextSize(PX, detailsTextSize * myScale);
+        name.setTextSize(PX, nameTextSize * myScale);
     }
 
     @Override

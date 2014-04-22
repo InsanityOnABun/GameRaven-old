@@ -32,23 +32,46 @@ public abstract class BaseRowView extends LinearLayout {
     }
 
     private void preInit(Context c) {
+        init(c);
+
+        switch (myType) {
+            case GAME_SEARCH:
+            case BOARD:
+            case TOPIC:
+            case AMP_TOPIC:
+            case TRACKED_TOPIC:
+            case MESSAGE:
+            case USER_DETAIL:
+            case PM:
+            case PM_DETAIL:
+                setBackgroundDrawable(new SelectorDrawable(getContext()));
+                break;
+            case HEADER:
+            case ADMOB_AD:
+            case GFAQS_AD:
+                break;
+        }
+
+        preRetheme();
+    }
+
+    private void preRetheme() {
         myColor = Theming.accentColor();
         myScale = Theming.textScale();
-        init(c);
+        retheme();
     }
 
     public void beginShowingView(BaseRowData data) {
         if (Theming.accentColor() != myColor || Theming.textScale() != myScale) {
-            myColor = Theming.accentColor();
-            myScale = Theming.textScale();
-            retheme(myColor, myScale);
+            SelectorDrawable.rebuildColorFilter();
+            preRetheme();
         }
         showView(data);
     }
 
     protected abstract void init(Context context);
 
-    protected abstract void retheme(int color, float scale);
+    protected abstract void retheme();
 
     protected abstract void showView(BaseRowData data);
 

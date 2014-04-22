@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.NetDesc;
-import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
@@ -69,15 +68,13 @@ public class PMRowView extends BaseRowView {
                     AllInOneV2.get().getSession().get(NetDesc.PM_OUTBOX_DETAIL, myData.getUrl(), null);
             }
         });
-
-        retheme(Theming.accentColor(), Theming.textScale());
     }
 
     @Override
-    protected void retheme(int color, float scale) {
-        subject.setTextSize(PX, subjectTextSize * scale);
-        sender.setTextSize(PX, senderTextSize * scale);
-        time.setTextSize(PX, timeTextSize * scale);
+    protected void retheme() {
+        subject.setTextSize(PX, subjectTextSize * myScale);
+        sender.setTextSize(PX, senderTextSize * myScale);
+        time.setTextSize(PX, timeTextSize * myScale);
     }
 
     @Override

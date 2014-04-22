@@ -40,7 +40,7 @@ public class AdGFAQsRowView extends BaseRowView {
     }
 
     @Override
-    protected void retheme(int color, float scale) {
+    protected void retheme() {
         // Nothing to theme here.
     }
 

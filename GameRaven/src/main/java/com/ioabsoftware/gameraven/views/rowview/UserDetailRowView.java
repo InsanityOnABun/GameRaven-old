@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
-import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
@@ -75,30 +74,28 @@ public class UserDetailRowView extends BaseRowView {
                 AllInOneV2.get().pmSetup(myData.getName(), null, null);
             }
         });
-
-        retheme(Theming.accentColor(), Theming.textScale());
     }
 
     @Override
-    protected void retheme(int color, float scale) {
-        ID.setTextSize(PX, idTextSize * scale);
-        level.setTextSize(PX, levelTextSize * scale);
-        creation.setTextSize(PX, creationTextSize * scale);
-        lVisit.setTextSize(PX, lVisitTextSize * scale);
-        karma.setTextSize(PX, karmaTextSize * scale);
-        amp.setTextSize(PX, ampTextSize * scale);
-        sig.setTextSize(PX, sigTextSize * scale);
-        sendPM.setTextSize(PX, sendPMTextSize * scale);
+    protected void retheme() {
+        ID.setTextSize(PX, idTextSize * myScale);
+        level.setTextSize(PX, levelTextSize * myScale);
+        creation.setTextSize(PX, creationTextSize * myScale);
+        lVisit.setTextSize(PX, lVisitTextSize * myScale);
+        karma.setTextSize(PX, karmaTextSize * myScale);
+        amp.setTextSize(PX, ampTextSize * myScale);
+        sig.setTextSize(PX, sigTextSize * myScale);
+        sendPM.setTextSize(PX, sendPMTextSize * myScale);
 
-        findViewById(R.id.udIDSep).setBackgroundColor(color);
-        findViewById(R.id.udLevelSep).setBackgroundColor(color);
-        findViewById(R.id.udCreationSep).setBackgroundColor(color);
-        findViewById(R.id.udLVisitSep).setBackgroundColor(color);
-        findViewById(R.id.udSigSep).setBackgroundColor(color);
-        findViewById(R.id.udKarmaSep).setBackgroundColor(color);
-        findViewById(R.id.udAMPSep).setBackgroundColor(color);
+        findViewById(R.id.udIDSep).setBackgroundColor(myColor);
+        findViewById(R.id.udLevelSep).setBackgroundColor(myColor);
+        findViewById(R.id.udCreationSep).setBackgroundColor(myColor);
+        findViewById(R.id.udLVisitSep).setBackgroundColor(myColor);
+        findViewById(R.id.udSigSep).setBackgroundColor(myColor);
+        findViewById(R.id.udKarmaSep).setBackgroundColor(myColor);
+        findViewById(R.id.udAMPSep).setBackgroundColor(myColor);
 
-        sig.setLinkTextColor(color);
+        sig.setLinkTextColor(myColor);
     }
 
     @Override

@@ -16,6 +16,7 @@ import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
+import com.ioabsoftware.gameraven.views.SelectorDrawable;
 import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 
 public class TrackedTopicRowView extends BaseRowView {
@@ -57,7 +58,7 @@ public class TrackedTopicRowView extends BaseRowView {
 
         board = (TextView) findViewById(R.id.ttBoardName);
         title = (TextView) findViewById(R.id.ttTitle);
-        msgLP = (TextView) findViewById(R.id.ttMessageCountLastPost);
+        msgLP = (TextView) findViewById(R.id.ttMsgCountLastPost);
         lpLink = (TextView) findViewById(R.id.ttLastPostLink);
         removeLink = (TextView) findViewById(R.id.ttStopTracking);
 
@@ -91,6 +92,7 @@ public class TrackedTopicRowView extends BaseRowView {
             }
         });
 
+        lpLink.setBackgroundDrawable(new SelectorDrawable(context));
         lpLink.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,23 +101,22 @@ public class TrackedTopicRowView extends BaseRowView {
             }
         });
 
+        removeLink.setBackgroundDrawable(new SelectorDrawable(context));
         removeLink.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 AllInOneV2.get().getSession().get(NetDesc.TRACKED_TOPICS, myData.getRemoveUrl(), null);
             }
         });
-
-        retheme(Theming.accentColor(), Theming.textScale());
     }
 
     @Override
-    protected void retheme(int color, float scale) {
-        board.setTextSize(PX, boardTextSize * scale);
-        title.setTextSize(PX, titleTextSize * scale);
-        msgLP.setTextSize(PX, msgLPTextSize * scale);
-        lpLink.setTextSize(PX, lpLinkTextSize * scale);
-        removeLink.setTextSize(PX, removeLinkTextSize * scale);
+    protected void retheme() {
+        board.setTextSize(PX, boardTextSize * myScale);
+        title.setTextSize(PX, titleTextSize * myScale);
+        msgLP.setTextSize(PX, msgLPTextSize * myScale);
+        lpLink.setTextSize(PX, lpLinkTextSize * myScale);
+        removeLink.setTextSize(PX, removeLinkTextSize * myScale);
     }
 
     @Override

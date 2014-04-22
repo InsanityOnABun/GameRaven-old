@@ -2,26 +2,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ttGlobalWrapper"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/item_selector" >
+    android:layout_height="wrap_content">
 
     <RelativeLayout
         android:id="@+id/ttMainWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp" >
+        android:layout_marginRight="3dp">
 
         <TextView
             android:id="@+id/ttStopTracking"
-            android:background="@drawable/item_selector"
-            android:layout_width="30dp"
-            android:layout_alignTop="@+id/ttMessageCountLastPost"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/ttTitle"
+            android:layout_alignTop="@+id/ttMsgCountLastPost"
             android:gravity="center"
-            android:paddingLeft="0dp"
-            android:paddingRight="2dp"
             android:text="X"
             android:textColor="?attr/themedTextColor"
             android:textSize="12sp" />
@@ -44,7 +40,7 @@
             android:textSize="10sp" />
 
         <TextView
-            android:id="@+id/ttMessageCountLastPost"
+            android:id="@+id/ttMsgCountLastPost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -57,7 +53,7 @@
             android:id="@+id/ttTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ttMessageCountLastPost"
+            android:layout_below="@+id/ttMsgCountLastPost"
             android:layout_toLeftOf="@+id/ttLPSep"
             android:layout_toRightOf="@+id/ttSTSep"
             android:ellipsize="end"
@@ -69,12 +65,12 @@
 
         <TextView
             android:id="@+id/ttLastPostLink"
-            android:background="@drawable/item_selector"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/ttTitle"
             android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/ttMessageCountLastPost"
+            android:layout_alignTop="@+id/ttMsgCountLastPost"
+            android:gravity="center"
             android:text="Last\nPost"
             android:textColor="?attr/themedTextColor"
             android:textSize="12sp" />
