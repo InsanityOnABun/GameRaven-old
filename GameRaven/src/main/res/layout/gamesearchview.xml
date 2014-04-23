@@ -3,21 +3,23 @@
     android:id="@+id/gsGlobalWrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/gsWrapper"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp" >
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/gsPlatform"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
+            android:layout_marginLeft="@dimen/item_padding_horizontal"
+            android:layout_marginRight="@dimen/item_padding_horizontal"
+            android:layout_marginTop="@dimen/item_padding_vertical"
             android:text="Platform: AND"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textSize="10sp" />
@@ -26,11 +28,12 @@
             android:id="@+id/gsName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_alignLeft="@+id/gsPlatform"
+            android:layout_alignRight="@+id/gsPlatform"
             android:layout_below="@+id/gsPlatform"
+            android:layout_marginBottom="@dimen/item_padding_vertical"
             android:gravity="center_vertical"
             android:maxLines="2"
-            android:minLines="2"
             android:text="Android"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>

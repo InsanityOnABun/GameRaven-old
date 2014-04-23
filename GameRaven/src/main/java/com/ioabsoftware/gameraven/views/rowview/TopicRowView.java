@@ -76,9 +76,7 @@ public class TopicRowView extends BaseRowView {
             lpLinkTextSize = lpLink.getTextSize();
         }
 
-        int tenDP = Theming.convertDPtoPX(context, 10);
         lpLink.setBackgroundDrawable(new SelectorDrawable(context));
-        lpLink.setPadding(tenDP, lpLink.getPaddingTop(), tenDP, lpLink.getPaddingBottom());
         lpLink.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,4 +168,9 @@ public class TopicRowView extends BaseRowView {
         typeIndicator.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    protected void drawableStateChanged() {
+        lpLink.getBackground().setState(this.getDrawableState());
+        super.drawableStateChanged();
+    }
 }

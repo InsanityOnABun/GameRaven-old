@@ -1,6 +1,8 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +14,11 @@ import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.SettingsHighlightedUsers;
 import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
+import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
+import com.ioabsoftware.gameraven.views.RowType;
+import com.ioabsoftware.gameraven.views.StateDrawable;
 
 public class HighlightedUserView extends BaseRowView implements OnClickListener {
 
@@ -23,6 +28,8 @@ public class HighlightedUserView extends BaseRowView implements OnClickListener 
 
     private LinearLayout colorFrame;
     private TextView nameView, labelView;
+
+    private StateDrawable back;
 
     public HighlightedUserView(Context context) {
         super(context);
@@ -48,12 +55,17 @@ public class HighlightedUserView extends BaseRowView implements OnClickListener 
         nameView = (TextView) findViewById(R.id.hvName);
         labelView = (TextView) findViewById(R.id.hvLabel);
         colorFrame = (LinearLayout) findViewById(R.id.hvColorFrame);
+        findViewById(R.id.hvSep).setBackgroundColor(Theming.accentColor());
 
         nameView.setText(user.getName());
         labelView.setText(user.getLabel());
 
         if (user.getColor() != 0)
             colorFrame.setBackgroundColor(user.getColor());
+
+        back = new StateDrawable(new Drawable[] {getResources().getDrawable(R.drawable.selector)});
+        back.setMyColor(Color.TRANSPARENT);
+        setBackgroundDrawable(back);
 
         setOnClickListener(this);
     }
@@ -65,7 +77,7 @@ public class HighlightedUserView extends BaseRowView implements OnClickListener 
 
     @Override
     protected void init(Context context) {
-        // nada
+        myType = RowType.HIGHLIGHTED_USER;
     }
 
     @Override

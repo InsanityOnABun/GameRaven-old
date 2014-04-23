@@ -41,11 +41,12 @@ public abstract class BaseRowView extends LinearLayout {
             case AMP_TOPIC:
             case TRACKED_TOPIC:
             case MESSAGE:
-            case USER_DETAIL:
             case PM:
             case PM_DETAIL:
                 setBackgroundDrawable(new SelectorDrawable(getContext()));
                 break;
+            case USER_DETAIL:
+            case HIGHLIGHTED_USER:
             case HEADER:
             case ADMOB_AD:
             case GFAQS_AD:

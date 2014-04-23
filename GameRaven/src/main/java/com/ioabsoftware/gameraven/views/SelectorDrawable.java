@@ -18,11 +18,10 @@ public class SelectorDrawable extends StateListDrawable {
         if (pressedFilter == null)
             rebuildColorFilter();
 
-        addState(new int[] {android.R.attr.state_pressed}, c.getResources().getDrawable(R.drawable.item_background_pressed));
-        addState(new int[] {android.R.attr.state_focused}, c.getResources().getDrawable(R.drawable.item_background_focused));
-        addState(new int[] {android.R.attr.state_hovered}, c.getResources().getDrawable(R.drawable.item_background_focused));
-        addState(new int[] {android.R.attr.state_selected}, c.getResources().getDrawable(R.drawable.item_background_focused));
-        addState(new int[]{}, c.getResources().getDrawable(R.drawable.item_background));
+        if (!Theming.usingLightTheme())
+            addState(new int[]{}, c.getResources().getDrawable(R.drawable.item_background));
+        else
+            addState(new int[]{}, c.getResources().getDrawable(R.drawable.item_background_light));
     }
 
     @Override

@@ -12,15 +12,17 @@
         android:layout_height="wrap_content"
         android:background="@drawable/msghead"
         android:clickable="true"
-        android:paddingRight="3dp" >
+        android:paddingRight="@dimen/item_padding_horizontal"
+        android:paddingLeft="@dimen/item_padding_horizontal" >
 
         <LinearLayout
             android:id="@+id/mvDetailsWrapper"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/item_padding_horizontal"
+            android:layout_toLeftOf="@+id/mvMessageMenuIcon"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
             android:orientation="vertical" >
 
             <TextView
@@ -46,10 +48,9 @@
             android:id="@+id/mvMessageMenuIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/item_padding_horizontal"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
             android:src="@drawable/ic_info" />
     </RelativeLayout>
 
@@ -65,8 +66,9 @@
         android:id="@+id/mvMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp"
+        android:layout_marginLeft="@dimen/item_padding_horizontal"
+        android:layout_marginRight="@dimen/item_padding_horizontal"
+        android:layout_marginBottom="@dimen/item_padding_vertical"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="This is a big long post. Man fan died room 97 etc.\n---\nThis is a sig."
         android:textSize="15sp" />
