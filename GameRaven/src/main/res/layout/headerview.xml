@@ -3,11 +3,10 @@
 
     <TextView
         android:id="@+id/hdrText"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="3dp"
-        android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp"
+        android:padding="@dimen/item_padding_vertical"
+        android:background="@drawable/header_background"
         android:minLines="1"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@android:color/black" />

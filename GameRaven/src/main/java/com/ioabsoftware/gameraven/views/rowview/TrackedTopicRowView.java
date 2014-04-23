@@ -54,13 +54,16 @@ public class TrackedTopicRowView extends BaseRowView {
     protected void init(Context context) {
         myType = RowType.TRACKED_TOPIC;
         setOrientation(VERTICAL);
-        LayoutInflater.from(context).inflate(R.layout.trackedtopicview, this, true);
+        LayoutInflater.from(context).inflate(R.layout.topicview, this, true);
 
-        board = (TextView) findViewById(R.id.ttBoardName);
-        title = (TextView) findViewById(R.id.ttTitle);
-        msgLP = (TextView) findViewById(R.id.ttMsgCountLastPost);
-        lpLink = (TextView) findViewById(R.id.ttLastPostLink);
-        removeLink = (TextView) findViewById(R.id.ttStopTracking);
+        board = (TextView) findViewById(R.id.tvTC);
+        title = (TextView) findViewById(R.id.tvTitle);
+        msgLP = (TextView) findViewById(R.id.tvMsgCountLastPost);
+        lpLink = (TextView) findViewById(R.id.tvLastPostLink);
+        removeLink = (TextView) findViewById(R.id.tvStopTracking);
+
+        removeLink.setVisibility(View.VISIBLE);
+        findViewById(R.id.tvTypeIndicator).setVisibility(View.GONE);
 
         defaultBoardColor = board.getCurrentTextColor();
         defaultTitleColor = title.getCurrentTextColor();
@@ -159,6 +162,14 @@ public class TrackedTopicRowView extends BaseRowView {
         board.setText(myData.getBoard());
         title.setText(myData.getTitle());
         msgLP.setText(myData.getMsgs() + " Msgs, Last: " + myData.getLastPost());
+    }
+
+    @Override
+    protected void drawableStateChanged() {
+        int[] state = this.getDrawableState();
+        lpLink.getBackground().setState(state);
+        removeLink.getBackground().setState(state);
+        super.drawableStateChanged();
     }
 
 }

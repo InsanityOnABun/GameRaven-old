@@ -3,19 +3,19 @@
     android:id="@+id/pmdGlobalWrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="2dp"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <com.ioabsoftware.gameraven.views.ClickableLinksTextView
         android:id="@+id/pmdMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/item_padding_vertical"
+        android:layout_marginLeft="@dimen/item_padding_horizontal"
+        android:layout_marginRight="@dimen/item_padding_horizontal"
+        android:layout_marginTop="@dimen/item_padding_vertical"
         android:gravity="center_vertical"
         android:text="man fan died at the room shot up to 97 degrees"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp"
-        android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp" />
+        android:textSize="15sp" />
 
 </LinearLayout>

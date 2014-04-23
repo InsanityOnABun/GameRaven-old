@@ -15,4 +15,7 @@
 
     <color name="background">#222222</color>
     <color name="background_light">#dddddd</color>
+
+    <color name="item_line">#363636</color>
+    <color name="item_line_light">#c9c9c9</color>
 </resources>

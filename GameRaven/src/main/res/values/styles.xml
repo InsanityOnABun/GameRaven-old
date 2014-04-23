@@ -20,6 +20,7 @@
 
     <style name="MyThemes.LightTheme" parent="android:Theme.Holo.Light">
         <item name="android:actionBarStyle">@android:style/Widget.Holo.Light.ActionBar.Solid</item>
+        <item name="android:windowContentOverlay">@null</item>
         <item name="themedBackground">@color/background_light</item>
         <item name="themedSearchIcon">@drawable/ic_search_light</item>
         <item name="themedAddFavIcon">@drawable/ic_addfav_light</item>
