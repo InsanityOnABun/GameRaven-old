@@ -8,7 +8,8 @@ GameRaven is an Android app that aims to enhance the GameFAQs experience on Andr
 
 ##Requirements
 * Android 4.0 or above
-* GameFAQs Account
+* GameFAQs Account (for accessing account-restricted boards and posting)
 
 ##Installation
-You can install GameRaven from https://play.google.com/store/apps/details?id=com.ioabsoftware.gameraven
+You can install GameRaven from the Google Play Store.  
+[![Google Play Store Listing](http://developer.android.com/images/brand/en_generic_rgb_wo_60.png)](https://play.google.com/store/apps/details?id=com.ioabsoftware.gameraven)
