@@ -1,0 +1,13 @@
+GameRaven
+Copyright (C) Charles Rosaaen 2012
+All rights reserved, with exceptions listed below.
+
+You may fork this repository with the intent to merge changes back into the official repository.
+
+You are not allowed to distribute, redistribute, or otherwise release any component of GameRaven,
+whether compiled, source, or otherwise, edited or original, except when contributing directly to
+the official GameRaven repository.
+
+Uses software licensed under the Apache Software License 2.0, details of which can be found in the
+"LICENSED SOFTWARE" file. These libraries are exempt from the previously mentioned rules.
+All copyrights for these libraries belong to their respective owners.
