@@ -3,14 +3,54 @@
     android:id="@+id/udGlobalWrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:layout_marginBottom="@dimen/item_padding_vertical"
     android:layout_marginTop="@dimen/item_padding_vertical"
-    android:layout_marginBottom="@dimen/item_padding_vertical" >
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/udTagWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/udTagLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="@dimen/item_padding_horizontal"
+            android:layout_marginRight="@dimen/item_padding_horizontal"
+            android:text="User Tag"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/udTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/udTagLabel"
+            android:layout_below="@+id/udTagLabel"
+            android:layout_marginLeft="@dimen/item_padding_horizontal"
+            android:layout_marginRight="@dimen/item_padding_horizontal"
+            android:text="Pretty Cool Guy"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="15sp" />
+
+        <View
+            android:id="@+id/udTagSep"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/udTag"
+            android:layout_marginBottom="@dimen/item_padding_vertical"
+            android:layout_marginTop="@dimen/item_padding_vertical"
+            android:background="#33B5E5"
+            android:visibility="visible" />
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/udIDWrapper"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/udIDLabel"
@@ -28,8 +68,8 @@
             android:id="@+id/udID"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/udIDLabel"
             android:layout_alignLeft="@+id/udIDLabel"
+            android:layout_below="@+id/udIDLabel"
             android:layout_marginLeft="@dimen/item_padding_horizontal"
             android:layout_marginRight="@dimen/item_padding_horizontal"
             android:text="3705639"
@@ -41,8 +81,8 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/udID"
-            android:layout_marginTop="@dimen/item_padding_vertical"
             android:layout_marginBottom="@dimen/item_padding_vertical"
+            android:layout_marginTop="@dimen/item_padding_vertical"
             android:background="#33B5E5"
             android:visibility="visible" />
     </RelativeLayout>
@@ -50,7 +90,7 @@
     <RelativeLayout
         android:id="@+id/udLevelWrapper"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/udLevelLabel"
@@ -68,8 +108,8 @@
             android:id="@+id/udLevel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/udLevelLabel"
             android:layout_alignLeft="@+id/udLevelLabel"
+            android:layout_below="@+id/udLevelLabel"
             android:layout_marginLeft="@dimen/item_padding_horizontal"
             android:layout_marginRight="@dimen/item_padding_horizontal"
             android:text="35: Idol"
@@ -81,8 +121,8 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/udLevel"
-            android:layout_marginTop="@dimen/item_padding_vertical"
             android:layout_marginBottom="@dimen/item_padding_vertical"
+            android:layout_marginTop="@dimen/item_padding_vertical"
             android:background="#33B5E5"
             android:visibility="visible" />
     </RelativeLayout>
@@ -90,7 +130,7 @@
     <RelativeLayout
         android:id="@+id/udCreationWrapper"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/udCreationLabel"
@@ -108,8 +148,8 @@
             android:id="@+id/udCreation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/udCreationLabel"
             android:layout_alignLeft="@+id/udCreationLabel"
+            android:layout_below="@+id/udCreationLabel"
             android:layout_marginLeft="@dimen/item_padding_horizontal"
             android:layout_marginRight="@dimen/item_padding_horizontal"
             android:text="Friday, August 11, 2006 8:03 AM"
@@ -121,8 +161,8 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/udCreation"
-            android:layout_marginTop="@dimen/item_padding_vertical"
             android:layout_marginBottom="@dimen/item_padding_vertical"
+            android:layout_marginTop="@dimen/item_padding_vertical"
             android:background="#33B5E5"
             android:visibility="visible" />
     </RelativeLayout>
@@ -130,7 +170,7 @@
     <RelativeLayout
         android:id="@+id/udLVisitWrapper"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/udLVisitLabel"
@@ -148,8 +188,8 @@
             android:id="@+id/udLVisit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/udLVisitLabel"
             android:layout_alignLeft="@+id/udLVisitLabel"
+            android:layout_below="@+id/udLVisitLabel"
             android:layout_marginLeft="@dimen/item_padding_horizontal"
             android:layout_marginRight="@dimen/item_padding_horizontal"
             android:text="Thursday, March 14, 2013 9:11 PM"
@@ -161,8 +201,8 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/udLVisit"
-            android:layout_marginTop="@dimen/item_padding_vertical"
             android:layout_marginBottom="@dimen/item_padding_vertical"
+            android:layout_marginTop="@dimen/item_padding_vertical"
             android:background="#33B5E5"
             android:visibility="visible" />
     </RelativeLayout>
@@ -170,16 +210,16 @@
     <RelativeLayout
         android:id="@+id/udSigWrapper"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/udSigLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
             android:layout_marginLeft="@dimen/item_padding_horizontal"
             android:layout_marginRight="@dimen/item_padding_horizontal"
-            android:layout_alignParentTop="true"
             android:text="Signature"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="15sp" />
@@ -188,8 +228,8 @@
             android:id="@+id/udSig"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/udSigLabel"
             android:layout_alignLeft="@+id/udSigLabel"
+            android:layout_below="@+id/udSigLabel"
             android:layout_marginLeft="@dimen/item_padding_horizontal"
             android:layout_marginRight="@dimen/item_padding_horizontal"
             android:text="http://www.last.fm/user/InsanityOnABun"
@@ -201,8 +241,8 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/udSig"
-            android:layout_marginTop="@dimen/item_padding_vertical"
             android:layout_marginBottom="@dimen/item_padding_vertical"
+            android:layout_marginTop="@dimen/item_padding_vertical"
             android:background="#33B5E5"
             android:visibility="visible" />
     </RelativeLayout>
@@ -210,16 +250,16 @@
     <RelativeLayout
         android:id="@+id/udKarmaWrapper"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/udKarmaLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
             android:layout_marginLeft="@dimen/item_padding_horizontal"
             android:layout_marginRight="@dimen/item_padding_horizontal"
-            android:layout_alignParentTop="true"
             android:text="Karma"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="15sp" />
@@ -228,8 +268,8 @@
             android:id="@+id/udKarma"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/udKarmaLabel"
             android:layout_alignLeft="@+id/udKarmaLabel"
+            android:layout_below="@+id/udKarmaLabel"
             android:layout_marginLeft="@dimen/item_padding_horizontal"
             android:layout_marginRight="@dimen/item_padding_horizontal"
             android:text="1557"
@@ -241,8 +281,8 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/udKarma"
-            android:layout_marginTop="@dimen/item_padding_vertical"
             android:layout_marginBottom="@dimen/item_padding_vertical"
+            android:layout_marginTop="@dimen/item_padding_vertical"
             android:background="#33B5E5"
             android:visibility="visible" />
     </RelativeLayout>
@@ -250,7 +290,7 @@
     <RelativeLayout
         android:id="@+id/udAMPWrapper"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/udAMPLabel"
@@ -268,8 +308,8 @@
             android:id="@+id/udAMP"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/udAMPLabel"
             android:layout_alignLeft="@+id/udAMPLabel"
+            android:layout_below="@+id/udAMPLabel"
             android:layout_marginLeft="@dimen/item_padding_horizontal"
             android:layout_marginRight="@dimen/item_padding_horizontal"
             android:text="252"
@@ -281,18 +321,10 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_below="@+id/udAMP"
-            android:layout_marginTop="@dimen/item_padding_vertical"
             android:layout_marginBottom="@dimen/item_padding_vertical"
+            android:layout_marginTop="@dimen/item_padding_vertical"
             android:background="#33B5E5"
             android:visibility="visible" />
     </RelativeLayout>
-
-    <Button
-        android:id="@+id/udSendPM"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/item_padding_horizontal"
-        android:layout_marginRight="@dimen/item_padding_horizontal"
-        android:text="Button" />
 
 </LinearLayout>
