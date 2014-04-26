@@ -1,10 +1,9 @@
 package com.ioabsoftware.gameraven.views.rowdata;
 
-import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
@@ -19,8 +18,6 @@ import android.text.style.TypefaceSpan;
 import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 import android.text.util.Linkify;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -39,8 +36,7 @@ import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.ClickableLinksTextView;
 import com.ioabsoftware.gameraven.views.GRQuoteSpan;
 import com.ioabsoftware.gameraven.views.RowType;
-
-import net.margaritov.preference.colorpicker.ColorPickerPreference;
+import com.ioabsoftware.gameraven.views.rowview.HeaderRowView;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.nodes.Element;
@@ -183,21 +179,21 @@ public class MessageRowData extends BaseRowData {
 
             Element pollElem = messageElem.getElementsByClass("board_poll").first();
 
-            poll = new LinearLayout(AllInOneV2.get());
+            poll = new LinearLayout(aio);
             poll.setOrientation(LinearLayout.VERTICAL);
 
-            LinearLayout pollInnerWrapper = new LinearLayout(AllInOneV2.get());
+            LinearLayout pollInnerWrapper = new LinearLayout(aio);
             pollInnerWrapper.setPadding(15, 0, 15, 15);
             pollInnerWrapper.setOrientation(LinearLayout.VERTICAL);
 
-            ShapeDrawable s = new ShapeDrawable();
-            Paint p = s.getPaint();
-            p.setStyle(Paint.Style.STROKE);
-            p.setStrokeWidth(10);
-            p.setColor(Color.parseColor(ColorPickerPreference.convertToARGB(Theming.accentColor())));
-
+            Drawable s = aio.getResources().getDrawable(R.drawable.item_background);
+            s.setColorFilter(Theming.accentColor(), PorterDuff.Mode.SRC_ATOP);
             poll.setBackgroundDrawable(s);
-            poll.addView(new HeaderView(AllInOneV2.get(), pollElem.getElementsByClass("poll_head").first().text()));
+
+            HeaderRowView h = new HeaderRowView(aio);
+            h.showView(new HeaderRowData(pollElem.getElementsByClass("poll_head").first().text()));
+            poll.addView(h);
+
             poll.addView(pollInnerWrapper);
 
             if (pollElem.getElementsByTag("form").isEmpty()) {
@@ -206,7 +202,7 @@ public class MessageRowData extends BaseRowData {
                 TextView t;
                 for (Element e : pollElem.select("div.row")) {
                     Elements c = e.children();
-                    t = new TextView(AllInOneV2.get());
+                    t = new TextView(aio);
                     String text = c.get(0).text() + ": " + c.get(1).text();
                     if (!c.get(0).children().isEmpty()) {
                         SpannableStringBuilder votedFor = new SpannableStringBuilder(text);
@@ -221,7 +217,7 @@ public class MessageRowData extends BaseRowData {
 
                 String foot = pollElem.getElementsByClass("poll_foot_left").text();
                 if (foot.length() > 0) {
-                    t = new TextView(AllInOneV2.get());
+                    t = new TextView(aio);
                     t.setText(foot);
                     pollInnerWrapper.addView(t);
                 }
@@ -234,7 +230,7 @@ public class MessageRowData extends BaseRowData {
                 int x = 0;
                 for (Element e : pollElem.getElementsByAttributeValue("name", "poll_vote")) {
                     x++;
-                    Button b = new Button(AllInOneV2.get());
+                    Button b = new Button(aio);
                     b.setText(e.nextElementSibling().text());
                     final HashMap<String, List<String>> data = new HashMap<String, List<String>>();
                     data.put("key", Arrays.asList(key));
@@ -244,18 +240,18 @@ public class MessageRowData extends BaseRowData {
                     b.setOnClickListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            AllInOneV2.get().getSession().post(NetDesc.TOPIC, action, data);
+                            aio.getSession().post(NetDesc.TOPIC, action, data);
                         }
                     });
                     pollInnerWrapper.addView(b);
                 }
 
-                Button b = new Button(AllInOneV2.get());
+                Button b = new Button(aio);
                 b.setText("View Results");
                 b.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        AllInOneV2.get().getSession().get(NetDesc.TOPIC, action + "?results=1", null);
+                        aio.getSession().get(NetDesc.TOPIC, action + "?results=1", null);
                     }
                 });
                 pollInnerWrapper.addView(b);
@@ -455,24 +451,6 @@ public class MessageRowData extends BaseRowData {
 
         AllInOneV2.wtl("returning finalbody");
         return finalBody;
-    }
-
-    class HeaderView extends LinearLayout {
-
-        public HeaderView(Context context, String text) {
-            super(context);
-
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            inflater.inflate(R.layout.headerview, this);
-
-            setBackgroundColor(Theming.accentColor());
-
-            TextView tView = (TextView) findViewById(R.id.hdrText);
-            tView.setTextSize(TypedValue.COMPLEX_UNIT_PX, tView.getTextSize() * Theming.textScale());
-            tView.setTextColor(Theming.accentTextColor());
-            tView.setText(text);
-        }
-
     }
 
 }

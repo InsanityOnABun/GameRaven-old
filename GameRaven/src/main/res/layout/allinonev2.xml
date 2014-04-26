@@ -163,6 +163,9 @@
             android:divider="@null"
             android:dividerHeight="5dp"
             android:fastScrollEnabled="true"
+            android:paddingBottom="5dp"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
             android:paddingTop="5dp"
             android:smoothScrollbar="true" />
     </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
