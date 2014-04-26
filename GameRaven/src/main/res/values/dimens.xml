@@ -1,5 +1,6 @@
 <resources>
     <dimen name="item_stroke_width">2dp</dimen>
+    <dimen name="item_corner_radius">3dp</dimen>
 
     <dimen name="item_padding_vertical">3dp</dimen>
     <dimen name="item_padding_horizontal">5dp</dimen>

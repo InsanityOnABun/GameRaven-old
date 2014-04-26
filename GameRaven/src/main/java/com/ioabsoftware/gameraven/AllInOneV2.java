@@ -1952,7 +1952,6 @@ public class AllInOneV2 extends Activity {
 
                 if (Session.isLoggedIn()) {
                     Element button = doc.select("input.btn").first();
-                    wtl(button.text().toString());
                     if (button != null && button.attr("value").startsWith("Send a PM to"))
                         setMenuItemVisibility(sendUserPMIcon, true);
 

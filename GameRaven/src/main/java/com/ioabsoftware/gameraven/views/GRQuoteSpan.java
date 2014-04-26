@@ -1,6 +1,7 @@
 package com.ioabsoftware.gameraven.views;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Parcel;
 import android.text.Layout;
@@ -31,12 +32,15 @@ public class GRQuoteSpan extends QuoteSpan {
                                   int top, int baseline, int bottom,
                                   CharSequence text, int start, int end,
                                   boolean first, Layout layout) {
+
         Paint.Style style = p.getStyle();
         int color = p.getColor();
 
         p.setStyle(Paint.Style.FILL);
-        p.setColor(COLOR);
+        p.setColor(Color.parseColor("#22ffffff"));
+        c.drawRect(x, top, c.getWidth(), bottom, p);
 
+        p.setColor(COLOR);
         c.drawRect(x, top, x + dir * WIDTH, bottom, p);
 
         p.setStyle(style);
