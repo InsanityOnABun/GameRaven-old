@@ -9,6 +9,8 @@
         <item name="themedTopicListIcon">@drawable/ic_topiclist</item>
         <item name="themedPMInboxIcon">@drawable/ic_inbox</item>
         <item name="themedPMOutboxIcon">@drawable/ic_outbox</item>
+        <item name="themedSendUserPMIcon">@drawable/ic_send_pm</item>
+        <item name="themedTagUserIcon">@drawable/ic_tag</item>
         <item name="themedPostIcon">@drawable/ic_newpost</item>
         <item name="themedReplyIcon">@drawable/ic_reply</item>
         <item name="themedRefreshIcon">@drawable/ic_refresh</item>
@@ -28,6 +30,8 @@
         <item name="themedTopicListIcon">@drawable/ic_topiclist_light</item>
         <item name="themedPMInboxIcon">@drawable/ic_inbox_light</item>
         <item name="themedPMOutboxIcon">@drawable/ic_outbox_light</item>
+        <item name="themedSendUserPMIcon">@drawable/ic_send_pm_light</item>
+        <item name="themedTagUserIcon">@drawable/ic_tag_light</item>
         <item name="themedPostIcon">@drawable/ic_newpost_light</item>
         <item name="themedReplyIcon">@drawable/ic_reply_light</item>
         <item name="themedRefreshIcon">@drawable/ic_refresh_light</item>

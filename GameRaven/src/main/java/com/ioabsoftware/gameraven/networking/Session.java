@@ -349,6 +349,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
     }
 
     private NetDesc currentDesc;
+
     /**
      * onCompleted is called by the Future with the result or exception of the asynchronous operation.
      *
@@ -374,6 +375,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             case BOARD_LIST:
             case MESSAGE_DETAIL:
             case USER_DETAIL:
+            case TAG_USER:
             case MODHIST:
             case PM_INBOX:
             case PM_INBOX_DETAIL:
@@ -563,6 +565,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         AllInOneV2.wtl("addToHistory unchanged: " + addToHistory);
                         break;
 
+                    case TAG_USER:
                     case MARKMSG_S1:
                     case MARKMSG_S2:
                     case CLOSE_TOPIC:
@@ -597,6 +600,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                                 AllInOneV2.wtl("finished history addition");
                                 break;
 
+                            case TAG_USER:
                             case MARKMSG_S1:
                             case MARKMSG_S2:
                             case CLOSE_TOPIC:
@@ -657,6 +661,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         break;
 
 
+                    case TAG_USER:
                     case MARKMSG_S1:
                     case MARKMSG_S2:
                     case CLOSE_TOPIC:
@@ -981,6 +986,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case BOARD_JUMPER:
                     case UNSPECIFIED:
                     case USER_DETAIL:
+                    case TAG_USER:
                     case MODHIST:
                     case PM_INBOX:
                     case PM_INBOX_DETAIL:
@@ -1047,6 +1053,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             case TOPIC:
             case MESSAGE_DETAIL:
             case USER_DETAIL:
+            case TAG_USER:
             case MODHIST:
             case PM_INBOX:
             case PM_INBOX_DETAIL:

@@ -11,6 +11,8 @@
         <attr name="themedTopicListIcon" format="reference" />
         <attr name="themedPMInboxIcon" format="reference" />
         <attr name="themedPMOutboxIcon" format="reference" />
+        <attr name="themedSendUserPMIcon" format="reference" />
+        <attr name="themedTagUserIcon" format="reference" />
         <attr name="themedPostIcon" format="reference" />
         <attr name="themedReplyIcon" format="reference" />
         <attr name="themedRefreshIcon" format="reference" />

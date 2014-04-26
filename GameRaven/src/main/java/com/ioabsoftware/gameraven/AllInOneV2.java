@@ -92,6 +92,7 @@ import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -195,16 +196,6 @@ public class AllInOneV2 extends Activity {
 
     private PullToRefreshLayout ptrLayout;
     private ListView contentList;
-
-    private MenuItem refreshIcon;
-    private MenuItem postIcon;
-    private MenuItem replyIcon;
-    private MenuItem pmInboxIcon;
-    private MenuItem pmOutboxIcon;
-    private MenuItem addFavIcon;
-    private MenuItem remFavIcon;
-    private MenuItem searchIcon;
-    private MenuItem topicListIcon;
 
     private String tlUrl;
 
@@ -531,6 +522,10 @@ public class AllInOneV2 extends Activity {
         wtl("starting db creation");
         hlDB = new HighlightListDBHelper(this);
 
+        adapterRows.add(new HeaderRowData("Loading..."));
+        adapterRows.add(new AdmobRowData());
+        contentList.setAdapter(viewAdapter);
+
         wtl("onCreate finishing");
     }
 
@@ -710,6 +705,9 @@ public class AllInOneV2 extends Activity {
         }
     }
 
+    private MenuItem refreshIcon, postIcon, replyIcon, pmInboxIcon, pmOutboxIcon,
+            addFavIcon, remFavIcon, searchIcon, topicListIcon, sendUserPMIcon, tagUserIcon;
+
     /**
      * Adds menu items
      */
@@ -723,6 +721,8 @@ public class AllInOneV2 extends Activity {
         remFavIcon = menu.findItem(R.id.remFav);
         pmInboxIcon = menu.findItem(R.id.pmInbox);
         pmOutboxIcon = menu.findItem(R.id.pmOutbox);
+        sendUserPMIcon = menu.findItem(R.id.sendUserPM);
+        tagUserIcon = menu.findItem(R.id.tagUser);
         postIcon = menu.findItem(R.id.post);
         replyIcon = menu.findItem(R.id.reply);
         refreshIcon = menu.findItem(R.id.refresh);
@@ -760,6 +760,8 @@ public class AllInOneV2 extends Activity {
 
         return true;
     }
+
+    UserDetailRowData userDetailData;
 
     /**
      * fires when a menu option is selected
@@ -888,6 +890,35 @@ public class AllInOneV2 extends Activity {
                 session.get(NetDesc.PM_OUTBOX, "/pm/sent", null);
                 return true;
 
+            case R.id.sendUserPM:
+                pmSetup(userDetailData.getName(), null, null);
+                return true;
+
+            case R.id.tagUser:
+                AlertDialog.Builder b = new AlertDialog.Builder(this);
+                b.setTitle("Set " + userDetailData.getName() + "'s Tag");
+                b.setMessage("User tags can be up to 30 characters long and cannot contain any banned words.");
+
+                final EditText tagText = new EditText(this);
+                tagText.setHint(R.string.user_tag_hint);
+                tagText.setText(userDetailData.getTagText());
+                b.setView(tagText);
+
+                b.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        HashMap<String, List<String>> data = new HashMap<String, List<String>>();
+                        data.put("key", Arrays.asList(userDetailData.getTagKey()));
+                        data.put("tag_text", Arrays.asList(tagText.getText().toString()));
+                        data.put("tag_submit", Arrays.asList("Tag this User"));
+
+                        hideSoftKeyboard(tagText);
+                        AllInOneV2.get().getSession().post(NetDesc.TAG_USER, userDetailData.getTagPath(), data);
+                    }
+                });
+                b.show();
+                return true;
+
             case R.id.post:
                 if (pMode == PostMode.ON_BOARD)
                     postSetup(false);
@@ -936,6 +967,8 @@ public class AllInOneV2 extends Activity {
         setMenuItemVisibility(replyIcon, visible);
         setMenuItemVisibility(pmInboxIcon, visible);
         setMenuItemVisibility(pmOutboxIcon, visible);
+        setMenuItemVisibility(sendUserPMIcon, visible);
+        setMenuItemVisibility(tagUserIcon, visible);
         setMenuItemVisibility(addFavIcon, visible);
         setMenuItemVisibility(remFavIcon, visible);
         setMenuItemVisibility(topicListIcon, visible);
@@ -948,6 +981,8 @@ public class AllInOneV2 extends Activity {
         setMenuItemEnabled(replyIcon, enabled);
         setMenuItemEnabled(pmInboxIcon, enabled);
         setMenuItemEnabled(pmOutboxIcon, enabled);
+        setMenuItemEnabled(sendUserPMIcon, enabled);
+        setMenuItemEnabled(tagUserIcon, enabled);
         setMenuItemEnabled(addFavIcon, enabled);
         setMenuItemEnabled(remFavIcon, enabled);
         setMenuItemEnabled(topicListIcon, enabled);
@@ -1079,9 +1114,13 @@ public class AllInOneV2 extends Activity {
             messageIDForEditing = null;
             postPostUrl = null;
 
-            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
-                    hideSoftInputFromWindow(postBody.getWindowToken(), 0);
+            hideSoftKeyboard(postBody);
         }
+    }
+
+    private void hideSoftKeyboard(View inputView) {
+        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
+                hideSoftInputFromWindow(inputView.getWindowToken(), 0);
     }
 
     public void setAMPLinkVisible(boolean visible) {
@@ -1099,7 +1138,6 @@ public class AllInOneV2 extends Activity {
 
     ArrayList<BaseRowData> adapterRows = new ArrayList<BaseRowData>();
     ViewAdapter viewAdapter = new ViewAdapter(this, adapterRows);
-    boolean adapterSet = false;
 
     WebView web;
     String adBaseUrl;
@@ -1754,7 +1792,7 @@ public class AllInOneV2 extends Activity {
                                 userTitles += " " + t;
 
                             else if (e.hasClass("tag"))
-                                userTitles += " (tagged as " + t + ")";
+                                userTitles += " (" + t + ")";
 
                             else if (t.startsWith("Posted"))
                                 postTime = t;
@@ -1787,7 +1825,7 @@ public class AllInOneV2 extends Activity {
                         for (int y = 0; y < elementsSize; y++) {
                             Element e = elements.get(y);
                             if (e.hasClass("tag"))
-                                userTitles += " (tagged as " + e.text() + ")";
+                                userTitles += " (" + e.text() + ")";
 
                             else if (e.text().equals("message detail"))
                                 mID = parseMessageID(e.attr("href"));
@@ -1864,6 +1902,18 @@ public class AllInOneV2 extends Activity {
 
                 break;
 
+            case TAG_USER:
+                wtl("starting check for user tag success");
+                Element error = doc.getElementsByClass("error").first();
+                if (error == null) {
+                    Crouton.showText(this, "User tag updated successfully.", Theming.croutonStyle());
+                } else {
+                    AlertDialog.Builder b = new AlertDialog.Builder(this);
+                    b.setTitle("There was an error tagging the user...");
+                    b.setMessage("Error message from GameFAQs:\n\n" + error.text());
+                    b.setPositiveButton("OK", null);
+                    b.show();
+                }
             case USER_DETAIL:
                 wtl("starting user detail processing");
                 tbody = doc.select("table.board").first().getElementsByTag("tbody").first();
@@ -1876,6 +1926,8 @@ public class AllInOneV2 extends Activity {
                 String sig = null;
                 String karma = null;
                 String AMP = null;
+                String tagKey = null;
+                String tagText = null;
                 for (Element row : tbody.children()) {
                     String label = row.child(0).text().toLowerCase(Locale.US);
                     wtl("user detail row label: " + label);
@@ -1898,25 +1950,38 @@ public class AllInOneV2 extends Activity {
                         AMP = row.child(1).text();
                 }
 
+                if (Session.isLoggedIn()) {
+                    Element button = doc.select("input.btn").first();
+                    wtl(button.text().toString());
+                    if (button != null && button.attr("value").startsWith("Send a PM to"))
+                        setMenuItemVisibility(sendUserPMIcon, true);
+
+                    setMenuItemVisibility(tagUserIcon, true);
+                    tagKey = doc.getElementsByAttributeValue("name", "key").attr("value");
+                    tagText = doc.getElementsByAttributeValue("name", "tag_text").attr("value");
+                    if (tagText == null) tagText = "";
+                }
+
                 updateHeaderNoJumper(name + "'s Details", NetDesc.USER_DETAIL);
 
-                adapterRows.add(new UserDetailRowData(name, ID, level, creation, lVisit, sig, karma, AMP));
+                userDetailData = new UserDetailRowData(name, ID, level, creation, lVisit, sig,
+                        karma, AMP, tagKey, tagText, resUrl);
+                adapterRows.add(userDetailData);
                 break;
 
             case GAME_SEARCH:
                 wtl("GRAIO hNR determined this is a game search response");
 
-                String url = resUrl;
-                wtl("game search url: " + url);
+                wtl("game search url: " + resUrl);
 
-                String searchQuery = url.substring(url.indexOf("game=") + 5);
+                String searchQuery = resUrl.substring(resUrl.indexOf("game=") + 5);
                 int i = searchQuery.indexOf("&");
                 if (i != -1)
                     searchQuery = searchQuery.replace(searchQuery.substring(i), EMPTY_STRING);
 
-                int pageIndex = url.indexOf("page=");
+                int pageIndex = resUrl.indexOf("page=");
                 if (pageIndex != -1) {
-                    currPage = url.substring(pageIndex + 5);
+                    currPage = resUrl.substring(pageIndex + 5);
                     i = currPage.indexOf("&");
                     if (i != -1)
                         currPage = currPage.replace(currPage.substring(i), EMPTY_STRING);
@@ -2057,11 +2122,7 @@ public class AllInOneV2 extends Activity {
 
         ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
 
-        if (!adapterSet) {
-            contentList.setAdapter(viewAdapter);
-            adapterSet = true;
-        } else
-            viewAdapter.notifyDataSetChanged();
+        viewAdapter.notifyDataSetChanged();
 
         if (consumeGoToUrlDefinedPost() && !Session.applySavedScroll) {
             contentList.post(new Runnable() {
@@ -3028,6 +3089,7 @@ public class AllInOneV2 extends Activity {
     }
 
     private boolean marqueeSpeedSet = false;
+
     private void setMarqueeSpeed(TextView tv, float speed, boolean speedIsMultiplier) {
         if (!marqueeSpeedSet) {
             try {
