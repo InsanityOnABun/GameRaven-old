@@ -13,6 +13,9 @@
     <color name="drawerHeader">#999999</color>
     <color name="drawerHeaderLight">#555555</color>
 
+    <color name="read_topic">#666666</color>
+    <color name="read_topic_light">#aaaaaa</color>
+
     <color name="background">#222222</color>
     <color name="background_light">#dddddd</color>
 
