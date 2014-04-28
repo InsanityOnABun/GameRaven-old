@@ -154,7 +154,7 @@ public class MessageRowData extends BaseRowData {
     public MessageRowData(String userIn, String userTitlesIn, String postNumIn, String postTimeIn,
                           Element messageIn, String BID, String TID, String MID, int hlColorIn) {
 
-        if (aio == null)
+        if (aio == null || aio != AllInOneV2.get())
             aio = AllInOneV2.get();
 
         AllInOneV2.wtl("setting values");
