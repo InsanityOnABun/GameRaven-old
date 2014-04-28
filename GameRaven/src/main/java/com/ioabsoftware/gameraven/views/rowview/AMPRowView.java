@@ -32,7 +32,7 @@ public class AMPRowView extends TopicRowView {
             @Override
             public boolean onLongClick(View v) {
                 String url = myData.getUrl().substring(0, myData.getUrl().lastIndexOf('/'));
-                AllInOneV2.get().getSession().get(NetDesc.BOARD, url, null);
+                AllInOneV2.get().getSession().get(NetDesc.BOARD, url);
                 return true;
             }
         });
@@ -42,7 +42,7 @@ public class AMPRowView extends TopicRowView {
             @Override
             public boolean onLongClick(View v) {
                 AllInOneV2.get().enableGoToUrlDefinedPost();
-                AllInOneV2.get().getSession().get(NetDesc.TOPIC, ((AMPRowData) myData).getYLPUrl(), null);
+                AllInOneV2.get().getSession().get(NetDesc.TOPIC, ((AMPRowData) myData).getYLPUrl());
                 return true;
             }
         });

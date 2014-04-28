@@ -53,6 +53,7 @@ import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.util.AccountManager;
+import com.ioabsoftware.gameraven.util.DocumentParser;
 import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
@@ -88,8 +89,10 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -208,10 +211,11 @@ public class AllInOneV2 extends Activity {
     private FavMode fMode;
 
     private TextView title;
+    private Button pageLabel;
     private Button firstPage, prevPage, nextPage, lastPage;
-    private String firstPageUrl, prevPageUrl, nextPageUrl, lastPageUrl;
+    private String firstPageUrl, prevPageUrl, nextPageUrl, lastPageUrl, jumperPageUrl;
+    private AlertDialog.Builder jumperDialogBuilder;
     private NetDesc pageJumperDesc;
-    private TextView pageLabel;
 
     private View pageJumperWrapper;
 
@@ -313,7 +317,7 @@ public class AllInOneV2 extends Activity {
             @Override
             public void onClick(View v) {
                 drawer.closeMenu(true);
-                session.get(NetDesc.BOARD_JUMPER, "/boards", null);
+                session.get(NetDesc.BOARD_JUMPER, "/boards");
             }
         });
 
@@ -321,7 +325,7 @@ public class AllInOneV2 extends Activity {
             @Override
             public void onClick(View v) {
                 drawer.closeMenu(true);
-                session.get(NetDesc.AMP_LIST, buildAMPLink(), null);
+                session.get(NetDesc.AMP_LIST, buildAMPLink());
             }
         });
 
@@ -329,7 +333,7 @@ public class AllInOneV2 extends Activity {
             @Override
             public void onClick(View v) {
                 drawer.closeMenu(true);
-                session.get(NetDesc.TRACKED_TOPICS, "/boards/tracked", null);
+                session.get(NetDesc.TRACKED_TOPICS, "/boards/tracked");
             }
         });
 
@@ -337,7 +341,7 @@ public class AllInOneV2 extends Activity {
             @Override
             public void onClick(View v) {
                 drawer.closeMenu(true);
-                session.get(NetDesc.PM_INBOX, "/pm/", null);
+                session.get(NetDesc.PM_INBOX, "/pm/");
             }
         });
 
@@ -430,31 +434,37 @@ public class AllInOneV2 extends Activity {
         firstPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                session.get(pageJumperDesc, firstPageUrl, null);
+                session.get(pageJumperDesc, firstPageUrl);
             }
         });
         prevPage = (Button) findViewById(R.id.aioPreviousPage);
         prevPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                session.get(pageJumperDesc, prevPageUrl, null);
+                session.get(pageJumperDesc, prevPageUrl);
             }
         });
         nextPage = (Button) findViewById(R.id.aioNextPage);
         nextPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                session.get(pageJumperDesc, nextPageUrl, null);
+                session.get(pageJumperDesc, nextPageUrl);
             }
         });
         lastPage = (Button) findViewById(R.id.aioLastPage);
         lastPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                session.get(pageJumperDesc, lastPageUrl, null);
+                session.get(pageJumperDesc, lastPageUrl);
             }
         });
-        pageLabel = (TextView) findViewById(R.id.aioPageLabel);
+        pageLabel = (Button) findViewById(R.id.aioPageLabel);
+        pageLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                jumperDialogBuilder.show();
+            }
+        });
 
         Theming.setTextSizeBases(((TextView) drawer.findViewById(R.id.dwrChangeAccHeader)).getTextSize(),
                 ((TextView) drawer.findViewById(R.id.dwrChangeAcc)).getTextSize(),
@@ -535,7 +545,7 @@ public class AllInOneV2 extends Activity {
             String url = intent.getData().getPath();
             NetDesc desc = Session.determineNetDesc(url);
             if (desc != NetDesc.UNSPECIFIED)
-                session.get(desc, url, null);
+                session.get(desc, url);
             else
                 Crouton.showText(this, "Page not recognized: " + url, Theming.croutonStyle());
         }
@@ -739,15 +749,18 @@ public class AllInOneV2 extends Activity {
                 }
 
                 public boolean onQueryTextSubmit(String query) {
-                    HashMap<String, String> data = new HashMap<String, String>();
-                    if (session.getLastDesc() == NetDesc.BOARD) {
-                        wtl("searching board for query");
-                        data.put("search", query);
-                        session.get(NetDesc.BOARD, session.getLastPathWithoutData(), data);
-                    } else if (session.getLastDesc() == NetDesc.BOARD_JUMPER || session.getLastDesc() == NetDesc.GAME_SEARCH) {
-                        wtl("searching for games");
-                        data.put("game", query);
-                        session.get(NetDesc.GAME_SEARCH, "/search/index.html", data);
+                    try {
+                        String encodedQuery = URLEncoder.encode(query, DocumentParser.CHARSET_NAME);
+                        if (session.getLastDesc() == NetDesc.BOARD) {
+                            wtl("searching board for query");
+                            session.get(NetDesc.BOARD, session.getLastPathWithoutData() + "?search=" + encodedQuery);
+                        } else if (session.getLastDesc() == NetDesc.BOARD_JUMPER || session.getLastDesc() == NetDesc.GAME_SEARCH) {
+                            wtl("searching for games");
+                            session.get(NetDesc.GAME_SEARCH, "/search/index.html?game=" + encodedQuery);
+                        }
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                        // shouldn't ever happen
                     }
                     return true;
                 }
@@ -798,7 +811,7 @@ public class AllInOneV2 extends Activity {
                                 else
                                     addFavUrl += "?action=addfav";
 
-                                session.get(NetDesc.BOARD, addFavUrl, null);
+                                session.get(NetDesc.BOARD, addFavUrl);
                             }
                         });
                         break;
@@ -819,7 +832,7 @@ public class AllInOneV2 extends Activity {
                                 else
                                     addFavUrl += "?action=tracktopic";
 
-                                session.get(NetDesc.TOPIC, addFavUrl, null);
+                                session.get(NetDesc.TOPIC, addFavUrl);
                             }
                         });
                         break;
@@ -847,7 +860,7 @@ public class AllInOneV2 extends Activity {
                                 else
                                     remFavUrl += "?action=remfav";
 
-                                session.get(NetDesc.BOARD, remFavUrl, null);
+                                session.get(NetDesc.BOARD, remFavUrl);
                             }
                         });
                         break;
@@ -868,7 +881,7 @@ public class AllInOneV2 extends Activity {
                                 else
                                     remFavUrl += "?action=stoptrack";
 
-                                session.get(NetDesc.TOPIC, remFavUrl, null);
+                                session.get(NetDesc.TOPIC, remFavUrl);
                             }
                         });
                         break;
@@ -879,15 +892,15 @@ public class AllInOneV2 extends Activity {
                 return true;
 
             case R.id.topicList:
-                session.get(NetDesc.BOARD, tlUrl, null);
+                session.get(NetDesc.BOARD, tlUrl);
                 return true;
 
             case R.id.pmInbox:
-                session.get(NetDesc.PM_INBOX, "/pm/", null);
+                session.get(NetDesc.PM_INBOX, "/pm/");
                 return true;
 
             case R.id.pmOutbox:
-                session.get(NetDesc.PM_OUTBOX, "/pm/sent", null);
+                session.get(NetDesc.PM_OUTBOX, "/pm/sent");
                 return true;
 
             case R.id.sendUserPM:
@@ -1059,7 +1072,7 @@ public class AllInOneV2 extends Activity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (retry)
-                    session.get(session.getLastAttemptedDesc(), session.getLastAttemptedPath(), null);
+                    session.get(session.getLastAttemptedDesc(), session.getLastAttemptedPath());
                 else
                     refreshClicked(new View(AllInOneV2.this));
             }
@@ -1185,6 +1198,7 @@ public class AllInOneV2 extends Activity {
         String pageCount = "1";
         String nextPage = null;
         String lastPage = null;
+        String pagePrefix = null;
 
         wtl("setting bgcolor");
         String bgcolor;
@@ -1267,24 +1281,23 @@ public class AllInOneV2 extends Activity {
                         int currPageNum = Integer.parseInt(currPage);
                         int pageCountNum = Integer.parseInt(pageCount);
 
-                        String pmPagePrefix;
                         if (isInbox)
-                            pmPagePrefix = "/pm/";
+                            pagePrefix = "/pm/?page=";
                         else
-                            pmPagePrefix = "/pm/sent";
+                            pagePrefix = "/pm/sent?page=";
 
                         if (currPageNum > 1) {
-                            firstPage = pmPagePrefix;
-                            prevPage = pmPagePrefix + "?page=" + (currPageNum - 2);
+                            firstPage = pagePrefix + 0;
+                            prevPage = pagePrefix + (currPageNum - 2);
                         }
                         if (currPageNum != pageCountNum) {
-                            nextPage = pmPagePrefix + "?page=" + currPageNum;
-                            lastPage = pmPagePrefix + "?page=" + (pageCountNum - 1);
+                            nextPage = pagePrefix + currPageNum;
+                            lastPage = pagePrefix + (pageCountNum - 1);
                         }
                     }
 
                     updateHeader(headerTitle, firstPage, prevPage, currPage,
-                            pageCount, nextPage, lastPage, desc);
+                            pageCount, nextPage, lastPage, pagePrefix, desc);
 
                     if (isDefaultAcc && isInbox)
                         NotifierService.dismissPMNotif(this);
@@ -1376,19 +1389,19 @@ public class AllInOneV2 extends Activity {
                         int currPageNum = Integer.parseInt(currPage);
                         int pageCountNum = Integer.parseInt(pageCount);
 
-                        String amp = buildAMPLink();
+                        pagePrefix = buildAMPLink() + "&page=";
                         if (currPageNum > 1) {
-                            firstPage = amp;
-                            prevPage = amp + "&page=" + (currPageNum - 2);
+                            firstPage = pagePrefix + 0;
+                            prevPage = pagePrefix + (currPageNum - 2);
                         }
                         if (currPageNum != pageCountNum) {
-                            nextPage = amp + "&page=" + currPageNum;
-                            lastPage = amp + "&page=" + (pageCountNum - 1);
+                            nextPage = pagePrefix + currPageNum;
+                            lastPage = pagePrefix + (pageCountNum - 1);
                         }
                     }
                 }
                 updateHeader(headerTitle, firstPage, prevPage, currPage,
-                        pageCount, nextPage, lastPage, NetDesc.AMP_LIST);
+                        pageCount, nextPage, lastPage, pagePrefix, NetDesc.AMP_LIST);
 
                 if (isDefaultAcc)
                     NotifierService.dismissAMPNotif(this);
@@ -1514,7 +1527,7 @@ public class AllInOneV2 extends Activity {
                         searchQuery = url.substring(url.indexOf("search=") + 7);
                         int i = searchQuery.indexOf('&');
                         if (i != -1)
-                            searchQuery.replace(searchQuery.substring(i), EMPTY_STRING);
+                            searchQuery = searchQuery.replace(searchQuery.substring(i), EMPTY_STRING);
 
                         searchPJAddition = "&search=" + searchQuery;
                         searchQuery = URLDecoder.decode(searchQuery);
@@ -1557,32 +1570,27 @@ public class AllInOneV2 extends Activity {
                             int currPageNum = Integer.parseInt(currPage);
                             int pageCountNum = Integer.parseInt(pageCount);
 
+                            pagePrefix = "boards/" + boardID + "?page=";
                             if (currPageNum > 1) {
-                                firstPage = "boards/" + boardID + "?page=0"
-                                        + searchPJAddition;
-                                prevPage = "boards/" + boardID + "?page="
-                                        + (currPageNum - 2)
-                                        + searchPJAddition;
+                                firstPage = pagePrefix + 0 + searchPJAddition;
+                                prevPage = pagePrefix + (currPageNum - 2) + searchPJAddition;
                             }
                             if (currPageNum != pageCountNum) {
-                                nextPage = "boards/" + boardID + "?page="
-                                        + currPageNum + searchPJAddition;
-                                lastPage = "boards/" + boardID + "?page="
-                                        + (pageCountNum - 1)
-                                        + searchPJAddition;
+                                nextPage = pagePrefix + currPageNum + searchPJAddition;
+                                lastPage = pagePrefix  + (pageCountNum - 1) + searchPJAddition;
 
                                 if (currPageNum > pageCountNum) {
                                     session.forceNoHistoryAddition();
                                     session.forceSkipAIOCleanup();
                                     Crouton.showText(this, "Page count higher than page amount, going to last page...", Theming.croutonStyle());
-                                    session.get(NetDesc.BOARD, lastPage, null);
+                                    session.get(NetDesc.BOARD, lastPage);
                                     return;
                                 }
                             }
                         }
                     }
-                    updateHeader(headerTitle, firstPage, prevPage, currPage,
-                            pageCount, nextPage, lastPage, NetDesc.BOARD);
+                    updateHeader(headerTitle, firstPage, prevPage, currPage, pageCount, nextPage,
+                            lastPage, pagePrefix + searchPJAddition, NetDesc.BOARD);
 
                     setMenuItemVisibility(searchIcon, true);
 
@@ -1718,29 +1726,27 @@ public class AllInOneV2 extends Activity {
                         int currPageNum = Integer.parseInt(currPage);
                         int pageCountNum = Integer.parseInt(pageCount);
 
+                        pagePrefix = "boards/" + boardID + "/" + topicID + "?page=";
                         if (currPageNum > 1) {
-                            firstPage = "boards/" + boardID + "/" + topicID;
-                            prevPage = "boards/" + boardID + "/" + topicID
-                                    + "?page=" + (currPageNum - 2);
+                            firstPage = pagePrefix + 0;
+                            prevPage = pagePrefix + (currPageNum - 2);
                         }
                         if (currPageNum != pageCountNum) {
-                            nextPage = "boards/" + boardID + "/" + topicID
-                                    + "?page=" + currPageNum;
-                            lastPage = "boards/" + boardID + "/" + topicID
-                                    + "?page=" + (pageCountNum - 1);
+                            nextPage = pagePrefix + currPageNum;
+                            lastPage = pagePrefix + (pageCountNum - 1);
 
                             if (currPageNum > pageCountNum) {
                                 session.forceNoHistoryAddition();
                                 session.forceSkipAIOCleanup();
                                 Crouton.showText(this, "Page count higher than page amount, going to last page...", Theming.croutonStyle());
-                                session.get(NetDesc.TOPIC, lastPage, null);
+                                session.get(NetDesc.TOPIC, lastPage);
                                 return;
                             }
                         }
                     }
                 }
                 updateHeader(headerTitle, firstPage, prevPage, currPage,
-                        pageCount, nextPage, lastPage, NetDesc.TOPIC);
+                        pageCount, nextPage, lastPage, pagePrefix, NetDesc.TOPIC);
 
                 if (Session.isLoggedIn()) {
                     String favtext = doc.getElementsByClass("user").first().text().toLowerCase(Locale.US);
@@ -1917,7 +1923,6 @@ public class AllInOneV2 extends Activity {
             case USER_DETAIL:
                 wtl("starting user detail processing");
                 tbody = doc.select("table.board").first().getElementsByTag("tbody").first();
-                Log.d("udtb", tbody.outerHtml());
                 String name = null;
                 String ID = null;
                 String level = null;
@@ -1990,13 +1995,8 @@ public class AllInOneV2 extends Activity {
 
                 int currPageNum = Integer.parseInt(currPage);
 
-                Element nextPageElem = null;
-
-                if (!doc.getElementsContainingOwnText("Next Page").isEmpty())
-                    nextPageElem = doc.getElementsContainingOwnText("Next Page").first();
-
                 pageCount = "???";
-                if (nextPageElem != null) {
+                if (!doc.getElementsByClass("icon-angle-right").isEmpty()) {
                     nextPage = "/search/index.html?game=" + searchQuery + "&page=" + (currPageNum + 1);
                 }
                 if (currPageNum > 0) {
@@ -2007,7 +2007,7 @@ public class AllInOneV2 extends Activity {
                 headerTitle = "Searching games: " + URLDecoder.decode(searchQuery) + EMPTY_STRING;
 
                 updateHeader(headerTitle, firstPage, prevPage, Integer.toString(currPageNum + 1),
-                        pageCount, nextPage, lastPage, NetDesc.GAME_SEARCH);
+                        pageCount, nextPage, lastPage, pagePrefix, NetDesc.GAME_SEARCH);
 
                 setMenuItemVisibility(searchIcon, true);
 
@@ -2278,7 +2278,8 @@ public class AllInOneV2 extends Activity {
     }
 
     private void updateHeader(String titleIn, String firstPageIn, String prevPageIn, String currPage,
-                              String pageCount, String nextPageIn, String lastPageIn, NetDesc desc) {
+                              String pageCount, String nextPageIn, String lastPageIn,
+                              String jumperPageIn, NetDesc desc) {
 
         title.setText(titleIn);
 
@@ -2287,7 +2288,6 @@ public class AllInOneV2 extends Activity {
         } else {
             pageJumperWrapper.setVisibility(View.VISIBLE);
             pageJumperDesc = desc;
-            pageLabel.setText(currPage + " / " + pageCount);
 
             if (firstPageIn != null) {
                 firstPageUrl = firstPageIn;
@@ -2316,11 +2316,46 @@ public class AllInOneV2 extends Activity {
             } else {
                 lastPage.setEnabled(false);
             }
+
+            if (!pageCount.equals("1") && !pageCount.equals("???")) {
+                jumperPageUrl = jumperPageIn;
+
+                int pageCountNum = Integer.parseInt(pageCount);
+                final String[] items = new String[pageCountNum];
+                for (int x = 0; x < pageCountNum; x++) {
+                    items[x] = String.valueOf(x + 1);
+                }
+
+                if (jumperDialogBuilder == null) {
+                    jumperDialogBuilder = new AlertDialog.Builder(this);
+                    jumperDialogBuilder.setTitle("Select a page...");
+                }
+
+                jumperDialogBuilder.setItems(items, new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int x = jumperPageUrl.indexOf("?page=") + 6;
+                        if (x == 5) // -1 + 6 = 5, when "?page=" is not found
+                            x = jumperPageUrl.indexOf("&page=") + 6;
+
+                        String go = jumperPageUrl.substring(0, x) + which + jumperPageUrl.substring(x);
+                        wtl("jumper dialog url: " + go);
+                        session.get(pageJumperDesc, go);
+                    }
+                });
+
+                pageLabel.setEnabled(true);
+                pageLabel.setText("~ " + currPage + " / " + pageCount + " ~");
+            }
+            else {
+                pageLabel.setEnabled(false);
+                pageLabel.setText(currPage + " / " + pageCount);
+            }
         }
     }
 
     private void updateHeaderNoJumper(String title, NetDesc desc) {
-        updateHeader(title, null, null, "-1", "-1", null, null, desc);
+        updateHeader(title, null, null, "-1", "-1", null, null, null, desc);
     }
 
     private MessageRowView clickedMsg;
@@ -2439,7 +2474,7 @@ public class AllInOneV2 extends Activity {
             if (pollUse)
                 path += "&poll=1";
 
-            session.get(NetDesc.POSTTPC_S1, path, null);
+            session.get(NetDesc.POSTTPC_S1, path);
         } else {
             // posting on a topic
             wtl("posting on a topic");
@@ -2454,9 +2489,9 @@ public class AllInOneV2 extends Activity {
             postButton.setEnabled(false);
             cancelButton.setEnabled(false);
             if (messageIDForEditing != null)
-                session.get(NetDesc.EDIT_MSG, path, null);
+                session.get(NetDesc.EDIT_MSG, path);
             else
-                session.get(NetDesc.POSTMSG_S1, path, null);
+                session.get(NetDesc.POSTMSG_S1, path);
         }
     }
 
@@ -2588,7 +2623,7 @@ public class AllInOneV2 extends Activity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 reportCode = getResources().getStringArray(R.array.msgReportCodes)[which];
-                session.get(NetDesc.MARKMSG_S1, clickedMsg.getMessageDetailLink(), null);
+                session.get(NetDesc.MARKMSG_S1, clickedMsg.getMessageDetailLink());
             }
         });
 
@@ -2614,8 +2649,12 @@ public class AllInOneV2 extends Activity {
 
         ArrayList<String> listBuilder = new ArrayList<String>();
 
-        if (clickedMsg.isEdited() && clickedMsg.getMessageID() != null)
-            listBuilder.add("View Previous Version(s)");
+        if (clickedMsg.getMessageID() != null) {
+            if (clickedMsg.isEdited())
+                listBuilder.add("View Previous Version(s)");
+            else
+                listBuilder.add("Message Detail");
+        }
 
         if (Session.isLoggedIn()) {
             if (postIcon != null && postIcon.isVisible())
@@ -2643,22 +2682,22 @@ public class AllInOneV2 extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selected = (String) parent.getItemAtPosition(position);
-                if (selected.equals("View Previous Version(s)")) {
-                    session.get(NetDesc.MESSAGE_DETAIL, clickedMsg.getMessageDetailLink(), null);
+                if (selected.equals("View Previous Version(s)") || selected.equals("Message Detail")) {
+                    session.get(NetDesc.MESSAGE_DETAIL, clickedMsg.getMessageDetailLink());
                 } else if (selected.equals("Quote")) {
                     String msg = (quoteSelection != null ? quoteSelection : clickedMsg.getMessageForQuoting());
                     quoteSetup(clickedMsg.getUser(), msg);
                 } else if (selected.equals("Edit")) {
                     editPostSetup(clickedMsg.getMessageForEditing(), clickedMsg.getMessageID());
                 } else if (selected.equals("Delete")) {
-                    session.get(NetDesc.DLTMSG_S1, clickedMsg.getMessageDetailLink(), null);
+                    session.get(NetDesc.DLTMSG_S1, clickedMsg.getMessageDetailLink());
                 } else if (selected.equals("Report")) {
                     showDialog(REPORT_MESSAGE_DIALOG);
                 } else if (selected.equals("Highlight User")) {
                     HighlightedUser user = hlDB.getHighlightedUsers().get(clickedMsg.getUser().toLowerCase(Locale.US));
                     HighlightListDBHelper.showHighlightUserDialog(AllInOneV2.this, user, clickedMsg.getUser(), null);
                 } else if (selected.equals("User Details")) {
-                    session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink(), null);
+                    session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink());
                 } else {
                     Crouton.showText(AllInOneV2.this, "not recognized: " + selected, Theming.croutonStyle());
                 }
@@ -2729,7 +2768,7 @@ public class AllInOneV2 extends Activity {
 
                                     pmSending.setVisibility(View.VISIBLE);
 
-                                    session.get(NetDesc.SEND_PM_S1, "/pm/new", null);
+                                    session.get(NetDesc.SEND_PM_S1, "/pm/new");
 
                                 } else
                                     Crouton.showText(AllInOneV2.this,

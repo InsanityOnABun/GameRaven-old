@@ -43,7 +43,7 @@ public abstract class BaseRowView extends LinearLayout {
             case MESSAGE:
             case PM:
             case PM_DETAIL:
-                setBackgroundDrawable(new SelectorDrawable(getContext()));
+                setBackgroundDrawable(new SelectorItemDrawable(getContext()));
                 break;
             case USER_DETAIL:
             case HIGHLIGHTED_USER:
@@ -64,7 +64,7 @@ public abstract class BaseRowView extends LinearLayout {
 
     public void beginShowingView(BaseRowData data) {
         if (Theming.accentColor() != myColor || Theming.textScale() != myScale) {
-            SelectorDrawable.rebuildColorFilter();
+            SelectorItemDrawable.rebuildColorFilter();
             preRetheme();
         }
         showView(data);

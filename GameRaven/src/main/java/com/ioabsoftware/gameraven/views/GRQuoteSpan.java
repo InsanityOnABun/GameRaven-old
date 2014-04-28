@@ -12,7 +12,7 @@ import com.ioabsoftware.gameraven.util.Theming;
 public class GRQuoteSpan extends QuoteSpan {
 
     private static final int WIDTH = 4;
-    private static final int GAP = 4;
+    private static final int GAP = 6;
     private final int COLOR = Theming.accentColor();
 
     public void writeToParcel(Parcel dest, int flags) {
@@ -37,7 +37,7 @@ public class GRQuoteSpan extends QuoteSpan {
         int color = p.getColor();
 
         p.setStyle(Paint.Style.FILL);
-        p.setColor(Color.parseColor("#22ffffff"));
+        p.setColor(Color.parseColor("#33646464"));
         c.drawRect(x, top, c.getWidth(), bottom, p);
 
         p.setColor(COLOR);

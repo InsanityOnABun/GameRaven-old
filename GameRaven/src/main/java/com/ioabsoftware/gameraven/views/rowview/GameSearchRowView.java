@@ -52,7 +52,7 @@ public class GameSearchRowView extends BaseRowView {
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AllInOneV2.get().getSession().get(NetDesc.BOARD, myData.getUrl(), null);
+                AllInOneV2.get().getSession().get(NetDesc.BOARD, myData.getUrl());
             }
         });
     }

@@ -63,9 +63,9 @@ public class PMRowView extends BaseRowView {
             @Override
             public void onClick(View v) {
                 if (myData.isFromInbox())
-                    AllInOneV2.get().getSession().get(NetDesc.PM_INBOX_DETAIL, myData.getUrl(), null);
+                    AllInOneV2.get().getSession().get(NetDesc.PM_INBOX_DETAIL, myData.getUrl());
                 else
-                    AllInOneV2.get().getSession().get(NetDesc.PM_OUTBOX_DETAIL, myData.getUrl(), null);
+                    AllInOneV2.get().getSession().get(NetDesc.PM_OUTBOX_DETAIL, myData.getUrl());
             }
         });
     }

@@ -8,11 +8,11 @@ import android.graphics.drawable.StateListDrawable;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.util.Theming;
 
-public class SelectorDrawable extends StateListDrawable {
+public class SelectorItemDrawable extends StateListDrawable {
 
     private static PorterDuffColorFilter pressedFilter;
 
-    public SelectorDrawable(Context c) {
+    public SelectorItemDrawable(Context c) {
         super();
 
         if (pressedFilter == null)

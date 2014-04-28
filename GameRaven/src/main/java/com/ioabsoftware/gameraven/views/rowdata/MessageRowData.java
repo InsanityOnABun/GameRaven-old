@@ -251,7 +251,7 @@ public class MessageRowData extends BaseRowData {
                 b.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        aio.getSession().get(NetDesc.TOPIC, action + "?results=1", null);
+                        aio.getSession().get(NetDesc.TOPIC, action + "?results=1");
                     }
                 });
                 pollInnerWrapper.addView(b);

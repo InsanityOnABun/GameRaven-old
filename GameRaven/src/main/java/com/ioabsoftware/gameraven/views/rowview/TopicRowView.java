@@ -17,7 +17,7 @@ import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
-import com.ioabsoftware.gameraven.views.SelectorDrawable;
+import com.ioabsoftware.gameraven.views.SelectorItemDrawable;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
 
 public class TopicRowView extends BaseRowView {
@@ -76,19 +76,19 @@ public class TopicRowView extends BaseRowView {
             lpLinkTextSize = lpLink.getTextSize();
         }
 
-        lpLink.setBackgroundDrawable(new SelectorDrawable(context));
+        lpLink.setBackgroundDrawable(new SelectorItemDrawable(context));
         lpLink.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 AllInOneV2.get().enableGoToUrlDefinedPost();
-                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getLastPostUrl(), null);
+                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getLastPostUrl());
             }
         });
 
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getUrl(), null);
+                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getUrl());
             }
         });
     }
