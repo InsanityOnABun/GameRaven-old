@@ -17,7 +17,7 @@ import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.ClickableLinksTextView;
 import com.ioabsoftware.gameraven.views.RowType;
-import com.ioabsoftware.gameraven.views.StateDrawable;
+import com.ioabsoftware.gameraven.views.SelectorSolidDrawable;
 import com.ioabsoftware.gameraven.views.rowdata.MessageRowData;
 
 public class MessageRowView extends BaseRowView implements View.OnClickListener {
@@ -36,7 +36,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 
     MessageRowData myData;
 
-    StateDrawable headerSelector;
+    SelectorSolidDrawable headerSelector;
     private static Drawable bodyBackground;
 
     boolean isHighlighted = false;
@@ -75,7 +75,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
             messageTextSize = message.getTextSize();
         }
 
-        headerSelector = new StateDrawable(new Drawable[]{getResources().getDrawable(R.drawable.msghead)});
+        headerSelector = new SelectorSolidDrawable(new Drawable[]{getResources().getDrawable(R.drawable.msghead)});
         topWrapper.setBackgroundDrawable(headerSelector);
         topWrapper.setOnClickListener(this);
 

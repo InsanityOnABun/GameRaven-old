@@ -15,7 +15,8 @@ import java.nio.charset.Charset;
 
 public class DocumentParser implements AsyncParser<FinalDoc> {
 
-    private static Charset cset = Charset.forName("ISO-8859-1");
+    public static final String CHARSET_NAME = "ISO-8859-1";
+    public static final Charset CHARSET = Charset.forName(CHARSET_NAME);
 
     @Override
     public Future<FinalDoc> parse(DataEmitter emitter) {
@@ -24,7 +25,7 @@ public class DocumentParser implements AsyncParser<FinalDoc> {
                     @Override
                     protected void transform(ByteBufferList result) throws Exception {
                         byte[] bytes = result.getAllByteArray();
-                        setComplete(new FinalDoc(bytes, Jsoup.parse(new String(bytes, cset))));
+                        setComplete(new FinalDoc(bytes, Jsoup.parse(new String(bytes, CHARSET))));
                     }
                 });
     }

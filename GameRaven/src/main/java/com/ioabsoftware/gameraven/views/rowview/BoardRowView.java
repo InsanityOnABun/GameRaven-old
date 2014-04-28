@@ -67,9 +67,9 @@ public class BoardRowView extends BaseRowView {
                     b.create().show();
                 } else {
                     if (myData.getBoardType() == BoardType.LIST) {
-                        AllInOneV2.get().getSession().get(NetDesc.BOARD_LIST, myData.getUrl(), null);
+                        AllInOneV2.get().getSession().get(NetDesc.BOARD_LIST, myData.getUrl());
                     } else {
-                        AllInOneV2.get().getSession().get(NetDesc.BOARD, myData.getUrl(), null);
+                        AllInOneV2.get().getSession().get(NetDesc.BOARD, myData.getUrl());
                     }
                 }
             }

@@ -16,7 +16,7 @@ import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
-import com.ioabsoftware.gameraven.views.SelectorDrawable;
+import com.ioabsoftware.gameraven.views.SelectorItemDrawable;
 import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 
 public class TrackedTopicRowView extends BaseRowView {
@@ -82,7 +82,7 @@ public class TrackedTopicRowView extends BaseRowView {
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getUrl(), null);
+                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getUrl());
             }
         });
 
@@ -90,25 +90,25 @@ public class TrackedTopicRowView extends BaseRowView {
             @Override
             public boolean onLongClick(View v) {
                 String url = myData.getUrl().substring(0, myData.getUrl().lastIndexOf('/'));
-                AllInOneV2.get().getSession().get(NetDesc.BOARD, url, null);
+                AllInOneV2.get().getSession().get(NetDesc.BOARD, url);
                 return true;
             }
         });
 
-        lpLink.setBackgroundDrawable(new SelectorDrawable(context));
+        lpLink.setBackgroundDrawable(new SelectorItemDrawable(context));
         lpLink.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 AllInOneV2.get().enableGoToUrlDefinedPost();
-                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getLastPostUrl(), null);
+                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getLastPostUrl());
             }
         });
 
-        removeLink.setBackgroundDrawable(new SelectorDrawable(context));
+        removeLink.setBackgroundDrawable(new SelectorItemDrawable(context));
         removeLink.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AllInOneV2.get().getSession().get(NetDesc.TRACKED_TOPICS, myData.getRemoveUrl(), null);
+                AllInOneV2.get().getSession().get(NetDesc.TRACKED_TOPICS, myData.getRemoveUrl());
             }
         });
     }

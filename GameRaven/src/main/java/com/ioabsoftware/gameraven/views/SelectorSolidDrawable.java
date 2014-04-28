@@ -7,11 +7,11 @@ import android.graphics.drawable.LayerDrawable;
 
 import com.ioabsoftware.gameraven.util.Theming;
 
-public class StateDrawable extends LayerDrawable {
+public class SelectorSolidDrawable extends LayerDrawable {
 
     private int myColor, myClickedColor;
 
-    public StateDrawable(Drawable[] layers) {
+    public SelectorSolidDrawable(Drawable[] layers) {
         super(layers);
     }
 

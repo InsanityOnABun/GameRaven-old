@@ -18,7 +18,7 @@ import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
-import com.ioabsoftware.gameraven.views.StateDrawable;
+import com.ioabsoftware.gameraven.views.SelectorSolidDrawable;
 
 public class HighlightedUserView extends BaseRowView implements OnClickListener {
 
@@ -29,7 +29,7 @@ public class HighlightedUserView extends BaseRowView implements OnClickListener 
     private LinearLayout colorFrame;
     private TextView nameView, labelView;
 
-    private StateDrawable back;
+    private SelectorSolidDrawable back;
 
     public HighlightedUserView(Context context) {
         super(context);
@@ -63,7 +63,7 @@ public class HighlightedUserView extends BaseRowView implements OnClickListener 
         if (user.getColor() != 0)
             colorFrame.setBackgroundColor(user.getColor());
 
-        back = new StateDrawable(new Drawable[] {getResources().getDrawable(R.drawable.selector)});
+        back = new SelectorSolidDrawable(new Drawable[] {getResources().getDrawable(R.drawable.selector_solid)});
         back.setMyColor(Color.TRANSPARENT);
         setBackgroundDrawable(back);
 

@@ -41,15 +41,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/aioTitle"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <View
                     android:id="@+id/aioPJTopSep"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginBottom="3dp"
-                    android:background="#33B5E5"
-                    android:visibility="visible" />
+                    android:background="#33B5E5" />
 
                 <Button
                     android:id="@+id/aioFirstPage"
@@ -58,6 +56,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_below="@+id/aioPJTopSep"
+                    android:paddingBottom="@dimen/item_padding_vertical"
+                    android:paddingTop="@dimen/item_padding_vertical"
                     android:enabled="false"
                     android:minHeight="32dp"
                     android:minWidth="54dp"
@@ -67,23 +67,21 @@
                 <View
                     android:id="@+id/aioFirstPrevSep"
                     android:layout_width="1dp"
-                    android:layout_height="24dp"
+                    android:layout_height="wrap_content"
                     android:layout_alignBottom="@+id/aioFirstPage"
                     android:layout_alignTop="@+id/aioFirstPage"
                     android:layout_toRightOf="@+id/aioFirstPage"
-                    android:background="#33B5E5"
-                    android:visibility="visible" />
+                    android:background="#33B5E5" />
 
                 <Button
                     android:id="@+id/aioPreviousPage"
                     style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/aioFirstPage"
                     android:layout_alignBottom="@+id/aioFirstPage"
+                    android:layout_alignTop="@+id/aioFirstPage"
                     android:layout_toRightOf="@+id/aioFirstPrevSep"
                     android:enabled="false"
-                    android:minHeight="32dp"
                     android:minWidth="54dp"
                     android:text="@string/prevpage"
                     android:textColor="?attr/themedPageJumperColor" />
@@ -93,11 +91,10 @@
                     style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/aioFirstPage"
-                    android:layout_alignBottom="@+id/aioPreviousPage"
+                    android:layout_alignBottom="@+id/aioFirstPage"
                     android:layout_alignParentRight="true"
+                    android:layout_alignTop="@+id/aioFirstPage"
                     android:enabled="false"
-                    android:minHeight="32dp"
                     android:minWidth="54dp"
                     android:text="@string/lastpage"
                     android:textColor="?attr/themedPageJumperColor" />
@@ -105,37 +102,36 @@
                 <View
                     android:id="@+id/aioNextLastSep"
                     android:layout_width="1dp"
-                    android:layout_height="24dp"
+                    android:layout_height="wrap_content"
                     android:layout_alignBottom="@+id/aioFirstPage"
                     android:layout_alignTop="@+id/aioFirstPage"
                     android:layout_toLeftOf="@+id/aioLastPage"
-                    android:background="#33B5E5"
-                    android:visibility="visible" />
+                    android:background="#33B5E5" />
 
                 <Button
                     android:id="@+id/aioNextPage"
                     style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/aioFirstPage"
-                    android:layout_alignBottom="@+id/aioLastPage"
+                    android:layout_alignBottom="@+id/aioFirstPage"
+                    android:layout_alignTop="@+id/aioFirstPage"
                     android:layout_toLeftOf="@+id/aioNextLastSep"
                     android:enabled="false"
-                    android:minHeight="32dp"
                     android:minWidth="54dp"
                     android:text="@string/nextpage"
                     android:textColor="?attr/themedPageJumperColor" />
 
-                <TextView
+                <Button
                     android:id="@+id/aioPageLabel"
+                    style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/aioFirstPage"
-                    android:layout_centerHorizontal="true"
+                    android:layout_alignBottom="@+id/aioFirstPage"
+                    android:layout_alignTop="@+id/aioFirstPage"
                     android:layout_toLeftOf="@+id/aioNextPage"
                     android:layout_toRightOf="@+id/aioPreviousPage"
-                    android:gravity="center"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="?attr/themedPageJumperColor" />
             </RelativeLayout>
         </RelativeLayout>
 
@@ -143,9 +139,7 @@
             android:id="@+id/aioSep"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="3dp"
-            android:background="@color/holo_blue"
-            android:visibility="visible" />
+            android:background="@color/holo_blue" />
     </LinearLayout>
 
     <uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout
@@ -164,8 +158,6 @@
             android:dividerHeight="5dp"
             android:fastScrollEnabled="true"
             android:paddingBottom="5dp"
-            android:paddingLeft="2dp"
-            android:paddingRight="2dp"
             android:paddingTop="5dp"
             android:smoothScrollbar="true" />
     </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>

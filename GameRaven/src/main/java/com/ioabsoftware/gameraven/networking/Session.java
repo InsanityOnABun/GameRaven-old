@@ -9,17 +9,20 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.util.Log;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
+import com.ioabsoftware.gameraven.BuildConfig;
 import com.ioabsoftware.gameraven.db.History;
 import com.ioabsoftware.gameraven.db.HistoryDBAdapter;
 import com.ioabsoftware.gameraven.util.DocumentParser;
 import com.ioabsoftware.gameraven.util.FinalDoc;
 import com.ioabsoftware.gameraven.util.Theming;
+import com.koushikdutta.async.future.Future;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
@@ -34,6 +37,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeoutException;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
@@ -250,13 +254,16 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         // clear out cookies
         Ion.getDefault(aio).getCookieMiddleware().clear();
 
+        if (BuildConfig.DEBUG)
+            Ion.getDefault(aio).configure().setLogging("IonLogs", Log.VERBOSE);
+
         if (user == null) {
             AllInOneV2.wtl("session constructor, user is null, starting logged out session");
-            get(NetDesc.BOARD_JUMPER, ROOT + "/boards", null);
+            get(NetDesc.BOARD_JUMPER, ROOT + "/boards");
             aio.setLoginName("Logged Out");
         } else {
             AllInOneV2.wtl("session constructor, user is not null, starting logged in session");
-            get(NetDesc.LOGIN_S1, ROOT + "/boards", null);
+            get(NetDesc.LOGIN_S1, ROOT + "/boards");
             aio.setLoginName(user);
         }
     }
@@ -297,25 +304,31 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         return netInfo != null && netInfo.isConnected();
     }
 
+
+    Future currentNetworkTask;
     /**
      * Sends a GET request to a specified page.
      *
      * @param desc Description of this request, to properly handle the response later.
      * @param path The path to send the request to.
-     * @param data The extra data to send along, pass null if no extra data.
      */
-    public void get(NetDesc desc, String path, Map<String, String> data) {
+    public void get(NetDesc desc, String path) {
         if (hasNetworkConnection()) {
             if (desc != NetDesc.MODHIST) {
+                if (currentNetworkTask != null && !currentNetworkTask.isDone())
+                    currentNetworkTask.cancel(true);
+
                 lastAttemptedPath = path;
                 lastAttemptedDesc = desc;
 
                 preExecuteSetup(desc);
-                Ion.with(aio)
+
+                currentNetworkTask = Ion.with(aio)
                         .load("GET", buildURL(path, desc))
                         .as(new DocumentParser())
                         .withResponse()
                         .setCallback(this);
+
             } else
                 aio.genError("Page Unsupported", "The moderation history page is currently unsupported in-app. Sorry.");
 
@@ -333,9 +346,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
     public void post(NetDesc desc, String path, Map<String, List<String>> data) {
         if (hasNetworkConnection()) {
             if (desc != NetDesc.MODHIST) {
+                if (currentNetworkTask != null && !currentNetworkTask.isDone())
+                    currentNetworkTask.cancel(true);
 
                 preExecuteSetup(desc);
-                Ion.with(aio)
+                currentNetworkTask = Ion.with(aio)
                         .load("POST", buildURL(path, desc))
                         .setBodyParameters(data)
                         .as(new DocumentParser())
@@ -358,6 +373,9 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
      */
     @Override
     public void onCompleted(Exception e, Response<FinalDoc> result) {
+        if (e != null && e instanceof CancellationException)
+            return;
+
         NetDesc thisDesc = currentDesc;
         handleNetworkResult(e, thisDesc, result);
         postExecuteCleanup(thisDesc);
@@ -506,7 +524,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         AllInOneV2.wtl("status code 401");
                         if (lastDesc == NetDesc.LOGIN_S2) {
                             forceSkipAIOCleanup();
-                            get(NetDesc.BOARD_JUMPER, "/boards", null);
+                            get(NetDesc.BOARD_JUMPER, "/boards");
                         } else {
                             Elements paragraphs = doc.getElementsByTag("p");
                             aio.genError("401 Error", paragraphs.get(1).text()
@@ -527,6 +545,29 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     aio.genError("503 Error", "GameFAQs is experiencing some temporary difficulties with " +
                             "the site. Probably because of something they did. Please wait a few " +
                             "seconds before refreshing this page to try again.");
+
+                    return;
+                }
+
+                if (resUrl.contains("account_suspended.html")) {
+                    aio.genError("Account Suspended", "Your account seems to be suspended. Please " +
+                            "log in to your account in a web browser for more details.");
+
+                    return;
+                }
+
+                if (resUrl.contains("account_banned.html")) {
+                    aio.genError("Account Banned", "Your account seems to be banned. Please " +
+                            "log in to your account in a web browser for more details.");
+
+                    return;
+                }
+
+                if (resUrl.contains("welcome.php")) {
+                    aio.genError("New Account", "It looks like this is a new account. Welcome to GameFAQs! " +
+                            "There are some ground rules you'll have to go over first before you can get " +
+                            "access to the message boards. Please log in to your account in a web browser " +
+                            "and access the message boards there to view and accept the site terms and rules.");
 
                     return;
                 }
@@ -699,13 +740,13 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                         if (initUrl != null) {
                             AllInOneV2.wtl("loading previous page");
-                            get(initDesc, initUrl, null);
+                            get(initDesc, initUrl);
                         } else if (userCanViewAMP() && AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false)) {
                             AllInOneV2.wtl("loading AMP");
-                            get(NetDesc.AMP_LIST, AllInOneV2.buildAMPLink(), null);
+                            get(NetDesc.AMP_LIST, AllInOneV2.buildAMPLink());
                         } else {
                             AllInOneV2.wtl("loading board jumper");
-                            get(NetDesc.BOARD_JUMPER, "/boards", null);
+                            get(NetDesc.BOARD_JUMPER, "/boards");
                         }
 
                         break;
@@ -1110,7 +1151,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         if (forceReload || AllInOneV2.getSettingsPref().getBoolean("reloadOnBack", false)) {
             forceNoHistoryAddition();
             AllInOneV2.wtl("going back in history, refreshing: " + h.getDesc().name() + " " + h.getPath());
-            get(h.getDesc(), h.getPath(), null);
+            get(h.getDesc(), h.getPath());
         } else {
             AllInOneV2.wtl("going back in history: " + h.getDesc().name() + " " + h.getPath());
             lastDesc = h.getDesc();
@@ -1145,7 +1186,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         if (lastDesc == NetDesc.AMP_LIST)
             trimmedPath = AllInOneV2.buildAMPLink();
 
-        get(lastDesc, trimmedPath, null);
+        get(lastDesc, trimmedPath);
     }
 
     private void showAutoFlagWarning(final String path, final HashMap<String, List<String>> data, final NetDesc desc, String msg) {
