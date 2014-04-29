@@ -1,7 +1,6 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -130,7 +129,9 @@ public class TrackedTopicRowView extends BaseRowView {
         myData = (TrackedTopicRowData) data;
 
         if (myData.getStatus() == ReadStatus.READ) {
-            int readColor = Theming.usingLightTheme() ? Color.LTGRAY : Color.DKGRAY;
+            int readColor = Theming.usingLightTheme() ?
+                    getResources().getColor(R.color.read_topic_light) :
+                    getResources().getColor(R.color.read_topic);
             board.setTextColor(readColor);
             title.setTextColor(readColor);
             msgLP.setTextColor(readColor);

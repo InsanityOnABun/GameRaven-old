@@ -313,7 +313,8 @@ public class AllInOneV2 extends Activity {
             }
         });
 
-        drawer.findViewById(R.id.dwrBoardJumper).setOnClickListener(new View.OnClickListener() {
+        boardListButton = (Button) drawer.findViewById(R.id.dwrBoardJumper);
+        boardListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 drawer.closeMenu(true);
@@ -576,7 +577,7 @@ public class AllInOneV2 extends Activity {
             ((TextView) drawer.findViewById(R.id.dwrChangeAccHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
             ((TextView) drawer.findViewById(R.id.dwrChangeAcc)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
             ((TextView) drawer.findViewById(R.id.dwrNavHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrBoardJumper)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            boardListButton.setTextSize(px, Theming.getScaledDwrButtonTextSize());
             ((TextView) drawer.findViewById(R.id.dwrAMPList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
             ((TextView) drawer.findViewById(R.id.dwrTrackedTopics)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
             ((TextView) drawer.findViewById(R.id.dwrPMInbox)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
@@ -1211,7 +1212,9 @@ public class AllInOneV2 extends Activity {
         adBuilder.setLength(0);
         adBuilder.append("<html>");
         adBuilder.append(doc.head().outerHtml());
-        adBuilder.append("<body style=\"background-color:" + bgcolor + " !important\">");
+        adBuilder.append("<body style=\"background-color:");
+        adBuilder.append(bgcolor);
+        adBuilder.append(" !important\">");
 
         wtl("appending ad elements to adbuilder");
         for (Element e : doc.getElementsByClass("ad")) {
@@ -1235,6 +1238,44 @@ public class AllInOneV2 extends Activity {
 
         wtl("enabling javascript");
         web.getSettings().setJavaScriptEnabled(settings.getBoolean("enableJS", true));
+
+        wtl("checking for board quick list");
+        Element boardsDropdown = null;
+        for (Element e : doc.select("ul.masthead_mygames_subnav")) {
+            if (e.previousElementSibling().ownText().equals("My Boards")) {
+                boardsDropdown = e;
+                break;
+            }
+        }
+        if (boardsDropdown != null) {
+            Elements dItems = boardsDropdown.getElementsByTag("a");
+            boardQuickListOptions = new String[dItems.size()];
+            boardQuickListLinks = new String[dItems.size()];
+            int x = 0;
+            for (Element e : dItems) {
+                boardQuickListOptions[x] = e.text();
+                boardQuickListLinks[x] = e.attr("href");
+                x++;
+            }
+
+            if (!boardListButton.isLongClickable()) {
+                boardListButton.setText(getResources().getString(R.string.board_jumper) +
+                        getResources().getString(R.string.board_jumper_quick_list));
+
+                boardListButton.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        showBoardQuickList();
+                        return true;
+                    }
+                });
+            }
+
+        }
+        else if (boardListButton.isLongClickable()) {
+            boardListButton.setText(getResources().getString(R.string.board_jumper));
+            boardListButton.setLongClickable(false);
+        }
 
         switch (desc) {
             case BOARD_JUMPER:
@@ -2878,6 +2919,23 @@ public class AllInOneV2 extends Activity {
             }
         });
         return d;
+    }
+
+    private Button boardListButton;
+    private String[] boardQuickListOptions;
+    private String[] boardQuickListLinks;
+    private void showBoardQuickList() {
+        AlertDialog.Builder b = new AlertDialog.Builder(this);
+        b.setTitle("My Boards");
+        b.setNegativeButton("Cancel", null);
+        b.setItems(boardQuickListOptions, new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                session.get(NetDesc.BOARD, boardQuickListLinks[which]);
+            }
+        });
+        drawer.closeMenu(true);
+        b.show();
     }
 
     private String replyTo, replySubject;
