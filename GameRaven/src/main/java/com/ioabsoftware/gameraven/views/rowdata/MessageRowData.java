@@ -274,7 +274,7 @@ public class MessageRowData extends BaseRowData {
         // quotes don't use CharacterStyles, so do it manually
         while (ssb.toString().contains("<blockquote>")) {
             int start = ssb.toString().indexOf("<blockquote>");
-            ssb.replace(start, start + "<blockquote>".length(), "\n");
+            ssb.replace(start, start + 12, "\n");
             start++;
 
             int stackCount = 1;
@@ -301,8 +301,8 @@ public class MessageRowData extends BaseRowData {
         }
 
         AllInOneV2.wtl("getting text colors for spoilers");
-        final int defTextColor;
-        final int color;
+        int defTextColor;
+        int color;
         if (Theming.usingLightTheme()) {
             color = Color.WHITE;
             defTextColor = Color.BLACK;
@@ -316,13 +316,13 @@ public class MessageRowData extends BaseRowData {
         AllInOneV2.wtl("replacing &gameravenlt; with <");
         while (ssb.toString().contains("&gameravenlt;")) {
             int start = ssb.toString().indexOf("&gameravenlt;");
-            ssb.replace(start, start + "&gameravenlt;".length(), "<");
+            ssb.replace(start, start + 13, "<");
         }
 
         AllInOneV2.wtl("replacing &gameravengt; with >");
         while (ssb.toString().contains("&gameravengt;")) {
             int start = ssb.toString().indexOf("&gameravengt;");
-            ssb.replace(start, start + "&gameravengt;".length(), ">");
+            ssb.replace(start, start + 13, ">");
         }
 
         AllInOneV2.wtl("linkifying");
@@ -332,23 +332,12 @@ public class MessageRowData extends BaseRowData {
         // do spoiler tags manually instead of in the method, as the clickablespan needs
         // to know the start and end points
         while (ssb.toString().contains("<spoiler>")) {
-            final int start = ssb.toString().indexOf("<spoiler>");
+            int start = ssb.toString().indexOf("<spoiler>");
             ssb.delete(start, start + 9);
-            final int end = ssb.toString().indexOf("</spoiler>", start);
+            int end = ssb.toString().indexOf("</spoiler>", start);
             ssb.delete(end, end + 10);
             ssb.setSpan(new BackgroundColorSpan(defTextColor), start, end, 0);
-            ssb.setSpan(new ClickableSpan() {
-                @Override
-                public void onClick(View widget) {
-                    ((Spannable) ((ClickableLinksTextView) widget).getText()).setSpan(new BackgroundColorSpan(color), start, end, 0);
-                }
-
-                @Override
-                public void updateDrawState(TextPaint ds) {
-                    ds.setColor(defTextColor);
-                    ds.setUnderlineText(false);
-                }
-            }, start, end, 0);
+            ssb.setSpan(new SpoilerClickSpan(start, end, color, defTextColor), start, end, 0);
 
         }
 
@@ -451,6 +440,30 @@ public class MessageRowData extends BaseRowData {
 
         AllInOneV2.wtl("returning finalbody");
         return finalBody;
+    }
+
+    private class SpoilerClickSpan extends ClickableSpan {
+
+        int color, defTextColor;
+        int start, end;
+
+        public SpoilerClickSpan(int start, int end, int color, int defTextColor) {
+            this.start = start;
+            this.end = end;
+            this.color = color;
+            this.defTextColor = defTextColor;
+        }
+
+        @Override
+        public void onClick(View widget) {
+            ((Spannable) ((ClickableLinksTextView) widget).getText()).setSpan(new BackgroundColorSpan(color), start, end, 0);
+        }
+
+        @Override
+        public void updateDrawState(TextPaint ds) {
+            ds.setColor(defTextColor);
+            ds.setUnderlineText(false);
+        }
     }
 
 }
