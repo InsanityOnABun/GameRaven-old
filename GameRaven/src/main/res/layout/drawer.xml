@@ -83,6 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/listPreferredItemHeight"
                 android:gravity="left|center_vertical"
+                android:longClickable="false"
                 android:text="@string/board_jumper" />
 
             <View
