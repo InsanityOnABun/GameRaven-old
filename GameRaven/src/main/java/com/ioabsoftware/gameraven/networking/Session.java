@@ -1044,7 +1044,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                 AllInOneV2.wtl("res was null in session hNR");
                 aio.timeoutCleanup(desc);
             }
-        } catch (TimeoutException ex) {
+        } catch (TimeoutException timeoutEx) {
             aio.timeoutCleanup(desc);
         } catch (Throwable ex) {
             ex.printStackTrace();
@@ -1055,7 +1055,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             } else
                 url = body = "res is null";
 
-            aio.tryCaught(url, desc.toString(), e, body);
+            aio.tryCaught(url, desc.toString(), ex, body);
         }
 
         AllInOneV2.wtl("session hNR finishing, desc: " + desc.name());
