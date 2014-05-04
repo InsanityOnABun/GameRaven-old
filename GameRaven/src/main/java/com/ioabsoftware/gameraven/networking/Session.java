@@ -32,6 +32,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -1046,6 +1047,13 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             }
         } catch (TimeoutException timeoutEx) {
             aio.timeoutCleanup(desc);
+        } catch (UnknownHostException unknownHostEx) {
+            aio.genError("Unknown Host Exception", "Couldn't find the address for the specified host. " +
+                    "This usually happens due to a DNS lookup error, which is outside of GameRaven's " +
+                    "ability to handle. If you continue to receive this error, try resetting your network. " +
+                    "If you are on wifi, you can do this by unplugging your router for 30 seconds, then plugging " +
+                    "it back in. If on a cellular connection, toggle airplane mode on and off, or restart " +
+                    "the phone.");
         } catch (Throwable ex) {
             ex.printStackTrace();
             String url, body;
