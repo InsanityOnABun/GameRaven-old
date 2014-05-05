@@ -44,12 +44,12 @@ public class AdGFAQsRowView extends BaseRowView {
 
         View view = ((AdGFAQsRowData) data).getWebView();
 
-        try {
-            ((ViewGroup) view.getParent()).removeView(view);
-        } catch (Exception e1) {
+        if (view.getParent() != this) {
+            if (view.getParent() != null) {
+                        ((ViewGroup) view.getParent()).removeView(view);
+            }
+            addView(view);
         }
-
-        addView(view);
     }
 
 }

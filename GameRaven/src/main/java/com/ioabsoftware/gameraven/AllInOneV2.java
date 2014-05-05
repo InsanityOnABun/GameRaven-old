@@ -1159,6 +1159,9 @@ public class AllInOneV2 extends Activity {
     Runnable postProcessRunnable = new Runnable() {
         @Override
         public void run() {
+            if (web.getHeight() > web.getMinimumHeight())
+                ((View) web.getParent()).setMinimumHeight(web.getHeight());
+
             web.loadDataWithBaseURL(adBaseUrl, adBuilder.toString(), null, "iso-8859-1", null);
             adBuilder.setLength(0);
             setMarqueeSpeed(title, 4, false);
