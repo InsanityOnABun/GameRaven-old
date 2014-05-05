@@ -14,7 +14,6 @@ import com.ioabsoftware.gameraven.views.RowType;
 public class AdmobRowView extends BaseRowView {
 
     private static AdView adView;
-    private static AdRequest adRequest;
 
     public AdmobRowView(Context context) {
         super(context);
@@ -40,7 +39,7 @@ public class AdmobRowView extends BaseRowView {
         this.setWeightSum(1);
         this.addView(adView);
 
-        adRequest = new AdRequest.Builder()
+        AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)        // Emulator
                 .build();
 
@@ -69,6 +68,6 @@ public class AdmobRowView extends BaseRowView {
 
     @Override
     protected void showView(BaseRowData data) {
-        adView.loadAd(adRequest);
+        // nada
     }
 }

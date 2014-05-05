@@ -25,6 +25,12 @@ public final class Theming {
         return usingLightTheme;
     }
 
+    private static int backgroundColor;
+
+    public static int backgroundColor() {
+        return backgroundColor;
+    }
+
     private static int accentColor;
 
     public static int accentColor() {
@@ -66,6 +72,7 @@ public final class Theming {
     public static void init(Context c, SharedPreferences settings) {
         updateAccentColor(settings.getInt("accentColor", (c.getResources().getColor(R.color.holo_blue))), settings.getBoolean("useWhiteAccentText", false));
         usingLightTheme = settings.getBoolean("useLightTheme", false);
+        backgroundColor = c.getResources().getColor(usingLightTheme ? R.color.background_light : R.color.background);
         textScale = settings.getInt("textScale", 100) / 100f;
     }
 

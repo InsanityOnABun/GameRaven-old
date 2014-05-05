@@ -1202,18 +1202,11 @@ public class AllInOneV2 extends Activity {
         String lastPage = null;
         String pagePrefix = null;
 
-        wtl("setting bgcolor");
-        String bgcolor;
-        if (Theming.usingLightTheme())
-            bgcolor = ColorPickerPreference.convertToRGB(getResources().getColor(R.color.background));
-        else
-            bgcolor = ColorPickerPreference.convertToRGB(getResources().getColor(R.color.background_light));
-
         wtl("initial adbuilder appending");
         adBuilder.append("<html>");
         adBuilder.append(doc.head().outerHtml());
         adBuilder.append("<body style=\"background-color:");
-        adBuilder.append(bgcolor);
+        adBuilder.append(ColorPickerPreference.convertToRGB(Theming.backgroundColor()));
         adBuilder.append(" !important\">");
 
         wtl("appending ad elements to adbuilder");
@@ -1233,8 +1226,11 @@ public class AllInOneV2 extends Activity {
         adBaseUrl = resUrl;
 
         wtl("checking if webView is null, creating if so");
-        if (web == null)
+        if (web == null) {
             web = new WebView(this);
+            web.getSettings();
+            web.setBackgroundColor(Theming.backgroundColor());
+        }
 
         wtl("enabling javascript");
         web.getSettings().setJavaScriptEnabled(settings.getBoolean("enableJS", true));
