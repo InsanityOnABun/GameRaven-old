@@ -24,6 +24,7 @@ import com.ioabsoftware.gameraven.util.FinalDoc;
 import com.ioabsoftware.gameraven.util.Theming;
 import com.koushikdutta.async.future.Future;
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.ConnectionClosedException;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 
@@ -1054,6 +1055,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     "If you are on wifi, you can do this by unplugging your router for 30 seconds, then plugging " +
                     "it back in. If on a cellular connection, toggle airplane mode on and off, or restart " +
                     "the phone.");
+        } catch (ConnectionClosedException connClosedEx) {
+            aio.genError("Connection Closed", "The connection was closed before the the response was completed.");
         } catch (Throwable ex) {
             ex.printStackTrace();
             String url, body;
