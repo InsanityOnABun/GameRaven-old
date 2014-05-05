@@ -1061,8 +1061,16 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             ex.printStackTrace();
             String url, body;
             if (result != null) {
-                url = result.getRequest().getUri().toString();
-                body = new String(result.getResult().bytes);
+                try {
+                    url = result.getRequest().getUri().toString();
+                } catch (Exception e1) {
+                    url = "uri is null";
+                }
+                try {
+                    body = new String(result.getResult().bytes);
+                } catch (Exception e1) {
+                    body = "result bytes are null";
+                }
             } else
                 url = body = "res is null";
 
