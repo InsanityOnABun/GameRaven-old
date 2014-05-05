@@ -1206,20 +1206,21 @@ public class AllInOneV2 extends Activity {
         String pagePrefix = null;
 
         wtl("initial adbuilder appending");
-        adBuilder.append("<html>");
-        adBuilder.append(doc.head().outerHtml());
-        adBuilder.append("<body style=\"background-color:");
+        adBuilder.append("<html>\n<head>\n");
+        adBuilder.append(doc.head().html());
+        adBuilder.append("<style>\n* {background-color: ");
         adBuilder.append(ColorPickerPreference.convertToRGB(Theming.backgroundColor()));
-        adBuilder.append(" !important\">");
+        adBuilder.append(";}\n</style>\n</head>\n");
+        adBuilder.append("<body>");
 
         wtl("appending ad elements to adbuilder");
-        for (Element e : doc.getElementsByClass("ad")) {
+        for (Element e : doc.body().getElementsByClass("ad")) {
             adBuilder.append(e.outerHtml());
             e.remove();
         }
 
         wtl("appending script elements to adbuilder");
-        for (Element e : doc.getElementsByTag("script")) {
+        for (Element e : doc.body().getElementsByTag("script")) {
             adBuilder.append(e.outerHtml());
         }
 
