@@ -1160,6 +1160,7 @@ public class AllInOneV2 extends Activity {
         @Override
         public void run() {
             web.loadDataWithBaseURL(adBaseUrl, adBuilder.toString(), null, "iso-8859-1", null);
+            adBuilder.setLength(0);
             setMarqueeSpeed(title, 4, false);
         }
     };
@@ -1209,7 +1210,6 @@ public class AllInOneV2 extends Activity {
             bgcolor = ColorPickerPreference.convertToRGB(getResources().getColor(R.color.background_light));
 
         wtl("initial adbuilder appending");
-        adBuilder.setLength(0);
         adBuilder.append("<html>");
         adBuilder.append(doc.head().outerHtml());
         adBuilder.append("<body style=\"background-color:");
@@ -2095,11 +2095,6 @@ public class AllInOneV2 extends Activity {
                 wtl("GRAIO hNR determined response type is unhandled");
                 title.setText("Page unhandled - " + resUrl);
                 break;
-        }
-
-        try {
-            ((ViewGroup) web.getParent()).removeView(web);
-        } catch (Exception e1) {
         }
 
         adapterRows.add(new AdmobRowData());
