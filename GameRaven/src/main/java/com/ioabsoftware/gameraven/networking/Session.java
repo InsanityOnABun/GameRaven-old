@@ -24,6 +24,7 @@ import com.ioabsoftware.gameraven.util.FinalDoc;
 import com.ioabsoftware.gameraven.util.Theming;
 import com.koushikdutta.async.future.Future;
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.ConnectionClosedException;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 
@@ -32,6 +33,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -1044,18 +1046,35 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                 AllInOneV2.wtl("res was null in session hNR");
                 aio.timeoutCleanup(desc);
             }
-        } catch (TimeoutException ex) {
+        } catch (TimeoutException timeoutEx) {
             aio.timeoutCleanup(desc);
+        } catch (UnknownHostException unknownHostEx) {
+            aio.genError("Unknown Host Exception", "Couldn't find the address for the specified host. " +
+                    "This usually happens due to a DNS lookup error, which is outside of GameRaven's " +
+                    "ability to handle. If you continue to receive this error, try resetting your network. " +
+                    "If you are on wifi, you can do this by unplugging your router for 30 seconds, then plugging " +
+                    "it back in. If on a cellular connection, toggle airplane mode on and off, or restart " +
+                    "the phone.");
+        } catch (ConnectionClosedException connClosedEx) {
+            aio.genError("Connection Closed", "The connection was closed before the the response was completed.");
         } catch (Throwable ex) {
             ex.printStackTrace();
             String url, body;
             if (result != null) {
-                url = result.getRequest().getUri().toString();
-                body = new String(result.getResult().bytes);
+                try {
+                    url = result.getRequest().getUri().toString();
+                } catch (Exception e1) {
+                    url = "uri is null";
+                }
+                try {
+                    body = new String(result.getResult().bytes);
+                } catch (Exception e1) {
+                    body = "result bytes are null";
+                }
             } else
                 url = body = "res is null";
 
-            aio.tryCaught(url, desc.toString(), e, body);
+            aio.tryCaught(url, desc.toString(), ex, body);
         }
 
         AllInOneV2.wtl("session hNR finishing, desc: " + desc.name());

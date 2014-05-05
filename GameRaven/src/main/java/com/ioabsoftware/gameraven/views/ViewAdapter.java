@@ -98,7 +98,7 @@ public class ViewAdapter extends BaseAdapter {
                     view = new UserDetailRowView(context);
                     break;
                 case GFAQS_AD:
-                    view = new AdGFAQsRowView(context, data);
+                    view = new AdGFAQsRowView(context);
                     break;
                 case ADMOB_AD:
                     view = new AdmobRowView(context);

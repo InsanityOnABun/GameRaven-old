@@ -1159,7 +1159,11 @@ public class AllInOneV2 extends Activity {
     Runnable postProcessRunnable = new Runnable() {
         @Override
         public void run() {
+            if (web.getHeight() > web.getMinimumHeight())
+                ((View) web.getParent()).setMinimumHeight(web.getHeight());
+
             web.loadDataWithBaseURL(adBaseUrl, adBuilder.toString(), null, "iso-8859-1", null);
+            adBuilder.setLength(0);
             setMarqueeSpeed(title, 4, false);
         }
     };
@@ -1201,29 +1205,22 @@ public class AllInOneV2 extends Activity {
         String lastPage = null;
         String pagePrefix = null;
 
-        wtl("setting bgcolor");
-        String bgcolor;
-        if (Theming.usingLightTheme())
-            bgcolor = ColorPickerPreference.convertToRGB(getResources().getColor(R.color.background));
-        else
-            bgcolor = ColorPickerPreference.convertToRGB(getResources().getColor(R.color.background_light));
-
         wtl("initial adbuilder appending");
-        adBuilder.setLength(0);
-        adBuilder.append("<html>");
-        adBuilder.append(doc.head().outerHtml());
-        adBuilder.append("<body style=\"background-color:");
-        adBuilder.append(bgcolor);
-        adBuilder.append(" !important\">");
+        adBuilder.append("<html>\n<head>\n");
+        adBuilder.append(doc.head().html());
+        adBuilder.append("<style>\n* {background-color: ");
+        adBuilder.append(ColorPickerPreference.convertToRGB(Theming.backgroundColor()));
+        adBuilder.append(";}\n</style>\n</head>\n");
+        adBuilder.append("<body>");
 
         wtl("appending ad elements to adbuilder");
-        for (Element e : doc.getElementsByClass("ad")) {
+        for (Element e : doc.body().getElementsByClass("ad")) {
             adBuilder.append(e.outerHtml());
             e.remove();
         }
 
         wtl("appending script elements to adbuilder");
-        for (Element e : doc.getElementsByTag("script")) {
+        for (Element e : doc.body().getElementsByTag("script")) {
             adBuilder.append(e.outerHtml());
         }
 
@@ -1233,8 +1230,11 @@ public class AllInOneV2 extends Activity {
         adBaseUrl = resUrl;
 
         wtl("checking if webView is null, creating if so");
-        if (web == null)
+        if (web == null) {
             web = new WebView(this);
+            web.getSettings();
+            web.setBackgroundColor(Theming.backgroundColor());
+        }
 
         wtl("enabling javascript");
         web.getSettings().setJavaScriptEnabled(settings.getBoolean("enableJS", true));
@@ -2095,11 +2095,6 @@ public class AllInOneV2 extends Activity {
                 wtl("GRAIO hNR determined response type is unhandled");
                 title.setText("Page unhandled - " + resUrl);
                 break;
-        }
-
-        try {
-            ((ViewGroup) web.getParent()).removeView(web);
-        } catch (Exception e1) {
         }
 
         adapterRows.add(new AdmobRowData());
