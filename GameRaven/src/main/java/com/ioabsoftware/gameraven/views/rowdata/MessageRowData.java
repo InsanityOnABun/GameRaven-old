@@ -54,8 +54,7 @@ import java.util.TimeZone;
 public class MessageRowData extends BaseRowData {
 
     private String username, userTitles, postNum, postTime, messageID, boardID, topicID;
-
-    private Element messageElem, messageElemNoPoll;
+    private final String unprocessedMessageText;
 
     private LinearLayout poll = null;
 
@@ -64,6 +63,21 @@ public class MessageRowData extends BaseRowData {
     private int hlColor;
 
     private boolean topClickable = true;
+
+    @Override
+    public String toString() {
+        return "username: " + username +
+                "\nuserTitles: " + userTitles +
+                "\nhlColor: " + hlColor +
+                "\npostNum: " + postNum +
+                "\npostTime: " + postTime +
+                "\nmessageID: " + messageID +
+                "\nboardID: " + boardID +
+                "\ntopicID: " + topicID +
+                "\nhasPoll: " + hasPoll() +
+                "\nunprocessedMessageText: " + unprocessedMessageText +
+                "\nspannedMessage: " + spannedMessage;
+    }
 
     public void disableTopClick() {
         topClickable = false;
@@ -109,12 +123,8 @@ public class MessageRowData extends BaseRowData {
         return boardID;
     }
 
-    public Element getMessage() {
-        return messageElem;
-    }
-
-    public Element getMessageNoPoll() {
-        return messageElemNoPoll;
+    public String getUnprocessedMessageText() {
+        return unprocessedMessageText;
     }
 
     public LinearLayout getPoll() {
@@ -162,22 +172,16 @@ public class MessageRowData extends BaseRowData {
         userTitles = userTitlesIn;
         postNum = postNumIn;
         postTime = postTimeIn.replace('\u00A0', ' ');
-        messageElem = messageIn;
         boardID = BID;
         topicID = TID;
         messageID = MID;
         hlColor = hlColorIn;
 
         AllInOneV2.wtl("checking for poll");
-        if (messageElem.getElementsByClass("board_poll").isEmpty())
-            messageElemNoPoll = messageElem.clone();
-        else {
+        if (!messageIn.getElementsByClass("board_poll").isEmpty()) {
             AllInOneV2.wtl("there is a poll");
 
-            messageElemNoPoll = messageElem.clone();
-            messageElemNoPoll.getElementsByClass("board_poll").first().remove();
-
-            Element pollElem = messageElem.getElementsByClass("board_poll").first();
+            Element pollElem = messageIn.getElementsByClass("board_poll").first();
 
             poll = new LinearLayout(aio);
             poll.setOrientation(LinearLayout.VERTICAL);
@@ -256,7 +260,12 @@ public class MessageRowData extends BaseRowData {
                 });
                 pollInnerWrapper.addView(b);
             }
+
+            // remove the poll element so it doesn't get put in unprocessedMessageText
+            messageIn.getElementsByClass("board_poll").first().remove();
         }
+
+        unprocessedMessageText = messageIn.html();
 
         AllInOneV2.wtl("creating ssb");
         SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false, true));
@@ -401,10 +410,9 @@ public class MessageRowData extends BaseRowData {
 
     private String processContent(boolean removeSig, boolean ignoreLtGt) {
         AllInOneV2.wtl("getting messageElemNoPoll.html()");
-        String finalBody = messageElemNoPoll.html();
 
         AllInOneV2.wtl("replacing spoiler spans with spoiler tags");
-        finalBody = finalBody.replace("<span class=\"fspoiler\">", "<spoiler>").replace("</span>", "</spoiler>");
+        String finalBody = unprocessedMessageText.replace("<span class=\"fspoiler\">", "<spoiler>").replace("</span>", "</spoiler>");
 
         AllInOneV2.wtl("beginning opening anchor tag removal");
         while (finalBody.contains("<a href")) {

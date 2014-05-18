@@ -72,4 +72,19 @@ public class UserDetailRowData extends BaseRowData {
         tagPath = tagPathIn;
     }
 
+    @Override
+    public String toString() {
+        return "name: " + name +
+                "\nID: " + ID +
+                "\nlevel: " + level +
+                "\ncreation: " + creation +
+                "\nlVisit: " + lVisit +
+                "\nsig: " + sig +
+                "\nkarma: " + karma +
+                "\namp: " + amp +
+                "\ntagKey: " + tagKey +
+                "\ntagText: " + tagText +
+                "\ntagPath: " + tagPath;
+    }
+
 }

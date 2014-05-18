@@ -22,4 +22,8 @@ public class AdGFAQsRowData extends BaseRowData {
         web = webIn;
     }
 
+    @Override
+    public String toString() {
+        return "AdGFAQsRowData";
+    }
 }

@@ -30,4 +30,10 @@ public class GameSearchRowData extends BaseRowData {
         return RowType.GAME_SEARCH;
     }
 
+    @Override
+    public String toString() {
+        return "name: " + name +
+                "\nplatform: " + platform +
+                "\nurl: " + url;
+    }
 }

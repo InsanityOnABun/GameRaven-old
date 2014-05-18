@@ -23,4 +23,8 @@ public class AMPRowData extends TopicRowData {
         ylpUrl = ylpUrlIn;
     }
 
+    @Override
+    public String toString() {
+        return super.toString() + "\nylpUrl: " + ylpUrl;
+    }
 }
