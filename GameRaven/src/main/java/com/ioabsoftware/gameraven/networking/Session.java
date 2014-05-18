@@ -433,7 +433,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             if (e != null)
                 throw e;
 
-            if (result != null) {
+            if (result != null && result.getResult() != null && result.getResult().doc != null) {
 
                 AllInOneV2.wtl("parsing res");
                 Document doc = result.getResult().doc;
