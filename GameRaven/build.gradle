@@ -7,6 +7,7 @@ repositories {
 dependencies {
     compile 'com.android.support:appcompat-v7:+'
     compile 'com.google.android.gms:play-services:+'
+    compile 'org.apache.commons:commons-lang3:3.3.2'
     compile 'ch.acra:acra:4.5.0'
     compile 'com.github.chrisbanes.actionbarpulltorefresh:library:+'
     compile 'net.simonvt.menudrawer:menudrawer:+'
