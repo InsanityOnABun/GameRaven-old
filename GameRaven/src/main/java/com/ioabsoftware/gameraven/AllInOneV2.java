@@ -2654,7 +2654,12 @@ public class AllInOneV2 extends Activity {
         AlertDialog.Builder reportMsgBuilder = new AlertDialog.Builder(this);
         reportMsgBuilder.setTitle("Report Message");
 
-        final String[] reportOptions = getResources().getStringArray(R.array.msgReportReasons);
+        final String[] reportOptions;
+        if (clickedMsg.getPostNum().equals("1"))
+            reportOptions = getResources().getStringArray(R.array.msgReportReasonsWithOffTopic);
+        else
+            reportOptions = getResources().getStringArray(R.array.msgReportReasons);
+
         reportMsgBuilder.setItems(reportOptions, new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
