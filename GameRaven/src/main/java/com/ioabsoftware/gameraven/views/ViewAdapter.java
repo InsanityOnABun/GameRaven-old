@@ -71,12 +71,15 @@ public class ViewAdapter extends BaseAdapter {
             data = rows.get(position);
         }
         catch (IndexOutOfBoundsException e) {
-            ACRA.getErrorReporter().putCustomData("rows.size()", String.valueOf(rows.size()));
+            ACRA.getErrorReporter().putCustomData("rows size", String.valueOf(rows.size()));
             ACRA.getErrorReporter().putCustomData("position", String.valueOf(position));
 
             int x = 0;
             for (BaseRowData dat : rows) {
-                ACRA.getErrorReporter().putCustomData("[" + x++ + "] " + dat.getRowType().name(), dat.toString());
+                String index = String.valueOf(x++);
+                if (index.length() < 2) index = "0" + index;
+
+                ACRA.getErrorReporter().putCustomData("[" + index + "] " + dat.getRowType().name(), dat.toString());
             }
 
             StringWriter sw = new StringWriter();
