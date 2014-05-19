@@ -18,6 +18,10 @@ import com.ioabsoftware.gameraven.views.rowview.TopicRowView;
 import com.ioabsoftware.gameraven.views.rowview.TrackedTopicRowView;
 import com.ioabsoftware.gameraven.views.rowview.UserDetailRowView;
 
+import org.acra.ACRA;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 public class ViewAdapter extends BaseAdapter {
@@ -61,7 +65,31 @@ public class ViewAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         BaseRowView view;
-        BaseRowData data = rows.get(position);
+        BaseRowData data;
+
+        try {
+            data = rows.get(position);
+        }
+        catch (IndexOutOfBoundsException e) {
+            ACRA.getErrorReporter().putCustomData("rows size", String.valueOf(rows.size()));
+            ACRA.getErrorReporter().putCustomData("position", String.valueOf(position));
+
+            int x = 0;
+            for (BaseRowData dat : rows) {
+                String index = String.valueOf(x++);
+                if (index.length() < 2) index = "0" + index;
+
+                ACRA.getErrorReporter().putCustomData("[" + index + "] " + dat.getRowType().name(), dat.toString());
+            }
+
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            ACRA.getErrorReporter().putCustomData("original stack trace", sw.toString());
+
+            ACRA.getErrorReporter().handleException(new IndexOutOfBoundsException("rows.get(position) was out of bounds"), true);
+            return new HeaderRowView(context);
+        }
 
         if (convertView != null) {
             view = (BaseRowView) convertView;

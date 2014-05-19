@@ -20,4 +20,9 @@ public class HeaderRowData extends BaseRowData {
         headerText = text;
     }
 
+    @Override
+    public String toString() {
+        return "headerText: " + headerText;
+    }
+
 }

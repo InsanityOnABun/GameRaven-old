@@ -170,6 +170,10 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
         return myData.getUser();
     }
 
+    public String getPostNum() {
+        return myData.getPostNum();
+    }
+
     public boolean isEditable() {
         return myData.isEditable();
     }

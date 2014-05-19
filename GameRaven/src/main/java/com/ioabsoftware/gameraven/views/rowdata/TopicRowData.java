@@ -75,4 +75,17 @@ public class TopicRowData extends BaseRowData {
         hlColor = hlColorIn;
     }
 
+    @Override
+    public String toString() {
+        return "title: " + title +
+                "\ntc: " + tc +
+                "\nhlColor: " + hlColor +
+                "\nlastPost: " + lastPost +
+                "\nmCount: " + mCount +
+                "\nurl: " + url +
+                "\nlPostUrl: " + lPostUrl +
+                "\ntype: " + type.name() +
+                "\nstatus: " + status.name();
+    }
+
 }

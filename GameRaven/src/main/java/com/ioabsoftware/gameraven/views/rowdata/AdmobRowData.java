@@ -12,4 +12,9 @@ public class AdmobRowData extends BaseRowData {
     public RowType getRowType() {
         return RowType.ADMOB_AD;
     }
+
+    @Override
+    public String toString() {
+        return "AdmobRowData";
+    }
 }

@@ -1,5 +1,5 @@
 GameRaven
-Copyright (C) Charles Rosaaen 2012
+Copyright (C) 2012, Charles Rosaaen
 All rights reserved, with exceptions listed below.
 
 You may fork this repository with the intent to merge changes back into the official repository.
@@ -9,5 +9,9 @@ whether compiled, source, or otherwise, edited or original, except when contribu
 the official GameRaven repository.
 
 Uses software licensed under the Apache Software License 2.0, details of which can be found in the
-"LICENSED SOFTWARE" file. These libraries are exempt from the previously mentioned rules.
+"LICENSED SOFTWARE_APACHE" file. These libraries are exempt from the previously mentioned rules.
+All copyrights for these libraries belong to their respective owners.
+
+Uses software licensed under the MIT License, details of which can be found in the
+"LICENSED SOFTWARE_MIT" file. These libraries are exempt from the previously mentioned rules.
 All copyrights for these libraries belong to their respective owners.

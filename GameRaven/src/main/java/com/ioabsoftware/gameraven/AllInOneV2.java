@@ -20,6 +20,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.Time;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.HapticFeedbackConstants;
@@ -74,6 +75,8 @@ import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
 import com.ioabsoftware.gameraven.views.rowview.AdmobRowView;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
 import net.margaritov.preference.colorpicker.ColorPickerPreference;
 import net.simonvt.menudrawer.MenuDrawer;
@@ -83,6 +86,7 @@ import net.simonvt.menudrawer.MenuDrawer.Type;
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
@@ -562,6 +566,55 @@ public class AllInOneV2 extends Activity {
         AdmobRowView.resumeAd();
 
         ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
+
+        int lastUpdateYear = settings.getInt("lastUpdateYear", 0);
+        int lastUpdateYearDay = settings.getInt("lastUpdateYearDay", 0);
+        Time now = new Time();
+        now.setToNow();
+        if (lastUpdateYear != now.year || lastUpdateYearDay != now.yearDay) {
+            wtl("checking for update");
+            try {
+                final int myVersion = this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionCode;
+                wtl("my version is " + myVersion);
+                Ion.with(this, "http://ioabsoftware.com/gameraven/latest.txt")
+                        .asString()
+                        .setCallback(new FutureCallback<String>() {
+                            @Override
+                            public void onCompleted(Exception e, String result) {
+                                if (NumberUtils.isNumber(result)) {
+                                    int netVersion = Integer.valueOf(result);
+                                    wtl("net version is " + netVersion);
+
+                                    if (netVersion > myVersion) {
+                                        AlertDialog.Builder b = new AlertDialog.Builder(AllInOneV2.this);
+                                        b.setTitle("New Version Found");
+                                        b.setMessage("Open Google Play Market to download new version? Note that although " +
+                                                "care is taken to make sure this notification only goes out once the update " +
+                                                "has spread to all Google servers, there is still a chance the update may not " +
+                                                "show up in the Play Store at first. Rest assured, there is a new version. " +
+                                                "It just hasn't reached your local Google Play server yet.");
+                                        b.setPositiveButton("Yes", new OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Intent i = new Intent(Intent.ACTION_VIEW);
+                                                i.setData(Uri.parse("market://details?id=com.ioabsoftware.gameraven"));
+                                                AllInOneV2.this.startActivity(i);
+                                            }
+                                        });
+                                        b.setNegativeButton("No", null);
+                                        b.show();
+                                    }
+                                }
+                            }
+                        });
+
+                settings.edit().putInt("lastUpdateYear", now.year).putInt("lastUpdateYearDay", now.yearDay).apply();
+            } catch (NameNotFoundException e) {
+                e.printStackTrace();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+        }
 
         if (Theming.updateTextScale(settings.getInt("textScale", 100) / 100f)) {
             int px = TypedValue.COMPLEX_UNIT_PX;
@@ -2654,7 +2707,12 @@ public class AllInOneV2 extends Activity {
         AlertDialog.Builder reportMsgBuilder = new AlertDialog.Builder(this);
         reportMsgBuilder.setTitle("Report Message");
 
-        final String[] reportOptions = getResources().getStringArray(R.array.msgReportReasons);
+        final String[] reportOptions;
+        if (clickedMsg.getPostNum().equals("1"))
+            reportOptions = getResources().getStringArray(R.array.msgReportReasonsWithOffTopic);
+        else
+            reportOptions = getResources().getStringArray(R.array.msgReportReasons);
+
         reportMsgBuilder.setItems(reportOptions, new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

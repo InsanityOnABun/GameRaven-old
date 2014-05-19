@@ -59,4 +59,16 @@ public class TrackedTopicRowData extends BaseRowData {
         readStatus = rs;
     }
 
+    @Override
+    public String toString() {
+        return "title: " + title +
+                "\nboard: " + board +
+                "\nlastPost: " + lastPost +
+                "\nmsgs: " + msgs +
+                "\nurl: " + url +
+                "\nremoveUrl: " + removeUrl +
+                "\nlastPostUrl: " + lastPostUrl +
+                "\nreadStatus: " + readStatus.name();
+    }
+
 }

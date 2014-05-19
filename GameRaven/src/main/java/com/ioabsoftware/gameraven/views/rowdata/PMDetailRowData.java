@@ -30,4 +30,10 @@ public class PMDetailRowData extends BaseRowData {
         message = messageIn;
     }
 
+    @Override
+    public String toString() {
+        return "title: " + title +
+                "\nsender: " + sender +
+                "\nmessage: " + message;
+    }
 }
