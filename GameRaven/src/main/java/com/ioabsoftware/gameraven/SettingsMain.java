@@ -507,13 +507,13 @@ public class SettingsMain extends PreferenceActivity {
                                         AllInOneV2.getHLDB().addUser(user, label, Integer.parseInt(color));
                                     }
                                 } else
-                                    AllInOneV2.wtl("line unhandled in restore: " + line);
+                                    if (BuildConfig.DEBUG) AllInOneV2.wtl("line unhandled in restore: " + line);
                             } else if (line.contains("=")) {
                                 splitLine = line.split("=", 2);
                                 keys.add(splitLine[0]);
                                 values.add(splitLine[1]);
                             } else
-                                AllInOneV2.wtl("line unhandled in restore: " + line);
+                                if (BuildConfig.DEBUG) AllInOneV2.wtl("line unhandled in restore: " + line);
                         }
                     }
 
@@ -541,7 +541,7 @@ public class SettingsMain extends PreferenceActivity {
                             } else
                                 editor.putString(key, val);
                         } else
-                            AllInOneV2.wtl("Key, Val pair not recognized in restore: " + key + ", " + val);
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("Key, Val pair not recognized in restore: " + key + ", " + val);
                     }
 
                     editor.commit();

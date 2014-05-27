@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
+import com.ioabsoftware.gameraven.BuildConfig;
 import com.ioabsoftware.gameraven.networking.NetDesc;
 
 public class HistoryDBAdapter {
@@ -79,21 +80,21 @@ public class HistoryDBAdapter {
 
     public void insertHistory(String pathIn, String descIn, byte[] srcIn, int vLocFirstVisIn, int vLocOffsetIn) {
         if (!lastAddedPath.equals(pathIn)) {
-            aio.wtl("starting insert history method");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("starting insert history method");
             lastAddedPath = pathIn;
-            aio.wtl("creating content vals obj");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("creating content vals obj");
             ContentValues vals = new ContentValues();
-            aio.wtl("putting content vals");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("putting content vals");
             vals.put(COLUMN_HIST_PATH, pathIn);
             vals.put(COLUMN_HIST_DESC, descIn);
             vals.put(COLUMN_HIST_SRC, srcIn);
             vals.put(COLUMN_HIST_VLOC_FIRSTVIS, vLocFirstVisIn);
             vals.put(COLUMN_HIST_VLOC_OFFSET, vLocOffsetIn);
-            aio.wtl("inserting row");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("inserting row");
             db.insert(TABLE_HISTORY, null, vals);
-            aio.wtl("updating hasHistory");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("updating hasHistory");
             updateHasHistory();
-            aio.wtl("insert history method completing");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("insert history method completing");
         }
     }
 

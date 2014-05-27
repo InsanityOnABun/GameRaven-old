@@ -26,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
+import com.ioabsoftware.gameraven.BuildConfig;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
@@ -167,7 +168,7 @@ public class MessageRowData extends BaseRowData {
         if (aio == null || aio != AllInOneV2.get())
             aio = AllInOneV2.get();
 
-        AllInOneV2.wtl("setting values");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("setting values");
         username = userIn;
         userTitles = userTitlesIn;
         postNum = postNumIn;
@@ -177,9 +178,9 @@ public class MessageRowData extends BaseRowData {
         messageID = MID;
         hlColor = hlColorIn;
 
-        AllInOneV2.wtl("checking for poll");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("checking for poll");
         if (!messageIn.getElementsByClass("board_poll").isEmpty()) {
-            AllInOneV2.wtl("there is a poll");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("there is a poll");
 
             Element pollElem = messageIn.getElementsByClass("board_poll").first();
 
@@ -267,19 +268,19 @@ public class MessageRowData extends BaseRowData {
 
         unprocessedMessageText = messageIn.html();
 
-        AllInOneV2.wtl("creating ssb");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("creating ssb");
         SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false, true));
 
-        AllInOneV2.wtl("adding <b> spans");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding <b> spans");
         addSpan(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
-        AllInOneV2.wtl("adding <i> spans");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding <i> spans");
         addSpan(ssb, "<i>", "</i>", new StyleSpan(Typeface.ITALIC));
-        AllInOneV2.wtl("adding <code> spans");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding <code> spans");
         addSpan(ssb, "<code>", "</code>", new TypefaceSpan("monospace"));
-        AllInOneV2.wtl("adding <cite> spans");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding <cite> spans");
         addSpan(ssb, "<cite>", "</cite>", new UnderlineSpan(), new StyleSpan(Typeface.ITALIC));
 
-        AllInOneV2.wtl("adding <quote> spans");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding <quote> spans");
         // quotes don't use CharacterStyles, so do it manually
         while (ssb.toString().contains("<blockquote>")) {
             int start = ssb.toString().indexOf("<blockquote>");
@@ -309,7 +310,7 @@ public class MessageRowData extends BaseRowData {
             ssb.setSpan(new GRQuoteSpan(), start, closer, 0);
         }
 
-        AllInOneV2.wtl("getting text colors for spoilers");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("getting text colors for spoilers");
         int defTextColor;
         int color;
         if (Theming.usingLightTheme()) {
@@ -322,22 +323,22 @@ public class MessageRowData extends BaseRowData {
 
         ssb.append('\n');
 
-        AllInOneV2.wtl("replacing &gameravenlt; with <");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("replacing &gameravenlt; with <");
         while (ssb.toString().contains("&gameravenlt;")) {
             int start = ssb.toString().indexOf("&gameravenlt;");
             ssb.replace(start, start + 13, "<");
         }
 
-        AllInOneV2.wtl("replacing &gameravengt; with >");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("replacing &gameravengt; with >");
         while (ssb.toString().contains("&gameravengt;")) {
             int start = ssb.toString().indexOf("&gameravengt;");
             ssb.replace(start, start + 13, ">");
         }
 
-        AllInOneV2.wtl("linkifying");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("linkifying");
         Linkify.addLinks(ssb, Linkify.WEB_URLS);
 
-        AllInOneV2.wtl("adding <spoiler> spans");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding <spoiler> spans");
         // do spoiler tags manually instead of in the method, as the clickablespan needs
         // to know the start and end points
         while (ssb.toString().contains("<spoiler>")) {
@@ -350,7 +351,7 @@ public class MessageRowData extends BaseRowData {
 
         }
 
-        AllInOneV2.wtl("setting spannedMessage");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("setting spannedMessage");
         spannedMessage = RichTextUtils.replaceAll(ssb, URLSpan.class, new UrlSpanConverter());
     }
 
@@ -409,12 +410,12 @@ public class MessageRowData extends BaseRowData {
     }
 
     private String processContent(boolean removeSig, boolean ignoreLtGt) {
-        AllInOneV2.wtl("getting messageElemNoPoll.html()");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("getting messageElemNoPoll.html()");
 
-        AllInOneV2.wtl("replacing spoiler spans with spoiler tags");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("replacing spoiler spans with spoiler tags");
         String finalBody = unprocessedMessageText.replace("<span class=\"fspoiler\">", "<spoiler>").replace("</span>", "</spoiler>");
 
-        AllInOneV2.wtl("beginning opening anchor tag removal");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning opening anchor tag removal");
         while (finalBody.contains("<a href")) {
             int start = finalBody.indexOf("<a href");
             int end = finalBody.indexOf(">", start) + 1;
@@ -422,31 +423,31 @@ public class MessageRowData extends BaseRowData {
                     "");
         }
 
-        AllInOneV2.wtl("removing closing anchor tags");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("removing closing anchor tags");
         finalBody = finalBody.replace("</a>", "");
 
-        AllInOneV2.wtl("removing existing \\n, replacing linebreak tags with \\n");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("removing existing \\n, replacing linebreak tags with \\n");
         if (finalBody.endsWith("<br />"))
             finalBody = finalBody.substring(0, finalBody.length() - 6);
         finalBody = finalBody.replace("\n", "");
         finalBody = finalBody.replace("<br />", "\n");
 
         if (removeSig) {
-            AllInOneV2.wtl("removing sig");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("removing sig");
             int sigStart = finalBody.lastIndexOf("\n---\n");
             if (sigStart != -1)
                 finalBody = finalBody.substring(0, sigStart);
         }
 
         if (ignoreLtGt) {
-            AllInOneV2.wtl("ignoring less than / greater than");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("ignoring less than / greater than");
             finalBody = finalBody.replace("&lt;", "&gameravenlt;").replace("&gt;", "&gameravengt;");
         }
 
-        AllInOneV2.wtl("unescaping finalbody html");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("unescaping finalbody html");
         finalBody = StringEscapeUtils.unescapeHtml4(finalBody);
 
-        AllInOneV2.wtl("returning finalbody");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("returning finalbody");
         return finalBody;
     }
 
