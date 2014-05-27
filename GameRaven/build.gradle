@@ -13,6 +13,7 @@ dependencies {
     compile 'net.simonvt.menudrawer:menudrawer:+'
     compile 'de.keyboardsurfer.android.widget:crouton:+'
     compile 'com.koushikdutta.ion:ion:+'
+    compile 'com.intellij:annotations:+@jar'
 }
 
 android {
@@ -22,8 +23,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 19
-        versionCode 106
-        versionName "2.0.3"
+        versionCode 107
+        versionName "2.0.4.A"
     }
     signingConfigs {
         release {
