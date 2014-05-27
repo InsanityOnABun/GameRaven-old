@@ -558,7 +558,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     return;
                 }
 
-                if (BuildConfig.DEBUG) AllInOneV2.wtl("checking for suspended, banned, and new accounts");
+                if (BuildConfig.DEBUG) AllInOneV2.wtl("checking for suspended, banned, and new accounts, " +
+                        "as well as register.html?miss=1 page");
                 if (resUrl.contains("account_suspended.html")) {
                     aio.genError("Account Suspended", "Your account seems to be suspended. Please " +
                             "log in to your account in a web browser for more details.");
@@ -574,6 +575,13 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             "There are some ground rules you'll have to go over first before you can get " +
                             "access to the message boards. Please log in to your account in a web browser " +
                             "and access the message boards there to view and accept the site terms and rules.");
+
+                    return;
+                } else if (resUrl.contains("register.html?miss=1")) {
+                    aio.genError("Login Required", "You've just tried to access a feature that requires a " +
+                            "GameFAQs account. You can manage your accounts and log in through the navigation " +
+                            "drawer. If you are currently logged into an account, try removing the account " +
+                            "from the app and re-adding it.");
 
                     return;
                 }
