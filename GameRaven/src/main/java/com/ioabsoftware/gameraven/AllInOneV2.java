@@ -167,8 +167,8 @@ public class AllInOneV2 extends Activity {
     private TextView titleCounter;
     private TextView bodyCounter;
 
-    private Button postButton;
-    private Button cancelButton;
+    private Button postSubmitButton;
+    private Button postCancelButton;
     private Button pollButton;
 
     private View pollSep;
@@ -514,8 +514,8 @@ public class AllInOneV2 extends Activity {
             }
         });
 
-        postButton = (Button) findViewById(R.id.aioPostDo);
-        cancelButton = (Button) findViewById(R.id.aioPostCancel);
+        postSubmitButton = (Button) findViewById(R.id.aioPostDo);
+        postCancelButton = (Button) findViewById(R.id.aioPostCancel);
         pollButton = (Button) findViewById(R.id.aioPollOptions);
         pollSep = findViewById(R.id.aioPollSep);
 
@@ -1148,8 +1148,8 @@ public class AllInOneV2 extends Activity {
         ptrLayout.setRefreshing(false);
         setMenuItemVisibility(refreshIcon, true);
         if (postWrapper.getVisibility() == View.VISIBLE) {
-            postButton.setEnabled(true);
-            cancelButton.setEnabled(true);
+            postSubmitButton.setEnabled(true);
+            postCancelButton.setEnabled(true);
             pollButton.setEnabled(true);
             setMenuItemVisibility(postIcon, true);
         }
@@ -2481,8 +2481,8 @@ public class AllInOneV2 extends Activity {
     private void postSetup(boolean postingOnTopic) {
         findViewById(R.id.aioHTMLScroller).scrollTo(0, 0);
         pageJumperWrapper.setVisibility(View.GONE);
-        postButton.setEnabled(true);
-        cancelButton.setEnabled(true);
+        postSubmitButton.setEnabled(true);
+        postCancelButton.setEnabled(true);
 
         if (postingOnTopic) {
             titleWrapper.setVisibility(View.GONE);
@@ -2559,9 +2559,9 @@ public class AllInOneV2 extends Activity {
             savedPostTitle = postTitle.getText().toString();
             if (BuildConfig.DEBUG) wtl("saved post title: " + savedPostTitle);
             if (BuildConfig.DEBUG) wtl("sending topic");
-            postButton.setEnabled(false);
+            postSubmitButton.setEnabled(false);
             pollButton.setEnabled(false);
-            cancelButton.setEnabled(false);
+            postCancelButton.setEnabled(false);
             if (pollUse)
                 path += "&poll=1";
 
@@ -2577,8 +2577,8 @@ public class AllInOneV2 extends Activity {
             savedPostBody = postBody.getText().toString();
             if (BuildConfig.DEBUG) wtl("saved post body: " + savedPostBody);
             if (BuildConfig.DEBUG) wtl("sending post");
-            postButton.setEnabled(false);
-            cancelButton.setEnabled(false);
+            postSubmitButton.setEnabled(false);
+            postCancelButton.setEnabled(false);
             if (messageIDForEditing != null)
                 session.get(NetDesc.EDIT_MSG, path);
             else
@@ -3191,7 +3191,7 @@ public class AllInOneV2 extends Activity {
         } else if (drawer.isMenuVisible()) {
             drawer.closeMenu(true);
         } else if (postWrapper.getVisibility() == View.VISIBLE) {
-            postCleanup();
+            postCancel(postCancelButton);
         } else {
             goBack();
         }
