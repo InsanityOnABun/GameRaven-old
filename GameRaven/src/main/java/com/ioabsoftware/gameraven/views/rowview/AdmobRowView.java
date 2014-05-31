@@ -15,6 +15,8 @@ public class AdmobRowView extends BaseRowView {
 
     private static AdView adView;
 
+    private AdRequest adRequest;
+
     public AdmobRowView(Context context) {
         super(context);
     }
@@ -39,11 +41,12 @@ public class AdmobRowView extends BaseRowView {
         this.setWeightSum(1);
         this.addView(adView);
 
-        AdRequest adRequest = new AdRequest.Builder()
+        adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)        // Emulator
                 .build();
 
         adView.loadAd(adRequest);
+        lastNano = System.nanoTime();
     }
 
     public static void pauseAd() {
@@ -66,8 +69,13 @@ public class AdmobRowView extends BaseRowView {
         // nada
     }
 
+    private static long lastNano = 0;
     @Override
     protected void showView(BaseRowData data) {
-        // nada
+        long currNano = System.nanoTime();
+        if (currNano - lastNano > 60000000000L) {
+            adView.loadAd(adRequest);
+            lastNano = System.nanoTime();
+        }
     }
 }

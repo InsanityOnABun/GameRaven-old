@@ -8,7 +8,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
+import com.ioabsoftware.gameraven.BuildConfig;
 import com.ioabsoftware.gameraven.networking.NetDesc;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 public class HistoryDBAdapter {
 
@@ -79,21 +85,21 @@ public class HistoryDBAdapter {
 
     public void insertHistory(String pathIn, String descIn, byte[] srcIn, int vLocFirstVisIn, int vLocOffsetIn) {
         if (!lastAddedPath.equals(pathIn)) {
-            aio.wtl("starting insert history method");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("starting insert history method");
             lastAddedPath = pathIn;
-            aio.wtl("creating content vals obj");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("creating content vals obj");
             ContentValues vals = new ContentValues();
-            aio.wtl("putting content vals");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("putting content vals");
             vals.put(COLUMN_HIST_PATH, pathIn);
             vals.put(COLUMN_HIST_DESC, descIn);
-            vals.put(COLUMN_HIST_SRC, srcIn);
+            vals.put(COLUMN_HIST_SRC, compress(srcIn));
             vals.put(COLUMN_HIST_VLOC_FIRSTVIS, vLocFirstVisIn);
             vals.put(COLUMN_HIST_VLOC_OFFSET, vLocOffsetIn);
-            aio.wtl("inserting row");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("inserting row");
             db.insert(TABLE_HISTORY, null, vals);
-            aio.wtl("updating hasHistory");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("updating hasHistory");
             updateHasHistory();
-            aio.wtl("insert history method completing");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("insert history method completing");
         }
     }
 
@@ -105,7 +111,7 @@ public class HistoryDBAdapter {
         String path = cur.getString(1);
         History h = new History(path,
                 NetDesc.valueOf(cur.getString(2)),
-                cur.getBlob(3),
+                decompress(cur.getBlob(3)),
                 new int[]{cur.getInt(4), cur.getInt(5)});
 
         if (cur.moveToNext())
@@ -129,4 +135,56 @@ public class HistoryDBAdapter {
         return hasHistory;
     }
 
+    public static byte[] compress(byte[] data) {
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("starting history compression");
+        try {
+            Deflater deflater = new Deflater(Deflater.BEST_SPEED);
+            deflater.setInput(data);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
+
+            deflater.finish();
+            byte[] buffer = new byte[1024];
+            while (!deflater.finished()) {
+                int count = deflater.deflate(buffer); // returns the generated code... index
+                outputStream.write(buffer, 0, count);
+            }
+
+            deflater.end();
+            outputStream.close();
+            byte[] output = outputStream.toByteArray();
+
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("CMPRSSN - Original: " + data.length / 1024 + " Kb");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("CMPRSSN - Compressed: " + output.length / 1024 + " Kb");
+            return output;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return data;
+        }
+    }
+
+    public static byte[] decompress(byte[] data) {
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("starting history decompression");
+        try {
+            Inflater inflater = new Inflater();
+            inflater.setInput(data);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
+            byte[] buffer = new byte[1024];
+            while (!inflater.finished()) {
+                int count = inflater.inflate(buffer);
+                outputStream.write(buffer, 0, count);
+            }
+            inflater.end();
+            outputStream.close();
+            byte[] output = outputStream.toByteArray();
+
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("CMPRSSN - Original: " + data.length / 1024 + " Kb");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("CMPRSSN - Decompressed: " + output.length / 1024 + " Kb");
+            return output;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return data;
+        }
+    }
 }

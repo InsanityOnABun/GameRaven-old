@@ -178,7 +178,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
     private boolean addToHistory = true;
 
     public void forceNoHistoryAddition() {
-        AllInOneV2.wtl("forcing history addition off");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("forcing history addition off");
         addToHistory = false;
     }
 
@@ -238,7 +238,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
      */
     private void finalConstructor(AllInOneV2 aioIn, String userIn, String passwordIn) {
         aio = aioIn;
-        AllInOneV2.wtl("NEW SESSION");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("NEW SESSION");
         aio.disableNavList();
 
         netManager = (ConnectivityManager) aio.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -260,11 +260,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             Ion.getDefault(aio).configure().setLogging("IonLogs", Log.VERBOSE);
 
         if (user == null) {
-            AllInOneV2.wtl("session constructor, user is null, starting logged out session");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("session constructor, user is null, starting logged out session");
             get(NetDesc.BOARD_JUMPER, ROOT + "/boards");
             aio.setLoginName("Logged Out");
         } else {
-            AllInOneV2.wtl("session constructor, user is not null, starting logged in session");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("session constructor, user is not null, starting logged in session");
             get(NetDesc.LOGIN_S1, ROOT + "/boards");
             aio.setLoginName(user);
         }
@@ -428,19 +428,19 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
     }
 
     public void handleNetworkResult(Exception e, NetDesc desc, Response<FinalDoc> result) {
-        AllInOneV2.wtl("session hNR fired, desc: " + desc.name());
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR fired, desc: " + desc.name());
         try {
             if (e != null)
                 throw e;
 
             if (result != null && result.getResult() != null && result.getResult().doc != null) {
 
-                AllInOneV2.wtl("parsing res");
+                if (BuildConfig.DEBUG) AllInOneV2.wtl("parsing res");
                 Document doc = result.getResult().doc;
                 String resUrl = result.getRequest().getUri().toString();
-                AllInOneV2.wtl("resUrl: " + resUrl);
+                if (BuildConfig.DEBUG) AllInOneV2.wtl("resUrl: " + resUrl);
 
-                AllInOneV2.wtl("checking if res does not start with root");
+                if (BuildConfig.DEBUG) AllInOneV2.wtl("checking if res does not start with root");
                 if (!resUrl.startsWith(ROOT)) {
                     AlertDialog.Builder b = new AlertDialog.Builder(aio);
                     b.setTitle("Redirected");
@@ -462,7 +462,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     return;
                 }
 
-                AllInOneV2.wtl("checking if pRes contains captcha");
+                if (BuildConfig.DEBUG) AllInOneV2.wtl("checking if pRes contains captcha");
                 if (!doc.select("header.page_header:contains(CAPTCHA)").isEmpty()) {
 
                     String captcha = doc.select("iframe").outerHtml();
@@ -508,68 +508,80 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     return;
                 }
 
-                Element gfaqsError = doc.select("h1.page-title").first();
-                if (gfaqsError != null && gfaqsError.text().contains("Error")) {
-                    if (gfaqsError.text().contains("404 Error")) {
-                        AllInOneV2.wtl("status code 404");
+                if (BuildConfig.DEBUG) AllInOneV2.wtl("checking for non-200 http response code");
+                int responseCode = result.getHeaders().getResponseCode();
+                if (BuildConfig.DEBUG && responseCode != 200)
+                    Crouton.showText(aio, "HTTP Response Code: " + responseCode, Theming.croutonStyle());
+
+                if (responseCode != 200) {
+                    if (responseCode == 404) {
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("status code 404");
                         Elements paragraphs = doc.getElementsByTag("p");
-                        aio.genError("404 Error", paragraphs.get(1).text() + "\n\n"
-                                + paragraphs.get(2).text());
+                        aio.genError("404 Error", paragraphs.get(1).text() + "\n\n" + paragraphs.get(2).text());
                         return;
-                    } else if (gfaqsError.text().contains("403 Error")) {
-                        AllInOneV2.wtl("status code 403");
+                    } else if (responseCode == 403) {
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("status code 403");
                         Elements paragraphs = doc.getElementsByTag("p");
-                        aio.genError("403 Error", paragraphs.get(1).text() + "\n\n"
-                                + paragraphs.get(2).text());
+                        aio.genError("403 Error", paragraphs.get(1).text() + "\n\n" + paragraphs.get(2).text());
                         return;
-                    } else if (gfaqsError.text().contains("401 Error")) {
-                        AllInOneV2.wtl("status code 401");
+                    } else if (responseCode == 401) {
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("status code 401");
                         if (lastDesc == NetDesc.LOGIN_S2) {
                             forceSkipAIOCleanup();
                             get(NetDesc.BOARD_JUMPER, "/boards");
                         } else {
                             Elements paragraphs = doc.getElementsByTag("p");
-                            aio.genError("401 Error", paragraphs.get(1).text()
-                                    + "\n\n" + paragraphs.get(2).text());
+                            aio.genError("401 Error", paragraphs.get(1).text() + "\n\n" + paragraphs.get(2).text());
                         }
                         return;
                     }
                 }
 
+                if (BuildConfig.DEBUG) AllInOneV2.wtl("checking for 408, 503, GameFAQs is Down pages");
                 Element firstHeader = doc.getElementsByTag("h1").first();
                 if (firstHeader != null && firstHeader.text().equals("408 Request Time-out")) {
-                    AllInOneV2.wtl("status code 408");
+                    if (BuildConfig.DEBUG) AllInOneV2.wtl("status code 408");
                     aio.genError("408 Error", "Your browser didn't send a complete request in time.");
                     return;
                 }
 
                 if (doc.title().equals("GameFAQs - 503 - Temporarily Unavailable")) {
                     aio.genError("503 Error", "GameFAQs is experiencing some temporary difficulties with " +
-                            "the site. Probably because of something they did. Please wait a few " +
-                            "seconds before refreshing this page to try again.");
+                            "the site. Please wait a few seconds before refreshing this page to try again.");
+
+                    return;
+                } else if (doc.title().equals("GameFAQs is Down")) {
+                    aio.genError("GameFAQs is Down", "GameFAQs is experiencing an outage at the moment - " +
+                            "the servers are overloaded and unable to serve pages. Hopefully, this is a " +
+                            "temporary problem, and will be rectified by the time you refresh this page.");
 
                     return;
                 }
 
+                if (BuildConfig.DEBUG) AllInOneV2.wtl("checking for suspended, banned, and new accounts, " +
+                        "as well as register.html?miss=1 page");
                 if (resUrl.contains("account_suspended.html")) {
                     aio.genError("Account Suspended", "Your account seems to be suspended. Please " +
                             "log in to your account in a web browser for more details.");
 
                     return;
-                }
-
-                if (resUrl.contains("account_banned.html")) {
+                } else if (resUrl.contains("account_banned.html")) {
                     aio.genError("Account Banned", "Your account seems to be banned. Please " +
                             "log in to your account in a web browser for more details.");
 
                     return;
-                }
-
-                if (resUrl.contains("welcome.php")) {
+                } else if (resUrl.contains("welcome.php")) {
                     aio.genError("New Account", "It looks like this is a new account. Welcome to GameFAQs! " +
                             "There are some ground rules you'll have to go over first before you can get " +
                             "access to the message boards. Please log in to your account in a web browser " +
                             "and access the message boards there to view and accept the site terms and rules.");
+
+                    return;
+                } else if (resUrl.contains("register.html?miss=1")) {
+                    aio.genError("Login Required", "You've just tried to access a feature that requires a " +
+                            "GameFAQs account. You can manage your accounts and log in through the navigation " +
+                            "drawer. If you are currently logged into an account, try removing the account " +
+                            "from the app and re-adding it.");
 
                     return;
                 }
@@ -605,7 +617,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case POSTTPC_S3:
                     case VERIFY_ACCOUNT_S1:
                     case VERIFY_ACCOUNT_S2:
-                        AllInOneV2.wtl("addToHistory unchanged: " + addToHistory);
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("addToHistory unchanged: " + addToHistory);
                         break;
 
                     case TAG_USER:
@@ -614,7 +626,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case CLOSE_TOPIC:
                     case SEND_PM_S1:
                     case SEND_PM_S2:
-                        AllInOneV2.wtl("setting addToHistory to false based on current NetDesc");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("setting addToHistory to false based on current NetDesc");
                         addToHistory = false;
                         break;
                 }
@@ -637,10 +649,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             case PM_OUTBOX:
                             case PM_OUTBOX_DETAIL:
                             case UNSPECIFIED:
-                                AllInOneV2.wtl("beginning history addition");
+                                if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning history addition");
                                 int[] vLoc = aio.getScrollerVertLoc();
                                 hAdapter.insertHistory(lastPath, lastDesc.name(), lastResBodyAsBytes, vLoc[0], vLoc[1]);
-                                AllInOneV2.wtl("finished history addition");
+                                if (BuildConfig.DEBUG) AllInOneV2.wtl("finished history addition");
                                 break;
 
                             case TAG_USER:
@@ -662,7 +674,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             case VERIFY_ACCOUNT_S2:
                             case SEND_PM_S1:
                             case SEND_PM_S2:
-                                AllInOneV2.wtl("not adding to history");
+                                if (BuildConfig.DEBUG) AllInOneV2.wtl("not adding to history");
                                 break;
 
                         }
@@ -696,11 +708,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case POSTTPC_S3:
                     case VERIFY_ACCOUNT_S1:
                     case VERIFY_ACCOUNT_S2:
-                        AllInOneV2.wtl("beginning lastDesc, lastRes, etc. setting");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning lastDesc, lastRes, etc. setting");
                         lastDesc = desc;
                         lastResBodyAsBytes = result.getResult().bytes;
                         lastPath = resUrl;
-                        AllInOneV2.wtl("finishing lastDesc, lastRes, etc. setting");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing lastDesc, lastRes, etc. setting");
                         break;
 
 
@@ -712,7 +724,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case DLTMSG_S2:
                     case SEND_PM_S1:
                     case SEND_PM_S2:
-                        AllInOneV2.wtl("not setting lastDesc, lastRes, etc.");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("not setting lastDesc, lastRes, etc.");
                         break;
 
                 }
@@ -722,7 +734,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                 switch (desc) {
                     case LOGIN_S1:
-                        AllInOneV2.wtl("session hNR determined this is login step 1");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is login step 1");
                         String loginKey = doc.getElementsByAttributeValue("name", "key").attr("value");
 
                         HashMap<String, List<String>> loginData = new HashMap<String, List<String>>();
@@ -732,22 +744,22 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         loginData.put("path", Arrays.asList(lastPath));
                         loginData.put("key", Arrays.asList(loginKey));
 
-                        AllInOneV2.wtl("finishing login step 1, sending step 2");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing login step 1, sending step 2");
                         post(NetDesc.LOGIN_S2, "/user/login.html", loginData);
                         break;
 
                     case LOGIN_S2:
-                        AllInOneV2.wtl("session hNR determined this is login step 2");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is login step 2");
                         aio.setAMPLinkVisible(userCanViewAMP());
 
                         if (initUrl != null) {
-                            AllInOneV2.wtl("loading previous page");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("loading previous page");
                             get(initDesc, initUrl);
                         } else if (userCanViewAMP() && AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false)) {
-                            AllInOneV2.wtl("loading AMP");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("loading AMP");
                             get(NetDesc.AMP_LIST, AllInOneV2.buildAMPLink());
                         } else {
-                            AllInOneV2.wtl("loading board jumper");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("loading board jumper");
                             get(NetDesc.BOARD_JUMPER, "/boards");
                         }
 
@@ -755,7 +767,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                     case POSTMSG_S1:
                     case EDIT_MSG:
-                        AllInOneV2.wtl("session hNR determined this is post message step 1");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post message step 1");
                         String msg1Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 
                         String sig;
@@ -772,17 +784,17 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                         Elements msg1Error = doc.getElementsContainingOwnText("There was an error posting your message:");
                         if (!msg1Error.isEmpty()) {
-                            AllInOneV2.wtl("there was an error in post msg step 1, ending early");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("there was an error in post msg step 1, ending early");
                             aio.postError(msg1Error.first().parent().parent().text());
                             aio.postExecuteCleanup(desc);
                         } else {
-                            AllInOneV2.wtl("finishing post message step 1, sending step 2");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing post message step 1, sending step 2");
                             post((userHasAdvancedPosting() ? NetDesc.POSTMSG_S3 : NetDesc.POSTMSG_S2), lastPath, msg1Data);
                         }
                         break;
 
                     case POSTMSG_S2:
-                        AllInOneV2.wtl("session hNR determined this is post message step 2");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post message step 2");
                         String msg2Key = doc.getElementsByAttributeValue("name", "key").attr("value");
                         String msgPost_id = doc.getElementsByAttributeValue("name", "post_id").attr("value");
                         String msgUid = doc.getElementsByAttributeValue("name", "uid").attr("value");
@@ -796,30 +808,30 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         Elements msg2Error = doc.getElementsContainingOwnText("There was an error posting your message:");
                         Elements msg2AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
                         if (!msg2Error.isEmpty()) {
-                            AllInOneV2.wtl("there was an error in post msg step 2, ending early");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("there was an error in post msg step 2, ending early");
                             aio.postError(msg2Error.first().parent().parent().text());
                             aio.postExecuteCleanup(desc);
                         } else if (!msg2AutoFlag.isEmpty()) {
-                            AllInOneV2.wtl("autoflag got tripped in post msg step 2, showing autoflag dialog");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("autoflag got tripped in post msg step 2, showing autoflag dialog");
                             String msg = msg2AutoFlag.first().parent().parent().text();
                             showAutoFlagWarning(lastPath, msg2Data, NetDesc.POSTMSG_S3, msg);
                         } else {
-                            AllInOneV2.wtl("finishing post message step 2, sending step 3");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing post message step 2, sending step 3");
                             post(NetDesc.POSTMSG_S3, lastPath, msg2Data);
                         }
                         break;
 
                     case POSTMSG_S3:
-                        AllInOneV2.wtl("session hNR determined this is post message step 3 (if jumping from 1 to 3, then app is quick posting)");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post message step 3 (if jumping from 1 to 3, then app is quick posting)");
 
                         Elements msg3AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
                         Elements msg3Error = doc.getElementsContainingOwnText("There was an error posting your message:");
                         if (!msg3Error.isEmpty()) {
-                            AllInOneV2.wtl("there was an error in post msg step 3, ending early");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("there was an error in post msg step 3, ending early");
                             aio.postError(msg3Error.first().parent().parent().text());
                             aio.postExecuteCleanup(desc);
                         } else if (!msg3AutoFlag.isEmpty()) {
-                            AllInOneV2.wtl("autoflag got tripped in post msg step 3, getting data and showing autoflag dialog");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("autoflag got tripped in post msg step 3, getting data and showing autoflag dialog");
                             String msg = msg3AutoFlag.first().parent().parent().text();
 
                             String msg3Key = doc.getElementsByAttributeValue("name", "key").attr("value");
@@ -835,7 +847,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             showAutoFlagWarning(lastPath, msg3Data, NetDesc.POSTMSG_S3, msg);
                             postErrorDetected = true;
                         } else {
-                            AllInOneV2.wtl("finishing post message step 3, refreshing topic");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing post message step 3, refreshing topic");
                             lastDesc = NetDesc.TOPIC;
                             aio.enableGoToUrlDefinedPost();
                             Crouton.showText(aio, "Message posted.", Theming.croutonStyle());
@@ -844,7 +856,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         break;
 
                     case POSTTPC_S1:
-                        AllInOneV2.wtl("session hNR determined this is post topic step 1");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post topic step 1");
                         String tpc1Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 
                         HashMap<String, List<String>> tpc1Data = new HashMap<String, List<String>>();
@@ -867,17 +879,17 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                         Elements tpc1Error = doc.getElementsContainingOwnText("There was an error posting your message:");
                         if (!tpc1Error.isEmpty()) {
-                            AllInOneV2.wtl("there was an error in post topic step 1, ending early");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("there was an error in post topic step 1, ending early");
                             aio.postError(tpc1Error.first().parent().parent().text());
                             aio.postExecuteCleanup(desc);
                         } else {
-                            AllInOneV2.wtl("finishing post topic step 1, sending step 2");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing post topic step 1, sending step 2");
                             post((userHasAdvancedPosting() ? NetDesc.POSTTPC_S3 : NetDesc.POSTTPC_S2), lastPath, tpc1Data);
                         }
                         break;
 
                     case POSTTPC_S2:
-                        AllInOneV2.wtl("session hNR determined this is post topic step 2");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post topic step 2");
                         String tpc2Key = doc.getElementsByAttributeValue("name", "key").attr("value");
                         String tpcPost_id = doc.getElementsByAttributeValue("name", "post_id").attr("value");
                         String tpcUid = doc.getElementsByAttributeValue("name", "uid").attr("value");
@@ -902,30 +914,30 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         Elements tpc2Error = doc.getElementsContainingOwnText("There was an error posting your message:");
                         Elements tpc2AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
                         if (!tpc2Error.isEmpty()) {
-                            AllInOneV2.wtl("there was an error in post topic step 2, ending early");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("there was an error in post topic step 2, ending early");
                             aio.postError(tpc2Error.first().parent().parent().text());
                             aio.postExecuteCleanup(desc);
                         } else if (!tpc2AutoFlag.isEmpty()) {
-                            AllInOneV2.wtl("autoflag got tripped in post msg step 2, showing autoflag dialog");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("autoflag got tripped in post msg step 2, showing autoflag dialog");
                             String msg = tpc2AutoFlag.first().parent().parent().text();
                             showAutoFlagWarning(lastPath, tpc2Data, NetDesc.POSTTPC_S3, msg);
                         } else {
-                            AllInOneV2.wtl("finishing post topic step 2, sending step 3");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing post topic step 2, sending step 3");
                             post(NetDesc.POSTTPC_S3, lastPath, tpc2Data);
                         }
                         break;
 
                     case POSTTPC_S3:
-                        AllInOneV2.wtl("session hNR determined this is post topic step 3 (if jumping from 1 to 3, then app is quick posting)");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post topic step 3 (if jumping from 1 to 3, then app is quick posting)");
 
                         Elements tpc3AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
                         Elements tpc3Error = doc.getElementsContainingOwnText("There was an error posting your message:");
                         if (!tpc3Error.isEmpty()) {
-                            AllInOneV2.wtl("there was an error in post topic step 3, ending early");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("there was an error in post topic step 3, ending early");
                             aio.postError(tpc3Error.first().parent().parent().text());
                             aio.postExecuteCleanup(desc);
                         } else if (!tpc3AutoFlag.isEmpty()) {
-                            AllInOneV2.wtl("autoflag got tripped in post msg step 3, getting data and showing autoflag dialog");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("autoflag got tripped in post msg step 3, getting data and showing autoflag dialog");
                             String msg = tpc3AutoFlag.first().parent().parent().text();
 
                             String tpc3Key = doc.getElementsByAttributeValue("name", "key").attr("value");
@@ -941,7 +953,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             showAutoFlagWarning(lastPath, tpc3Data, NetDesc.POSTTPC_S3, msg);
                             postErrorDetected = true;
                         } else {
-                            AllInOneV2.wtl("finishing post topic step 3, processing new topic");
+                            if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing post topic step 3, processing new topic");
                             lastDesc = NetDesc.TOPIC;
                             Crouton.showText(aio, "Topic posted.", Theming.croutonStyle());
                             processTopicsAndMessages(doc, resUrl, NetDesc.TOPIC);
@@ -1012,12 +1024,12 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         break;
 
                     case TOPIC:
-                        AllInOneV2.wtl("session hNR determined this is a topic");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is a topic");
                         processTopicsAndMessages(doc, resUrl, NetDesc.TOPIC);
                         break;
 
                     case MESSAGE_DETAIL:
-                        AllInOneV2.wtl("session hNR determined this is a message");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is a message");
                         processTopicsAndMessages(doc, resUrl, NetDesc.MESSAGE_DETAIL);
                         break;
 
@@ -1037,13 +1049,13 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case PM_OUTBOX_DETAIL:
                     case VERIFY_ACCOUNT_S1:
                     case VERIFY_ACCOUNT_S2:
-                        AllInOneV2.wtl("session hNR determined this should be handled by AIO");
+                        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this should be handled by AIO");
                         aio.processContent(desc, doc, resUrl);
                         break;
                 }
             } else {
                 // connection failed for some reason, probably timed out
-                AllInOneV2.wtl("res was null in session hNR");
+                if (BuildConfig.DEBUG) AllInOneV2.wtl("res was null in session hNR");
                 aio.timeoutCleanup(desc);
             }
         } catch (TimeoutException timeoutEx) {
@@ -1077,7 +1089,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             aio.tryCaught(url, desc.toString(), ex, body);
         }
 
-        AllInOneV2.wtl("session hNR finishing, desc: " + desc.name());
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR finishing, desc: " + desc.name());
     }
 
     private void processTopicsAndMessages(Document doc, String resUrl, NetDesc successDesc) {
@@ -1087,10 +1099,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             else if (successDesc == NetDesc.MESSAGE_DETAIL)
                 Crouton.showText(aio, "The message you selected is no longer available for viewing.", Theming.croutonStyle());
 
-            AllInOneV2.wtl("topic or message is no longer available, treat response as a board");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("topic or message is no longer available, treat response as a board");
             aio.processContent(NetDesc.BOARD, doc, resUrl);
         } else {
-            AllInOneV2.wtl("handle the topic or message in AIO");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("handle the topic or message in AIO");
             aio.processContent(successDesc, doc, resUrl);
         }
     }
@@ -1098,7 +1110,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
     private boolean skipAIOCleanup = false;
 
     public void forceSkipAIOCleanup() {
-        AllInOneV2.wtl("forcing AIO cleanup skip");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("forcing AIO cleanup skip");
         skipAIOCleanup = true;
     }
 
@@ -1169,10 +1181,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
         if (forceReload || AllInOneV2.getSettingsPref().getBoolean("reloadOnBack", false)) {
             forceNoHistoryAddition();
-            AllInOneV2.wtl("going back in history, refreshing: " + h.getDesc().name() + " " + h.getPath());
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("going back in history, refreshing: " + h.getDesc().name() + " " + h.getPath());
             get(h.getDesc(), h.getPath());
         } else {
-            AllInOneV2.wtl("going back in history: " + h.getDesc().name() + " " + h.getPath());
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("going back in history: " + h.getDesc().name() + " " + h.getPath());
             lastDesc = h.getDesc();
             lastResBodyAsBytes = h.getResBodyAsBytes();
             lastPath = h.getPath();
@@ -1191,7 +1203,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
     public void refresh() {
         forceNoHistoryAddition();
-        AllInOneV2.wtl("refreshing: " + lastDesc.name() + " " + lastPath);
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("refreshing: " + lastDesc.name() + " " + lastPath);
         applySavedScroll = true;
         savedScrollVal = aio.getScrollerVertLoc();
 
@@ -1240,7 +1252,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         if (end > start)
             userLevel = Integer.parseInt(sc.substring(start, end));
 
-        AllInOneV2.wtl("user level: " + userLevel);
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("user level: " + userLevel);
     }
 
     public static NetDesc determineNetDesc(String url) {
