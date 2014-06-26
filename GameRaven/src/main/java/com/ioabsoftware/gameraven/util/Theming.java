@@ -37,6 +37,12 @@ public final class Theming {
         return accentColor;
     }
 
+    private static int moddedAccentColor;
+
+    public static int moddedAccentColor() {
+        return moddedAccentColor;
+    }
+
     private static int accentTextColor;
 
     public static int accentTextColor() {
@@ -140,6 +146,8 @@ public final class Theming {
                 accentTextColor = Color.BLACK;
                 isAccentLight = true;
             }
+
+            moddedAccentColor = Color.HSVToColor(hsv);
 
             croutonStyle = new Style.Builder()
                     .setBackgroundColorValue(accentColor)
