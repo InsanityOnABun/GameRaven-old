@@ -406,7 +406,7 @@ public class MessageRowData extends BaseRowData {
     }
 
     public String getMessageForEditing() {
-        return processContent(false, false);
+        return processContent(true, false);
     }
 
     private String processContent(boolean removeSig, boolean ignoreLtGt) {

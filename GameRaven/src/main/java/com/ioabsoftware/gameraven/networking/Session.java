@@ -770,15 +770,9 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post message step 1");
                         String msg1Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 
-                        String sig;
-                        if (desc == NetDesc.EDIT_MSG)
-                            sig = AllInOneV2.EMPTY_STRING;
-                        else
-                            sig = aio.getSig();
-
                         HashMap<String, List<String>> msg1Data = new HashMap<String, List<String>>();
                         msg1Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
-                        msg1Data.put("custom_sig", Arrays.asList(sig));
+                        msg1Data.put("custom_sig", Arrays.asList(aio.getSig()));
                         msg1Data.put("post", Arrays.asList((userHasAdvancedPosting() ? "Post without Preview" : "Preview Message")));
                         msg1Data.put("key", Arrays.asList(msg1Key));
 
