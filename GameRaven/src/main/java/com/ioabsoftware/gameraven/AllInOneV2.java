@@ -399,7 +399,7 @@ public class AllInOneV2 extends Activity {
             Editor sEditor = settings.edit();
             sEditor.putString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)
                     .putString("timezone", TimeZone.getDefault().getID())
-                    .commit();
+                    .apply();
         }
 
         ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
@@ -1057,6 +1057,11 @@ public class AllInOneV2 extends Activity {
         ((TextView) findViewById(R.id.dwrChangeAcc)).setText(name + " (Click to Change)");
     }
 
+    private void hideSoftKeyboard(View inputView) {
+        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
+                hideSoftInputFromWindow(inputView.getWindowToken(), 0);
+    }
+
     public void postError(String msg) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(msg);
@@ -1132,13 +1137,7 @@ public class AllInOneV2 extends Activity {
         b.setNegativeButton("Dismiss", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-//				switch ((session.getLastDoc() == null) ? 1 : 0) {
-//				case 0:
-//					processContent(session.getLastDesc(), session.getLastDoc(), session.getLastPath());
-//				case 1:
                 postExecuteCleanup(session.getLastDesc());
-//					break;
-//				}
             }
         });
         b.create().show();
@@ -1153,15 +1152,6 @@ public class AllInOneV2 extends Activity {
             pollButton.setEnabled(true);
             setMenuItemVisibility(postIcon, true);
         }
-    }
-
-    public void preExecuteSetup(NetDesc desc) {
-        if (BuildConfig.DEBUG) wtl("GRAIO dPreES fired --NEL, desc: " + desc.name());
-        ptrLayout.setRefreshing(true);
-        setAllMenuItemsEnabled(false);
-
-        if (desc != NetDesc.POSTMSG_S1 && desc != NetDesc.POSTTPC_S1 && desc != NetDesc.EDIT_MSG)
-            postCleanup();
     }
 
     private boolean isRoR = false;
@@ -1183,16 +1173,20 @@ public class AllInOneV2 extends Activity {
         }
     }
 
-    private void hideSoftKeyboard(View inputView) {
-        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
-                hideSoftInputFromWindow(inputView.getWindowToken(), 0);
-    }
-
     public void setAMPLinkVisible(boolean visible) {
         if (visible)
             findViewById(R.id.dwrAMPWrapper).setVisibility(View.VISIBLE);
         else
             findViewById(R.id.dwrAMPWrapper).setVisibility(View.GONE);
+    }
+
+    public void preExecuteSetup(NetDesc desc) {
+        if (BuildConfig.DEBUG) wtl("GRAIO dPreES fired --NEL, desc: " + desc.name());
+        ptrLayout.setRefreshing(true);
+        setAllMenuItemsEnabled(false);
+
+        if (desc != NetDesc.POSTMSG_S1 && desc != NetDesc.POSTTPC_S1 && desc != NetDesc.EDIT_MSG)
+            postCleanup();
     }
 
     /**
@@ -2938,13 +2932,13 @@ public class AllInOneV2 extends Activity {
 
                 else {
                     if (!selUser.equals(currUser) && !selUser.equals(LOG_OUT_LABEL))
-                        if (session.hasNetworkConnection()) {
+                        if (session.hasNetworkConnection())
                             session = new Session(AllInOneV2.this,
                                     selUser,
                                     AccountManager.getPassword(AllInOneV2.this, selUser),
                                     session.getLastPath(),
                                     session.getLastDesc());
-                        } else
+                        else
                             noNetworkConnection();
                 }
 
