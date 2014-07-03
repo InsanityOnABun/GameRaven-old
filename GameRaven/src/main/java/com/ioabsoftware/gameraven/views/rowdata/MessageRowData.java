@@ -54,6 +54,11 @@ import java.util.TimeZone;
 
 public class MessageRowData extends BaseRowData {
 
+    public static final String SPOILER_START = "<s>";
+    public static final String SPOILER_END = "</s>";
+    public static final String QUOTE_START = "<blockquote>";
+    public static final String QUOTE_END = "</blockquote>";
+
     private String username, userTitles, postNum, postTime, messageID, boardID, topicID;
     private final String unprocessedMessageText;
 
@@ -271,20 +276,20 @@ public class MessageRowData extends BaseRowData {
         if (BuildConfig.DEBUG) AllInOneV2.wtl("creating ssb");
         SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false, true));
 
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding <b> spans");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding bold spans");
         addSpan(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding <i> spans");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding italic spans");
         addSpan(ssb, "<i>", "</i>", new StyleSpan(Typeface.ITALIC));
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding <code> spans");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding code spans");
         addSpan(ssb, "<code>", "</code>", new TypefaceSpan("monospace"));
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding <cite> spans");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding cite spans");
         addSpan(ssb, "<cite>", "</cite>", new UnderlineSpan(), new StyleSpan(Typeface.ITALIC));
 
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding <quote> spans");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding quote spans");
         // quotes don't use CharacterStyles, so do it manually
-        while (ssb.toString().contains("<blockquote>")) {
-            int start = ssb.toString().indexOf("<blockquote>");
-            ssb.replace(start, start + 12, "\n");
+        while (ssb.toString().contains(QUOTE_START)) {
+            int start = ssb.toString().indexOf(QUOTE_START);
+            ssb.replace(start, start + QUOTE_START.length(), "\n");
             start++;
 
             int stackCount = 1;
@@ -292,8 +297,8 @@ public class MessageRowData extends BaseRowData {
             int opener;
             int innerStartPoint = start;
             do {
-                opener = ssb.toString().indexOf("<blockquote>", innerStartPoint + 1);
-                closer = ssb.toString().indexOf("</blockquote>", innerStartPoint + 1);
+                opener = ssb.toString().indexOf(QUOTE_START, innerStartPoint + 1);
+                closer = ssb.toString().indexOf(QUOTE_END, innerStartPoint + 1);
                 if (opener != -1 && opener < closer) {
                     // found a nested quote
                     stackCount++;
@@ -306,7 +311,7 @@ public class MessageRowData extends BaseRowData {
             } while (stackCount > 0);
 
 
-            ssb.replace(closer, closer + "</blockquote>".length(), "\n");
+            ssb.replace(closer, closer + QUOTE_END.length(), "\n");
             ssb.setSpan(new GRQuoteSpan(), start, closer, 0);
         }
 
@@ -338,14 +343,14 @@ public class MessageRowData extends BaseRowData {
         if (BuildConfig.DEBUG) AllInOneV2.wtl("linkifying");
         Linkify.addLinks(ssb, Linkify.WEB_URLS);
 
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding <spoiler> spans");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding spoiler spans");
         // do spoiler tags manually instead of in the method, as the clickablespan needs
         // to know the start and end points
-        while (ssb.toString().contains("<spoiler>")) {
-            int start = ssb.toString().indexOf("<spoiler>");
-            ssb.delete(start, start + 9);
-            int end = ssb.toString().indexOf("</spoiler>", start);
-            ssb.delete(end, end + 10);
+        while (ssb.toString().contains(SPOILER_START)) {
+            int start = ssb.toString().indexOf(SPOILER_START);
+            ssb.delete(start, start + SPOILER_START.length());
+            int end = ssb.toString().indexOf(SPOILER_END, start);
+            ssb.delete(end, end + SPOILER_END.length());
             ssb.setSpan(new BackgroundColorSpan(defTextColor), start, end, 0);
             ssb.setSpan(new SpoilerClickSpan(start, end, color, defTextColor), start, end, 0);
 
@@ -379,10 +384,7 @@ public class MessageRowData extends BaseRowData {
             now.setToNow();
             now.normalize(true);
 
-            if ((now.toMillis(false) - then.toMillis(false)) / ((float) DateUtils.HOUR_IN_MILLIS) < 1f)
-                return true;
-            else
-                return false;
+            return (now.toMillis(false) - then.toMillis(false)) / ((float) DateUtils.HOUR_IN_MILLIS) < 1f;
 
         } catch (ParseException e) {
             e.printStackTrace();
@@ -410,10 +412,7 @@ public class MessageRowData extends BaseRowData {
     }
 
     private String processContent(boolean removeSig, boolean ignoreLtGt) {
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("getting messageElemNoPoll.html()");
-
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("replacing spoiler spans with spoiler tags");
-        String finalBody = unprocessedMessageText.replace("<span class=\"fspoiler\">", "<spoiler>").replace("</span>", "</spoiler>");
+        String finalBody = unprocessedMessageText;
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning opening anchor tag removal");
         while (finalBody.contains("<a href")) {
