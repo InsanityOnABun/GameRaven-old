@@ -183,6 +183,9 @@ public class MessageRowData extends BaseRowData {
         messageID = MID;
         hlColor = hlColorIn;
 
+        if (!Session.isLoggedIn())
+            messageIn.select("div.message_mpu").remove();
+
         if (BuildConfig.DEBUG) AllInOneV2.wtl("checking for poll");
         if (!messageIn.getElementsByClass("board_poll").isEmpty()) {
             if (BuildConfig.DEBUG) AllInOneV2.wtl("there is a poll");
