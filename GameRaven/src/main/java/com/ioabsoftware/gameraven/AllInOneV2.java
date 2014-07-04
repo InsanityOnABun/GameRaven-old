@@ -1148,9 +1148,6 @@ public class AllInOneV2 extends Activity {
                 "and posting again without first checking if the post went through may result in the post " +
                 "being submitted twice.");
 
-        final View view = new View(this);
-        b.setView(view);
-
         b.setPositiveButton("Refresh", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -1158,20 +1155,42 @@ public class AllInOneV2 extends Activity {
             }
         });
 
-        b.setNeutralButton("Copy Message Body to Clipboard", null);
+        b.setNeutralButton("Copy Post to Clipboard", null);
 
         b.setNegativeButton("Dismiss", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                session.setLastPathAndDesc(postPostUrl, Session.determineNetDesc(postPostUrl));
                 ptrCleanup();
             }
         });
 
+        b.setCancelable(false);
         final AlertDialog d = b.create();
         d.setOnShowListener(new OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
-                d.getButton(DialogInterface.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
+                Button posButton = d.getButton(DialogInterface.BUTTON_POSITIVE);
+                final Button neuButton = d.getButton(DialogInterface.BUTTON_NEUTRAL);
+                Button negButton = d.getButton(DialogInterface.BUTTON_NEGATIVE);
+
+                LayoutParams posParams = (LayoutParams) posButton.getLayoutParams();
+                posParams.weight = 1;
+                posParams.width = LayoutParams.MATCH_PARENT;
+
+                LayoutParams neuParams = (LayoutParams) negButton.getLayoutParams();
+                neuParams.weight = 1.2f;
+                neuParams.width = LayoutParams.MATCH_PARENT;
+
+                LayoutParams negParams = (LayoutParams) negButton.getLayoutParams();
+                negParams.weight = 1;
+                negParams.width = LayoutParams.MATCH_PARENT;
+
+                posButton.setLayoutParams(posParams);
+                neuButton.setLayoutParams(neuParams);
+                negButton.setLayoutParams(negParams);
+
+                neuButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         android.content.ClipboardManager clipboard =
@@ -1182,7 +1201,7 @@ public class AllInOneV2 extends Activity {
                         Crouton.showText(AllInOneV2.this,
                                 "Message body copied to clipboard.",
                                 Theming.croutonStyle(),
-                                (ViewGroup) view.getParent());
+                                (ViewGroup) d.findViewById(android.R.id.message).getParent().getParent());
                     }
                 });
             }
@@ -1210,6 +1229,7 @@ public class AllInOneV2 extends Activity {
 
     private void ptrCleanup() {
         ptrLayout.setRefreshing(false);
+        setAllMenuItemsEnabled(true);
         if (postWrapper.getVisibility() == View.VISIBLE) {
             postSubmitButton.setEnabled(true);
             postCancelButton.setEnabled(true);
@@ -2377,8 +2397,7 @@ public class AllInOneV2 extends Activity {
             needToSetNavList = false;
         }
 
-        setAllMenuItemsEnabled(true);
-        ptrLayout.setRefreshing(false);
+        ptrCleanup();
         if (desc == NetDesc.BOARD || desc == NetDesc.TOPIC)
             postInterfaceCleanup();
 
