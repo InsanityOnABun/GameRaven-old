@@ -1195,6 +1195,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         hAdapter.close();
     }
 
+    public void setLastPathAndDesc(String path, NetDesc desc) {
+        lastPath = path;
+        lastDesc = desc;
+    }
+
     public void refresh() {
         forceNoHistoryAddition();
         if (BuildConfig.DEBUG) AllInOneV2.wtl("refreshing: " + lastDesc.name() + " " + lastPath);

@@ -399,7 +399,7 @@ public class AllInOneV2 extends Activity {
             Editor sEditor = settings.edit();
             sEditor.putString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)
                     .putString("timezone", TimeZone.getDefault().getID())
-                    .commit();
+                    .apply();
         }
 
         ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
@@ -1057,6 +1057,11 @@ public class AllInOneV2 extends Activity {
         ((TextView) findViewById(R.id.dwrChangeAcc)).setText(name + " (Click to Change)");
     }
 
+    private void hideSoftKeyboard(View inputView) {
+        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
+                hideSoftInputFromWindow(inputView.getWindowToken(), 0);
+    }
+
     public void postError(String msg) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(msg);
@@ -1064,7 +1069,7 @@ public class AllInOneV2 extends Activity {
         builder.setPositiveButton("Ok", null);
         builder.create().show();
 
-        uiCleanup();
+        ptrCleanup();
     }
 
     public void genError(String errorTitle, String errorMsg) {
@@ -1074,7 +1079,7 @@ public class AllInOneV2 extends Activity {
         builder.setPositiveButton("Ok", null);
         builder.create().show();
 
-        uiCleanup();
+        ptrCleanup();
     }
 
     public void noNetworkConnection() {
@@ -1103,10 +1108,8 @@ public class AllInOneV2 extends Activity {
             case POSTTPC_S1:
             case POSTTPC_S2:
             case POSTTPC_S3:
-                title = "Post Timeout";
-                msg = "Post timed out. Press refresh to check if your post made it through.";
-                posButtonText = "Refresh";
-                break;
+                postTimeoutCleanup();
+                return;
             default:
                 retrySub = true;
                 title = "Timeout";
@@ -1132,27 +1135,113 @@ public class AllInOneV2 extends Activity {
         b.setNegativeButton("Dismiss", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-//				switch ((session.getLastDoc() == null) ? 1 : 0) {
-//				case 0:
-//					processContent(session.getLastDesc(), session.getLastDoc(), session.getLastPath());
-//				case 1:
                 postExecuteCleanup(session.getLastDesc());
-//					break;
-//				}
             }
         });
-        b.create().show();
+        b.show();
     }
 
-    private void uiCleanup() {
+    private void postTimeoutCleanup() {
+        AlertDialog.Builder b = new AlertDialog.Builder(AllInOneV2.this);
+        b.setTitle("Post Timeout");
+        b.setMessage("Post timed out. Press refresh to check if your post made it through. Dismissing " +
+                "and posting again without first checking if the post went through may result in the post " +
+                "being submitted twice.");
+
+        b.setPositiveButton("Refresh", new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                session.get(Session.determineNetDesc(postPostUrl), postPostUrl);
+            }
+        });
+
+        b.setNeutralButton("Copy Post to Clipboard", null);
+
+        b.setNegativeButton("Dismiss", new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                session.setLastPathAndDesc(postPostUrl, Session.determineNetDesc(postPostUrl));
+                ptrCleanup();
+            }
+        });
+
+        b.setCancelable(false);
+        final AlertDialog d = b.create();
+        d.setOnShowListener(new OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                Button posButton = d.getButton(DialogInterface.BUTTON_POSITIVE);
+                final Button neuButton = d.getButton(DialogInterface.BUTTON_NEUTRAL);
+                Button negButton = d.getButton(DialogInterface.BUTTON_NEGATIVE);
+
+                LayoutParams posParams = (LayoutParams) posButton.getLayoutParams();
+                posParams.weight = 1;
+                posParams.width = LayoutParams.MATCH_PARENT;
+
+                LayoutParams neuParams = (LayoutParams) negButton.getLayoutParams();
+                neuParams.weight = 1.2f;
+                neuParams.width = LayoutParams.MATCH_PARENT;
+
+                LayoutParams negParams = (LayoutParams) negButton.getLayoutParams();
+                negParams.weight = 1;
+                negParams.width = LayoutParams.MATCH_PARENT;
+
+                posButton.setLayoutParams(posParams);
+                neuButton.setLayoutParams(neuParams);
+                negButton.setLayoutParams(negParams);
+
+                neuButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        android.content.ClipboardManager clipboard =
+                                (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+
+                        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("simple text", savedPostBody));
+
+                        Crouton.showText(AllInOneV2.this,
+                                "Message body copied to clipboard.",
+                                Theming.croutonStyle(),
+                                (ViewGroup) d.findViewById(android.R.id.message).getParent().getParent());
+                    }
+                });
+            }
+        });
+        d.show();
+    }
+
+    private boolean isRoR = false;
+
+    private void postInterfaceCleanup() {
+        if (!isRoR && postWrapper.getVisibility() == View.VISIBLE) {
+            if (BuildConfig.DEBUG) wtl("postInterfaceCleanup fired --NEL");
+            pageJumperWrapper.setVisibility(View.VISIBLE);
+            postWrapper.setVisibility(View.GONE);
+            pollButton.setVisibility(View.GONE);
+            pollSep.setVisibility(View.GONE);
+            postBody.setText(null);
+            postTitle.setText(null);
+            clearPoll();
+            messageIDForEditing = null;
+
+            hideSoftKeyboard(postBody);
+        }
+    }
+
+    private void ptrCleanup() {
         ptrLayout.setRefreshing(false);
-        setMenuItemVisibility(refreshIcon, true);
+        setAllMenuItemsEnabled(true);
         if (postWrapper.getVisibility() == View.VISIBLE) {
             postSubmitButton.setEnabled(true);
             postCancelButton.setEnabled(true);
             pollButton.setEnabled(true);
-            setMenuItemVisibility(postIcon, true);
         }
+    }
+
+    public void setAMPLinkVisible(boolean visible) {
+        if (visible)
+            findViewById(R.id.dwrAMPWrapper).setVisibility(View.VISIBLE);
+        else
+            findViewById(R.id.dwrAMPWrapper).setVisibility(View.GONE);
     }
 
     public void preExecuteSetup(NetDesc desc) {
@@ -1161,38 +1250,7 @@ public class AllInOneV2 extends Activity {
         setAllMenuItemsEnabled(false);
 
         if (desc != NetDesc.POSTMSG_S1 && desc != NetDesc.POSTTPC_S1 && desc != NetDesc.EDIT_MSG)
-            postCleanup();
-    }
-
-    private boolean isRoR = false;
-
-    private void postCleanup() {
-        if (!isRoR && postWrapper.getVisibility() == View.VISIBLE) {
-            pageJumperWrapper.setVisibility(View.VISIBLE);
-            if (BuildConfig.DEBUG) wtl("postCleanup fired --NEL");
-            postWrapper.setVisibility(View.GONE);
-            pollButton.setVisibility(View.GONE);
-            pollSep.setVisibility(View.GONE);
-            postBody.setText(null);
-            postTitle.setText(null);
-            clearPoll();
-            messageIDForEditing = null;
-            postPostUrl = null;
-
-            hideSoftKeyboard(postBody);
-        }
-    }
-
-    private void hideSoftKeyboard(View inputView) {
-        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
-                hideSoftInputFromWindow(inputView.getWindowToken(), 0);
-    }
-
-    public void setAMPLinkVisible(boolean visible) {
-        if (visible)
-            findViewById(R.id.dwrAMPWrapper).setVisibility(View.VISIBLE);
-        else
-            findViewById(R.id.dwrAMPWrapper).setVisibility(View.GONE);
+            postInterfaceCleanup();
     }
 
     /**
@@ -2339,10 +2397,9 @@ public class AllInOneV2 extends Activity {
             needToSetNavList = false;
         }
 
-        setAllMenuItemsEnabled(true);
-        ptrLayout.setRefreshing(false);
+        ptrCleanup();
         if (desc == NetDesc.BOARD || desc == NetDesc.TOPIC)
-            postCleanup();
+            postInterfaceCleanup();
 
         if (isRoR)
             isRoR = false;
@@ -2513,13 +2570,13 @@ public class AllInOneV2 extends Activity {
             b.setPositiveButton("Yes", new OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    postCleanup();
+                    postInterfaceCleanup();
                 }
             });
             b.setNegativeButton("No", null);
             b.create().show();
         } else
-            postCleanup();
+            postInterfaceCleanup();
     }
 
     public void postPollOptions(View view) {
@@ -2938,13 +2995,13 @@ public class AllInOneV2 extends Activity {
 
                 else {
                     if (!selUser.equals(currUser) && !selUser.equals(LOG_OUT_LABEL))
-                        if (session.hasNetworkConnection()) {
+                        if (session.hasNetworkConnection())
                             session = new Session(AllInOneV2.this,
                                     selUser,
                                     AccountManager.getPassword(AllInOneV2.this, selUser),
                                     session.getLastPath(),
                                     session.getLastDesc());
-                        } else
+                        else
                             noNetworkConnection();
                 }
 
