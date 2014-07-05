@@ -290,7 +290,7 @@ public class MessageRowData extends BaseRowData {
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding quote spans");
         // quotes don't use CharacterStyles, so do it manually
-        while (ssb.toString().contains(QUOTE_START)) {
+        while (ssb.toString().contains(QUOTE_START) && ssb.toString().contains(QUOTE_END)) {
             int start = ssb.toString().indexOf(QUOTE_START);
             ssb.replace(start, start + QUOTE_START.length(), "\n");
             start++;
@@ -349,7 +349,7 @@ public class MessageRowData extends BaseRowData {
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding spoiler spans");
         // do spoiler tags manually instead of in the method, as the clickablespan needs
         // to know the start and end points
-        while (ssb.toString().contains(SPOILER_START)) {
+        while (ssb.toString().contains(SPOILER_START) && ssb.toString().contains(SPOILER_END)) {
             int start = ssb.toString().indexOf(SPOILER_START);
             ssb.delete(start, start + SPOILER_START.length());
             int end = ssb.toString().indexOf(SPOILER_END, start);
@@ -396,7 +396,7 @@ public class MessageRowData extends BaseRowData {
     }
 
     private static void addSpan(SpannableStringBuilder ssb, String tag, String endTag, CharacterStyle... cs) {
-        while (ssb.toString().contains(tag)) {
+        while (ssb.toString().contains(tag) && ssb.toString().contains(endTag)) {
             int start = ssb.toString().indexOf(tag);
             ssb.delete(start, start + tag.length());
             int end = ssb.toString().indexOf(endTag, start);
