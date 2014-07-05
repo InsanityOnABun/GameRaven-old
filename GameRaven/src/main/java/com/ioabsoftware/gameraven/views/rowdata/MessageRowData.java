@@ -280,13 +280,13 @@ public class MessageRowData extends BaseRowData {
         SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false, true));
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding bold spans");
-        addSpan(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
+        addGenericSpan(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding italic spans");
-        addSpan(ssb, "<i>", "</i>", new StyleSpan(Typeface.ITALIC));
+        addGenericSpan(ssb, "<i>", "</i>", new StyleSpan(Typeface.ITALIC));
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding code spans");
-        addSpan(ssb, "<code>", "</code>", new TypefaceSpan("monospace"));
+        addGenericSpan(ssb, "<code>", "</code>", new TypefaceSpan("monospace"));
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding cite spans");
-        addSpan(ssb, "<cite>", "</cite>", new UnderlineSpan(), new StyleSpan(Typeface.ITALIC));
+        addGenericSpan(ssb, "<cite>", "</cite>", new UnderlineSpan(), new StyleSpan(Typeface.ITALIC));
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding quote spans");
         // quotes don't use CharacterStyles, so do it manually
@@ -395,14 +395,32 @@ public class MessageRowData extends BaseRowData {
         }
     }
 
-    private static void addSpan(SpannableStringBuilder ssb, String tag, String endTag, CharacterStyle... cs) {
+    private static void addGenericSpan(SpannableStringBuilder ssb, String tag, String endTag, CharacterStyle... cs) {
         while (ssb.toString().contains(tag) && ssb.toString().contains(endTag)) {
             int start = ssb.toString().indexOf(tag);
             ssb.delete(start, start + tag.length());
-            int end = ssb.toString().indexOf(endTag, start);
-            ssb.delete(end, end + endTag.length());
+
+            int stackCount = 1;
+            int close;
+            int open;
+            int innerStartPoint = start;
+            do {
+                open = ssb.toString().indexOf(tag, innerStartPoint + 1);
+                close = ssb.toString().indexOf(endTag, innerStartPoint + 1);
+                if (open != -1 && open < close) {
+                    // found a nested tag
+                    stackCount++;
+                    innerStartPoint = open;
+                } else {
+                    // this closer is the right one
+                    stackCount--;
+                    innerStartPoint = close;
+                }
+            } while (stackCount > 0);
+
+            ssb.delete(close, close + endTag.length());
             for (CharacterStyle c : cs)
-                ssb.setSpan(CharacterStyle.wrap(c), start, end, 0);
+                ssb.setSpan(CharacterStyle.wrap(c), start, close, 0);
         }
     }
 
