@@ -6,12 +6,10 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.TextPaint;
 import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.CharacterStyle;
-import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
@@ -34,9 +32,9 @@ import com.ioabsoftware.gameraven.util.RichTextUtils;
 import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.util.UrlSpanConverter;
 import com.ioabsoftware.gameraven.views.BaseRowData;
-import com.ioabsoftware.gameraven.views.ClickableLinksTextView;
 import com.ioabsoftware.gameraven.views.GRQuoteSpan;
 import com.ioabsoftware.gameraven.views.RowType;
+import com.ioabsoftware.gameraven.views.SpoilerClickSpan;
 import com.ioabsoftware.gameraven.views.rowview.HeaderRowView;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -53,11 +51,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class MessageRowData extends BaseRowData {
-
-    public static final String SPOILER_START = "<s>";
-    public static final String SPOILER_END = "</s>";
-    public static final String QUOTE_START = "<blockquote>";
-    public static final String QUOTE_END = "</blockquote>";
 
     private String username, userTitles, postNum, postTime, messageID, boardID, topicID;
     private final String unprocessedMessageText;
@@ -307,17 +300,7 @@ public class MessageRowData extends BaseRowData {
         Linkify.addLinks(ssb, Linkify.WEB_URLS);
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding spoiler spans");
-        // do spoiler tags manually instead of in the method, as the clickablespan needs
-        // to know the start and end points
-        while (ssb.toString().contains(SPOILER_START) && ssb.toString().contains(SPOILER_END)) {
-            int start = ssb.toString().indexOf(SPOILER_START);
-            ssb.delete(start, start + SPOILER_START.length());
-            int end = ssb.toString().indexOf(SPOILER_END, start);
-            ssb.delete(end, end + SPOILER_END.length());
-            ssb.setSpan(new BackgroundColorSpan(defTextColor), start, end, 0);
-            ssb.setSpan(new SpoilerClickSpan(start, end, color, defTextColor), start, end, 0);
-
-        }
+        addSpoilerSpans(ssb, color, defTextColor);
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("setting spannedMessage");
         spannedMessage = RichTextUtils.replaceAll(ssb, URLSpan.class, new UrlSpanConverter());
@@ -356,49 +339,101 @@ public class MessageRowData extends BaseRowData {
     }
 
     private static void addGenericSpans(SpannableStringBuilder ssb, String tag, String endTag, CharacterStyle... cs) {
-        while (ssb.toString().contains(tag) && ssb.toString().contains(endTag)) {
-            int start = ssb.toString().indexOf(tag);
-            ssb.delete(start, start + tag.length());
+        // initialize array
+        int[] startEnd = spanStartAndEnd(ssb.toString(), tag, endTag);
 
-            int stackCount = 1;
-            int close;
-            int open;
-            int innerStartPoint = start;
-            do {
-                open = ssb.toString().indexOf(tag, innerStartPoint + 1);
-                close = ssb.toString().indexOf(endTag, innerStartPoint + 1);
-                if (open != -1 && open < close) {
-                    // found a nested tag
-                    stackCount++;
-                    innerStartPoint = open;
-                } else {
-                    // this closer is the right one
-                    stackCount--;
-                    innerStartPoint = close;
-                }
-            } while (stackCount > 0);
+        // while start and end points are found...
+        while (!Arrays.equals(startEnd, noStartEndBase)) {
+            // remove the start tag
+            ssb.delete(startEnd[0], startEnd[0] + tag.length());
 
-            ssb.delete(close, close + endTag.length());
+            // adjust end point for removed start tag
+            startEnd[1] -= tag.length();
+
+            // remove end tag
+            ssb.delete(startEnd[1], startEnd[1] + endTag.length());
+
+            // apply styles
             for (CharacterStyle c : cs)
-                ssb.setSpan(CharacterStyle.wrap(c), start, close, 0);
+                ssb.setSpan(CharacterStyle.wrap(c), startEnd[0], startEnd[1], 0);
+
+            // get new start and end points
+            startEnd = spanStartAndEnd(ssb.toString(), tag, endTag);
         }
     }
 
-    private void addQuoteSpans(SpannableStringBuilder ssb) {
-        while (ssb.toString().contains(QUOTE_START) && ssb.toString().contains(QUOTE_END)) {
-            int start = ssb.toString().indexOf(QUOTE_START);
-            ssb.replace(start, start + QUOTE_START.length(), "\n");
-            start++;
+    public static final String QUOTE_START = "<blockquote>";
+    public static final String QUOTE_END = "</blockquote>";
+
+    private static void addQuoteSpans(SpannableStringBuilder ssb) {
+        // initialize array
+        int[] startEnd = spanStartAndEnd(ssb.toString(), QUOTE_START, QUOTE_END);
+
+        // while start and end points are found...
+        while (!Arrays.equals(startEnd, noStartEndBase)) {
+            // replace the start tag
+            ssb.replace(startEnd[0], startEnd[0] + QUOTE_START.length(), "\n");
+            startEnd[0]++;
+
+            // adjust end point for replaced start tag
+            startEnd[1] -= QUOTE_START.length() - 1;
+
+            // remove end tag
+            ssb.replace(startEnd[1], startEnd[1] + QUOTE_END.length(), "\n");
+
+            // apply style
+            ssb.setSpan(new GRQuoteSpan(), startEnd[0], startEnd[1], 0);
+
+            // get new start and end points
+            startEnd = spanStartAndEnd(ssb.toString(), QUOTE_START, QUOTE_END);
+        }
+    }
+
+    public static final String SPOILER_START = "<s>";
+    public static final String SPOILER_END = "</s>";
+
+    private static void addSpoilerSpans(SpannableStringBuilder ssb, int color, int defTextColor) {
+        // initialize array
+        int[] startEnd = spanStartAndEnd(ssb.toString(), SPOILER_START, SPOILER_END);
+
+        // while start and end points are found...
+        while (!Arrays.equals(startEnd, noStartEndBase)) {
+            // remove the start tag
+            ssb.delete(startEnd[0], startEnd[0] + SPOILER_START.length());
+
+            // adjust end point for removed start tag
+            startEnd[1] -= SPOILER_START.length();
+
+            // remove end tag
+            ssb.delete(startEnd[1], startEnd[1] + SPOILER_END.length());
+
+            // apply styles
+            ssb.setSpan(new BackgroundColorSpan(defTextColor), startEnd[0], startEnd[1], 0);
+            ssb.setSpan(new SpoilerClickSpan(startEnd[0], startEnd[1], color, defTextColor), startEnd[0], startEnd[1], 0);
+
+            // get new start and end points
+            startEnd = spanStartAndEnd(ssb.toString(), SPOILER_START, SPOILER_END);
+        }
+    }
+
+    private static int[] noStartEndBase = {-1, -1};
+
+    private static int[] spanStartAndEnd(String text, String openTag, String closeTag) {
+        int start = -1;
+        int end = -1;
+        if (text.contains(openTag) && text.contains(closeTag)) {
+            start = text.indexOf(openTag);
+            end = text.indexOf(closeTag);
 
             int stackCount = 1;
             int closer;
             int opener;
             int innerStartPoint = start;
             do {
-                opener = ssb.toString().indexOf(QUOTE_START, innerStartPoint + 1);
-                closer = ssb.toString().indexOf(QUOTE_END, innerStartPoint + 1);
+                opener = text.indexOf(openTag, innerStartPoint + 1);
+                closer = text.indexOf(closeTag, innerStartPoint + 1);
                 if (opener != -1 && opener < closer) {
-                    // found a nested quote
+                    // found a nested tag
                     stackCount++;
                     innerStartPoint = opener;
                 } else {
@@ -408,10 +443,11 @@ public class MessageRowData extends BaseRowData {
                 }
             } while (stackCount > 0);
 
+            if (closer != -1)
+                end = closer;
 
-            ssb.replace(closer, closer + QUOTE_END.length(), "\n");
-            ssb.setSpan(new GRQuoteSpan(), start, closer, 0);
         }
+        return new int[]{start, end};
     }
 
     public String getMessageForQuoting() {
@@ -436,7 +472,8 @@ public class MessageRowData extends BaseRowData {
         if (BuildConfig.DEBUG) AllInOneV2.wtl("removing closing anchor tags");
         finalBody = finalBody.replace("</a>", "");
 
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("removing existing \\n, replacing linebreak tags with \\n");
+        if (BuildConfig.DEBUG)
+            AllInOneV2.wtl("removing existing \\n, replacing linebreak tags with \\n");
         if (finalBody.endsWith("<br />"))
             finalBody = finalBody.substring(0, finalBody.length() - 6);
         finalBody = finalBody.replace("\n", "");
@@ -454,30 +491,6 @@ public class MessageRowData extends BaseRowData {
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("returning finalbody");
         return finalBody;
-    }
-
-    private class SpoilerClickSpan extends ClickableSpan {
-
-        int color, defTextColor;
-        int start, end;
-
-        public SpoilerClickSpan(int start, int end, int color, int defTextColor) {
-            this.start = start;
-            this.end = end;
-            this.color = color;
-            this.defTextColor = defTextColor;
-        }
-
-        @Override
-        public void onClick(View widget) {
-            ((Spannable) ((ClickableLinksTextView) widget).getText()).setSpan(new BackgroundColorSpan(color), start, end, 0);
-        }
-
-        @Override
-        public void updateDrawState(TextPaint ds) {
-            ds.setColor(defTextColor);
-            ds.setUnderlineText(false);
-        }
     }
 
 }
