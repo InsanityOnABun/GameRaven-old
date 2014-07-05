@@ -277,7 +277,7 @@ public class MessageRowData extends BaseRowData {
         unprocessedMessageText = messageIn.html();
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("creating ssb");
-        SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false, true));
+        SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false));
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding bold spans");
         addGenericSpan(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
@@ -330,18 +330,6 @@ public class MessageRowData extends BaseRowData {
         }
 
         ssb.append('\n');
-
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("replacing &gameravenlt; with <");
-        while (ssb.toString().contains("&gameravenlt;")) {
-            int start = ssb.toString().indexOf("&gameravenlt;");
-            ssb.replace(start, start + 13, "<");
-        }
-
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("replacing &gameravengt; with >");
-        while (ssb.toString().contains("&gameravengt;")) {
-            int start = ssb.toString().indexOf("&gameravengt;");
-            ssb.replace(start, start + 13, ">");
-        }
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("linkifying");
         Linkify.addLinks(ssb, Linkify.WEB_URLS);
@@ -425,14 +413,14 @@ public class MessageRowData extends BaseRowData {
     }
 
     public String getMessageForQuoting() {
-        return processContent(true, false);
+        return processContent(true);
     }
 
     public String getMessageForEditing() {
-        return processContent(true, false);
+        return processContent(true);
     }
 
-    private String processContent(boolean removeSig, boolean ignoreLtGt) {
+    private String processContent(boolean removeSig) {
         String finalBody = unprocessedMessageText;
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning opening anchor tag removal");
@@ -457,11 +445,6 @@ public class MessageRowData extends BaseRowData {
             int sigStart = finalBody.lastIndexOf("\n---\n");
             if (sigStart != -1)
                 finalBody = finalBody.substring(0, sigStart);
-        }
-
-        if (ignoreLtGt) {
-            if (BuildConfig.DEBUG) AllInOneV2.wtl("ignoring less than / greater than");
-            finalBody = finalBody.replace("&lt;", "&gameravenlt;").replace("&gt;", "&gameravengt;");
         }
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("unescaping finalbody html");
