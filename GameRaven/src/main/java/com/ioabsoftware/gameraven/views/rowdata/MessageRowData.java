@@ -280,43 +280,15 @@ public class MessageRowData extends BaseRowData {
         SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false));
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding bold spans");
-        addGenericSpan(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
+        addGenericSpans(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding italic spans");
-        addGenericSpan(ssb, "<i>", "</i>", new StyleSpan(Typeface.ITALIC));
+        addGenericSpans(ssb, "<i>", "</i>", new StyleSpan(Typeface.ITALIC));
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding code spans");
-        addGenericSpan(ssb, "<code>", "</code>", new TypefaceSpan("monospace"));
+        addGenericSpans(ssb, "<code>", "</code>", new TypefaceSpan("monospace"));
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding cite spans");
-        addGenericSpan(ssb, "<cite>", "</cite>", new UnderlineSpan(), new StyleSpan(Typeface.ITALIC));
-
+        addGenericSpans(ssb, "<cite>", "</cite>", new UnderlineSpan(), new StyleSpan(Typeface.ITALIC));
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding quote spans");
-        // quotes don't use CharacterStyles, so do it manually
-        while (ssb.toString().contains(QUOTE_START) && ssb.toString().contains(QUOTE_END)) {
-            int start = ssb.toString().indexOf(QUOTE_START);
-            ssb.replace(start, start + QUOTE_START.length(), "\n");
-            start++;
-
-            int stackCount = 1;
-            int closer;
-            int opener;
-            int innerStartPoint = start;
-            do {
-                opener = ssb.toString().indexOf(QUOTE_START, innerStartPoint + 1);
-                closer = ssb.toString().indexOf(QUOTE_END, innerStartPoint + 1);
-                if (opener != -1 && opener < closer) {
-                    // found a nested quote
-                    stackCount++;
-                    innerStartPoint = opener;
-                } else {
-                    // this closer is the right one
-                    stackCount--;
-                    innerStartPoint = closer;
-                }
-            } while (stackCount > 0);
-
-
-            ssb.replace(closer, closer + QUOTE_END.length(), "\n");
-            ssb.setSpan(new GRQuoteSpan(), start, closer, 0);
-        }
+        addQuoteSpans(ssb);
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("getting text colors for spoilers");
         int defTextColor;
@@ -383,7 +355,7 @@ public class MessageRowData extends BaseRowData {
         }
     }
 
-    private static void addGenericSpan(SpannableStringBuilder ssb, String tag, String endTag, CharacterStyle... cs) {
+    private static void addGenericSpans(SpannableStringBuilder ssb, String tag, String endTag, CharacterStyle... cs) {
         while (ssb.toString().contains(tag) && ssb.toString().contains(endTag)) {
             int start = ssb.toString().indexOf(tag);
             ssb.delete(start, start + tag.length());
@@ -409,6 +381,36 @@ public class MessageRowData extends BaseRowData {
             ssb.delete(close, close + endTag.length());
             for (CharacterStyle c : cs)
                 ssb.setSpan(CharacterStyle.wrap(c), start, close, 0);
+        }
+    }
+
+    private void addQuoteSpans(SpannableStringBuilder ssb) {
+        while (ssb.toString().contains(QUOTE_START) && ssb.toString().contains(QUOTE_END)) {
+            int start = ssb.toString().indexOf(QUOTE_START);
+            ssb.replace(start, start + QUOTE_START.length(), "\n");
+            start++;
+
+            int stackCount = 1;
+            int closer;
+            int opener;
+            int innerStartPoint = start;
+            do {
+                opener = ssb.toString().indexOf(QUOTE_START, innerStartPoint + 1);
+                closer = ssb.toString().indexOf(QUOTE_END, innerStartPoint + 1);
+                if (opener != -1 && opener < closer) {
+                    // found a nested quote
+                    stackCount++;
+                    innerStartPoint = opener;
+                } else {
+                    // this closer is the right one
+                    stackCount--;
+                    innerStartPoint = closer;
+                }
+            } while (stackCount > 0);
+
+
+            ssb.replace(closer, closer + QUOTE_END.length(), "\n");
+            ssb.setSpan(new GRQuoteSpan(), start, closer, 0);
         }
     }
 
