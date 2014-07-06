@@ -139,14 +139,15 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
             isUsingAvatars = globalIsUsingAvatars;
             if (isUsingAvatars) {
                 avatar.setVisibility(View.VISIBLE);
-                Ion.with(avatar)
-                        .placeholder(R.drawable.avatar_placeholder)
-                        .error(R.drawable.avatar_default)
-                        .load("http://weblab.cs.uml.edu/~rdupuis/gamefaqs-avatars/avatars/" + myData.getUser().replace(" ", "%20") + ".png");
             } else {
                 avatar.setVisibility(View.GONE);
             }
         }
+        if (isUsingAvatars)
+            Ion.with(avatar)
+                    .placeholder(R.drawable.avatar_placeholder)
+                    .error(R.drawable.avatar_default)
+                    .load("http://weblab.cs.uml.edu/~rdupuis/gamefaqs-avatars/avatars/" + myData.getUser().replace(" ", "%20") + ".png");
 
         message.setText(myData.getSpannedMessage());
 
