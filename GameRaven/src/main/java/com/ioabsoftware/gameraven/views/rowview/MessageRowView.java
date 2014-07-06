@@ -20,10 +20,13 @@ import com.ioabsoftware.gameraven.views.ClickableLinksTextView;
 import com.ioabsoftware.gameraven.views.RowType;
 import com.ioabsoftware.gameraven.views.SelectorSolidDrawable;
 import com.ioabsoftware.gameraven.views.rowdata.MessageRowData;
+import com.koushikdutta.ion.Ion;
 
 public class MessageRowView extends BaseRowView implements View.OnClickListener {
 
     View topWrapper;
+
+    ImageView avatar;
 
     TextView user;
     TextView post;
@@ -38,10 +41,10 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
     MessageRowData myData;
 
     SelectorSolidDrawable headerSelector;
-    private static Drawable bodyBackground;
 
     boolean isHighlighted = false;
     boolean isShowingPoll = false;
+    boolean isUsingAvatars = false;
 
     public MessageRowView(Context context) {
         super(context);
@@ -62,6 +65,8 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
         LayoutInflater.from(context).inflate(R.layout.msgview, this, true);
 
         topWrapper = findViewById(R.id.mvTopWrapper);
+
+        avatar = (ImageView) findViewById(R.id.mvAvatar);
 
         user = (TextView) findViewById(R.id.mvUser);
         post = (TextView) findViewById(R.id.mvPostNumber);
@@ -130,6 +135,19 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
             headerSelector.setMyColor(myData.getHLColor());
         }
 
+        if (isUsingAvatars != globalIsUsingAvatars) {
+            isUsingAvatars = globalIsUsingAvatars;
+            if (isUsingAvatars) {
+                avatar.setVisibility(View.VISIBLE);
+                Ion.with(avatar)
+                        .placeholder(R.drawable.avatar_placeholder)
+                        .error(R.drawable.avatar_default)
+                        .load("http://weblab.cs.uml.edu/~rdupuis/gamefaqs-avatars/avatars/" + myData.getUser().replace(" ", "%20") + ".png");
+            } else {
+                avatar.setVisibility(View.GONE);
+            }
+        }
+
         message.setText(myData.getSpannedMessage());
 
         message.setMovementMethod(ArrowKeyMovementMethod.getInstance());
@@ -149,6 +167,11 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
             return message.getText().subSequence(start, end).toString();
         else
             return null;
+    }
+
+    @Override
+    public void onClick(View v) {
+        AllInOneV2.get().messageMenuClicked(this);
     }
 
     public String getMessageDetailLink() {
@@ -199,9 +222,10 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
         return myData.spoilersAreRevealed();
     }
 
-    @Override
-    public void onClick(View v) {
-        AllInOneV2.get().messageMenuClicked(this);
+    private static boolean globalIsUsingAvatars;
+
+    public static void setUsingAvatars(boolean set) {
+        globalIsUsingAvatars = set;
     }
 
 }

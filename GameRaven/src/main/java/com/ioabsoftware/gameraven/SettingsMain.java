@@ -113,6 +113,7 @@ public class SettingsMain extends PreferenceActivity {
         ACCEPTED_KEYS.add("confirmPostSubmit");
         ACCEPTED_KEYS.add("autoCensorEnable");
         ACCEPTED_KEYS.add("textScale");
+        ACCEPTED_KEYS.add("usingAvatars");
 
         findPreference("donate").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -166,7 +167,7 @@ public class SettingsMain extends PreferenceActivity {
         findPreference("notifsEnable").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                if ((Boolean) newValue == true) {
+                if ((Boolean) newValue) {
                     // enabling notifications
                     if (settings.getString("defaultAccount", NO_DEFAULT_ACCOUNT).equals(NO_DEFAULT_ACCOUNT)) {
                         Crouton.showText(SettingsMain.this, "You have no default account set!", Theming.croutonStyle());
@@ -369,6 +370,11 @@ public class SettingsMain extends PreferenceActivity {
 
                 buf.append("notifsFrequency=" + settings.getString("notifsFrequency", "60") + '\n');
 
+                if (settings.getBoolean("usingAvatars", false))
+                    buf.append("usingAvatars=true\n");
+                else
+                    buf.append("usingAvatars=false\n");
+
                 if (settings.getBoolean("startAtAMP", false))
                     buf.append("startAtAMP=true\n");
                 else
@@ -544,7 +550,7 @@ public class SettingsMain extends PreferenceActivity {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("Key, Val pair not recognized in restore: " + key + ", " + val);
                     }
 
-                    editor.commit();
+                    editor.apply();
 
                     disableNotifs();
                     if (settings.getBoolean("notifsEnable", false))

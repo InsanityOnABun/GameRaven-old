@@ -84,6 +84,12 @@
         android:title="General Settings">
         <CheckBoxPreference
             android:defaultValue="false"
+            android:key="usingAvatars"
+            android:persistent="true"
+            android:summary="Only supports displaying at the moment, no upload. Use browser to upload."
+            android:title="Use Avatars" />
+        <CheckBoxPreference
+            android:defaultValue="false"
             android:key="startAtAMP"
             android:persistent="true"
             android:summaryOff="New sessions will not start on the Active Messages Posted List"

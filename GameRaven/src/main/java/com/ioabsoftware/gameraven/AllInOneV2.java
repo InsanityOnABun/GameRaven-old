@@ -667,6 +667,7 @@ public class AllInOneV2 extends Activity {
             drawer.findViewById(R.id.dwrFuncSep).setBackgroundColor(Theming.accentColor());
         }
 
+        MessageRowView.setUsingAvatars(settings.getBoolean("usingAvatars", false));
 
         if (session != null) {
             if (settings.getBoolean("reloadOnResume", false)) {
