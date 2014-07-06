@@ -270,7 +270,7 @@ public class MessageRowData extends BaseRowData {
         unprocessedMessageText = messageIn.html();
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("creating ssb");
-        SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false));
+        SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false, true));
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding bold spans");
         addGenericSpans(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
@@ -299,6 +299,18 @@ public class MessageRowData extends BaseRowData {
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding spoiler spans");
         addSpoilerSpans(ssb);
+
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("replacing &lt; with <");
+        while (ssb.toString().contains("&lt;")) {
+            int start = ssb.toString().indexOf("&lt;");
+            ssb.replace(start, start + "&lt;".length(), "<");
+        }
+
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("replacing &gt; with >");
+        while (ssb.toString().contains("&gt;")) {
+            int start = ssb.toString().indexOf("&gt;");
+            ssb.replace(start, start + "&gt;".length(), ">");
+        }
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("setting spannedMessage");
         spannedMessage = RichTextUtils.replaceAll(ssb, URLSpan.class, new UrlSpanConverter());
@@ -470,14 +482,14 @@ public class MessageRowData extends BaseRowData {
     }
 
     public String getMessageForQuoting() {
-        return processContent(true);
+        return processContent(true, false);
     }
 
     public String getMessageForEditing() {
-        return processContent(true);
+        return processContent(true, false);
     }
 
-    private String processContent(boolean removeSig) {
+    private String processContent(boolean removeSig, boolean ignoreLtGt) {
         String finalBody = unprocessedMessageText;
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning opening anchor tag removal");
@@ -505,8 +517,18 @@ public class MessageRowData extends BaseRowData {
                 finalBody = finalBody.substring(0, sigStart);
         }
 
+        if (ignoreLtGt) {
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("ignoring &lt; / &gt;, pre-unescape");
+            finalBody = finalBody.replace("&lt;", "&gameravenlt;").replace("&gt;", "&gameravengt;");
+        }
+
         if (BuildConfig.DEBUG) AllInOneV2.wtl("unescaping finalbody html");
         finalBody = StringEscapeUtils.unescapeHtml4(finalBody);
+
+        if (ignoreLtGt) {
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("ignoring &lt; / &gt;, post-unescape");
+            finalBody = finalBody.replace("&gameravenlt;", "&lt;").replace("&gameravengt;", "&gt;");
+        }
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("returning finalbody");
         return finalBody;
