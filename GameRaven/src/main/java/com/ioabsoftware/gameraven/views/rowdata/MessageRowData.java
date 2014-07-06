@@ -34,7 +34,7 @@ import com.ioabsoftware.gameraven.util.UrlSpanConverter;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.GRQuoteSpan;
 import com.ioabsoftware.gameraven.views.RowType;
-import com.ioabsoftware.gameraven.views.SpoilerClickSpan;
+import com.ioabsoftware.gameraven.views.SpoilerSpan;
 import com.ioabsoftware.gameraven.views.rowview.HeaderRowView;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -43,6 +43,7 @@ import org.jsoup.select.Elements;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -284,14 +285,13 @@ public class MessageRowData extends BaseRowData {
         addQuoteSpans(ssb);
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("getting text colors for spoilers");
-        int defTextColor;
-        int color;
+        int hiddenSpoilerColor;
         if (Theming.usingLightTheme()) {
-            color = Color.WHITE;
-            defTextColor = Color.BLACK;
+            revealedSpoilerColor = Color.WHITE;
+            hiddenSpoilerColor = Color.BLACK;
         } else {
-            color = Color.BLACK;
-            defTextColor = Color.WHITE;
+            revealedSpoilerColor = Color.BLACK;
+            hiddenSpoilerColor = Color.WHITE;
         }
 
         ssb.append('\n');
@@ -300,7 +300,7 @@ public class MessageRowData extends BaseRowData {
         Linkify.addLinks(ssb, Linkify.WEB_URLS);
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding spoiler spans");
-        addSpoilerSpans(ssb, color, defTextColor);
+        addSpoilerSpans(ssb, hiddenSpoilerColor);
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("setting spannedMessage");
         spannedMessage = RichTextUtils.replaceAll(ssb, URLSpan.class, new UrlSpanConverter());
@@ -391,8 +391,26 @@ public class MessageRowData extends BaseRowData {
 
     public static final String SPOILER_START = "<s>";
     public static final String SPOILER_END = "</s>";
+    private int revealedSpoilerColor;
+    private boolean spoilersAreRevealed = false;
+    private ArrayList<SpoilerSpan> spoilers = new ArrayList<SpoilerSpan>();
 
-    private static void addSpoilerSpans(SpannableStringBuilder ssb, int color, int defTextColor) {
+    public void revealSpoilers(Spannable s) {
+        for (SpoilerSpan spoiler : spoilers)
+            s.setSpan(new BackgroundColorSpan(revealedSpoilerColor), s.getSpanStart(spoiler), s.getSpanEnd(spoiler), 0);
+
+        spoilersAreRevealed = true;
+    }
+
+    public boolean hasSpoilers() {
+        return !spoilers.isEmpty();
+    }
+
+    public boolean spoilersAreRevealed() {
+        return spoilersAreRevealed;
+    }
+
+    private void addSpoilerSpans(SpannableStringBuilder ssb, int color) {
         // initialize array
         int[] startEnd = spanStartAndEnd(ssb.toString(), SPOILER_START, SPOILER_END);
 
@@ -408,8 +426,9 @@ public class MessageRowData extends BaseRowData {
             ssb.delete(startEnd[1], startEnd[1] + SPOILER_END.length());
 
             // apply styles
-            ssb.setSpan(new BackgroundColorSpan(defTextColor), startEnd[0], startEnd[1], 0);
-            ssb.setSpan(new SpoilerClickSpan(startEnd[0], startEnd[1], color, defTextColor), startEnd[0], startEnd[1], 0);
+            SpoilerSpan spoiler = new SpoilerSpan(color);
+            ssb.setSpan(spoiler, startEnd[0], startEnd[1], 0);
+            spoilers.add(spoiler);
 
             // get new start and end points
             startEnd = spanStartAndEnd(ssb.toString(), SPOILER_START, SPOILER_END);

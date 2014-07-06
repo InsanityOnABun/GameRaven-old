@@ -2810,6 +2810,9 @@ public class AllInOneV2 extends Activity {
 
         ArrayList<String> listBuilder = new ArrayList<String>();
 
+        if (clickedMsg.hasSpoilers() && !clickedMsg.spoilersAreRevealed())
+            listBuilder.add("Reveal Spoilers");
+
         if (clickedMsg.getMessageID() != null) {
             if (clickedMsg.isEdited())
                 listBuilder.add("View Previous Version(s)");
@@ -2845,7 +2848,9 @@ public class AllInOneV2 extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selected = (String) parent.getItemAtPosition(position);
                 assert selected != null : "selected is null";
-                if (selected.equals("View Previous Version(s)") || selected.equals("Message Detail")) {
+                if (selected.equals("Reveal Spoilers")) {
+                    clickedMsg.revealSpoilers();
+                } else if (selected.equals("View Previous Version(s)") || selected.equals("Message Detail")) {
                     session.get(NetDesc.MESSAGE_DETAIL, clickedMsg.getMessageDetailLink());
                 } else if (selected.equals("Quote")) {
                     String msg = (quoteSelection != null ? quoteSelection : clickedMsg.getMessageForQuoting());
