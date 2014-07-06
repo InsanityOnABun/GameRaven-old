@@ -7,17 +7,28 @@ import org.jetbrains.annotations.NotNull;
 
 public class SpoilerSpan extends BackgroundColorSpan {
 
-    int color;
+    TextPaint textPaint;
+    int backColor, textColor, linkColor;
 
-    public SpoilerSpan(int color) {
-        super(color);
-        this.color = color;
+    public SpoilerSpan(int bColor, int tColor, int lColor) {
+        super(bColor);
+        backColor = bColor;
+        textColor = tColor;
+        linkColor = lColor;
+    }
+
+    public void reveal(int bColor, int tColor, int lColor) {
+        backColor = bColor;
+        textColor = tColor;
+        linkColor = lColor;
+        updateDrawState(textPaint);
     }
 
     @Override
     public void updateDrawState(@NotNull TextPaint ds) {
-        ds.setColor(color);
-        ds.linkColor = color;
-        ds.bgColor = color;
+        textPaint = ds;
+        ds.bgColor = backColor;
+        ds.setColor(textColor);
+        ds.linkColor = linkColor;
     }
 }

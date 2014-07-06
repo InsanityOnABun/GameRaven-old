@@ -8,7 +8,6 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
 import android.text.format.Time;
-import android.text.style.BackgroundColorSpan;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
@@ -285,7 +284,6 @@ public class MessageRowData extends BaseRowData {
         addQuoteSpans(ssb);
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("getting text colors for spoilers");
-        int hiddenSpoilerColor;
         if (Theming.usingLightTheme()) {
             revealedSpoilerColor = Color.WHITE;
             hiddenSpoilerColor = Color.BLACK;
@@ -300,7 +298,7 @@ public class MessageRowData extends BaseRowData {
         Linkify.addLinks(ssb, Linkify.WEB_URLS);
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding spoiler spans");
-        addSpoilerSpans(ssb, hiddenSpoilerColor);
+        addSpoilerSpans(ssb);
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("setting spannedMessage");
         spannedMessage = RichTextUtils.replaceAll(ssb, URLSpan.class, new UrlSpanConverter());
@@ -391,13 +389,15 @@ public class MessageRowData extends BaseRowData {
 
     public static final String SPOILER_START = "<s>";
     public static final String SPOILER_END = "</s>";
-    private int revealedSpoilerColor;
+    private int hiddenSpoilerColor, revealedSpoilerColor;
     private boolean spoilersAreRevealed = false;
     private ArrayList<SpoilerSpan> spoilers = new ArrayList<SpoilerSpan>();
 
     public void revealSpoilers(Spannable s) {
         for (SpoilerSpan spoiler : spoilers)
-            s.setSpan(new BackgroundColorSpan(revealedSpoilerColor), s.getSpanStart(spoiler), s.getSpanEnd(spoiler), 0);
+            spoiler.reveal(revealedSpoilerColor, hiddenSpoilerColor, Theming.accentColor());
+
+        s.setSpan(new StyleSpan(Typeface.BOLD), 0, 0, 0);
 
         spoilersAreRevealed = true;
     }
@@ -410,7 +410,7 @@ public class MessageRowData extends BaseRowData {
         return spoilersAreRevealed;
     }
 
-    private void addSpoilerSpans(SpannableStringBuilder ssb, int color) {
+    private void addSpoilerSpans(SpannableStringBuilder ssb) {
         // initialize array
         int[] startEnd = spanStartAndEnd(ssb.toString(), SPOILER_START, SPOILER_END);
 
@@ -426,7 +426,7 @@ public class MessageRowData extends BaseRowData {
             ssb.delete(startEnd[1], startEnd[1] + SPOILER_END.length());
 
             // apply styles
-            SpoilerSpan spoiler = new SpoilerSpan(color);
+            SpoilerSpan spoiler = new SpoilerSpan(hiddenSpoilerColor, hiddenSpoilerColor, hiddenSpoilerColor);
             ssb.setSpan(spoiler, startEnd[0], startEnd[1], 0);
             spoilers.add(spoiler);
 
