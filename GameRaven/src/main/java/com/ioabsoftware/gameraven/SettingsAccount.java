@@ -32,6 +32,7 @@ import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
+import com.ioabsoftware.gameraven.prefs.TabbedSettings;
 import com.ioabsoftware.gameraven.util.AccountManager;
 import com.ioabsoftware.gameraven.util.DocumentParser;
 import com.ioabsoftware.gameraven.util.FinalDoc;
@@ -75,7 +76,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
 
         super.onCreate(savedInstanceState);
 
-        addPreferencesFromResource(R.xml.settingsaccount);
+        addPreferencesFromResource(R.xml.settingsaccounts);
 
         accountVerifier = Ion.getInstance(this, ION_INSTANCE);
         accountVerifier.getCookieMiddleware().clear();
@@ -126,7 +127,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
     private void updateAccountList() {
         accounts.removeAll();
 
-        String def = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
+        String def = settings.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT);
 
         for (String s : AccountManager.getUsernames(this)) {
             Preference pref = new Preference(this);
@@ -254,7 +255,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
         final EditText sigContent = (EditText) v.findViewById(R.id.modaccSigContent);
         final TextView sigCounter = (TextView) v.findViewById(R.id.modaccSigCounter);
 
-        if (clickedAccount.getTitle().toString().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)))
+        if (clickedAccount.getTitle().toString().equals(settings.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT)))
             defaultAcc.setChecked(true);
         else
             defaultAcc.setChecked(false);
@@ -269,7 +270,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
                             Theming.croutonStyle(),
                             (ViewGroup) buttonView.getParent().getParent());
                 } else {
-                    settings.edit().putString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT).commit();
+                    settings.edit().putString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT).commit();
                     settings.edit().putLong("notifsLastPost", 0).commit();
                     Crouton.showText(SettingsAccount.this,
                             "Default account removed.",
@@ -282,8 +283,8 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
         deleteAcc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (clickedAccount.getTitle().toString().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)))
-                    settings.edit().putString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT).commit();
+                if (clickedAccount.getTitle().toString().equals(settings.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT)))
+                    settings.edit().putString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT).commit();
 
                 settings.edit().remove("customSig" + clickedAccount.getTitle().toString()).commit();
 

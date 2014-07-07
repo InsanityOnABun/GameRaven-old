@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.ioabsoftware.gameraven.networking.Session;
+import com.ioabsoftware.gameraven.prefs.TabbedSettings;
 import com.ioabsoftware.gameraven.util.AccountManager;
 
 import org.jsoup.Connection.Method;
@@ -42,10 +43,10 @@ public class NotifierService extends IntentService {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        String username = prefs.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
+        String username = prefs.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT);
 
         // service does nothing if there is no default account set or there is no generated salt
-        if (!username.equals(SettingsMain.NO_DEFAULT_ACCOUNT) && prefs.getString("secureSalt", null) != null) {
+        if (!username.equals(TabbedSettings.NO_DEFAULT_ACCOUNT) && prefs.getString("secureSalt", null) != null) {
             HashMap<String, String> cookies = new HashMap<String, String>();
             String password = AccountManager.getPassword(getApplicationContext(), username);
 

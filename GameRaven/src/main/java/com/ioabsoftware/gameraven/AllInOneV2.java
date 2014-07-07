@@ -51,6 +51,7 @@ import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
+import com.ioabsoftware.gameraven.prefs.TabbedSettings;
 import com.ioabsoftware.gameraven.util.AccountManager;
 import com.ioabsoftware.gameraven.util.DocumentParser;
 import com.ioabsoftware.gameraven.util.Theming;
@@ -373,7 +374,7 @@ public class AllInOneV2 extends Activity {
             @Override
             public void onClick(View v) {
                 drawer.closeMenu(false);
-                startActivity(new Intent(AllInOneV2.this, SettingsMain.class));
+                startActivity(new Intent(AllInOneV2.this, TabbedSettings.class));
             }
         });
 
@@ -395,9 +396,12 @@ public class AllInOneV2 extends Activity {
 
         if (!settings.contains("defaultAccount")) {
             // settings need to be set to default
-            PreferenceManager.setDefaultValues(this, R.xml.settingsmain, false);
+            PreferenceManager.setDefaultValues(this, R.xml.settingsaccounts, false);
+            PreferenceManager.setDefaultValues(this, R.xml.settingsadvanced, false);
+            PreferenceManager.setDefaultValues(this, R.xml.settingsgeneral, false);
+            PreferenceManager.setDefaultValues(this, R.xml.settingstheming, false);
             Editor sEditor = settings.edit();
-            sEditor.putString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)
+            sEditor.putString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT)
                     .putString("timezone", TimeZone.getDefault().getID())
                     .apply();
         }
@@ -687,7 +691,7 @@ public class AllInOneV2 extends Activity {
                     }
                 }
             }
-            String defaultAccount = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
+            String defaultAccount = settings.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT);
             if (AccountManager.containsUser(this, defaultAccount)) {
                 if (BuildConfig.DEBUG) wtl("starting new session from onResume, logged in");
                 session = new Session(this, defaultAccount, AccountManager.getPassword(this, defaultAccount), initUrl, initDesc);
@@ -1293,7 +1297,7 @@ public class AllInOneV2 extends Activity {
         adapterRows.clear();
 
         boolean isDefaultAcc = Session.getUser() != null &&
-                Session.getUser().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT));
+                Session.getUser().equals(settings.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT));
 
         if (BuildConfig.DEBUG) wtl("setting board, topic, message id to null");
         boardID = null;
