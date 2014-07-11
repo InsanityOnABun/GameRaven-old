@@ -62,9 +62,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsMain"
-            android:configChanges="orientation|screenSize" />
-        <activity
             android:name=".prefs.SettingsAccount"
             android:configChanges="orientation|screenSize" />
         <activity
@@ -94,8 +91,7 @@
 
         <activity
             android:name=".prefs.TabbedSettings"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_tabbed_settings" />
+            android:configChanges="orientation|screenSize" />
     </application>
 
 </manifest>
