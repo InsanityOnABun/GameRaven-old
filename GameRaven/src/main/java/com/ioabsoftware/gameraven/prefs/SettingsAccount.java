@@ -1,4 +1,4 @@
-package com.ioabsoftware.gameraven;
+package com.ioabsoftware.gameraven.prefs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -30,9 +30,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
-import com.ioabsoftware.gameraven.prefs.TabbedSettings;
 import com.ioabsoftware.gameraven.util.AccountManager;
 import com.ioabsoftware.gameraven.util.DocumentParser;
 import com.ioabsoftware.gameraven.util.FinalDoc;

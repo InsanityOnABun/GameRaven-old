@@ -65,10 +65,10 @@
             android:name=".SettingsMain"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".SettingsAccount"
+            android:name=".prefs.SettingsAccount"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".SettingsHighlightedUsers"
+            android:name=".prefs.SettingsHighlightedUsers"
             android:configChanges="orientation|screenSize" />
         <activity android:name=".About" />
         <activity

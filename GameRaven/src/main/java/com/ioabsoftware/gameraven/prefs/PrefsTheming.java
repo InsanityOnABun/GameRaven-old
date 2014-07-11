@@ -6,7 +6,6 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
 import com.ioabsoftware.gameraven.R;
-import com.ioabsoftware.gameraven.SettingsHighlightedUsers;
 
 import net.margaritov.preference.colorpicker.ColorPickerPreference;
 

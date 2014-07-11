@@ -1,4 +1,4 @@
-package com.ioabsoftware.gameraven;
+package com.ioabsoftware.gameraven.prefs;
 
 import android.app.Activity;
 import android.graphics.PorterDuff;
@@ -8,6 +8,8 @@ import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
+import com.ioabsoftware.gameraven.AllInOneV2;
+import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.db.HlUDDismissListener;
 import com.ioabsoftware.gameraven.util.Theming;

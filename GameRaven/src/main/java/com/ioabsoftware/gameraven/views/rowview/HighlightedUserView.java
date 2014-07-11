@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.R;
-import com.ioabsoftware.gameraven.SettingsHighlightedUsers;
+import com.ioabsoftware.gameraven.prefs.SettingsHighlightedUsers;
 import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.util.Theming;

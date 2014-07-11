@@ -51,6 +51,8 @@ import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
+import com.ioabsoftware.gameraven.prefs.SettingsAccount;
+import com.ioabsoftware.gameraven.prefs.SettingsHighlightedUsers;
 import com.ioabsoftware.gameraven.prefs.TabbedSettings;
 import com.ioabsoftware.gameraven.util.AccountManager;
 import com.ioabsoftware.gameraven.util.DocumentParser;

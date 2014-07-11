@@ -19,7 +19,6 @@ import android.widget.TextView;
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.BuildConfig;
 import com.ioabsoftware.gameraven.R;
-import com.ioabsoftware.gameraven.SettingsAccount;
 import com.ioabsoftware.gameraven.util.Theming;
 
 import org.apache.commons.lang3.StringEscapeUtils;
