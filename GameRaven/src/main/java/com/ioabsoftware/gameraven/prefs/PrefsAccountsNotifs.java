@@ -33,7 +33,7 @@ public class PrefsAccountsNotifs extends PreferenceFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.settingsaccounts);
+        addPreferencesFromResource(R.xml.prefsaccountsnotifs);
 
         myHost = (TabbedSettings) getActivity();
         settings = myHost.getSettings();

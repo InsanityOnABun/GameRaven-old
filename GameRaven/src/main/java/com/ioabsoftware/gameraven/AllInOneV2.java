@@ -398,10 +398,10 @@ public class AllInOneV2 extends Activity {
 
         if (!settings.contains("defaultAccount")) {
             // settings need to be set to default
-            PreferenceManager.setDefaultValues(this, R.xml.settingsaccounts, false);
-            PreferenceManager.setDefaultValues(this, R.xml.settingsadvanced, false);
-            PreferenceManager.setDefaultValues(this, R.xml.settingsgeneral, false);
-            PreferenceManager.setDefaultValues(this, R.xml.settingstheming, false);
+            PreferenceManager.setDefaultValues(this, R.xml.prefsaccountsnotifs, false);
+            PreferenceManager.setDefaultValues(this, R.xml.prefsadvanced, false);
+            PreferenceManager.setDefaultValues(this, R.xml.prefsgeneral, false);
+            PreferenceManager.setDefaultValues(this, R.xml.prefstheming, false);
             Editor sEditor = settings.edit();
             sEditor.putString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT)
                     .putString("timezone", TimeZone.getDefault().getID())

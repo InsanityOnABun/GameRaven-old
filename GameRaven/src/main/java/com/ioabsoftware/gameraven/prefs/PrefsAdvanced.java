@@ -40,7 +40,7 @@ public class PrefsAdvanced extends PreferenceFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.settingsadvanced);
+        addPreferencesFromResource(R.xml.prefsadvanced);
 
         myHost = (TabbedSettings) getActivity();
         settings = myHost.getSettings();

@@ -76,7 +76,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
 
         super.onCreate(savedInstanceState);
 
-        addPreferencesFromResource(R.xml.settingsaccounts);
+        addPreferencesFromResource(R.xml.settingsaccount);
 
         accountVerifier = Ion.getInstance(this, ION_INSTANCE);
         accountVerifier.getCookieMiddleware().clear();
