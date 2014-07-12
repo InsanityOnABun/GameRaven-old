@@ -2,7 +2,6 @@ package com.ioabsoftware.gameraven.views.rowview;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.text.Spannable;
 import android.text.method.ArrowKeyMovementMethod;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -209,18 +208,6 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 
     public String getMessageForEditing() {
         return myData.getMessageForEditing();
-    }
-
-    public boolean hasSpoilers() {
-        return myData.hasSpoilers();
-    }
-
-    public void revealSpoilers() {
-        myData.revealSpoilers((Spannable) message.getText());
-    }
-
-    public boolean spoilersAreRevealed() {
-        return myData.spoilersAreRevealed();
     }
 
     private static boolean globalIsUsingAvatars;

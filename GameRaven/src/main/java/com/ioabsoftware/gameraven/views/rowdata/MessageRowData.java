@@ -33,7 +33,8 @@ import com.ioabsoftware.gameraven.util.UrlSpanConverter;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.GRQuoteSpan;
 import com.ioabsoftware.gameraven.views.RowType;
-import com.ioabsoftware.gameraven.views.SpoilerSpan;
+import com.ioabsoftware.gameraven.views.SpoilerBackgroundSpan;
+import com.ioabsoftware.gameraven.views.SpoilerClickSpan;
 import com.ioabsoftware.gameraven.views.rowview.HeaderRowView;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -42,7 +43,6 @@ import org.jsoup.select.Elements;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -402,25 +402,6 @@ public class MessageRowData extends BaseRowData {
     public static final String SPOILER_START = "<s>";
     public static final String SPOILER_END = "</s>";
     private int hiddenSpoilerColor, revealedSpoilerColor;
-    private boolean spoilersAreRevealed = false;
-    private ArrayList<SpoilerSpan> spoilers = new ArrayList<SpoilerSpan>();
-
-    public void revealSpoilers(Spannable s) {
-        for (SpoilerSpan spoiler : spoilers)
-            spoiler.reveal(revealedSpoilerColor, hiddenSpoilerColor, Theming.accentColor());
-
-        s.setSpan(new StyleSpan(Typeface.BOLD), 0, 0, 0);
-
-        spoilersAreRevealed = true;
-    }
-
-    public boolean hasSpoilers() {
-        return !spoilers.isEmpty();
-    }
-
-    public boolean spoilersAreRevealed() {
-        return spoilersAreRevealed;
-    }
 
     private void addSpoilerSpans(SpannableStringBuilder ssb) {
         // initialize array
@@ -438,9 +419,10 @@ public class MessageRowData extends BaseRowData {
             ssb.delete(startEnd[1], startEnd[1] + SPOILER_END.length());
 
             // apply styles
-            SpoilerSpan spoiler = new SpoilerSpan(hiddenSpoilerColor, hiddenSpoilerColor, hiddenSpoilerColor);
+            SpoilerBackgroundSpan spoiler = new SpoilerBackgroundSpan(hiddenSpoilerColor, revealedSpoilerColor);
+            SpoilerClickSpan spoilerClick = new SpoilerClickSpan(spoiler);
             ssb.setSpan(spoiler, startEnd[0], startEnd[1], 0);
-            spoilers.add(spoiler);
+            ssb.setSpan(spoilerClick, startEnd[0], startEnd[1], 0);
 
             // get new start and end points
             startEnd = spanStartAndEnd(ssb.toString(), SPOILER_START, SPOILER_END);
