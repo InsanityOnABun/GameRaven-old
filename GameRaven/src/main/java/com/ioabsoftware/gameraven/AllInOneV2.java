@@ -88,6 +88,7 @@ import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.codechimp.apprater.AppRater;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -536,8 +537,7 @@ public class AllInOneV2 extends Activity {
             if (BuildConfig.DEBUG) wtl("css directory does not exist, creating");
             if (cssDirectory.mkdir())
                 if (BuildConfig.DEBUG) wtl("css directory created");
-            else
-                if (BuildConfig.DEBUG) wtl("css directory creation failed");
+                else if (BuildConfig.DEBUG) wtl("css directory creation failed");
         }
 
         if (BuildConfig.DEBUG) wtl("starting db creation");
@@ -546,6 +546,8 @@ public class AllInOneV2 extends Activity {
         adapterRows.add(new HeaderRowData("Loading..."));
         adapterRows.add(new AdmobRowData());
         contentList.setAdapter(viewAdapter);
+
+        AppRater.app_launched(this);
 
         if (BuildConfig.DEBUG) wtl("onCreate finishing");
     }
@@ -677,7 +679,8 @@ public class AllInOneV2 extends Activity {
 
         if (session != null) {
             if (settings.getBoolean("reloadOnResume", false)) {
-                if (BuildConfig.DEBUG) wtl("session exists, reload on resume is true, refreshing page");
+                if (BuildConfig.DEBUG)
+                    wtl("session exists, reload on resume is true, refreshing page");
                 isRoR = true;
                 session.refresh();
             }
@@ -1008,10 +1011,12 @@ public class AllInOneV2 extends Activity {
             case R.id.refresh:
                 if (session.getLastPath() == null) {
                     if (Session.isLoggedIn()) {
-                        if (BuildConfig.DEBUG) wtl("starting new session from case R.id.refresh, logged in");
+                        if (BuildConfig.DEBUG)
+                            wtl("starting new session from case R.id.refresh, logged in");
                         session = new Session(this, Session.getUser(), AccountManager.getPassword(this, Session.getUser()));
                     } else {
-                        if (BuildConfig.DEBUG) wtl("starting new session from R.id.refresh, no login");
+                        if (BuildConfig.DEBUG)
+                            wtl("starting new session from R.id.refresh, no login");
                         session = new Session(this);
                     }
                 } else
@@ -1383,8 +1388,7 @@ public class AllInOneV2 extends Activity {
                 });
             }
 
-        }
-        else if (boardListButton.isLongClickable()) {
+        } else if (boardListButton.isLongClickable()) {
             boardListButton.setText(getResources().getString(R.string.board_jumper));
             boardListButton.setLongClickable(false);
         }
@@ -1734,7 +1738,7 @@ public class AllInOneV2 extends Activity {
                             }
                             if (currPageNum != pageCountNum) {
                                 nextPage = pagePrefix + currPageNum + searchPJAddition;
-                                lastPage = pagePrefix  + (pageCountNum - 1) + searchPJAddition;
+                                lastPage = pagePrefix + (pageCountNum - 1) + searchPJAddition;
 
                                 if (currPageNum > pageCountNum) {
                                     session.forceNoHistoryAddition();
@@ -2397,7 +2401,8 @@ public class AllInOneV2 extends Activity {
     }
 
     public void postExecuteCleanup(NetDesc desc) {
-        if (BuildConfig.DEBUG) wtl("GRAIO dPostEC --NEL, desc: " + (desc == null ? "null" : desc.name()));
+        if (BuildConfig.DEBUG)
+            wtl("GRAIO dPostEC --NEL, desc: " + (desc == null ? "null" : desc.name()));
 
         if (needToSetNavList) {
             setNavList(Session.isLoggedIn());
@@ -2496,8 +2501,7 @@ public class AllInOneV2 extends Activity {
 
                 pageLabel.setEnabled(true);
                 pageLabel.setText("~ " + currPage + " / " + pageCount + " ~");
-            }
-            else {
+            } else {
                 pageLabel.setEnabled(false);
                 pageLabel.setText(currPage + " / " + pageCount);
             }
@@ -3058,6 +3062,7 @@ public class AllInOneV2 extends Activity {
     private Button boardListButton;
     private String[] boardQuickListOptions;
     private String[] boardQuickListLinks;
+
     private void showBoardQuickList() {
         AlertDialog.Builder b = new AlertDialog.Builder(this);
         b.setTitle("My Boards");
@@ -3334,7 +3339,8 @@ public class AllInOneV2 extends Activity {
                         newSpeed = curSpeed * speed;
                     }
                     mf.setFloat(marquee, newSpeed);
-                    if (BuildConfig.DEBUG) wtl("marquee speed set to " + newSpeed + ", from " + curSpeed);
+                    if (BuildConfig.DEBUG)
+                        wtl("marquee speed set to " + newSpeed + ", from " + curSpeed);
                     marqueeSpeedSet = true;
                 }
             } catch (Exception e) {

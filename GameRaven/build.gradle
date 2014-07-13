@@ -13,6 +13,7 @@ dependencies {
     compile 'com.github.chrisbanes.actionbarpulltorefresh:library:+'
     compile 'net.simonvt.menudrawer:menudrawer:+'
     compile 'com.intellij:annotations:+@jar'
+    compile 'com.github.codechimp-org.apprater:library:1.0.+'
 
     compile 'com.koushikdutta.ion:ion:1.3.1'
 
