@@ -11,7 +11,7 @@
             android:key="enableJS"
             android:persistent="true"
             android:summary="Some ads loaded from GFAQs use javascript."
-            android:title="Enable Javascript" />
+            android:title="Javascript" />
 
         <Preference
             android:key="backupSettings"

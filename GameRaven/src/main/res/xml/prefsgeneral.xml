@@ -10,35 +10,32 @@
             android:defaultValue="false"
             android:key="usingAvatars"
             android:persistent="true"
-            android:summary="Only supports displaying at the moment, no upload. Use browser to upload."
-            android:title="Use Avatars" />
+            android:summary="Currently only supports displaying, no upload."
+            android:title="Avatars" />
         <SwitchPreference
             android:defaultValue="false"
             android:key="startAtAMP"
             android:persistent="true"
-            android:summaryOff="New sessions will not start on the Active Messages Posted List"
-            android:summaryOn="New sessions will start on the Active Messages Posted List"
+            android:summary="Start new sessions on the AMP List."
             android:title="Start on AMP List" />
         <SwitchPreference
             android:defaultValue="false"
             android:key="reloadOnBack"
             android:persistent="true"
-            android:summaryOff="Do not reload pages when navigating back."
-            android:summaryOn="Reload pages when navigating back."
+            android:summary="Reload page when navigating back."
             android:title="Reload On Back" />
         <SwitchPreference
             android:defaultValue="false"
             android:key="reloadOnResume"
             android:persistent="true"
-            android:summaryOff="Do not reload pages when app is resumed."
-            android:summaryOn="Reload pages when app is resumed."
+            android:summary="Reload page when resuming app."
             android:title="Reload On Resume" />
         <SwitchPreference
             android:defaultValue="false"
             android:key="enablePTR"
             android:persistent="true"
-            android:summary="Enables the option to refresh the page by pulling past the top."
-            android:title="Enable Pull-To-Refresh" />
+            android:summary="Pull past the top of the page to refresh."
+            android:title="Pull-To-Refresh" />
 
         <ListPreference
             android:defaultValue="-1"
@@ -66,6 +63,6 @@
             android:key="autoCensorEnable"
             android:persistent="true"
             android:summary="Automatically censors banned words."
-            android:title="Enable AutoCensor" />
+            android:title="AutoCensor" />
     </PreferenceCategory>
 </PreferenceScreen>

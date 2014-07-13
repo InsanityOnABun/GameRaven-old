@@ -17,14 +17,14 @@
             android:defaultValue="false"
             android:key="useLightTheme"
             android:persistent="true"
-            android:summary="Changes require restart to take effect. (Menu -> Exit GameRaven)"
-            android:title="Use Light Theme" />
+            android:summary="Requires restart to take effect. (Menu -> Exit GameRaven)"
+            android:title="Light Theme" />
         <SwitchPreference
             android:defaultValue="false"
             android:key="useWhiteAccentText"
             android:persistent="true"
-            android:summary="Changes require restart to take effect. (Menu -> Exit GameRaven)"
-            android:title="Use White Accent Text" />
+            android:summary="Requires restart to take effect. (Menu -> Exit GameRaven)"
+            android:title="White Accent Text" />
 
         <net.margaritov.preference.colorpicker.ColorPickerPreference
             hexValue="true"
