@@ -53,6 +53,10 @@ public class TabbedSettings extends Activity implements ActionBar.TabListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (Theming.usingLightTheme()) {
+            setTheme(R.style.MyThemes_LightTheme);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tabbed_settings);
 
@@ -153,9 +157,9 @@ public class TabbedSettings extends Activity implements ActionBar.TabListener {
                 case 0:
                     return new PrefsAccountsNotifs();
                 case 1:
-                    return new PrefsGeneral();
-                case 2:
                     return new PrefsTheming();
+                case 2:
+                    return new PrefsGeneral();
                 case 3:
                     return new PrefsAdvanced();
                 default:
@@ -175,9 +179,9 @@ public class TabbedSettings extends Activity implements ActionBar.TabListener {
                 case 0:
                     return "Accounts & Notifications";
                 case 1:
-                    return "General";
-                case 2:
                     return "Theming";
+                case 2:
+                    return "General";
                 case 3:
                     return "Advanced";
             }
