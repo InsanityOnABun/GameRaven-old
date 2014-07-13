@@ -6,34 +6,34 @@
         android:orderingFromXml="true"
         android:persistent="false"
         android:title="General Settings">
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="false"
             android:key="usingAvatars"
             android:persistent="true"
             android:summary="Only supports displaying at the moment, no upload. Use browser to upload."
             android:title="Use Avatars" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="false"
             android:key="startAtAMP"
             android:persistent="true"
             android:summaryOff="New sessions will not start on the Active Messages Posted List"
             android:summaryOn="New sessions will start on the Active Messages Posted List"
             android:title="Start on AMP List" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="false"
             android:key="reloadOnBack"
             android:persistent="true"
             android:summaryOff="Do not reload pages when navigating back."
             android:summaryOn="Reload pages when navigating back."
             android:title="Reload On Back" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="false"
             android:key="reloadOnResume"
             android:persistent="true"
             android:summaryOff="Do not reload pages when app is resumed."
             android:summaryOn="Reload pages when app is resumed."
             android:title="Reload On Resume" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="false"
             android:key="enablePTR"
             android:persistent="true"
@@ -49,19 +49,19 @@
             android:summary="Select your preferred sorting style for your Active Messages list."
             android:title="AMP Sort Options" />
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="false"
             android:key="confirmPostCancel"
             android:persistent="true"
             android:summary="A confirmation dialog will show when cancelling a post."
             android:title="Confirm Post Cancel" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="false"
             android:key="confirmPostSubmit"
             android:persistent="true"
             android:summary="A confirmation dialog will show when submitting a post."
             android:title="Confirm Post Submission" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="true"
             android:key="autoCensorEnable"
             android:persistent="true"

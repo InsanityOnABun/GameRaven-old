@@ -6,7 +6,7 @@
         android:orderingFromXml="true"
         android:persistent="false"
         android:title="Advanced Settings">
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="true"
             android:key="enableJS"
             android:persistent="true"

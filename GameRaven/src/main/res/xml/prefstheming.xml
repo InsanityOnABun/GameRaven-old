@@ -13,13 +13,13 @@
             android:summary="Add, edit, and remove highlighted users."
             android:title="Manage Highlighted Users" />
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="false"
             android:key="useLightTheme"
             android:persistent="true"
             android:summary="Changes require restart to take effect. (Menu -> Exit GameRaven)"
             android:title="Use Light Theme" />
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="false"
             android:key="useWhiteAccentText"
             android:persistent="true"
