@@ -1,8 +1,6 @@
 package com.ioabsoftware.gameraven.prefs;
 
 import android.app.Activity;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
@@ -28,15 +26,6 @@ public class SettingsHighlightedUsers extends Activity implements HlUDDismissLis
         }
 
         super.onCreate(savedInstanceState);
-
-        Drawable aBarDrawable;
-        if (Theming.usingLightTheme())
-            aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);
-        else
-            aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_light_holo);
-
-        aBarDrawable.setColorFilter(Theming.accentColor(), PorterDuff.Mode.SRC_ATOP);
-        getActionBar().setBackgroundDrawable(aBarDrawable);
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
 

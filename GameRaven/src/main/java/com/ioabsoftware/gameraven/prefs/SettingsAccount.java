@@ -8,8 +8,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.DialogInterface.OnShowListener;
 import android.content.SharedPreferences;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -82,15 +80,6 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
         accountVerifier.getCookieMiddleware().clear();
 
         Theming.colorOverscroll(this);
-
-        Drawable aBarDrawable;
-        if (Theming.usingLightTheme())
-            aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);
-        else
-            aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_light_holo);
-
-        aBarDrawable.setColorFilter(Theming.accentColor(), PorterDuff.Mode.SRC_ATOP);
-        getActionBar().setBackgroundDrawable(aBarDrawable);
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
