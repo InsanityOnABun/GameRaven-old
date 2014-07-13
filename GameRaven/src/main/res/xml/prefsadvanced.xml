@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="devCategory"
+        android:orderingFromXml="true"
+        android:persistent="false"
+        android:title="Advanced Settings">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="enableJS"
+            android:persistent="true"
+            android:summary="Some ads loaded from GFAQs use javascript."
+            android:title="Javascript" />
+
+        <Preference
+            android:key="backupSettings"
+            android:summary="Passwords are stored as plain text! Back up settings to sdcard/gameraven/gameraven_settings"
+            android:title="Back Up Settings" />
+        <Preference
+            android:key="restoreSettings"
+            android:summary="This will remove any previously added accounts! Restore settings from sdcard/gameraven/gameraven_settings"
+            android:title="Restore Settings" />
+        <Preference
+            android:key="aboutFeedback"
+            android:title="About &amp; Feedback" />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="false"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/mvTopWrapper"
@@ -12,35 +12,45 @@
         android:layout_height="wrap_content"
         android:background="@drawable/msghead"
         android:clickable="true"
-        android:paddingRight="@dimen/item_padding_horizontal"
-        android:paddingLeft="@dimen/item_padding_horizontal" >
+        android:paddingRight="@dimen/item_padding_horizontal">
+
+        <ImageView
+            android:id="@+id/mvAvatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/item_padding_horizontal"
+            android:scaleType="centerCrop"
+            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/mvDetailsWrapper"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="@dimen/item_padding_horizontal"
             android:layout_toLeftOf="@+id/mvMessageMenuIcon"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:orientation="vertical" >
+            android:layout_toRightOf="@+id/mvAvatar"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/mvUser"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="User"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@android:color/black"
-                android:text="User"
                 android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/mvPostNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="#500, Posted 1/1/2014 12:00 AM"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@android:color/black"
-                android:text="#500, Posted 1/1/2014 12:00 AM"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -48,9 +58,9 @@
             android:id="@+id/mvMessageMenuIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/item_padding_horizontal"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/item_padding_horizontal"
             android:src="@drawable/ic_info" />
     </RelativeLayout>
 
@@ -59,18 +69,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:orientation="vertical" >
-    </LinearLayout>
+        android:orientation="vertical" />
 
     <com.ioabsoftware.gameraven.views.ClickableLinksTextView
         android:id="@+id/mvMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/item_padding_vertical"
         android:layout_marginLeft="@dimen/item_padding_horizontal"
         android:layout_marginRight="@dimen/item_padding_horizontal"
-        android:layout_marginBottom="@dimen/item_padding_vertical"
-        android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="This is a big long post. Man fan died room 97 etc.\n---\nThis is a sig."
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="15sp" />
 
 </LinearLayout>

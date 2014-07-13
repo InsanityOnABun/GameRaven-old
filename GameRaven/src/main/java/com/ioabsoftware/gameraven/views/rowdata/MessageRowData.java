@@ -6,12 +6,9 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.TextPaint;
 import android.text.format.DateUtils;
 import android.text.format.Time;
-import android.text.style.BackgroundColorSpan;
 import android.text.style.CharacterStyle;
-import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
@@ -34,9 +31,10 @@ import com.ioabsoftware.gameraven.util.RichTextUtils;
 import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.util.UrlSpanConverter;
 import com.ioabsoftware.gameraven.views.BaseRowData;
-import com.ioabsoftware.gameraven.views.ClickableLinksTextView;
 import com.ioabsoftware.gameraven.views.GRQuoteSpan;
 import com.ioabsoftware.gameraven.views.RowType;
+import com.ioabsoftware.gameraven.views.SpoilerBackgroundSpan;
+import com.ioabsoftware.gameraven.views.SpoilerClickSpan;
 import com.ioabsoftware.gameraven.views.rowview.HeaderRowView;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -53,11 +51,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class MessageRowData extends BaseRowData {
-
-    public static final String SPOILER_START = "<s>";
-    public static final String SPOILER_END = "</s>";
-    public static final String QUOTE_START = "<blockquote>";
-    public static final String QUOTE_END = "</blockquote>";
 
     private String username, userTitles, postNum, postTime, messageID, boardID, topicID;
     private final String unprocessedMessageText;
@@ -280,83 +273,43 @@ public class MessageRowData extends BaseRowData {
         SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false, true));
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding bold spans");
-        addSpan(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
+        addGenericSpans(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding italic spans");
-        addSpan(ssb, "<i>", "</i>", new StyleSpan(Typeface.ITALIC));
+        addGenericSpans(ssb, "<i>", "</i>", new StyleSpan(Typeface.ITALIC));
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding code spans");
-        addSpan(ssb, "<code>", "</code>", new TypefaceSpan("monospace"));
+        addGenericSpans(ssb, "<code>", "</code>", new TypefaceSpan("monospace"));
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding cite spans");
-        addSpan(ssb, "<cite>", "</cite>", new UnderlineSpan(), new StyleSpan(Typeface.ITALIC));
-
+        addGenericSpans(ssb, "<cite>", "</cite>", new UnderlineSpan(), new StyleSpan(Typeface.ITALIC));
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding quote spans");
-        // quotes don't use CharacterStyles, so do it manually
-        while (ssb.toString().contains(QUOTE_START)) {
-            int start = ssb.toString().indexOf(QUOTE_START);
-            ssb.replace(start, start + QUOTE_START.length(), "\n");
-            start++;
-
-            int stackCount = 1;
-            int closer;
-            int opener;
-            int innerStartPoint = start;
-            do {
-                opener = ssb.toString().indexOf(QUOTE_START, innerStartPoint + 1);
-                closer = ssb.toString().indexOf(QUOTE_END, innerStartPoint + 1);
-                if (opener != -1 && opener < closer) {
-                    // found a nested quote
-                    stackCount++;
-                    innerStartPoint = opener;
-                } else {
-                    // this closer is the right one
-                    stackCount--;
-                    innerStartPoint = closer;
-                }
-            } while (stackCount > 0);
-
-
-            ssb.replace(closer, closer + QUOTE_END.length(), "\n");
-            ssb.setSpan(new GRQuoteSpan(), start, closer, 0);
-        }
+        addQuoteSpans(ssb);
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("getting text colors for spoilers");
-        int defTextColor;
-        int color;
         if (Theming.usingLightTheme()) {
-            color = Color.WHITE;
-            defTextColor = Color.BLACK;
+            revealedSpoilerColor = Color.WHITE;
+            hiddenSpoilerColor = Color.BLACK;
         } else {
-            color = Color.BLACK;
-            defTextColor = Color.WHITE;
+            revealedSpoilerColor = Color.BLACK;
+            hiddenSpoilerColor = Color.WHITE;
         }
 
         ssb.append('\n');
-
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("replacing &gameravenlt; with <");
-        while (ssb.toString().contains("&gameravenlt;")) {
-            int start = ssb.toString().indexOf("&gameravenlt;");
-            ssb.replace(start, start + 13, "<");
-        }
-
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("replacing &gameravengt; with >");
-        while (ssb.toString().contains("&gameravengt;")) {
-            int start = ssb.toString().indexOf("&gameravengt;");
-            ssb.replace(start, start + 13, ">");
-        }
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("linkifying");
         Linkify.addLinks(ssb, Linkify.WEB_URLS);
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding spoiler spans");
-        // do spoiler tags manually instead of in the method, as the clickablespan needs
-        // to know the start and end points
-        while (ssb.toString().contains(SPOILER_START)) {
-            int start = ssb.toString().indexOf(SPOILER_START);
-            ssb.delete(start, start + SPOILER_START.length());
-            int end = ssb.toString().indexOf(SPOILER_END, start);
-            ssb.delete(end, end + SPOILER_END.length());
-            ssb.setSpan(new BackgroundColorSpan(defTextColor), start, end, 0);
-            ssb.setSpan(new SpoilerClickSpan(start, end, color, defTextColor), start, end, 0);
+        addSpoilerSpans(ssb);
 
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("replacing &lt; with <");
+        while (ssb.toString().contains("&lt;")) {
+            int start = ssb.toString().indexOf("&lt;");
+            ssb.replace(start, start + "&lt;".length(), "<");
+        }
+
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("replacing &gt; with >");
+        while (ssb.toString().contains("&gt;")) {
+            int start = ssb.toString().indexOf("&gt;");
+            ssb.replace(start, start + "&gt;".length(), ">");
         }
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("setting spannedMessage");
@@ -395,15 +348,119 @@ public class MessageRowData extends BaseRowData {
         }
     }
 
-    private static void addSpan(SpannableStringBuilder ssb, String tag, String endTag, CharacterStyle... cs) {
-        while (ssb.toString().contains(tag)) {
-            int start = ssb.toString().indexOf(tag);
-            ssb.delete(start, start + tag.length());
-            int end = ssb.toString().indexOf(endTag, start);
-            ssb.delete(end, end + endTag.length());
+    private static void addGenericSpans(SpannableStringBuilder ssb, String tag, String endTag, CharacterStyle... cs) {
+        // initialize array
+        int[] startEnd = spanStartAndEnd(ssb.toString(), tag, endTag);
+
+        // while start and end points are found...
+        while (!Arrays.equals(startEnd, noStartEndBase)) {
+            // remove the start tag
+            ssb.delete(startEnd[0], startEnd[0] + tag.length());
+
+            // adjust end point for removed start tag
+            startEnd[1] -= tag.length();
+
+            // remove end tag
+            ssb.delete(startEnd[1], startEnd[1] + endTag.length());
+
+            // apply styles
             for (CharacterStyle c : cs)
-                ssb.setSpan(CharacterStyle.wrap(c), start, end, 0);
+                ssb.setSpan(CharacterStyle.wrap(c), startEnd[0], startEnd[1], 0);
+
+            // get new start and end points
+            startEnd = spanStartAndEnd(ssb.toString(), tag, endTag);
         }
+    }
+
+    public static final String QUOTE_START = "<blockquote>";
+    public static final String QUOTE_END = "</blockquote>";
+
+    private static void addQuoteSpans(SpannableStringBuilder ssb) {
+        // initialize array
+        int[] startEnd = spanStartAndEnd(ssb.toString(), QUOTE_START, QUOTE_END);
+
+        // while start and end points are found...
+        while (!Arrays.equals(startEnd, noStartEndBase)) {
+            // replace the start tag
+            ssb.replace(startEnd[0], startEnd[0] + QUOTE_START.length(), "\n");
+            startEnd[0]++;
+
+            // adjust end point for replaced start tag
+            startEnd[1] -= QUOTE_START.length() - 1;
+
+            // remove end tag
+            ssb.replace(startEnd[1], startEnd[1] + QUOTE_END.length(), "\n");
+
+            // apply style
+            ssb.setSpan(new GRQuoteSpan(), startEnd[0], startEnd[1], 0);
+
+            // get new start and end points
+            startEnd = spanStartAndEnd(ssb.toString(), QUOTE_START, QUOTE_END);
+        }
+    }
+
+    public static final String SPOILER_START = "<s>";
+    public static final String SPOILER_END = "</s>";
+    private int hiddenSpoilerColor, revealedSpoilerColor;
+
+    private void addSpoilerSpans(SpannableStringBuilder ssb) {
+        // initialize array
+        int[] startEnd = spanStartAndEnd(ssb.toString(), SPOILER_START, SPOILER_END);
+
+        // while start and end points are found...
+        while (!Arrays.equals(startEnd, noStartEndBase)) {
+            // remove the start tag
+            ssb.delete(startEnd[0], startEnd[0] + SPOILER_START.length());
+
+            // adjust end point for removed start tag
+            startEnd[1] -= SPOILER_START.length();
+
+            // remove end tag
+            ssb.delete(startEnd[1], startEnd[1] + SPOILER_END.length());
+
+            // apply styles
+            SpoilerBackgroundSpan spoiler = new SpoilerBackgroundSpan(hiddenSpoilerColor, revealedSpoilerColor);
+            SpoilerClickSpan spoilerClick = new SpoilerClickSpan(spoiler);
+            ssb.setSpan(spoiler, startEnd[0], startEnd[1], 0);
+            ssb.setSpan(spoilerClick, startEnd[0], startEnd[1], 0);
+
+            // get new start and end points
+            startEnd = spanStartAndEnd(ssb.toString(), SPOILER_START, SPOILER_END);
+        }
+    }
+
+    private static int[] noStartEndBase = {-1, -1};
+
+    private static int[] spanStartAndEnd(String text, String openTag, String closeTag) {
+        int start = -1;
+        int end = -1;
+        if (text.contains(openTag) && text.contains(closeTag)) {
+            start = text.indexOf(openTag);
+            end = text.indexOf(closeTag);
+
+            int stackCount = 1;
+            int closer;
+            int opener;
+            int innerStartPoint = start;
+            do {
+                opener = text.indexOf(openTag, innerStartPoint + 1);
+                closer = text.indexOf(closeTag, innerStartPoint + 1);
+                if (opener != -1 && opener < closer) {
+                    // found a nested tag
+                    stackCount++;
+                    innerStartPoint = opener;
+                } else {
+                    // this closer is the right one
+                    stackCount--;
+                    innerStartPoint = closer;
+                }
+            } while (stackCount > 0);
+
+            if (closer != -1)
+                end = closer;
+
+        }
+        return new int[]{start, end};
     }
 
     public String getMessageForQuoting() {
@@ -428,7 +485,8 @@ public class MessageRowData extends BaseRowData {
         if (BuildConfig.DEBUG) AllInOneV2.wtl("removing closing anchor tags");
         finalBody = finalBody.replace("</a>", "");
 
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("removing existing \\n, replacing linebreak tags with \\n");
+        if (BuildConfig.DEBUG)
+            AllInOneV2.wtl("removing existing \\n, replacing linebreak tags with \\n");
         if (finalBody.endsWith("<br />"))
             finalBody = finalBody.substring(0, finalBody.length() - 6);
         finalBody = finalBody.replace("\n", "");
@@ -442,39 +500,20 @@ public class MessageRowData extends BaseRowData {
         }
 
         if (ignoreLtGt) {
-            if (BuildConfig.DEBUG) AllInOneV2.wtl("ignoring less than / greater than");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("ignoring &lt; / &gt;, pre-unescape");
             finalBody = finalBody.replace("&lt;", "&gameravenlt;").replace("&gt;", "&gameravengt;");
         }
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("unescaping finalbody html");
         finalBody = StringEscapeUtils.unescapeHtml4(finalBody);
 
+        if (ignoreLtGt) {
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("ignoring &lt; / &gt;, post-unescape");
+            finalBody = finalBody.replace("&gameravenlt;", "&lt;").replace("&gameravengt;", "&gt;");
+        }
+
         if (BuildConfig.DEBUG) AllInOneV2.wtl("returning finalbody");
         return finalBody;
-    }
-
-    private class SpoilerClickSpan extends ClickableSpan {
-
-        int color, defTextColor;
-        int start, end;
-
-        public SpoilerClickSpan(int start, int end, int color, int defTextColor) {
-            this.start = start;
-            this.end = end;
-            this.color = color;
-            this.defTextColor = defTextColor;
-        }
-
-        @Override
-        public void onClick(View widget) {
-            ((Spannable) ((ClickableLinksTextView) widget).getText()).setSpan(new BackgroundColorSpan(color), start, end, 0);
-        }
-
-        @Override
-        public void updateDrawState(TextPaint ds) {
-            ds.setColor(defTextColor);
-            ds.setUnderlineText(false);
-        }
     }
 
 }

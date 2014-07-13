@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="themingCategory"
+        android:orderingFromXml="true"
+        android:persistent="false"
+        android:title="Theming Settings">
+
+        <Preference
+            android:key="manageHighlightedUsers"
+            android:persistent="false"
+            android:summary="Add, edit, and remove highlighted users."
+            android:title="Manage Highlighted Users" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="useLightTheme"
+            android:persistent="true"
+            android:summary="Requires restart to take effect. (Menu -> Exit GameRaven)"
+            android:title="Light Theme" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="useWhiteAccentText"
+            android:persistent="true"
+            android:summary="Requires restart to take effect. (Menu -> Exit GameRaven)"
+            android:title="White Accent Text" />
+
+        <net.margaritov.preference.colorpicker.ColorPickerPreference
+            hexValue="true"
+            android:defaultValue="@color/holo_blue"
+            android:key="accentColor"
+            android:summary="Set the accent color. (Refresh to take complete effect)"
+            android:title="Accent Color" />
+
+        <Preference
+            android:key="resetAccentColor"
+            android:persistent="false"
+            android:summary="Reset the accent color back to Holo Blue. (Refresh to take complete effect)"
+            android:title="Reset Accent Color" />
+
+        <com.robobunny.SeekBarPreference
+            xmlns:robobunny="http://robobunny.com"
+            android:defaultValue="100"
+            android:key="textScale"
+            android:max="120"
+            android:summary="Adjust the scale of various text elements. (Refresh to take complete effect)"
+            android:title="Text Scale"
+            robobunny:min="80"
+            robobunny:unitsLeft=""
+            robobunny:unitsRight="%" />
+    </PreferenceCategory>
+</PreferenceScreen>

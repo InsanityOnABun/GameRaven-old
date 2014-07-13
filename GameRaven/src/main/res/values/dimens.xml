@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="item_stroke_width">2dp</dimen>
     <dimen name="item_corner_radius">3dp</dimen>

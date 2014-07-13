@@ -51,6 +51,9 @@ import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
+import com.ioabsoftware.gameraven.prefs.SettingsAccount;
+import com.ioabsoftware.gameraven.prefs.SettingsHighlightedUsers;
+import com.ioabsoftware.gameraven.prefs.TabbedSettings;
 import com.ioabsoftware.gameraven.util.AccountManager;
 import com.ioabsoftware.gameraven.util.DocumentParser;
 import com.ioabsoftware.gameraven.util.Theming;
@@ -85,6 +88,7 @@ import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.codechimp.apprater.AppRater;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -373,7 +377,7 @@ public class AllInOneV2 extends Activity {
             @Override
             public void onClick(View v) {
                 drawer.closeMenu(false);
-                startActivity(new Intent(AllInOneV2.this, SettingsMain.class));
+                startActivity(new Intent(AllInOneV2.this, TabbedSettings.class));
             }
         });
 
@@ -395,9 +399,12 @@ public class AllInOneV2 extends Activity {
 
         if (!settings.contains("defaultAccount")) {
             // settings need to be set to default
-            PreferenceManager.setDefaultValues(this, R.xml.settingsmain, false);
+            PreferenceManager.setDefaultValues(this, R.xml.prefsaccountsnotifs, false);
+            PreferenceManager.setDefaultValues(this, R.xml.prefsadvanced, false);
+            PreferenceManager.setDefaultValues(this, R.xml.prefsgeneral, false);
+            PreferenceManager.setDefaultValues(this, R.xml.prefstheming, false);
             Editor sEditor = settings.edit();
-            sEditor.putString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)
+            sEditor.putString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT)
                     .putString("timezone", TimeZone.getDefault().getID())
                     .apply();
         }
@@ -530,8 +537,7 @@ public class AllInOneV2 extends Activity {
             if (BuildConfig.DEBUG) wtl("css directory does not exist, creating");
             if (cssDirectory.mkdir())
                 if (BuildConfig.DEBUG) wtl("css directory created");
-            else
-                if (BuildConfig.DEBUG) wtl("css directory creation failed");
+                else if (BuildConfig.DEBUG) wtl("css directory creation failed");
         }
 
         if (BuildConfig.DEBUG) wtl("starting db creation");
@@ -540,6 +546,8 @@ public class AllInOneV2 extends Activity {
         adapterRows.add(new HeaderRowData("Loading..."));
         adapterRows.add(new AdmobRowData());
         contentList.setAdapter(viewAdapter);
+
+        AppRater.app_launched(this);
 
         if (BuildConfig.DEBUG) wtl("onCreate finishing");
     }
@@ -667,10 +675,12 @@ public class AllInOneV2 extends Activity {
             drawer.findViewById(R.id.dwrFuncSep).setBackgroundColor(Theming.accentColor());
         }
 
+        MessageRowView.setUsingAvatars(settings.getBoolean("usingAvatars", false));
 
         if (session != null) {
             if (settings.getBoolean("reloadOnResume", false)) {
-                if (BuildConfig.DEBUG) wtl("session exists, reload on resume is true, refreshing page");
+                if (BuildConfig.DEBUG)
+                    wtl("session exists, reload on resume is true, refreshing page");
                 isRoR = true;
                 session.refresh();
             }
@@ -686,7 +696,7 @@ public class AllInOneV2 extends Activity {
                     }
                 }
             }
-            String defaultAccount = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
+            String defaultAccount = settings.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT);
             if (AccountManager.containsUser(this, defaultAccount)) {
                 if (BuildConfig.DEBUG) wtl("starting new session from onResume, logged in");
                 session = new Session(this, defaultAccount, AccountManager.getPassword(this, defaultAccount), initUrl, initDesc);
@@ -1001,10 +1011,12 @@ public class AllInOneV2 extends Activity {
             case R.id.refresh:
                 if (session.getLastPath() == null) {
                     if (Session.isLoggedIn()) {
-                        if (BuildConfig.DEBUG) wtl("starting new session from case R.id.refresh, logged in");
+                        if (BuildConfig.DEBUG)
+                            wtl("starting new session from case R.id.refresh, logged in");
                         session = new Session(this, Session.getUser(), AccountManager.getPassword(this, Session.getUser()));
                     } else {
-                        if (BuildConfig.DEBUG) wtl("starting new session from R.id.refresh, no login");
+                        if (BuildConfig.DEBUG)
+                            wtl("starting new session from R.id.refresh, no login");
                         session = new Session(this);
                     }
                 } else
@@ -1292,7 +1304,7 @@ public class AllInOneV2 extends Activity {
         adapterRows.clear();
 
         boolean isDefaultAcc = Session.getUser() != null &&
-                Session.getUser().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT));
+                Session.getUser().equals(settings.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT));
 
         if (BuildConfig.DEBUG) wtl("setting board, topic, message id to null");
         boardID = null;
@@ -1376,8 +1388,7 @@ public class AllInOneV2 extends Activity {
                 });
             }
 
-        }
-        else if (boardListButton.isLongClickable()) {
+        } else if (boardListButton.isLongClickable()) {
             boardListButton.setText(getResources().getString(R.string.board_jumper));
             boardListButton.setLongClickable(false);
         }
@@ -1727,7 +1738,7 @@ public class AllInOneV2 extends Activity {
                             }
                             if (currPageNum != pageCountNum) {
                                 nextPage = pagePrefix + currPageNum + searchPJAddition;
-                                lastPage = pagePrefix  + (pageCountNum - 1) + searchPJAddition;
+                                lastPage = pagePrefix + (pageCountNum - 1) + searchPJAddition;
 
                                 if (currPageNum > pageCountNum) {
                                     session.forceNoHistoryAddition();
@@ -2390,7 +2401,8 @@ public class AllInOneV2 extends Activity {
     }
 
     public void postExecuteCleanup(NetDesc desc) {
-        if (BuildConfig.DEBUG) wtl("GRAIO dPostEC --NEL, desc: " + (desc == null ? "null" : desc.name()));
+        if (BuildConfig.DEBUG)
+            wtl("GRAIO dPostEC --NEL, desc: " + (desc == null ? "null" : desc.name()));
 
         if (needToSetNavList) {
             setNavList(Session.isLoggedIn());
@@ -2489,8 +2501,7 @@ public class AllInOneV2 extends Activity {
 
                 pageLabel.setEnabled(true);
                 pageLabel.setText("~ " + currPage + " / " + pageCount + " ~");
-            }
-            else {
+            } else {
                 pageLabel.setEnabled(false);
                 pageLabel.setText(currPage + " / " + pageCount);
             }
@@ -3051,6 +3062,7 @@ public class AllInOneV2 extends Activity {
     private Button boardListButton;
     private String[] boardQuickListOptions;
     private String[] boardQuickListLinks;
+
     private void showBoardQuickList() {
         AlertDialog.Builder b = new AlertDialog.Builder(this);
         b.setTitle("My Boards");
@@ -3327,7 +3339,8 @@ public class AllInOneV2 extends Activity {
                         newSpeed = curSpeed * speed;
                     }
                     mf.setFloat(marquee, newSpeed);
-                    if (BuildConfig.DEBUG) wtl("marquee speed set to " + newSpeed + ", from " + curSpeed);
+                    if (BuildConfig.DEBUG)
+                        wtl("marquee speed set to " + newSpeed + ", from " + curSpeed);
                     marqueeSpeedSet = true;
                 }
             } catch (Exception e) {
@@ -3350,13 +3363,11 @@ public class AllInOneV2 extends Activity {
             "cunt",
             "clit",
             "arse-hole",
-            "***hole",
             "ass-hole",
             "dildo",
             "pussies",
             "ibtl",
             "kevan.org",
-            "ass****",
             "nigga",
             "lesbo",
             "arsehole",

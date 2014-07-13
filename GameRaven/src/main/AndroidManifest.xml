@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.READ_LOGS" />
 
     <application
-        android:name="com.ioabsoftware.gameraven.MyApplication"
+        android:name=".MyApplication"
         android:allowBackup="false"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"
@@ -20,7 +20,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name="com.ioabsoftware.gameraven.AllInOneV2"
+            android:name=".AllInOneV2"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:launchMode="singleInstance"
             android:windowSoftInputMode="stateHidden">
@@ -62,15 +62,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.ioabsoftware.gameraven.SettingsMain"
+            android:name=".prefs.SettingsAccount"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name="com.ioabsoftware.gameraven.SettingsAccount"
+            android:name=".prefs.SettingsHighlightedUsers"
             android:configChanges="orientation|screenSize" />
-        <activity
-            android:name="com.ioabsoftware.gameraven.SettingsHighlightedUsers"
-            android:configChanges="orientation|screenSize" />
-        <activity android:name="com.ioabsoftware.gameraven.About" />
+        <activity android:name=".About" />
         <activity
             android:name="org.acra.CrashReportDialog"
             android:excludeFromRecents="true"
@@ -82,15 +79,19 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
 
         <service
-            android:name="com.ioabsoftware.gameraven.NotifierService"
+            android:name=".NotifierService"
             android:exported="false"
             android:label="Notifier Service" />
 
-        <receiver android:name="com.ioabsoftware.gameraven.NotifierStartupReceiver">
+        <receiver android:name=".NotifierStartupReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".prefs.TabbedSettings"
+            android:configChanges="orientation|screenSize" />
     </application>
 
 </manifest>
