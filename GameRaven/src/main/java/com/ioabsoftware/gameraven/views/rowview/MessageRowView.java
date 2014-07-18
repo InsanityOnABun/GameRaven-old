@@ -163,9 +163,14 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
     public String getSelection() {
         int start = message.getSelectionStart();
         int end = message.getSelectionEnd();
-        if (start != end)
+        if (start != end) {
+            if (start > end) {
+                int temp = end;
+                end = start;
+                start = temp;
+            }
             return message.getText().subSequence(start, end).toString();
-        else
+        } else
             return null;
     }
 
