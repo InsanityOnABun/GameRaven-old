@@ -1265,7 +1265,7 @@ public class AllInOneV2 extends Activity {
             postInterfaceCleanup();
     }
 
-    /**
+    /*
      * *****************************************
      * START HNR
      * *****************************************
@@ -1316,8 +1316,7 @@ public class AllInOneV2 extends Activity {
         String headerTitle;
         String firstPage = null;
         String prevPage = null;
-        String currPage = "1";
-        String pageCount = "1";
+        int[] pagesInfo = new int[] {1, 1};
         String nextPage = null;
         String lastPage = null;
         String pagePrefix = null;
@@ -1426,35 +1425,25 @@ public class AllInOneV2 extends Activity {
                     pj = doc.select("ul.paginate").first();
 
                     if (pj != null) {
-                        String pjText = pj.child(0).text();
-                        if (pjText.contains("Previous"))
-                            pjText = pj.child(1).text();
-                        //Page 1 of 5
-                        int currPageStart = 5;
-                        int ofIndex = pjText.indexOf(" of ");
-                        currPage = pjText.substring(currPageStart, ofIndex);
-                        int pageCountEnd = pjText.length();
-                        pageCount = pjText.substring(ofIndex + 4, pageCountEnd);
-                        int currPageNum = Integer.parseInt(currPage);
-                        int pageCountNum = Integer.parseInt(pageCount);
+                        pagesInfo = getPageJumperInfo(pj);
 
                         if (isInbox)
                             pagePrefix = "/pm/?page=";
                         else
                             pagePrefix = "/pm/sent?page=";
 
-                        if (currPageNum > 1) {
+                        if (pagesInfo[0] > 1) {
                             firstPage = pagePrefix + 0;
-                            prevPage = pagePrefix + (currPageNum - 2);
+                            prevPage = pagePrefix + (pagesInfo[0] - 2);
                         }
-                        if (currPageNum != pageCountNum) {
-                            nextPage = pagePrefix + currPageNum;
-                            lastPage = pagePrefix + (pageCountNum - 1);
+                        if (pagesInfo[0] != pagesInfo[1]) {
+                            nextPage = pagePrefix + pagesInfo[0];
+                            lastPage = pagePrefix + (pagesInfo[1] - 1);
                         }
                     }
 
-                    updateHeader(headerTitle, firstPage, prevPage, currPage,
-                            pageCount, nextPage, lastPage, pagePrefix, desc);
+                    updateHeader(headerTitle, firstPage, prevPage, pagesInfo[0],
+                            pagesInfo[1], nextPage, lastPage, pagePrefix, desc);
 
                     if (isDefaultAcc && isInbox)
                         NotifierService.dismissPMNotif(this);
@@ -1529,36 +1518,22 @@ public class AllInOneV2 extends Activity {
                     pj = doc.select("ul.paginate").get(1);
                     if (pj != null && !pj.hasClass("user")
                             && !pj.hasClass("tsort")) {
-                        int x = 0;
-                        String pjText = pj.child(x).text();
-                        while (pjText.contains("First")
-                                || pjText.contains("Previous")) {
-                            x++;
-                            pjText = pj.child(x).text();
-                        }
-                        // Page 2 of 3
-                        int currPageStart = 5;
-                        int ofIndex = pjText.indexOf(" of ");
-                        currPage = pjText.substring(currPageStart, ofIndex);
-                        int pageCountEnd = pjText.length();
-                        pageCount = pjText.substring(ofIndex + 4,
-                                pageCountEnd);
-                        int currPageNum = Integer.parseInt(currPage);
-                        int pageCountNum = Integer.parseInt(pageCount);
+
+                        pagesInfo = getPageJumperInfo(pj);
 
                         pagePrefix = buildAMPLink() + "&page=";
-                        if (currPageNum > 1) {
+                        if (pagesInfo[0] > 1) {
                             firstPage = pagePrefix + 0;
-                            prevPage = pagePrefix + (currPageNum - 2);
+                            prevPage = pagePrefix + (pagesInfo[0] - 2);
                         }
-                        if (currPageNum != pageCountNum) {
-                            nextPage = pagePrefix + currPageNum;
-                            lastPage = pagePrefix + (pageCountNum - 1);
+                        if (pagesInfo[0] != pagesInfo[1]) {
+                            nextPage = pagePrefix + pagesInfo[0];
+                            lastPage = pagePrefix + (pagesInfo[1] - 1);
                         }
                     }
                 }
-                updateHeader(headerTitle, firstPage, prevPage, currPage,
-                        pageCount, nextPage, lastPage, pagePrefix, NetDesc.AMP_LIST);
+                updateHeader(headerTitle, firstPage, prevPage, pagesInfo[0],
+                        pagesInfo[1], nextPage, lastPage, pagePrefix, NetDesc.AMP_LIST);
 
                 if (isDefaultAcc)
                     NotifierService.dismissAMPNotif(this);
@@ -1706,41 +1681,18 @@ public class AllInOneV2 extends Activity {
                     if (doc.select("ul.paginate").size() > 1) {
                         pj = doc.select("ul.paginate").get(1);
                         if (pj != null && !pj.hasClass("user")) {
-                            int x = 0;
-                            String pjText = pj.child(x).text();
-                            while (pjText.contains("First")
-                                    || pjText.contains("Previous")) {
-                                x++;
-                                pjText = pj.child(x).text();
-                            }
-                            // Page [dropdown] of 3
-                            // Page 1 of 3
-                            int ofIndex = pjText.indexOf(" of ");
-                            int currPageStart = 5;
-                            if (pj.getElementsByTag("select").isEmpty())
-                                currPage = pjText.substring(currPageStart,
-                                        ofIndex);
-                            else
-                                currPage = pj
-                                        .select("option[selected=selected]")
-                                        .first().text();
-
-                            int pageCountEnd = pjText.length();
-                            pageCount = pjText.substring(ofIndex + 4,
-                                    pageCountEnd);
-                            int currPageNum = Integer.parseInt(currPage);
-                            int pageCountNum = Integer.parseInt(pageCount);
+                            pagesInfo = getPageJumperInfo(pj);
 
                             pagePrefix = "boards/" + boardID + "?page=";
-                            if (currPageNum > 1) {
+                            if (pagesInfo[0] > 1) {
                                 firstPage = pagePrefix + 0 + searchPJAddition;
-                                prevPage = pagePrefix + (currPageNum - 2) + searchPJAddition;
+                                prevPage = pagePrefix + (pagesInfo[0] - 2) + searchPJAddition;
                             }
-                            if (currPageNum != pageCountNum) {
-                                nextPage = pagePrefix + currPageNum + searchPJAddition;
-                                lastPage = pagePrefix + (pageCountNum - 1) + searchPJAddition;
+                            if (pagesInfo[0] != pagesInfo[1]) {
+                                nextPage = pagePrefix + pagesInfo[0] + searchPJAddition;
+                                lastPage = pagePrefix + (pagesInfo[1] - 1) + searchPJAddition;
 
-                                if (currPageNum > pageCountNum) {
+                                if (pagesInfo[0] > pagesInfo[1]) {
                                     session.forceNoHistoryAddition();
                                     session.forceSkipAIOCleanup();
                                     Crouton.showText(this, "Page count higher than page amount, going to last page...", Theming.croutonStyle());
@@ -1750,7 +1702,7 @@ public class AllInOneV2 extends Activity {
                             }
                         }
                     }
-                    updateHeader(headerTitle, firstPage, prevPage, currPage, pageCount, nextPage,
+                    updateHeader(headerTitle, firstPage, prevPage, pagesInfo[0], pagesInfo[1], nextPage,
                             lastPage, pagePrefix + searchPJAddition, NetDesc.BOARD);
 
                     setMenuItemVisibility(searchIcon, true);
@@ -1862,41 +1814,18 @@ public class AllInOneV2 extends Activity {
                 if (doc.select("ul.paginate").size() > 1) {
                     pj = doc.select("ul.paginate").get(1);
                     if (pj != null && !pj.hasClass("user")) {
-                        int x = 0;
-                        String pjText = pj.child(x).text();
-                        while (pjText.contains("First")
-                                || pjText.contains("Previous")) {
-                            x++;
-                            pjText = pj.child(x).text();
-                        }
-                        // Page [dropdown] of 3
-                        // Page 1 of 3
-                        int ofIndex = pjText.indexOf(" of ");
-                        int currPageStart = 5;
-                        if (pj.getElementsByTag("select").isEmpty())
-                            currPage = pjText.substring(currPageStart,
-                                    ofIndex);
-                        else
-                            currPage = pj
-                                    .select("option[selected=selected]")
-                                    .first().text();
-
-                        int pageCountEnd = pjText.length();
-                        pageCount = pjText.substring(ofIndex + 4,
-                                pageCountEnd);
-                        int currPageNum = Integer.parseInt(currPage);
-                        int pageCountNum = Integer.parseInt(pageCount);
+                        pagesInfo = getPageJumperInfo(pj);
 
                         pagePrefix = "boards/" + boardID + "/" + topicID + "?page=";
-                        if (currPageNum > 1) {
+                        if (pagesInfo[0] > 1) {
                             firstPage = pagePrefix + 0;
-                            prevPage = pagePrefix + (currPageNum - 2);
+                            prevPage = pagePrefix + (pagesInfo[0] - 2);
                         }
-                        if (currPageNum != pageCountNum) {
-                            nextPage = pagePrefix + currPageNum;
-                            lastPage = pagePrefix + (pageCountNum - 1);
+                        if (pagesInfo[0] != pagesInfo[1]) {
+                            nextPage = pagePrefix + pagesInfo[0];
+                            lastPage = pagePrefix + (pagesInfo[1] - 1);
 
-                            if (currPageNum > pageCountNum) {
+                            if (pagesInfo[0] > pagesInfo[1]) {
                                 session.forceNoHistoryAddition();
                                 session.forceSkipAIOCleanup();
                                 Crouton.showText(this, "Page count higher than page amount, going to last page...", Theming.croutonStyle());
@@ -1906,8 +1835,8 @@ public class AllInOneV2 extends Activity {
                         }
                     }
                 }
-                updateHeader(headerTitle, firstPage, prevPage, currPage,
-                        pageCount, nextPage, lastPage, pagePrefix, NetDesc.TOPIC);
+                updateHeader(headerTitle, firstPage, prevPage, pagesInfo[0],
+                        pagesInfo[1], nextPage, lastPage, pagePrefix, NetDesc.TOPIC);
 
                 if (Session.isLoggedIn()) {
                     String favtext = doc.getElementsByClass("user").first().text().toLowerCase(Locale.US);
@@ -2142,23 +2071,21 @@ public class AllInOneV2 extends Activity {
 
                 int pageIndex = resUrl.indexOf("page=");
                 if (pageIndex != -1) {
-                    currPage = resUrl.substring(pageIndex + 5);
+                    String currPage = resUrl.substring(pageIndex + 5);
                     i = currPage.indexOf("&");
                     if (i != -1)
                         currPage = currPage.replace(currPage.substring(i), EMPTY_STRING);
+                    pagesInfo[0] = Integer.parseInt(currPage) + 1;
                 } else {
-                    currPage = "0";
+                    pagesInfo[0] = 1;
                 }
 
-                int currPageNum = Integer.parseInt(currPage);
-
-                pageCount = "???";
-                if (!doc.getElementsByClass("icon-angle-right").isEmpty()) {
-                    nextPage = "/search/index.html?game=" + searchQuery + "&page=" + (currPageNum + 1);
-                }
-                if (currPageNum > 0) {
-                    prevPage = "/search/index.html?game=" + searchQuery + "&page=" + (currPageNum - 1);
+                if (pagesInfo[0] > 1) {
                     firstPage = "/search/index.html?game=" + searchQuery + "&page=0";
+                    prevPage = "/search/index.html?game=" + searchQuery + "&page=" + (pagesInfo[0] - 2);
+                }
+                if (!doc.getElementsByClass("icon-angle-right").isEmpty()) {
+                    nextPage = "/search/index.html?game=" + searchQuery + "&page=" + (pagesInfo[0]);
                 }
 
                 try {
@@ -2168,8 +2095,8 @@ public class AllInOneV2 extends Activity {
                     // should never happen
                 }
 
-                updateHeader(headerTitle, firstPage, prevPage, Integer.toString(currPageNum + 1),
-                        pageCount, nextPage, lastPage, pagePrefix, NetDesc.GAME_SEARCH);
+                updateHeader(headerTitle, firstPage, prevPage, pagesInfo[0],
+                        -1, nextPage, lastPage, pagePrefix, NetDesc.GAME_SEARCH);
 
                 setMenuItemVisibility(searchIcon, true);
 
@@ -2312,7 +2239,7 @@ public class AllInOneV2 extends Activity {
         if (BuildConfig.DEBUG) wtl("GRAIO hNR finishing");
     }
 
-    /**
+    /*
      * ********************************
      * END HNR
      * ********************************
@@ -2386,6 +2313,36 @@ public class AllInOneV2 extends Activity {
         }
     }
 
+    private int[] getPageJumperInfo(Element pj) {
+        int[] i = new int[] {1, 1};
+        if (pj != null && !pj.hasClass("user") && !pj.hasClass("tsort")) {
+            String currPage, pageCount;
+
+            int x = 0;
+            String pjText = pj.child(x).text();
+            while (pjText.contains("First") || pjText.contains("Previous")) {
+                x++;
+                pjText = pj.child(x).text();
+            }
+            // Page [dropdown] of 4
+            // Page 1 of 3
+            if (pj.getElementsByTag("select").isEmpty()) {
+                int ofIndex = pjText.indexOf(" of ");
+                currPage = pjText.substring(5, ofIndex); // "Page ".length = 5
+
+                int pageCountEnd = pjText.length();
+                pageCount = pjText.substring(ofIndex + 4, pageCountEnd);
+            } else {
+                currPage = pj.select("option[selected=selected]").first().text();
+                pageCount = pj.getElementsByTag("option").last().text();
+            }
+
+            i[0] = Integer.parseInt(currPage);
+            i[1] = Integer.parseInt(pageCount);
+        }
+        return i;
+    }
+
     private void updatePostingRights(Document pRes, boolean onTopic) {
         if (onTopic) {
             if (pRes.getElementsByClass("user").first().text().contains("Post New Message")) {
@@ -2432,13 +2389,13 @@ public class AllInOneV2 extends Activity {
         return temp;
     }
 
-    private void updateHeader(String titleIn, String firstPageIn, String prevPageIn, String currPage,
-                              String pageCount, String nextPageIn, String lastPageIn,
+    private void updateHeader(String titleIn, String firstPageIn, String prevPageIn, int currPage,
+                              int pageCount, String nextPageIn, String lastPageIn,
                               String jumperPageIn, NetDesc desc) {
 
         title.setText(titleIn);
 
-        if (currPage.equals("-1")) {
+        if (currPage == -1) {
             pageJumperWrapper.setVisibility(View.GONE);
         } else {
             pageJumperWrapper.setVisibility(View.VISIBLE);
@@ -2472,12 +2429,11 @@ public class AllInOneV2 extends Activity {
                 lastPage.setEnabled(false);
             }
 
-            if (!pageCount.equals("1") && !pageCount.equals("???")) {
+            if (pageCount != 1 && pageCount != -1) {
                 jumperPageUrl = jumperPageIn;
 
-                int pageCountNum = Integer.parseInt(pageCount);
-                final String[] items = new String[pageCountNum];
-                for (int x = 0; x < pageCountNum; x++) {
+                final String[] items = new String[pageCount];
+                for (int x = 0; x < pageCount; x++) {
                     items[x] = String.valueOf(x + 1);
                 }
 
@@ -2503,13 +2459,16 @@ public class AllInOneV2 extends Activity {
                 pageLabel.setText("~ " + currPage + " / " + pageCount + " ~");
             } else {
                 pageLabel.setEnabled(false);
-                pageLabel.setText(currPage + " / " + pageCount);
+                if (pageCount == 1)
+                    pageLabel.setText(currPage + " / " + pageCount);
+                else
+                    pageLabel.setText(currPage + " / ???");
             }
         }
     }
 
     private void updateHeaderNoJumper(String title, NetDesc desc) {
-        updateHeader(title, null, null, "-1", "-1", null, null, null, desc);
+        updateHeader(title, null, null, -1, -1, null, null, null, desc);
     }
 
     private MessageRowView clickedMsg;
