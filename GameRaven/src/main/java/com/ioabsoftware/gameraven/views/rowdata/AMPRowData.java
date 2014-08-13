@@ -4,10 +4,10 @@ import com.ioabsoftware.gameraven.views.RowType;
 
 public class AMPRowData extends TopicRowData {
 
-    String ylpUrl;
+    String lpLongPressLink;
 
-    public String getYLPUrl() {
-        return ylpUrl;
+    public String getLPLongPressLink() {
+        return lpLongPressLink;
     }
 
     @Override
@@ -15,16 +15,16 @@ public class AMPRowData extends TopicRowData {
         return RowType.AMP_TOPIC;
     }
 
-    public AMPRowData(String titleIn, String tcIn, String lastPostIn,
-                      String mCountIn, String urlIn, String lPostUrlIn, String ylpUrlIn) {
+    public AMPRowData(String titleIn, String tcIn, String lastPostIn, String mCountIn,
+                      String urlIn, String lPostUrlIn, String ylpUrlIn, ReadStatus statusIn) {
         super(titleIn, tcIn, lastPostIn, mCountIn, urlIn, lPostUrlIn,
-                TopicType.NORMAL, ReadStatus.UNREAD, 0);
+                TopicType.NORMAL, statusIn, 0);
 
-        ylpUrl = ylpUrlIn;
+        lpLongPressLink = ylpUrlIn;
     }
 
     @Override
     public String toString() {
-        return super.toString() + "\nylpUrl: " + ylpUrl;
+        return super.toString() + "\nlpLongPressLink: " + lpLongPressLink;
     }
 }

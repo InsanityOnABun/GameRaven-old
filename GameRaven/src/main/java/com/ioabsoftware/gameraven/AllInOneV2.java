@@ -1563,20 +1563,29 @@ public class AllInOneV2 extends Activity {
                     }
 
                     for (Element row : tbody.children()) {
-                        // [board] [title] [msg] [last post] [your last post]
+                        // [board] [read status] [title] [msg] [last post] [your last post]
                         Elements cells = row.children();
                         String board = cells.get(0).text();
-                        Element titleLinkElem = cells.get(1).child(0);
+                        Element titleLinkElem = cells.get(2).child(0);
                         String title = titleLinkElem.text();
                         String link = titleLinkElem.attr("href");
-                        String mCount = cells.get(2).textNodes().get(0).text().trim();
-                        Element lPostLinkElem = cells.get(3).child(1);
+                        String mCount = cells.get(3).textNodes().get(0).text().trim();
+                        Element lPostLinkElem = cells.get(4).child(1);
                         String lPost = lPostLinkElem.text();
                         String lPostLink = lPostLinkElem.attr("href");
-                        String ylpLink = cells.get(4).child(1).attr("href");
+                        String lpLongPressLink = cells.get(5).child(1).attr("href");
+
+                        ReadStatus status = ReadStatus.UNREAD;
+                        String tImg = cells.get(1).child(0).className();
+                        if (tImg.endsWith("_read"))
+                            status = ReadStatus.READ;
+                        else if (tImg.endsWith("_unread")) {
+                            status = ReadStatus.NEW_POST;
+                            lpLongPressLink = cells.get(1).child(0).attr("href");
+                        }
 
                         adapterRows.add(new AMPRowData(title, board, lPost, mCount, link,
-                                lPostLink, ylpLink));
+                                lPostLink, lpLongPressLink, status));
                     }
                 } else {
                     adapterRows.add(new HeaderRowData("You have no active messages at this time."));

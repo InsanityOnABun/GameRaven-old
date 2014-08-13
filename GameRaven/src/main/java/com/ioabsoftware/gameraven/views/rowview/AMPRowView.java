@@ -42,7 +42,7 @@ public class AMPRowView extends TopicRowView {
             @Override
             public boolean onLongClick(View v) {
                 AllInOneV2.get().enableGoToUrlDefinedPost();
-                AllInOneV2.get().getSession().get(NetDesc.TOPIC, ((AMPRowData) myData).getYLPUrl());
+                AllInOneV2.get().getSession().get(NetDesc.TOPIC, ((AMPRowData) myData).getLPLongPressLink());
                 return true;
             }
         });
