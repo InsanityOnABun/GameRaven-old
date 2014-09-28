@@ -773,8 +773,12 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         HashMap<String, List<String>> msg1Data = new HashMap<String, List<String>>();
                         msg1Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
                         msg1Data.put("custom_sig", Arrays.asList(aio.getSig()));
-                        msg1Data.put("post", Arrays.asList((userHasAdvancedPosting() ? "Post without Preview" : "Preview Message")));
                         msg1Data.put("key", Arrays.asList(msg1Key));
+
+                        if (resUrl.contains("post?board"))
+                            msg1Data.put("post", Arrays.asList("Post Message"));
+                        else
+                            msg1Data.put("post", Arrays.asList((userHasAdvancedPosting() ? "Post without Preview" : "Preview Message")));
 
                         Elements msg1Error = doc.getElementsContainingOwnText("There was an error posting your message:");
                         if (!msg1Error.isEmpty()) {
@@ -857,8 +861,12 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         tpc1Data.put("topictitle", Arrays.asList(aio.getSavedPostTitle()));
                         tpc1Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
                         tpc1Data.put("custom_sig", Arrays.asList(aio.getSig()));
-                        tpc1Data.put("post", Arrays.asList((userHasAdvancedPosting() ? "Post without Preview" : "Preview Message")));
                         tpc1Data.put("key", Arrays.asList(tpc1Key));
+
+                        if (resUrl.contains("post?board"))
+                            tpc1Data.put("post", Arrays.asList("Post Message"));
+                        else
+                            tpc1Data.put("post", Arrays.asList((userHasAdvancedPosting() ? "Post without Preview" : "Preview Message")));
 
                         if (aio.isUsingPoll()) {
                             tpc1Data.put("poll_text", Arrays.asList(aio.getPollTitle()));

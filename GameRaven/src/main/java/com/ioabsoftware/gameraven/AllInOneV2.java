@@ -2601,6 +2601,9 @@ public class AllInOneV2 extends Activity {
             if (pollUse)
                 path += "&poll=1";
 
+            if (boardID.startsWith("899"))
+                path = path.replace("post.php", "post");
+
             session.get(NetDesc.POSTTPC_S1, path);
         } else {
             // posting on a topic
@@ -2608,6 +2611,9 @@ public class AllInOneV2 extends Activity {
             String path = Session.ROOT + "/boards/post.php?board=" + boardID + "&topic=" + topicID;
             if (messageIDForEditing != null)
                 path += "&message=" + messageIDForEditing;
+
+            if (boardID.startsWith("899"))
+                path = path.replace("post.php", "post");
 
             if (BuildConfig.DEBUG) wtl("post path: " + path);
             savedPostBody = postBody.getText().toString();
