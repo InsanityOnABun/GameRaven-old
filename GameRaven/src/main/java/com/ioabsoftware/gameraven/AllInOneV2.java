@@ -1115,10 +1115,8 @@ public class AllInOneV2 extends Activity {
                 posButtonText = "Retry";
                 break;
             case POSTMSG_S1:
-            case POSTMSG_S2:
             case POSTMSG_S3:
             case POSTTPC_S1:
-            case POSTTPC_S2:
             case POSTTPC_S3:
                 postTimeoutCleanup();
                 return;
@@ -2586,7 +2584,7 @@ public class AllInOneV2 extends Activity {
         if (titleWrapper.getVisibility() == View.VISIBLE) {
             if (BuildConfig.DEBUG) wtl("posting on a board");
             // posting on a board
-            String path = Session.ROOT + "/boards/post.php?board=" + boardID;
+            String path = Session.ROOT + "/boards/post?board=" + boardID;
             int i = path.indexOf('-');
             path = path.substring(0, i);
             if (BuildConfig.DEBUG) wtl("post path: " + path);
@@ -2601,19 +2599,13 @@ public class AllInOneV2 extends Activity {
             if (pollUse)
                 path += "&poll=1";
 
-            if (boardID.startsWith("899"))
-                path = path.replace("post.php", "post");
-
             session.get(NetDesc.POSTTPC_S1, path);
         } else {
             // posting on a topic
             if (BuildConfig.DEBUG) wtl("posting on a topic");
-            String path = Session.ROOT + "/boards/post.php?board=" + boardID + "&topic=" + topicID;
+            String path = Session.ROOT + "/boards/post?board=" + boardID + "&topic=" + topicID;
             if (messageIDForEditing != null)
                 path += "&message=" + messageIDForEditing;
-
-            if (boardID.startsWith("899"))
-                path = path.replace("post.php", "post");
 
             if (BuildConfig.DEBUG) wtl("post path: " + path);
             savedPostBody = postBody.getText().toString();

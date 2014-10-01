@@ -415,9 +415,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             case LOGIN_S2:
             case MARKMSG_S2:
             case DLTMSG_S2:
-            case POSTMSG_S2:
             case POSTMSG_S3:
-            case POSTTPC_S2:
             case POSTTPC_S3:
             case VERIFY_ACCOUNT_S1:
             case VERIFY_ACCOUNT_S2:
@@ -434,6 +432,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                 throw e;
 
             if (result != null && result.getResult() != null && result.getResult().doc != null) {
+
+                result.getResult().doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
 
                 if (BuildConfig.DEBUG) AllInOneV2.wtl("parsing res");
                 Document doc = result.getResult().doc;
@@ -610,10 +610,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case DLTMSG_S2:
                     case EDIT_MSG:
                     case POSTMSG_S1:
-                    case POSTMSG_S2:
                     case POSTMSG_S3:
                     case POSTTPC_S1:
-                    case POSTTPC_S2:
                     case POSTTPC_S3:
                     case VERIFY_ACCOUNT_S1:
                     case VERIFY_ACCOUNT_S2:
@@ -665,10 +663,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             case LOGIN_S2:
                             case EDIT_MSG:
                             case POSTMSG_S1:
-                            case POSTMSG_S2:
                             case POSTMSG_S3:
                             case POSTTPC_S1:
-                            case POSTTPC_S2:
                             case POSTTPC_S3:
                             case VERIFY_ACCOUNT_S1:
                             case VERIFY_ACCOUNT_S2:
@@ -701,10 +697,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case LOGIN_S2:
                     case EDIT_MSG:
                     case POSTMSG_S1:
-                    case POSTMSG_S2:
                     case POSTMSG_S3:
                     case POSTTPC_S1:
-                    case POSTTPC_S2:
                     case POSTTPC_S3:
                     case VERIFY_ACCOUNT_S1:
                     case VERIFY_ACCOUNT_S2:
@@ -774,11 +768,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         msg1Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
                         msg1Data.put("custom_sig", Arrays.asList(aio.getSig()));
                         msg1Data.put("key", Arrays.asList(msg1Key));
-
-                        if (resUrl.contains("post?board"))
-                            msg1Data.put("post", Arrays.asList("Post Message"));
-                        else
-                            msg1Data.put("post", Arrays.asList((userHasAdvancedPosting() ? "Post without Preview" : "Preview Message")));
+                        msg1Data.put("post", Arrays.asList("Post Message"));
 
                         Elements msg1Error = doc.getElementsContainingOwnText("There was an error posting your message:");
                         if (!msg1Error.isEmpty()) {
@@ -787,35 +777,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             aio.postExecuteCleanup(desc);
                         } else {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing post message step 1, sending step 2");
-                            post((userHasAdvancedPosting() ? NetDesc.POSTMSG_S3 : NetDesc.POSTMSG_S2), lastPath, msg1Data);
-                        }
-                        break;
-
-                    case POSTMSG_S2:
-                        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post message step 2");
-                        String msg2Key = doc.getElementsByAttributeValue("name", "key").attr("value");
-                        String msgPost_id = doc.getElementsByAttributeValue("name", "post_id").attr("value");
-                        String msgUid = doc.getElementsByAttributeValue("name", "uid").attr("value");
-
-                        HashMap<String, List<String>> msg2Data = new HashMap<String, List<String>>();
-                        msg2Data.put("post", Arrays.asList("Post Message"));
-                        msg2Data.put("key", Arrays.asList(msg2Key));
-                        msg2Data.put("post_id", Arrays.asList(msgPost_id));
-                        msg2Data.put("uid", Arrays.asList(msgUid));
-
-                        Elements msg2Error = doc.getElementsContainingOwnText("There was an error posting your message:");
-                        Elements msg2AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
-                        if (!msg2Error.isEmpty()) {
-                            if (BuildConfig.DEBUG) AllInOneV2.wtl("there was an error in post msg step 2, ending early");
-                            aio.postError(msg2Error.first().parent().parent().text());
-                            aio.postExecuteCleanup(desc);
-                        } else if (!msg2AutoFlag.isEmpty()) {
-                            if (BuildConfig.DEBUG) AllInOneV2.wtl("autoflag got tripped in post msg step 2, showing autoflag dialog");
-                            String msg = msg2AutoFlag.first().parent().parent().text();
-                            showAutoFlagWarning(lastPath, msg2Data, NetDesc.POSTMSG_S3, msg);
-                        } else {
-                            if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing post message step 2, sending step 3");
-                            post(NetDesc.POSTMSG_S3, lastPath, msg2Data);
+                            post(NetDesc.POSTMSG_S3, lastPath, msg1Data);
                         }
                         break;
 
@@ -862,11 +824,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         tpc1Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
                         tpc1Data.put("custom_sig", Arrays.asList(aio.getSig()));
                         tpc1Data.put("key", Arrays.asList(tpc1Key));
-
-                        if (resUrl.contains("post?board"))
-                            tpc1Data.put("post", Arrays.asList("Post Message"));
-                        else
-                            tpc1Data.put("post", Arrays.asList((userHasAdvancedPosting() ? "Post without Preview" : "Preview Message")));
+                        tpc1Data.put("post", Arrays.asList("Post Message"));
 
                         if (aio.isUsingPoll()) {
                             tpc1Data.put("poll_text", Arrays.asList(aio.getPollTitle()));
@@ -886,46 +844,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             aio.postExecuteCleanup(desc);
                         } else {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing post topic step 1, sending step 2");
-                            post((userHasAdvancedPosting() ? NetDesc.POSTTPC_S3 : NetDesc.POSTTPC_S2), lastPath, tpc1Data);
-                        }
-                        break;
-
-                    case POSTTPC_S2:
-                        if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post topic step 2");
-                        String tpc2Key = doc.getElementsByAttributeValue("name", "key").attr("value");
-                        String tpcPost_id = doc.getElementsByAttributeValue("name", "post_id").attr("value");
-                        String tpcUid = doc.getElementsByAttributeValue("name", "uid").attr("value");
-
-                        HashMap<String, List<String>> tpc2Data = new HashMap<String, List<String>>();
-                        tpc2Data.put("post", Arrays.asList("Post Message"));
-                        tpc2Data.put("key", Arrays.asList(tpc2Key));
-                        tpc2Data.put("post_id", Arrays.asList(tpcPost_id));
-                        tpc2Data.put("uid", Arrays.asList(tpcUid));
-
-                        if (aio.isUsingPoll()) {
-                            tpc2Data.put("poll_text", Arrays.asList(aio.getPollTitle()));
-                            for (int x = 0; x < 10; x++) {
-                                if (aio.getPollOptions()[x].length() != 0)
-                                    tpc2Data.put("poll_option_" + (x + 1), Arrays.asList(aio.getPollOptions()[x]));
-                                else
-                                    x = 11;
-                            }
-                            tpc2Data.put("min_level", Arrays.asList(aio.getPollMinLevel()));
-                        }
-
-                        Elements tpc2Error = doc.getElementsContainingOwnText("There was an error posting your message:");
-                        Elements tpc2AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
-                        if (!tpc2Error.isEmpty()) {
-                            if (BuildConfig.DEBUG) AllInOneV2.wtl("there was an error in post topic step 2, ending early");
-                            aio.postError(tpc2Error.first().parent().parent().text());
-                            aio.postExecuteCleanup(desc);
-                        } else if (!tpc2AutoFlag.isEmpty()) {
-                            if (BuildConfig.DEBUG) AllInOneV2.wtl("autoflag got tripped in post msg step 2, showing autoflag dialog");
-                            String msg = tpc2AutoFlag.first().parent().parent().text();
-                            showAutoFlagWarning(lastPath, tpc2Data, NetDesc.POSTTPC_S3, msg);
-                        } else {
-                            if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing post topic step 2, sending step 3");
-                            post(NetDesc.POSTTPC_S3, lastPath, tpc2Data);
+                            post(NetDesc.POSTTPC_S3, lastPath, tpc1Data);
                         }
                         break;
 
@@ -1157,9 +1076,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             case DLTMSG_S2:
             case EDIT_MSG:
             case POSTMSG_S1:
-            case POSTMSG_S2:
             case POSTTPC_S1:
-            case POSTTPC_S2:
             case VERIFY_ACCOUNT_S1:
             case VERIFY_ACCOUNT_S2:
             case SEND_PM_S1:
