@@ -781,8 +781,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         Elements msg3Error = doc.select("b:contains(There was an error posting your message)");
                         if (!msg3Error.isEmpty()) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("there was an error in post msg step 3, ending early");
-                            aio.postError(msg3Error.first().parent().parent().text());
-                            aio.postExecuteCleanup(desc);
+                            aio.postError(((TextNode) msg3Error.first().nextSibling().nextSibling()).text());
+                            postErrorDetected = true;
                         } else if (!msg3AutoFlag.isEmpty()) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("autoflag got tripped in post msg step 3, getting data and showing autoflag dialog");
                             String msg = ((TextNode) msg3AutoFlag.first().nextSibling().nextSibling()).text();
@@ -839,8 +839,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         Elements tpc3Error = doc.select("b:contains(There was an error posting your message)");
                         if (!tpc3Error.isEmpty()) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("there was an error in post topic step 3, ending early");
-                            aio.postError(tpc3Error.first().parent().parent().text());
-                            aio.postExecuteCleanup(desc);
+                            aio.postError(((TextNode) tpc3Error.first().nextSibling().nextSibling()).text());
+                            postErrorDetected = true;
                         } else if (!tpc3AutoFlag.isEmpty()) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("autoflag got tripped in post msg step 3, getting data and showing autoflag dialog");
                             String msg = ((TextNode) tpc3AutoFlag.first().nextSibling().nextSibling()).text();
