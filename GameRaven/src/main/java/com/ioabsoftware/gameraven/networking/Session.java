@@ -771,15 +771,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         msg1Data.put("key", Arrays.asList(msg1Key));
                         msg1Data.put("post", Arrays.asList("Post Message"));
 
-                        Elements msg1Error = doc.getElementsContainingOwnText("There was an error posting your message:");
-                        if (!msg1Error.isEmpty()) {
-                            if (BuildConfig.DEBUG) AllInOneV2.wtl("there was an error in post msg step 1, ending early");
-                            aio.postError(msg1Error.first().parent().parent().text());
-                            aio.postExecuteCleanup(desc);
-                        } else {
-                            if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing post message step 1, sending step 2");
-                            post(NetDesc.POSTMSG_S3, lastPath, msg1Data);
-                        }
+                        post(NetDesc.POSTMSG_S3, lastPath, msg1Data);
                         break;
 
                     case POSTMSG_S3:
@@ -837,15 +829,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             tpc1Data.put("min_level", Arrays.asList(aio.getPollMinLevel()));
                         }
 
-                        Elements tpc1Error = doc.getElementsContainingOwnText("There was an error posting your message:");
-                        if (!tpc1Error.isEmpty()) {
-                            if (BuildConfig.DEBUG) AllInOneV2.wtl("there was an error in post topic step 1, ending early");
-                            aio.postError(tpc1Error.first().parent().parent().text());
-                            aio.postExecuteCleanup(desc);
-                        } else {
-                            if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing post topic step 1, sending step 2");
-                            post(NetDesc.POSTTPC_S3, lastPath, tpc1Data);
-                        }
+                        post(NetDesc.POSTTPC_S3, lastPath, tpc1Data);
                         break;
 
                     case POSTTPC_S3:
