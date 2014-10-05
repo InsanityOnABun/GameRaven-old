@@ -1571,7 +1571,6 @@ public class AllInOneV2 extends Activity {
                         Element lPostLinkElem = cells.get(4).child(1);
                         String lPost = lPostLinkElem.text();
                         String lPostLink = lPostLinkElem.attr("href");
-                        String lpLongPressLink = cells.get(5).child(1).attr("href");
 
                         ReadStatus status = ReadStatus.UNREAD;
                         String tImg = cells.get(1).child(0).className();
@@ -1579,11 +1578,11 @@ public class AllInOneV2 extends Activity {
                             status = ReadStatus.READ;
                         else if (tImg.endsWith("_unread")) {
                             status = ReadStatus.NEW_POST;
-                            lpLongPressLink = cells.get(1).child(0).attr("href");
+                            lPostLink = cells.get(1).child(0).attr("href");
                         }
 
                         adapterRows.add(new AMPRowData(title, board, lPost, mCount, link,
-                                lPostLink, lpLongPressLink, status));
+                                lPostLink, status));
                     }
                 } else {
                     adapterRows.add(new HeaderRowData("You have no active messages at this time."));
@@ -1774,8 +1773,10 @@ public class AllInOneV2 extends Activity {
                                 ReadStatus status = ReadStatus.UNREAD;
                                 if (tImg.endsWith("_read"))
                                     status = ReadStatus.READ;
-                                else if (tImg.endsWith("_unread"))
+                                else if (tImg.endsWith("_unread")) {
                                     status = ReadStatus.NEW_POST;
+                                    lpUrl = cells.get(0).child(0).attr("href");
+                                }
 
                                 int hlColor = 0;
                                 if (hlUsers.contains(tc.toLowerCase(Locale.US))) {
