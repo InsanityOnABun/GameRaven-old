@@ -332,7 +332,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         .setCallback(this);
 
             } else
-                aio.genError("Page Unsupported", "The moderation history page is currently unsupported in-app. Sorry.");
+                aio.genError("Page Unsupported", "The moderation history page is currently unsupported in-app. Sorry.", "Ok");
 
         } else
             aio.noNetworkConnection();
@@ -359,7 +359,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         .withResponse()
                         .setCallback(this);
             } else
-                aio.genError("Page Unsupported", "The moderation history page is currently unsupported in-app. Sorry.");
+                aio.genError("Page Unsupported", "The moderation history page is currently unsupported in-app. Sorry.", "Ok");
 
         } else
             aio.noNetworkConnection();
@@ -517,12 +517,12 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     if (responseCode == 404) {
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("status code 404");
                         Elements paragraphs = doc.getElementsByTag("p");
-                        aio.genError("404 Error", paragraphs.get(1).text() + "\n\n" + paragraphs.get(2).text());
+                        aio.genError("404 Error", paragraphs.get(1).text() + "\n\n" + paragraphs.get(2).text(), "Ok");
                         return;
                     } else if (responseCode == 403) {
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("status code 403");
                         Elements paragraphs = doc.getElementsByTag("p");
-                        aio.genError("403 Error", paragraphs.get(1).text() + "\n\n" + paragraphs.get(2).text());
+                        aio.genError("403 Error", paragraphs.get(1).text() + "\n\n" + paragraphs.get(2).text(), "Ok");
                         return;
                     } else if (responseCode == 401) {
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("status code 401");
@@ -531,7 +531,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             get(NetDesc.BOARD_JUMPER, "/boards");
                         } else {
                             Elements paragraphs = doc.getElementsByTag("p");
-                            aio.genError("401 Error", paragraphs.get(1).text() + "\n\n" + paragraphs.get(2).text());
+                            aio.genError("401 Error", paragraphs.get(1).text() + "\n\n" + paragraphs.get(2).text(), "Ok");
                         }
                         return;
                     }
@@ -541,19 +541,19 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                 Element firstHeader = doc.getElementsByTag("h1").first();
                 if (firstHeader != null && firstHeader.text().equals("408 Request Time-out")) {
                     if (BuildConfig.DEBUG) AllInOneV2.wtl("status code 408");
-                    aio.genError("408 Error", "Your browser didn't send a complete request in time.");
+                    aio.genError("408 Error", "Your browser didn't send a complete request in time.", "Ok");
                     return;
                 }
 
                 if (doc.title().equals("GameFAQs - 503 - Temporarily Unavailable")) {
                     aio.genError("503 Error", "GameFAQs is experiencing some temporary difficulties with " +
-                            "the site. Please wait a few seconds before refreshing this page to try again.");
+                            "the site. Please wait a few seconds before refreshing this page to try again.", "Ok");
 
                     return;
                 } else if (doc.title().equals("GameFAQs is Down")) {
                     aio.genError("GameFAQs is Down", "GameFAQs is experiencing an outage at the moment - " +
                             "the servers are overloaded and unable to serve pages. Hopefully, this is a " +
-                            "temporary problem, and will be rectified by the time you refresh this page.");
+                            "temporary problem, and will be rectified by the time you refresh this page.", "Ok");
 
                     return;
                 }
@@ -562,26 +562,26 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         "as well as register.html?miss=1 page");
                 if (resUrl.contains("account_suspended.html")) {
                     aio.genError("Account Suspended", "Your account seems to be suspended. Please " +
-                            "log in to your account in a web browser for more details.");
+                            "log in to your account in a web browser for more details.", "Ok");
 
                     return;
                 } else if (resUrl.contains("account_banned.html")) {
                     aio.genError("Account Banned", "Your account seems to be banned. Please " +
-                            "log in to your account in a web browser for more details.");
+                            "log in to your account in a web browser for more details.", "Ok");
 
                     return;
                 } else if (resUrl.contains("welcome.php")) {
                     aio.genError("New Account", "It looks like this is a new account. Welcome to GameFAQs! " +
                             "There are some ground rules you'll have to go over first before you can get " +
                             "access to the message boards. Please log in to your account in a web browser " +
-                            "and access the message boards there to view and accept the site terms and rules.");
+                            "and access the message boards there to view and accept the site terms and rules.", "Ok");
 
                     return;
                 } else if (resUrl.contains("register.html?miss=1")) {
                     aio.genError("Login Required", "You've just tried to access a feature that requires a " +
                             "GameFAQs account. You can manage your accounts and log in through the navigation " +
                             "drawer. If you are currently logged into an account, try removing the account " +
-                            "from the app and re-adding it.");
+                            "from the app and re-adding it.", "Ok");
 
                     return;
                 }
@@ -784,8 +784,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case POSTMSG_S3:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post message step 3 (if jumping from 1 to 3, then app is quick posting)");
 
-                        Elements msg3AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
-                        Elements msg3Error = doc.getElementsContainingOwnText("There was an error posting your message:");
+                        Elements msg3AutoFlag = doc.select("b:contains(There are one or more potential issues with your message)");
+                        Elements msg3Error = doc.select("b:contains(There was an error posting your message)");
                         if (!msg3Error.isEmpty()) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("there was an error in post msg step 3, ending early");
                             aio.postError(msg3Error.first().parent().parent().text());
@@ -795,14 +795,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             String msg = msg3AutoFlag.first().parent().parent().text();
 
                             String msg3Key = doc.getElementsByAttributeValue("name", "key").attr("value");
-                            String msg3Post_id = doc.getElementsByAttributeValue("name", "post_id").attr("value");
-                            String msg3Uid = doc.getElementsByAttributeValue("name", "uid").attr("value");
 
                             HashMap<String, List<String>> msg3Data = new HashMap<String, List<String>>();
                             msg3Data.put("post", Arrays.asList("Post Message"));
                             msg3Data.put("key", Arrays.asList(msg3Key));
-                            msg3Data.put("post_id", Arrays.asList(msg3Post_id));
-                            msg3Data.put("uid", Arrays.asList(msg3Uid));
+                            msg3Data.put("override", Arrays.asList("checked"));
 
                             showAutoFlagWarning(lastPath, msg3Data, NetDesc.POSTMSG_S3, msg);
                             postErrorDetected = true;
@@ -851,8 +848,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case POSTTPC_S3:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post topic step 3 (if jumping from 1 to 3, then app is quick posting)");
 
-                        Elements tpc3AutoFlag = doc.getElementsContainingOwnText("There were one or more potential problems with your message:");
-                        Elements tpc3Error = doc.getElementsContainingOwnText("There was an error posting your message:");
+                        Elements tpc3AutoFlag = doc.select("b:contains(There are one or more potential issues with your message)");
+                        Elements tpc3Error = doc.select("b:contains(There was an error posting your message)");
                         if (!tpc3Error.isEmpty()) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("there was an error in post topic step 3, ending early");
                             aio.postError(tpc3Error.first().parent().parent().text());
@@ -862,14 +859,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             String msg = tpc3AutoFlag.first().parent().parent().text();
 
                             String tpc3Key = doc.getElementsByAttributeValue("name", "key").attr("value");
-                            String tpc3Post_id = doc.getElementsByAttributeValue("name", "post_id").attr("value");
-                            String tpc3Uid = doc.getElementsByAttributeValue("name", "uid").attr("value");
 
                             HashMap<String, List<String>> tpc3Data = new HashMap<String, List<String>>();
                             tpc3Data.put("post", Arrays.asList("Post Message"));
                             tpc3Data.put("key", Arrays.asList(tpc3Key));
-                            tpc3Data.put("post_id", Arrays.asList(tpc3Post_id));
-                            tpc3Data.put("uid", Arrays.asList(tpc3Uid));
+                            tpc3Data.put("override", Arrays.asList("checked"));
 
                             showAutoFlagWarning(lastPath, tpc3Data, NetDesc.POSTTPC_S3, msg);
                             postErrorDetected = true;
@@ -987,9 +981,9 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     "ability to handle. If you continue to receive this error, try resetting your network. " +
                     "If you are on wifi, you can do this by unplugging your router for 30 seconds, then plugging " +
                     "it back in. If on a cellular connection, toggle airplane mode on and off, or restart " +
-                    "the phone.");
+                    "the phone.", "Ok");
         } catch (ConnectionClosedException connClosedEx) {
-            aio.genError("Connection Closed", "The connection was closed before the the response was completed.");
+            aio.genError("Connection Closed", "The connection was closed before the the response was completed.", "Ok");
         } catch (Throwable ex) {
             ex.printStackTrace();
             String url, body;
@@ -1108,7 +1102,9 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             lastResBodyAsBytes = h.getResBodyAsBytes();
             lastPath = h.getPath();
 
-            aio.processContent(lastDesc, Jsoup.parse(new String(lastResBodyAsBytes), lastPath), lastPath);
+            Document d = Jsoup.parse(new String(lastResBodyAsBytes), lastPath);
+            d.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
+            aio.processContent(lastDesc, d, lastPath);
         }
     }
 
