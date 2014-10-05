@@ -720,7 +720,7 @@ public class AllInOneV2 extends Activity {
                 }
             });
             b.setNegativeButton("No", null);
-            b.create().show();
+            b.show();
         }
 
         firstResume = false;
@@ -899,7 +899,7 @@ public class AllInOneV2 extends Activity {
                         break;
                 }
 
-                afb.create().show();
+                afb.show();
 
                 return true;
 
@@ -948,7 +948,7 @@ public class AllInOneV2 extends Activity {
                         break;
                 }
 
-                rfb.create().show();
+                rfb.show();
 
                 return true;
 
@@ -1079,27 +1079,24 @@ public class AllInOneV2 extends Activity {
         builder.setMessage(msg);
         builder.setTitle("There was a problem with your post...");
         builder.setPositiveButton("Ok", null);
-        builder.create().show();
+        builder.show();
 
         ptrCleanup();
     }
 
-    public void genError(String errorTitle, String errorMsg) {
+    public void genError(String errorTitle, String errorMsg, String buttonText) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(errorMsg);
         builder.setTitle(errorTitle);
-        builder.setPositiveButton("Ok", null);
-        builder.create().show();
+        builder.setPositiveButton(buttonText, null);
+        builder.show();
 
         ptrCleanup();
     }
 
     public void noNetworkConnection() {
-        AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setTitle("No Network Connection");
-        b.setMessage("Couldn't establish network connection. Check your network settings, then try again.");
-        b.setNegativeButton("Dismiss", null);
-        b.show();
+        genError("No Network Connection", "Couldn't establish network connection. Check your network settings, then try again.",
+                "Dismiss");
     }
 
     public void timeoutCleanup(NetDesc desc) {
@@ -2552,7 +2549,7 @@ public class AllInOneV2 extends Activity {
                 }
             });
             b.setNegativeButton("No", null);
-            b.create().show();
+            b.show();
         } else
             postInterfaceCleanup();
     }
@@ -2573,7 +2570,7 @@ public class AllInOneV2 extends Activity {
                 }
             });
             b.setNegativeButton("No", null);
-            b.create().show();
+            b.show();
         } else
             postSubmit();
     }
