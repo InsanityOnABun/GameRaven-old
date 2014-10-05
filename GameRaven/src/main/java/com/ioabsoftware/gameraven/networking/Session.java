@@ -31,6 +31,7 @@ import com.koushikdutta.ion.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.net.UnknownHostException;
@@ -792,11 +793,13 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             aio.postExecuteCleanup(desc);
                         } else if (!msg3AutoFlag.isEmpty()) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("autoflag got tripped in post msg step 3, getting data and showing autoflag dialog");
-                            String msg = msg3AutoFlag.first().parent().parent().text();
+                            String msg = ((TextNode) msg3AutoFlag.first().nextSibling().nextSibling()).text();
 
                             String msg3Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 
                             HashMap<String, List<String>> msg3Data = new HashMap<String, List<String>>();
+                            msg3Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
+                            msg3Data.put("custom_sig", Arrays.asList(aio.getSig()));
                             msg3Data.put("post", Arrays.asList("Post Message"));
                             msg3Data.put("key", Arrays.asList(msg3Key));
                             msg3Data.put("override", Arrays.asList("checked"));
@@ -856,11 +859,14 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             aio.postExecuteCleanup(desc);
                         } else if (!tpc3AutoFlag.isEmpty()) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("autoflag got tripped in post msg step 3, getting data and showing autoflag dialog");
-                            String msg = tpc3AutoFlag.first().parent().parent().text();
+                            String msg = ((TextNode) tpc3AutoFlag.first().nextSibling().nextSibling()).text();
 
                             String tpc3Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 
                             HashMap<String, List<String>> tpc3Data = new HashMap<String, List<String>>();
+                            tpc3Data.put("topictitle", Arrays.asList(aio.getSavedPostTitle()));
+                            tpc3Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
+                            tpc3Data.put("custom_sig", Arrays.asList(aio.getSig()));
                             tpc3Data.put("post", Arrays.asList("Post Message"));
                             tpc3Data.put("key", Arrays.asList(tpc3Key));
                             tpc3Data.put("override", Arrays.asList("checked"));
