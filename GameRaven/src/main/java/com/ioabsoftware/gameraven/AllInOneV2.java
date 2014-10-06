@@ -720,7 +720,7 @@ public class AllInOneV2 extends Activity {
                 }
             });
             b.setNegativeButton("No", null);
-            b.create().show();
+            b.show();
         }
 
         firstResume = false;
@@ -899,7 +899,7 @@ public class AllInOneV2 extends Activity {
                         break;
                 }
 
-                afb.create().show();
+                afb.show();
 
                 return true;
 
@@ -948,7 +948,7 @@ public class AllInOneV2 extends Activity {
                         break;
                 }
 
-                rfb.create().show();
+                rfb.show();
 
                 return true;
 
@@ -1079,27 +1079,24 @@ public class AllInOneV2 extends Activity {
         builder.setMessage(msg);
         builder.setTitle("There was a problem with your post...");
         builder.setPositiveButton("Ok", null);
-        builder.create().show();
+        builder.show();
 
         ptrCleanup();
     }
 
-    public void genError(String errorTitle, String errorMsg) {
+    public void genError(String errorTitle, String errorMsg, String buttonText) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(errorMsg);
         builder.setTitle(errorTitle);
-        builder.setPositiveButton("Ok", null);
-        builder.create().show();
+        builder.setPositiveButton(buttonText, null);
+        builder.show();
 
         ptrCleanup();
     }
 
     public void noNetworkConnection() {
-        AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setTitle("No Network Connection");
-        b.setMessage("Couldn't establish network connection. Check your network settings, then try again.");
-        b.setNegativeButton("Dismiss", null);
-        b.show();
+        genError("No Network Connection", "Couldn't establish network connection. Check your network settings, then try again.",
+                "Dismiss");
     }
 
     public void timeoutCleanup(NetDesc desc) {
@@ -1115,10 +1112,8 @@ public class AllInOneV2 extends Activity {
                 posButtonText = "Retry";
                 break;
             case POSTMSG_S1:
-            case POSTMSG_S2:
             case POSTMSG_S3:
             case POSTTPC_S1:
-            case POSTTPC_S2:
             case POSTTPC_S3:
                 postTimeoutCleanup();
                 return;
@@ -1573,7 +1568,6 @@ public class AllInOneV2 extends Activity {
                         Element lPostLinkElem = cells.get(4).child(1);
                         String lPost = lPostLinkElem.text();
                         String lPostLink = lPostLinkElem.attr("href");
-                        String lpLongPressLink = cells.get(5).child(1).attr("href");
 
                         ReadStatus status = ReadStatus.UNREAD;
                         String tImg = cells.get(1).child(0).className();
@@ -1581,11 +1575,11 @@ public class AllInOneV2 extends Activity {
                             status = ReadStatus.READ;
                         else if (tImg.endsWith("_unread")) {
                             status = ReadStatus.NEW_POST;
-                            lpLongPressLink = cells.get(1).child(0).attr("href");
+                            lPostLink = cells.get(1).child(0).attr("href");
                         }
 
                         adapterRows.add(new AMPRowData(title, board, lPost, mCount, link,
-                                lPostLink, lpLongPressLink, status));
+                                lPostLink, status));
                     }
                 } else {
                     adapterRows.add(new HeaderRowData("You have no active messages at this time."));
@@ -1776,8 +1770,10 @@ public class AllInOneV2 extends Activity {
                                 ReadStatus status = ReadStatus.UNREAD;
                                 if (tImg.endsWith("_read"))
                                     status = ReadStatus.READ;
-                                else if (tImg.endsWith("_unread"))
+                                else if (tImg.endsWith("_unread")) {
                                     status = ReadStatus.NEW_POST;
+                                    lpUrl = cells.get(0).child(0).attr("href");
+                                }
 
                                 int hlColor = 0;
                                 if (hlUsers.contains(tc.toLowerCase(Locale.US))) {
@@ -2553,7 +2549,7 @@ public class AllInOneV2 extends Activity {
                 }
             });
             b.setNegativeButton("No", null);
-            b.create().show();
+            b.show();
         } else
             postInterfaceCleanup();
     }
@@ -2574,7 +2570,7 @@ public class AllInOneV2 extends Activity {
                 }
             });
             b.setNegativeButton("No", null);
-            b.create().show();
+            b.show();
         } else
             postSubmit();
     }
@@ -2586,7 +2582,7 @@ public class AllInOneV2 extends Activity {
         if (titleWrapper.getVisibility() == View.VISIBLE) {
             if (BuildConfig.DEBUG) wtl("posting on a board");
             // posting on a board
-            String path = Session.ROOT + "/boards/post.php?board=" + boardID;
+            String path = Session.ROOT + "/boards/post?board=" + boardID;
             int i = path.indexOf('-');
             path = path.substring(0, i);
             if (BuildConfig.DEBUG) wtl("post path: " + path);
@@ -2605,7 +2601,7 @@ public class AllInOneV2 extends Activity {
         } else {
             // posting on a topic
             if (BuildConfig.DEBUG) wtl("posting on a topic");
-            String path = Session.ROOT + "/boards/post.php?board=" + boardID + "&topic=" + topicID;
+            String path = Session.ROOT + "/boards/post?board=" + boardID + "&topic=" + topicID;
             if (messageIDForEditing != null)
                 path += "&message=" + messageIDForEditing;
 

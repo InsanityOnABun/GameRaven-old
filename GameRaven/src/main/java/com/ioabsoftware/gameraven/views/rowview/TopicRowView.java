@@ -137,12 +137,16 @@ public class TopicRowView extends BaseRowView {
             title.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
             msgLP.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
             lpLink.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
+
+            lpLink.setText(R.string.last_unread_post);
         } else {
 
             tc.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
             title.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
             msgLP.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
             lpLink.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+
+            lpLink.setText(R.string.last_post);
         }
 
         switch (myData.getType()) {
