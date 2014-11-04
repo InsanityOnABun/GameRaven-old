@@ -1,8 +1,6 @@
 package com.ioabsoftware.gameraven;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.SearchManager;
@@ -17,6 +15,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Time;
@@ -31,7 +31,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -61,8 +60,6 @@ import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
 import com.ioabsoftware.gameraven.views.ViewAdapter;
 import com.ioabsoftware.gameraven.views.rowdata.AMPRowData;
-import com.ioabsoftware.gameraven.views.rowdata.AdGFAQsRowData;
-import com.ioabsoftware.gameraven.views.rowdata.AdmobRowData;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData.BoardType;
 import com.ioabsoftware.gameraven.views.rowdata.GameSearchRowData;
@@ -74,12 +71,10 @@ import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData.TopicType;
 import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
-import com.ioabsoftware.gameraven.views.rowview.AdmobRowView;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
-import net.margaritov.preference.colorpicker.ColorPickerPreference;
 import net.simonvt.menudrawer.MenuDrawer;
 import net.simonvt.menudrawer.MenuDrawer.OnDrawerStateChangeListener;
 import net.simonvt.menudrawer.MenuDrawer.Type;
@@ -112,12 +107,11 @@ import java.util.TimeZone;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
 import uk.co.senab.actionbarpulltorefresh.library.Options;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
-public class AllInOneV2 extends Activity {
+public class AllInOneV2 extends ActionBarActivity {
 
     public static final int SEND_PM_DIALOG = 102;
     public static final int MESSAGE_ACTION_DIALOG = 103;
@@ -270,7 +264,7 @@ public class AllInOneV2 extends Activity {
         Theming.init(this, settings);
 
         if (Theming.usingLightTheme()) {
-            setTheme(R.style.MyThemes_LightTheme);
+            setTheme(R.style.MyThemes_LightBase);
         }
 
         super.onCreate(savedInstanceState);
@@ -281,7 +275,7 @@ public class AllInOneV2 extends Activity {
 
         AccountManager.init(this);
 
-        ActionBar aBar = getActionBar();
+        ActionBar aBar = getSupportActionBar();
         assert aBar != null : "Action bar is null";
 
         aBar.setDisplayHomeAsUpEnabled(true);
@@ -544,7 +538,6 @@ public class AllInOneV2 extends Activity {
         hlDB = new HighlightListDBHelper(this);
 
         adapterRows.add(new HeaderRowData("Loading..."));
-        adapterRows.add(new AdmobRowData());
         contentList.setAdapter(viewAdapter);
 
         AppRater.app_launched(this);
@@ -570,8 +563,6 @@ public class AllInOneV2 extends Activity {
     protected void onResume() {
         if (BuildConfig.DEBUG) wtl("onResume fired");
         super.onResume();
-
-        AdmobRowView.resumeAd();
 
         ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
 
@@ -647,33 +638,7 @@ public class AllInOneV2 extends Activity {
             ((TextView) drawer.findViewById(R.id.dwrExit)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
         }
 
-        int color = settings.getInt("accentColor", (getResources().getColor(R.color.holo_blue)));
         boolean whiteText = settings.getBoolean("useWhiteAccentText", false);
-
-        if (Theming.updateAccentColor(color, whiteText) || firstResume) {
-
-            ((DefaultHeaderTransformer) ptrLayout.getHeaderTransformer()).setProgressBarColor(Theming.accentColor());
-
-            findViewById(R.id.aioPJTopSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioFirstPrevSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioNextLastSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostWrapperSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostTitleSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostBodySep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioBoldSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioItalicSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioCodeSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioSpoilerSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioCiteSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioHTMLSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostButtonSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPollSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostSep).setBackgroundColor(Theming.accentColor());
-            drawer.findViewById(R.id.dwrCAHSep).setBackgroundColor(Theming.accentColor());
-            drawer.findViewById(R.id.dwrNavSep).setBackgroundColor(Theming.accentColor());
-            drawer.findViewById(R.id.dwrFuncSep).setBackgroundColor(Theming.accentColor());
-        }
 
         MessageRowView.setUsingAvatars(settings.getBoolean("usingAvatars", false));
 
@@ -729,15 +694,8 @@ public class AllInOneV2 extends Activity {
     }
 
     @Override
-    protected void onPause() {
-        AdmobRowView.pauseAd();
-        super.onPause();
-    }
-
-    @Override
     protected void onDestroy() {
         Crouton.clearCroutonsForActivity(this);
-        AdmobRowView.destroyAd();
 
         if (session != null)
             session.closeHistoryDB();
@@ -1269,21 +1227,6 @@ public class AllInOneV2 extends Activity {
     ArrayList<BaseRowData> adapterRows = new ArrayList<BaseRowData>();
     ViewAdapter viewAdapter = new ViewAdapter(this, adapterRows);
 
-    WebView web;
-    String adBaseUrl;
-    StringBuilder adBuilder = new StringBuilder();
-    Runnable postProcessRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (web.getParent() != null)
-                ((View) web.getParent()).setMinimumHeight(web.getHeight());
-
-            web.loadDataWithBaseURL(adBaseUrl, adBuilder.toString(), null, "iso-8859-1", null);
-            adBuilder.setLength(0);
-            setMarqueeSpeed(title, 4, false);
-        }
-    };
-
     @SuppressLint("SetJavaScriptEnabled")
     public void processContent(NetDesc desc, Document doc, String resUrl) {
 
@@ -1315,40 +1258,6 @@ public class AllInOneV2 extends Activity {
         String nextPage = null;
         String lastPage = null;
         String pagePrefix = null;
-
-        if (BuildConfig.DEBUG) wtl("initial adbuilder appending");
-        adBuilder.append("<html>\n<head>\n");
-        adBuilder.append(doc.head().html());
-        adBuilder.append("<style>\n* {background-color: ");
-        adBuilder.append(ColorPickerPreference.convertToRGB(Theming.backgroundColor()));
-        adBuilder.append(";}\n</style>\n</head>\n");
-        adBuilder.append("<body>");
-
-        if (BuildConfig.DEBUG) wtl("appending ad elements to adbuilder");
-        for (Element e : doc.body().getElementsByClass("ad")) {
-            adBuilder.append(e.outerHtml());
-            e.remove();
-        }
-
-        if (BuildConfig.DEBUG) wtl("appending script elements to adbuilder");
-        for (Element e : doc.body().getElementsByTag("script")) {
-            adBuilder.append(e.outerHtml());
-        }
-
-        if (BuildConfig.DEBUG) wtl("appending closing tags to adbuilder");
-        adBuilder.append("</body></html>");
-
-        adBaseUrl = resUrl;
-
-        if (BuildConfig.DEBUG) wtl("checking if webView is null, creating if so");
-        if (web == null) {
-            web = new WebView(this);
-            web.getSettings();
-            web.setBackgroundColor(Theming.backgroundColor());
-        }
-
-        if (BuildConfig.DEBUG) wtl("enabling javascript");
-        web.getSettings().setJavaScriptEnabled(settings.getBoolean("enableJS", true));
 
         if (BuildConfig.DEBUG) wtl("checking for board quick list");
         Element boardsDropdown = null;
@@ -2149,10 +2058,6 @@ public class AllInOneV2 extends Activity {
                 title.setText("Page unhandled - " + resUrl);
                 break;
         }
-
-        adapterRows.add(new AdmobRowData());
-        adapterRows.add(new AdGFAQsRowData(web));
-        contentList.post(postProcessRunnable);
 
         Element pmInboxLink = doc.select("div.masthead_user").first().select("a[href=/pm/]").first();
         String pmButtonLabel = getResources().getString(R.string.pm_inbox);

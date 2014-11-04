@@ -142,11 +142,12 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
                 avatar.setVisibility(View.GONE);
             }
         }
+        // http://www.nostlagiasky.pw/gamefaqs-avatars/avatars/Corrupt_Power.png
         if (isUsingAvatars)
             Ion.with(avatar)
                     .placeholder(R.drawable.avatar_placeholder)
                     .error(R.drawable.avatar_default)
-                    .load("http://weblab.cs.uml.edu/~rdupuis/gamefaqs-avatars/avatars/" + myData.getUser().replace(" ", "%20") + ".png");
+                    .load("http://www.nostlagiasky.pw/gamefaqs-avatars/avatars/" + myData.getUser().replace(" ", "%20") + ".png");
 
         message.setText(myData.getSpannedMessage());
 

@@ -1,11 +1,8 @@
 package com.ioabsoftware.gameraven.prefs;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +11,10 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
 import com.ioabsoftware.gameraven.NotifierService;
@@ -23,7 +23,7 @@ import com.ioabsoftware.gameraven.util.Theming;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public class TabbedSettings extends Activity implements ActionBar.TabListener {
+public class TabbedSettings extends ActionBarActivity implements ActionBar.TabListener {
 
     public static final String NO_DEFAULT_ACCOUNT = "N/A";
 
@@ -54,7 +54,7 @@ public class TabbedSettings extends Activity implements ActionBar.TabListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (Theming.usingLightTheme()) {
-            setTheme(R.style.MyThemes_LightTheme);
+            setTheme(R.style.MyThemes_LightBase);
         }
 
         super.onCreate(savedInstanceState);
@@ -69,7 +69,7 @@ public class TabbedSettings extends Activity implements ActionBar.TabListener {
         notifPendingIntent = PendingIntent.getService(this, 0, notifierIntent, 0);
 
         // Set up the action bar.
-        final ActionBar actionBar = getActionBar();
+        final ActionBar actionBar = getSupportActionBar();
         assert actionBar != null : "Action Bar is null";
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayHomeAsUpEnabled(true);

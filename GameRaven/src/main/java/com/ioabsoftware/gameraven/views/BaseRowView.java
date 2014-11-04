@@ -48,8 +48,6 @@ public abstract class BaseRowView extends LinearLayout {
             case USER_DETAIL:
             case HIGHLIGHTED_USER:
             case HEADER:
-            case ADMOB_AD:
-            case GFAQS_AD:
                 break;
         }
 

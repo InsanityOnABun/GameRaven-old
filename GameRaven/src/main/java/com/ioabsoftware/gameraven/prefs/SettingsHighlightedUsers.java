@@ -22,7 +22,7 @@ public class SettingsHighlightedUsers extends Activity implements HlUDDismissLis
     @Override
     public void onCreate(Bundle savedInstanceState) {
         if (Theming.usingLightTheme()) {
-            setTheme(R.style.MyThemes_LightTheme);
+            setTheme(R.style.MyThemes_LightBase);
         }
 
         super.onCreate(savedInstanceState);

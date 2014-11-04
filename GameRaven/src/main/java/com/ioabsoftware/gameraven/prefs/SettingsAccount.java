@@ -69,7 +69,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
     public void onCreate(Bundle savedInstanceState) {
         settings = PreferenceManager.getDefaultSharedPreferences(this);
         if (Theming.usingLightTheme()) {
-            setTheme(R.style.MyThemes_LightTheme);
+            setTheme(R.style.MyThemes_LightBase);
         }
 
         super.onCreate(savedInstanceState);

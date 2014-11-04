@@ -4,8 +4,7 @@
     android:id="@+id/aioGlobalWrapper"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    android:background="?attr/themedBackground">
+    android:animateLayoutChanges="true">
 
 
     <LinearLayout
@@ -47,7 +46,7 @@
                     android:id="@+id/aioPJTopSep"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#33B5E5" />
+                    android:background="?attr/colorPrimary" />
 
                 <Button
                     android:id="@+id/aioFirstPage"
@@ -71,7 +70,7 @@
                     android:layout_alignBottom="@+id/aioFirstPage"
                     android:layout_alignTop="@+id/aioFirstPage"
                     android:layout_toRightOf="@+id/aioFirstPage"
-                    android:background="#33B5E5" />
+                    android:background="?attr/colorPrimary" />
 
                 <Button
                     android:id="@+id/aioPreviousPage"
@@ -106,7 +105,7 @@
                     android:layout_alignBottom="@+id/aioFirstPage"
                     android:layout_alignTop="@+id/aioFirstPage"
                     android:layout_toLeftOf="@+id/aioLastPage"
-                    android:background="#33B5E5" />
+                    android:background="?attr/colorPrimary" />
 
                 <Button
                     android:id="@+id/aioNextPage"
@@ -139,7 +138,7 @@
             android:id="@+id/aioSep"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/holo_blue" />
+            android:background="?attr/colorPrimary" />
     </LinearLayout>
 
     <uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout
@@ -176,7 +175,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="3dp"
-            android:background="#33B5E5"
+            android:background="?attr/colorPrimary"
             android:visibility="visible" />
 
         <LinearLayout
@@ -224,7 +223,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginBottom="3dp"
-                android:background="#33B5E5"
+                android:background="?attr/colorPrimary"
                 android:visibility="visible" />
         </LinearLayout>
 
@@ -250,7 +249,7 @@
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="3dp"
-                android:background="#33B5E5"
+                android:background="?attr/colorPrimary"
                 android:visibility="visible" />
 
             <LinearLayout
@@ -289,7 +288,7 @@
                             android:id="@+id/aioBoldSep"
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="#33B5E5"
+                            android:background="?attr/colorPrimary"
                             android:visibility="visible" />
 
                         <Button
@@ -306,7 +305,7 @@
                             android:id="@+id/aioItalicSep"
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="#33B5E5"
+                            android:background="?attr/colorPrimary"
                             android:visibility="visible" />
 
                         <Button
@@ -323,7 +322,7 @@
                             android:id="@+id/aioCodeSep"
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="#33B5E5"
+                            android:background="?attr/colorPrimary"
                             android:visibility="visible" />
 
                         <Button
@@ -339,7 +338,7 @@
                             android:id="@+id/aioSpoilerSep"
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="#33B5E5"
+                            android:background="?attr/colorPrimary"
                             android:visibility="visible" />
 
                         <Button
@@ -355,7 +354,7 @@
                             android:id="@+id/aioCiteSep"
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="#33B5E5"
+                            android:background="?attr/colorPrimary"
                             android:visibility="visible" />
 
                         <Button
@@ -374,7 +373,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginBottom="1dp"
-                    android:background="#33B5E5"
+                    android:background="?attr/colorPrimary"
                     android:visibility="visible" />
 
                 <TextView
@@ -394,7 +393,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="3dp"
-            android:background="#33B5E5"
+            android:background="?attr/colorPrimary"
             android:visibility="visible" />
 
         <LinearLayout
@@ -415,7 +414,7 @@
                 android:id="@+id/aioPollSep"
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
-                android:background="#33B5E5"
+                android:background="?attr/colorPrimary"
                 android:visibility="gone" />
 
             <Button
@@ -432,7 +431,7 @@
                 android:id="@+id/aioPostSep"
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
-                android:background="#33B5E5"
+                android:background="?attr/colorPrimary"
                 android:visibility="visible" />
 
             <Button

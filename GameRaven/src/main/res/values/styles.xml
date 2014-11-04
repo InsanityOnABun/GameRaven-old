@@ -1,8 +1,6 @@
 <resources>
 
-    <style name="MyThemes.DarkTheme" parent="android:Theme.Holo">
-        <item name="android:actionBarStyle">@android:style/Widget.Holo.ActionBar.Solid</item>
-        <item name="themedBackground">@color/background</item>
+    <style name="MyThemes.DarkBase" parent="Theme.AppCompat">
         <item name="themedSearchIcon">@drawable/ic_search</item>
         <item name="themedAddFavIcon">@drawable/ic_addfav</item>
         <item name="themedRemFavIcon">@drawable/ic_remfav</item>
@@ -20,10 +18,7 @@
         <item name="themedDrawerHeaderColor">@color/drawerHeader</item>
     </style>
 
-    <style name="MyThemes.LightTheme" parent="android:Theme.Holo.Light">
-        <item name="android:actionBarStyle">@android:style/Widget.Holo.Light.ActionBar.Solid</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="themedBackground">@color/background_light</item>
+    <style name="MyThemes.LightBase" parent="Theme.AppCompat.Light">
         <item name="themedSearchIcon">@drawable/ic_search_light</item>
         <item name="themedAddFavIcon">@drawable/ic_addfav_light</item>
         <item name="themedRemFavIcon">@drawable/ic_remfav_light</item>
@@ -39,6 +34,66 @@
         <item name="themedPageJumperColor">@color/buttoncolors_light</item>
         <item name="themedPostInfoIcon">@drawable/ic_info_light</item>
         <item name="themedDrawerHeaderColor">@color/drawerHeaderLight</item>
+    </style>
+
+    <style name="MyThemes.DarkBlue" parent="MyThemes.DarkBase">
+        <item name="colorPrimary">@color/gf_blue</item>
+        <item name="colorPrimaryDark">@color/gf_blue_dark</item>
+        <item name="colorAccent">@color/gf_blue_accent</item>
+    </style>
+
+    <style name="MyThemes.DarkRed" parent="MyThemes.DarkBase">
+        <item name="colorPrimary">@color/gf_red</item>
+        <item name="colorPrimaryDark">@color/gf_red_dark</item>
+        <item name="colorAccent">@color/gf_red_accent</item>
+    </style>
+
+    <style name="MyThemes.DarkGreen" parent="MyThemes.DarkBase">
+        <item name="colorPrimary">@color/gf_green</item>
+        <item name="colorPrimaryDark">@color/gf_green_dark</item>
+        <item name="colorAccent">@color/gf_green_accent</item>
+    </style>
+
+    <style name="MyThemes.DarkOrange" parent="MyThemes.DarkBase">
+        <item name="colorPrimary">@color/gf_orange</item>
+        <item name="colorPrimaryDark">@color/gf_orange_dark</item>
+        <item name="colorAccent">@color/gf_orange_accent</item>
+    </style>
+
+    <style name="MyThemes.DarkPurple" parent="MyThemes.DarkBase">
+        <item name="colorPrimary">@color/gf_purple</item>
+        <item name="colorPrimaryDark">@color/gf_purple_dark</item>
+        <item name="colorAccent">@color/gf_purple_accent</item>
+    </style>
+
+    <style name="MyThemes.LightBlue" parent="MyThemes.LightBase">
+        <item name="colorPrimary">@color/gf_blue_light</item>
+        <item name="colorPrimaryDark">@color/gf_blue_light_dark</item>
+        <item name="colorAccent">@color/gf_blue_light_accent</item>
+    </style>
+
+    <style name="MyThemes.LightRed" parent="MyThemes.LightBase">
+        <item name="colorPrimary">@color/gf_red_light</item>
+        <item name="colorPrimaryDark">@color/gf_red_light_dark</item>
+        <item name="colorAccent">@color/gf_red_light_accent</item>
+    </style>
+
+    <style name="MyThemes.LightGreen" parent="MyThemes.LightBase">
+        <item name="colorPrimary">@color/gf_green_light</item>
+        <item name="colorPrimaryDark">@color/gf_green_light_dark</item>
+        <item name="colorAccent">@color/gf_green_light_accent</item>
+    </style>
+
+    <style name="MyThemes.LightOrange" parent="MyThemes.LightBase">
+        <item name="colorPrimary">@color/gf_orange_light</item>
+        <item name="colorPrimaryDark">@color/gf_orange_light_dark</item>
+        <item name="colorAccent">@color/gf_orange_light_accent</item>
+    </style>
+
+    <style name="MyThemes.LightPurple" parent="MyThemes.LightBase">
+        <item name="colorPrimary">@color/gf_purple_light</item>
+        <item name="colorPrimaryDark">@color/gf_purple_light_dark</item>
+        <item name="colorAccent">@color/gf_purple_light_accent</item>
     </style>
 
 </resources>

@@ -17,7 +17,7 @@ public class About extends Activity {
 
     public void onCreate(Bundle savedInstanceState) {
         if (Theming.usingLightTheme()) {
-            setTheme(R.style.MyThemes_LightTheme);
+            setTheme(R.style.MyThemes_LightBase);
         }
 
         super.onCreate(savedInstanceState);
