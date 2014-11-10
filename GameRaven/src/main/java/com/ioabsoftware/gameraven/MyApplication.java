@@ -84,7 +84,8 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        // trigger the initialization of ACRA
-        ACRA.init(this);
+        // trigger the initialization of ACRA, but only for release builds
+        if (!BuildConfig.DEBUG)
+            ACRA.init(this);
     }
 }
