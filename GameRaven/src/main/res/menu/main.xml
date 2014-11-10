@@ -1,72 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/search"
         android:actionViewClass="android.widget.SearchView"
         android:icon="?attr/themedSearchIcon"
-        android:showAsAction="always|collapseActionView"
+        app:showAsAction="always|collapseActionView"
         android:title="@string/search"
         android:visible="false" />
     <item
         android:id="@+id/topicList"
         android:icon="?attr/themedTopicListIcon"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="@string/return_to_topic_list"
         android:visible="false" />
     <item
         android:id="@+id/addFav"
         android:icon="?attr/themedAddFavIcon"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="@string/add_to_favorites"
         android:visible="false" />
     <item
         android:id="@+id/remFav"
         android:icon="?attr/themedRemFavIcon"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="@string/remove_from_favorites"
         android:visible="false" />
     <item
         android:id="@+id/pmInbox"
         android:icon="?attr/themedPMInboxIcon"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="@string/pm_inbox"
         android:visible="false" />
     <item
         android:id="@+id/pmOutbox"
         android:icon="?attr/themedPMOutboxIcon"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="@string/pm_outbox"
         android:visible="false" />
     <item
         android:id="@+id/sendUserPM"
         android:icon="?attr/themedSendUserPMIcon"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="@string/send_pm_to_this_user"
         android:visible="false" />
     <item
         android:id="@+id/tagUser"
         android:icon="?attr/themedTagUserIcon"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="@string/tag_this_user"
         android:visible="false" />
     <item
         android:id="@+id/reply"
         android:icon="?attr/themedReplyIcon"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="@string/reply"
         android:visible="false" />
     <item
         android:id="@+id/post"
         android:icon="?attr/themedPostIcon"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="@string/post_new_"
         android:visible="false" />
     <item
         android:id="@+id/refresh"
         android:icon="?attr/themedRefreshIcon"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="@string/refresh"
         android:visible="true" />
 
