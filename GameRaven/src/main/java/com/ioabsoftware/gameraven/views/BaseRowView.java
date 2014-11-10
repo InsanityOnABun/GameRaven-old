@@ -40,7 +40,7 @@ public abstract class BaseRowView extends CardView {
         setRadius(Theming.convertDPtoPX(c, 4));
 
         if (background == null)
-            background = new RRDWSBackgroundHack(getResources(), Theming.cardBackgroundColor(), getRadius(), Theming.convertDPtoPX(c, 2), Theming.convertDPtoPX(c, 4));
+            background = new RRDWSBackgroundHack(getResources(), Theming.cardBackgroundColor(), getRadius(), Theming.convertDPtoPX(c, 1), Theming.convertDPtoPX(c, 1));
 
         setBackgroundDrawable(background);
 
