@@ -61,7 +61,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="@dimen/item_padding_horizontal"
-            android:src="@drawable/ic_info" />
+            android:src="?attr/themedPostInfoIcon" />
     </RelativeLayout>
 
     <LinearLayout

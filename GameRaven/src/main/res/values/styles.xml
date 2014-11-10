@@ -1,98 +1,100 @@
 <resources>
 
     <style name="MyThemes.DarkBase" parent="Theme.AppCompat">
-        <item name="themedSearchIcon">@drawable/ic_search</item>
-        <item name="themedAddFavIcon">@drawable/ic_addfav</item>
-        <item name="themedRemFavIcon">@drawable/ic_remfav</item>
-        <item name="themedTopicListIcon">@drawable/ic_topiclist</item>
-        <item name="themedPMInboxIcon">@drawable/ic_inbox</item>
-        <item name="themedPMOutboxIcon">@drawable/ic_outbox</item>
-        <item name="themedSendUserPMIcon">@drawable/ic_send_pm</item>
-        <item name="themedTagUserIcon">@drawable/ic_tag</item>
-        <item name="themedPostIcon">@drawable/ic_newpost</item>
-        <item name="themedReplyIcon">@drawable/ic_reply</item>
-        <item name="themedRefreshIcon">@drawable/ic_refresh</item>
+        <item name="themedSearchIcon">@drawable/ic_search_white_36dp</item>
+        <item name="themedAddFavIcon">@drawable/ic_favorite_outline_white_36dp</item>
+        <item name="themedRemFavIcon">@drawable/ic_favorite_white_36dp</item>
+        <item name="themedTopicListIcon">@drawable/ic_list_white_36dp</item>
+        <item name="themedPMInboxIcon">@drawable/ic_inbox_white_36dp</item>
+        <item name="themedPMOutboxIcon">@drawable/ic_outbox_white_36dp</item>
+        <item name="themedSendUserPMIcon">@drawable/ic_mail_white_36dp</item>
+        <item name="themedTagUserIcon">@drawable/ic_label_white_36dp</item>
+        <item name="themedPostIcon">@drawable/ic_add_white_36dp</item>
+        <item name="themedReplyIcon">@drawable/ic_reply_white_36dp</item>
+        <item name="themedRefreshIcon">@drawable/ic_refresh_white_36dp</item>
         <item name="themedTextColor">@color/white</item>
         <item name="themedPageJumperColor">@color/buttoncolors</item>
-        <item name="themedPostInfoIcon">@drawable/ic_info</item>
+        <item name="themedPostInfoIcon">@drawable/ic_info_outline_white_36dp</item>
         <item name="themedDrawerHeaderColor">@color/drawerHeader</item>
+        <item name="themedBackground">@color/gf_background_dark</item>
     </style>
 
     <style name="MyThemes.LightBase" parent="Theme.AppCompat.Light">
-        <item name="themedSearchIcon">@drawable/ic_search_light</item>
-        <item name="themedAddFavIcon">@drawable/ic_addfav_light</item>
-        <item name="themedRemFavIcon">@drawable/ic_remfav_light</item>
-        <item name="themedTopicListIcon">@drawable/ic_topiclist_light</item>
-        <item name="themedPMInboxIcon">@drawable/ic_inbox_light</item>
-        <item name="themedPMOutboxIcon">@drawable/ic_outbox_light</item>
-        <item name="themedSendUserPMIcon">@drawable/ic_send_pm_light</item>
-        <item name="themedTagUserIcon">@drawable/ic_tag_light</item>
-        <item name="themedPostIcon">@drawable/ic_newpost_light</item>
-        <item name="themedReplyIcon">@drawable/ic_reply_light</item>
-        <item name="themedRefreshIcon">@drawable/ic_refresh_light</item>
+        <item name="themedSearchIcon">@drawable/ic_search_white_36dp</item>
+        <item name="themedAddFavIcon">@drawable/ic_favorite_outline_white_36dp</item>
+        <item name="themedRemFavIcon">@drawable/ic_favorite_white_36dp</item>
+        <item name="themedTopicListIcon">@drawable/ic_list_white_36dp</item>
+        <item name="themedPMInboxIcon">@drawable/ic_inbox_white_36dp</item>
+        <item name="themedPMOutboxIcon">@drawable/ic_outbox_white_36dp</item>
+        <item name="themedSendUserPMIcon">@drawable/ic_mail_white_36dp</item>
+        <item name="themedTagUserIcon">@drawable/ic_label_white_36dp</item>
+        <item name="themedPostIcon">@drawable/ic_add_white_36dp</item>
+        <item name="themedReplyIcon">@drawable/ic_reply_white_36dp</item>
+        <item name="themedRefreshIcon">@drawable/ic_refresh_white_36dp</item>
         <item name="themedTextColor">@color/black</item>
         <item name="themedPageJumperColor">@color/buttoncolors_light</item>
-        <item name="themedPostInfoIcon">@drawable/ic_info_light</item>
+        <item name="themedPostInfoIcon">@drawable/ic_info_outline_white_36dp</item>
         <item name="themedDrawerHeaderColor">@color/drawerHeaderLight</item>
+        <item name="themedBackground">@color/gf_background_light</item>
     </style>
 
     <style name="MyThemes.DarkBlue" parent="MyThemes.DarkBase">
-        <item name="colorPrimary">@color/gf_blue</item>
-        <item name="colorPrimaryDark">@color/gf_blue_dark</item>
-        <item name="colorAccent">@color/gf_blue_accent</item>
+        <item name="colorPrimary">@color/gf_blue_dark</item>
+        <item name="colorPrimaryDark">@color/gf_blue_dark_secondary</item>
+        <item name="colorAccent">@color/gf_blue_dark_accent</item>
     </style>
 
     <style name="MyThemes.DarkRed" parent="MyThemes.DarkBase">
-        <item name="colorPrimary">@color/gf_red</item>
-        <item name="colorPrimaryDark">@color/gf_red_dark</item>
-        <item name="colorAccent">@color/gf_red_accent</item>
+        <item name="colorPrimary">@color/gf_red_dark</item>
+        <item name="colorPrimaryDark">@color/gf_red_dark_secondary</item>
+        <item name="colorAccent">@color/gf_red_dark_accent</item>
     </style>
 
     <style name="MyThemes.DarkGreen" parent="MyThemes.DarkBase">
-        <item name="colorPrimary">@color/gf_green</item>
-        <item name="colorPrimaryDark">@color/gf_green_dark</item>
-        <item name="colorAccent">@color/gf_green_accent</item>
+        <item name="colorPrimary">@color/gf_green_dark</item>
+        <item name="colorPrimaryDark">@color/gf_green_dark_secondary</item>
+        <item name="colorAccent">@color/gf_green_dark_accent</item>
     </style>
 
     <style name="MyThemes.DarkOrange" parent="MyThemes.DarkBase">
-        <item name="colorPrimary">@color/gf_orange</item>
-        <item name="colorPrimaryDark">@color/gf_orange_dark</item>
-        <item name="colorAccent">@color/gf_orange_accent</item>
+        <item name="colorPrimary">@color/gf_orange_dark</item>
+        <item name="colorPrimaryDark">@color/gf_orange_dark_secondary</item>
+        <item name="colorAccent">@color/gf_orange_dark_accent</item>
     </style>
 
     <style name="MyThemes.DarkPurple" parent="MyThemes.DarkBase">
-        <item name="colorPrimary">@color/gf_purple</item>
-        <item name="colorPrimaryDark">@color/gf_purple_dark</item>
-        <item name="colorAccent">@color/gf_purple_accent</item>
+        <item name="colorPrimary">@color/gf_purple_dark</item>
+        <item name="colorPrimaryDark">@color/gf_purple_dark_secondary</item>
+        <item name="colorAccent">@color/gf_purple_dark_accent</item>
     </style>
 
     <style name="MyThemes.LightBlue" parent="MyThemes.LightBase">
         <item name="colorPrimary">@color/gf_blue_light</item>
-        <item name="colorPrimaryDark">@color/gf_blue_light_dark</item>
+        <item name="colorPrimaryDark">@color/gf_blue_light_secondary</item>
         <item name="colorAccent">@color/gf_blue_light_accent</item>
     </style>
 
     <style name="MyThemes.LightRed" parent="MyThemes.LightBase">
         <item name="colorPrimary">@color/gf_red_light</item>
-        <item name="colorPrimaryDark">@color/gf_red_light_dark</item>
+        <item name="colorPrimaryDark">@color/gf_red_light_secondary</item>
         <item name="colorAccent">@color/gf_red_light_accent</item>
     </style>
 
     <style name="MyThemes.LightGreen" parent="MyThemes.LightBase">
         <item name="colorPrimary">@color/gf_green_light</item>
-        <item name="colorPrimaryDark">@color/gf_green_light_dark</item>
+        <item name="colorPrimaryDark">@color/gf_green_light_secondary</item>
         <item name="colorAccent">@color/gf_green_light_accent</item>
     </style>
 
     <style name="MyThemes.LightOrange" parent="MyThemes.LightBase">
         <item name="colorPrimary">@color/gf_orange_light</item>
-        <item name="colorPrimaryDark">@color/gf_orange_light_dark</item>
+        <item name="colorPrimaryDark">@color/gf_orange_light_secondary</item>
         <item name="colorAccent">@color/gf_orange_light_accent</item>
     </style>
 
     <style name="MyThemes.LightPurple" parent="MyThemes.LightBase">
         <item name="colorPrimary">@color/gf_purple_light</item>
-        <item name="colorPrimaryDark">@color/gf_purple_light_dark</item>
+        <item name="colorPrimaryDark">@color/gf_purple_light_secondary</item>
         <item name="colorAccent">@color/gf_purple_light_accent</item>
     </style>
 

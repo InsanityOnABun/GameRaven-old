@@ -83,9 +83,6 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
         headerSelector = new SelectorSolidDrawable(new Drawable[]{getResources().getDrawable(R.drawable.msghead)});
         topWrapper.setBackgroundDrawable(headerSelector);
         topWrapper.setOnClickListener(this);
-
-        if (Theming.isAccentLight())
-            ((ImageView) findViewById(R.id.mvMessageMenuIcon)).setImageResource(R.drawable.ic_info_light);
     }
 
     @Override

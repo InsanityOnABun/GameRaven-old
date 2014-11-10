@@ -15,13 +15,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Time;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -42,6 +45,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -74,10 +78,6 @@ import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
-
-import net.simonvt.menudrawer.MenuDrawer;
-import net.simonvt.menudrawer.MenuDrawer.OnDrawerStateChangeListener;
-import net.simonvt.menudrawer.MenuDrawer.Type;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -237,7 +237,9 @@ public class AllInOneV2 extends ActionBarActivity {
         return hlDB;
     }
 
-    private MenuDrawer drawer;
+    private DrawerLayout drawerLayout;
+    private ScrollView drawerPullout;
+    private ActionBarDrawerToggle drawerToggle;
 
     private static AllInOneV2 me;
 
@@ -281,115 +283,98 @@ public class AllInOneV2 extends ActionBarActivity {
         aBar.setDisplayHomeAsUpEnabled(true);
         aBar.setDisplayShowTitleEnabled(false);
 
-        drawer = MenuDrawer.attach(this, Type.OVERLAY);
-        drawer.setContentView(R.layout.allinonev2);
-        drawer.setMenuView(R.layout.drawer);
-        drawer.setMenuSize(Theming.convertDPtoPX(this, 300));
+        drawerLayout = (DrawerLayout) findViewById(R.id.aioDrawerLayout);
+        drawerPullout = (ScrollView) findViewById(R.id.dwrScroller);
 
-        drawer.setOnDrawerStateChangeListener(new OnDrawerStateChangeListener() {
-
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close) {
             @Override
-            public void onDrawerStateChange(int oldState, int newState) {
-                if (newState == MenuDrawer.STATE_CLOSED)
-                    drawer.findViewById(R.id.dwrScroller).scrollTo(0, 0);
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                drawerPullout.scrollTo(0, 0);
             }
+        };
 
-            @Override
-            public void onDrawerSlide(float openRatio, int offsetPixels) {
-                // not needed
-            }
-        });
-
-        if (Theming.usingLightTheme())
-            drawer.findViewById(R.id.dwrScroller).setBackgroundResource(android.R.drawable.screen_background_light);
-        else
-            drawer.findViewById(R.id.dwrScroller).setBackgroundResource(android.R.drawable.screen_background_dark_transparent);
+        drawerLayout.setDrawerListener(drawerToggle);
 
 
-        drawer.findViewById(R.id.dwrChangeAcc).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrChangeAcc).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
+                drawerLayout.closeDrawers();
                 showDialog(CHANGE_LOGGED_IN_DIALOG);
             }
         });
 
-        boardListButton = (Button) drawer.findViewById(R.id.dwrBoardJumper);
+        boardListButton = (Button) findViewById(R.id.dwrBoardJumper);
         boardListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
+                drawerLayout.closeDrawers();
                 session.get(NetDesc.BOARD_JUMPER, "/boards");
             }
         });
 
-        drawer.findViewById(R.id.dwrAMPList).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrAMPList).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
+                drawerLayout.closeDrawers();
                 session.get(NetDesc.AMP_LIST, buildAMPLink());
             }
         });
 
-        drawer.findViewById(R.id.dwrTrackedTopics).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrTrackedTopics).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
+                drawerLayout.closeDrawers();
                 session.get(NetDesc.TRACKED_TOPICS, "/boards/tracked");
             }
         });
 
-        drawer.findViewById(R.id.dwrPMInbox).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrPMInbox).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
+                drawerLayout.closeDrawers();
                 session.get(NetDesc.PM_INBOX, "/pm/");
             }
         });
 
-        drawer.findViewById(R.id.dwrCopyCurrURL).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrCopyCurrURL).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 android.content.ClipboardManager clipboard =
                         (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
                 clipboard.setPrimaryClip(android.content.ClipData.newPlainText("simple text", session.getLastPath()));
-                drawer.closeMenu(true);
+                drawerLayout.closeDrawers();
                 Crouton.showText(AllInOneV2.this, "URL copied to clipboard.", Theming.croutonStyle());
             }
         });
 
-        drawer.findViewById(R.id.dwrHighlightList).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrHighlightList).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(false);
+                drawerLayout.closeDrawers();
                 startActivity(new Intent(AllInOneV2.this, SettingsHighlightedUsers.class));
             }
         });
 
-        drawer.findViewById(R.id.dwrSettings).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrSettings).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(false);
+                drawerLayout.closeDrawers();
                 startActivity(new Intent(AllInOneV2.this, TabbedSettings.class));
             }
         });
 
-        drawer.findViewById(R.id.dwrExit).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrExit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AllInOneV2.this.finish();
             }
         });
 
-        // The drawable that replaces the up indicator in the action bar
-        if (Theming.usingLightTheme())
-            drawer.setSlideDrawable(R.drawable.ic_drawer_light);
-        else
-            drawer.setSlideDrawable(R.drawable.ic_drawer);
-
-        // Whether the previous drawable should be shown
-        drawer.setDrawerIndicatorEnabled(true);
+        aBar.setDisplayHomeAsUpEnabled(true);
+        aBar.setHomeButtonEnabled(true);
 
         if (!settings.contains("defaultAccount")) {
             // settings need to be set to default
@@ -471,8 +456,8 @@ public class AllInOneV2 extends ActionBarActivity {
             }
         });
 
-        Theming.setTextSizeBases(((TextView) drawer.findViewById(R.id.dwrChangeAccHeader)).getTextSize(),
-                ((TextView) drawer.findViewById(R.id.dwrChangeAcc)).getTextSize(),
+        Theming.setTextSizeBases(((TextView) findViewById(R.id.dwrChangeAccHeader)).getTextSize(),
+                ((TextView) findViewById(R.id.dwrChangeAcc)).getTextSize(),
                 title.getTextSize(),
                 firstPage.getTextSize(),
                 pageLabel.getTextSize());
@@ -543,6 +528,13 @@ public class AllInOneV2 extends ActionBarActivity {
         AppRater.app_launched(this);
 
         if (BuildConfig.DEBUG) wtl("onCreate finishing");
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        drawerToggle.syncState();
     }
 
     @Override
@@ -624,18 +616,18 @@ public class AllInOneV2 extends ActionBarActivity {
             lastPage.setTextSize(px, Theming.getScaledPJButtonTextSize());
             pageLabel.setTextSize(px, Theming.getScaledPJLabelTextSize());
 
-            ((TextView) drawer.findViewById(R.id.dwrChangeAccHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrChangeAcc)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrNavHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
+            ((TextView) findViewById(R.id.dwrChangeAccHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
+            ((TextView) findViewById(R.id.dwrChangeAcc)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrNavHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
             boardListButton.setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrAMPList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrTrackedTopics)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrPMInbox)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrFuncHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrCopyCurrURL)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrHighlightList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrSettings)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrExit)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrAMPList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrTrackedTopics)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrPMInbox)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrFuncHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
+            ((TextView) findViewById(R.id.dwrCopyCurrURL)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrHighlightList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrSettings)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrExit)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
         }
 
         boolean whiteText = settings.getBoolean("useWhiteAccentText", false);
@@ -706,16 +698,16 @@ public class AllInOneV2 extends ActionBarActivity {
     private boolean needToSetNavList = true;
 
     public void disableNavList() {
-        drawer.findViewById(R.id.dwrNavWrapper).setVisibility(View.GONE);
+        findViewById(R.id.dwrNavWrapper).setVisibility(View.GONE);
         needToSetNavList = true;
     }
 
     public void setNavList(boolean isLoggedIn) {
-        drawer.findViewById(R.id.dwrNavWrapper).setVisibility(View.VISIBLE);
+        findViewById(R.id.dwrNavWrapper).setVisibility(View.VISIBLE);
         if (isLoggedIn)
-            drawer.findViewById(R.id.dwrLoggedInNav).setVisibility(View.VISIBLE);
+            findViewById(R.id.dwrLoggedInNav).setVisibility(View.VISIBLE);
         else
-            drawer.findViewById(R.id.dwrLoggedInNav).setVisibility(View.GONE);
+            findViewById(R.id.dwrLoggedInNav).setVisibility(View.GONE);
     }
 
     @Override
@@ -726,10 +718,17 @@ public class AllInOneV2 extends ActionBarActivity {
         return false;
     }
 
+    public void toggleMenu() {
+        if (drawerLayout.isDrawerOpen(Gravity.LEFT))
+            drawerLayout.closeDrawers();
+        else
+            drawerLayout.openDrawer(Gravity.LEFT);
+    }
+
     @Override
     public boolean onKeyUp(int keyCode, @NotNull KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_MENU) {
-            drawer.toggleMenu();
+            toggleMenu();
             return true;
         } else {
             return super.onKeyUp(keyCode, event);
@@ -800,16 +799,16 @@ public class AllInOneV2 extends ActionBarActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         // Handle item selection
         switch (item.getItemId()) {
-            case android.R.id.home:
-                if (BuildConfig.DEBUG) wtl("toggling drawer");
-                drawer.toggleMenu();
-                return true;
-
             case R.id.search:
                 onSearchRequested();
-//    		MenuItemCompat.expandActionView(searchIcon);
                 return true;
 
             case R.id.addFav:
@@ -2942,7 +2941,7 @@ public class AllInOneV2 extends ActionBarActivity {
                 session.get(NetDesc.BOARD, boardQuickListLinks[which]);
             }
         });
-        drawer.closeMenu(true);
+        drawerLayout.closeDrawers();
         b.show();
     }
 
@@ -3126,8 +3125,8 @@ public class AllInOneV2 extends ActionBarActivity {
     public void onBackPressed() {
         if (searchIcon != null && searchIcon.isActionViewExpanded()) {
             searchIcon.collapseActionView();
-        } else if (drawer.isMenuVisible()) {
-            drawer.closeMenu(true);
+        } else if (drawerLayout.isDrawerOpen(Gravity.LEFT)) {
+            drawerLayout.closeDrawers();
         } else if (postWrapper.getVisibility() == View.VISIBLE) {
             postCancel(postCancelButton);
         } else {

@@ -510,7 +510,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                 }
 
                 if (BuildConfig.DEBUG) AllInOneV2.wtl("checking for non-200 http response code");
-                int responseCode = result.getHeaders().getResponseCode();
+                int responseCode = result.getHeaders().code();
                 if (BuildConfig.DEBUG && responseCode != 200)
                     Crouton.showText(aio, "HTTP Response Code: " + responseCode, Theming.croutonStyle());
 

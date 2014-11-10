@@ -7,5 +7,5 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:id="@+id/imageView"
-        android:background="@color/gf_blue" />
+        android:background="@color/gf_blue_dark" />
 </RelativeLayout>
