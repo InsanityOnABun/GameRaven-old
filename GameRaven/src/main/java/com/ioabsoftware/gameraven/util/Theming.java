@@ -20,6 +20,24 @@ public final class Theming {
             pjButtonTextBaseSize,
             pjLabelTextBaseSize;
 
+    private static int colorPrimary;
+
+    public static int colorPrimary() {
+        return colorPrimary;
+    }
+
+    private static int colorPrimaryDark;
+
+    public static int colorPrimaryDark() {
+        return colorPrimaryDark;
+    }
+
+    private static int colorAccent;
+
+    public static int colorAccent() {
+        return colorAccent;
+    }
+
     private static boolean usingLightTheme;
 
     public static boolean usingLightTheme() {
@@ -81,18 +99,20 @@ public final class Theming {
         usingLightTheme = settings.getBoolean("useLightTheme", false);
         textScale = settings.getInt("textScale", 100) / 100f;
 
-        // Create an array of the attributes we want to resolve
-        // using values from a theme
-        int[] attrs = new int[] {
-                R.attr.themedCardBackgroundColor /* index 0 */
-        };
-
         // Obtain the styled attributes. 'themedContext' is a context with a
         // theme, typically the current Activity (i.e. 'this')
-        TypedArray ta = c.obtainStyledAttributes(attrs);
+        TypedArray ta = c.obtainStyledAttributes(new int[] {
+                R.attr.themedCardBackgroundColor,
+                R.attr.colorPrimary,
+                R.attr.colorPrimaryDark,
+                R.attr.colorAccent
+        });
 
         // Get the individual values
-        cardBackgroundColor = ta.getInt(0, c.getResources().getColor(R.color.card_background_dark));
+        cardBackgroundColor = ta.getColor(0, c.getResources().getColor(R.color.card_background_dark));
+        colorPrimary = ta.getColor(1, c.getResources().getColor(R.color.gf_blue_dark));
+        colorPrimaryDark = ta.getColor(2, c.getResources().getColor(R.color.gf_blue_dark_secondary));
+        colorAccent = ta.getColor(3, c.getResources().getColor(R.color.gf_blue_dark_accent));
 
         // Finally, free the resources used by TypedArray
         ta.recycle();

@@ -146,7 +146,7 @@
                 android:background="?attr/colorPrimary" />
         </LinearLayout>
 
-        <uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout
+        <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/ptr_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -164,7 +164,7 @@
                 android:paddingBottom="5dp"
                 android:paddingTop="5dp"
                 android:smoothScrollbar="true" />
-        </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
+        </android.support.v4.widget.SwipeRefreshLayout>
 
         <LinearLayout
             android:id="@+id/aioPostWrapper"

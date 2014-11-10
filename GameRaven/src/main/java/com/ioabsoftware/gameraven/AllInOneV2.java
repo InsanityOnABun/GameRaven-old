@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -106,12 +107,8 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.Options;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
-public class AllInOneV2 extends ActionBarActivity {
+public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     public static final int SEND_PM_DIALOG = 102;
     public static final int MESSAGE_ACTION_DIALOG = 103;
@@ -198,7 +195,7 @@ public class AllInOneV2 extends ActionBarActivity {
 
     private LinearLayout postWrapper;
 
-    private PullToRefreshLayout ptrLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private ListView contentList;
 
     private String tlUrl;
@@ -388,25 +385,11 @@ public class AllInOneV2 extends ActionBarActivity {
                     .apply();
         }
 
-        ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
-
-        // Now setup the PullToRefreshLayout
-        ActionBarPullToRefresh.from(this)
-                .options(Options.create()
-                        .noMinimize()
-                        .refreshOnUp(true)
-                        .build())
-                        // Mark All Children as pullable
-                .allChildrenArePullable()
-                        // Set the OnRefreshListener
-                .listener(new OnRefreshListener() {
-                    @Override
-                    public void onRefreshStarted(View view) {
-                        refreshClicked(view);
-                    }
-                })
-                        // Finally commit the setup to our PullToRefreshLayout
-                .setup(ptrLayout);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.ptr_layout);
+        swipeRefreshLayout.setEnabled(false);
+        swipeRefreshLayout.setColorSchemeColors(Theming.colorPrimary(), Theming.colorPrimaryDark());
+        swipeRefreshLayout.setProgressBackgroundColor(R.color.card_background_light);
+        swipeRefreshLayout.setOnRefreshListener(this);
 
         contentList = (ListView) findViewById(R.id.aioMainList);
 
@@ -556,7 +539,7 @@ public class AllInOneV2 extends ActionBarActivity {
         if (BuildConfig.DEBUG) wtl("onResume fired");
         super.onResume();
 
-        ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
+        swipeRefreshLayout.setEnabled(settings.getBoolean("enablePTR", false));
 
         int lastUpdateYear = settings.getInt("lastUpdateYear", 0);
         int lastUpdateYearDay = settings.getInt("lastUpdateYearDay", 0);
@@ -733,6 +716,11 @@ public class AllInOneV2 extends ActionBarActivity {
         } else {
             return super.onKeyUp(keyCode, event);
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        refreshClicked(null);
     }
 
     private MenuItem refreshIcon, postIcon, replyIcon, pmInboxIcon, pmOutboxIcon,
@@ -1192,7 +1180,7 @@ public class AllInOneV2 extends ActionBarActivity {
     }
 
     private void ptrCleanup() {
-        ptrLayout.setRefreshing(false);
+        swipeRefreshLayout.setRefreshing(false);
         setAllMenuItemsEnabled(true);
         if (postWrapper.getVisibility() == View.VISIBLE) {
             postSubmitButton.setEnabled(true);
@@ -1210,7 +1198,7 @@ public class AllInOneV2 extends ActionBarActivity {
 
     public void preExecuteSetup(NetDesc desc) {
         if (BuildConfig.DEBUG) wtl("GRAIO dPreES fired --NEL, desc: " + desc.name());
-        ptrLayout.setRefreshing(true);
+        swipeRefreshLayout.setRefreshing(true);
         setAllMenuItemsEnabled(false);
 
         if (desc != NetDesc.POSTMSG_S1 && desc != NetDesc.POSTTPC_S1 && desc != NetDesc.EDIT_MSG)
@@ -1231,7 +1219,7 @@ public class AllInOneV2 extends ActionBarActivity {
 
         if (BuildConfig.DEBUG) wtl("GRAIO hNR fired, desc: " + desc.name());
 
-        ptrLayout.setEnabled(false);
+        swipeRefreshLayout.setEnabled(false);
 
         if (searchIcon != null)
             searchIcon.collapseActionView();
@@ -2112,7 +2100,7 @@ public class AllInOneV2 extends ActionBarActivity {
 
         ((Button) findViewById(R.id.dwrTrackedTopics)).setText(ttButtonLabel);
 
-        ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
+        swipeRefreshLayout.setEnabled(settings.getBoolean("enablePTR", false));
 
         viewAdapter.notifyDataSetChanged();
 
@@ -2142,8 +2130,8 @@ public class AllInOneV2 extends ActionBarActivity {
             });
         }
 
-        if (ptrLayout.isRefreshing())
-            ptrLayout.setRefreshComplete();
+        if (swipeRefreshLayout.isRefreshing())
+            swipeRefreshLayout.setRefreshing(false);
 
         if (BuildConfig.DEBUG) wtl("GRAIO hNR finishing");
     }
