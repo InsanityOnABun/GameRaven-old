@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -696,7 +697,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
     @Override
     public boolean onSearchRequested() {
         if (searchIcon != null && searchIcon.isVisible())
-            searchIcon.expandActionView();
+            MenuItemCompat.expandActionView(searchIcon);
 
         return false;
     }
