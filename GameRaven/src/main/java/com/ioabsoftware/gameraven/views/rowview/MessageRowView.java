@@ -60,7 +60,6 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
     @Override
     protected void init(Context context) {
         myType = RowType.MESSAGE;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.msgview, this, true);
 
         topWrapper = findViewById(R.id.mvTopWrapper);

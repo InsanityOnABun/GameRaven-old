@@ -43,7 +43,6 @@ public class PMRowView extends BaseRowView {
     @Override
     protected void init(Context context) {
         myType = RowType.PM;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.pmview, this, true);
 
         subject = (TextView) findViewById(R.id.pmSubject);

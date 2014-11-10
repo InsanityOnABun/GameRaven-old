@@ -42,7 +42,6 @@ public class PMDetailRowView extends BaseRowView {
     @Override
     protected void init(Context context) {
         myType = RowType.PM_DETAIL;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.pmdetailview, this, true);
 
         messageView = (TextView) findViewById(R.id.pmdMessage);

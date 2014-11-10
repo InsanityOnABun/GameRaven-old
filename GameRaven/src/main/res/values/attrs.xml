@@ -18,6 +18,7 @@
         <attr name="themedRefreshIcon" format="reference" />
         <attr name="themedPostInfoIcon" format="reference" />
         <attr name="themedDrawerHeaderColor" format="color" />
+        <attr name="themedCardBackgroundColor" format="integer" />
     </declare-styleable>
 
 </resources>

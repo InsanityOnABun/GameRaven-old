@@ -38,7 +38,6 @@ public class GameSearchRowView extends BaseRowView {
     @Override
     protected void init(Context context) {
         myType = RowType.GAME_SEARCH;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.gamesearchview, this, true);
 
         platform = (TextView) findViewById(R.id.gsPlatform);

@@ -36,7 +36,6 @@ public class UserDetailRowView extends BaseRowView {
     @Override
     protected void init(Context context) {
         myType = RowType.USER_DETAIL;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.userdetailview, this, true);
 
         tag = (TextView) findViewById(R.id.udTag);

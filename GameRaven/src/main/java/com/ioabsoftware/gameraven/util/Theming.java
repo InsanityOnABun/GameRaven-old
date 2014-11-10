@@ -2,6 +2,7 @@ package com.ioabsoftware.gameraven.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -23,6 +24,12 @@ public final class Theming {
 
     public static boolean usingLightTheme() {
         return usingLightTheme;
+    }
+
+    private static int cardBackgroundColor;
+
+    public static int cardBackgroundColor() {
+        return cardBackgroundColor;
     }
 
     private static int accentColor;
@@ -73,6 +80,22 @@ public final class Theming {
         updateAccentColor(settings.getInt("accentColor", (c.getResources().getColor(R.color.holo_blue))), settings.getBoolean("useWhiteAccentText", false));
         usingLightTheme = settings.getBoolean("useLightTheme", false);
         textScale = settings.getInt("textScale", 100) / 100f;
+
+        // Create an array of the attributes we want to resolve
+        // using values from a theme
+        int[] attrs = new int[] {
+                R.attr.themedCardBackgroundColor /* index 0 */
+        };
+
+        // Obtain the styled attributes. 'themedContext' is a context with a
+        // theme, typically the current Activity (i.e. 'this')
+        TypedArray ta = c.obtainStyledAttributes(attrs);
+
+        // Get the individual values
+        cardBackgroundColor = ta.getInt(0, c.getResources().getColor(R.color.card_background_dark));
+
+        // Finally, free the resources used by TypedArray
+        ta.recycle();
     }
 
     public static void setTextSizeBases(float dwrHeader, float dwrButton, float pageTitle, float pjButton, float pjLabel) {

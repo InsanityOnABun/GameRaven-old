@@ -17,6 +17,7 @@
         <item name="themedPostInfoIcon">@drawable/ic_info_outline_white_36dp</item>
         <item name="themedDrawerHeaderColor">@color/drawerHeader</item>
         <item name="themedBackground">@color/gf_background_dark</item>
+        <item name="themedCardBackgroundColor">@color/card_background_dark</item>
     </style>
 
     <style name="MyThemes.LightBase" parent="Theme.AppCompat.Light">
@@ -36,6 +37,7 @@
         <item name="themedPostInfoIcon">@drawable/ic_info_outline_white_36dp</item>
         <item name="themedDrawerHeaderColor">@color/drawerHeaderLight</item>
         <item name="themedBackground">@color/gf_background_light</item>
+        <item name="themedCardBackgroundColor">@color/card_background_light</item>
     </style>
 
     <style name="MyThemes.DarkBlue" parent="MyThemes.DarkBase">

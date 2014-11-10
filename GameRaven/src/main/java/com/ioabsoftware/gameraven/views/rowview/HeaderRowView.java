@@ -37,7 +37,6 @@ public class HeaderRowView extends BaseRowView {
     @Override
     public void init(Context context) {
         myType = RowType.HEADER;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.headerview, this, true);
         tView = (TextView) findViewById(R.id.hdrText);
 

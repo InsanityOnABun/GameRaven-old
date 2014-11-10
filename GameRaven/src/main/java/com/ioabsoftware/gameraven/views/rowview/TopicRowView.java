@@ -16,7 +16,6 @@ import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
-import com.ioabsoftware.gameraven.views.SelectorItemDrawable;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
 
 public class TopicRowView extends BaseRowView {
@@ -53,7 +52,6 @@ public class TopicRowView extends BaseRowView {
     @Override
     protected void init(Context context) {
         myType = RowType.TOPIC;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.topicview, this, true);
 
         title = (TextView) findViewById(R.id.tvTitle);
@@ -75,14 +73,14 @@ public class TopicRowView extends BaseRowView {
             lpLinkTextSize = lpLink.getTextSize();
         }
 
-        lpLink.setBackgroundDrawable(new SelectorItemDrawable(context));
-        lpLink.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AllInOneV2.get().enableGoToUrlDefinedPost();
-                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getLastPostUrl());
-            }
-        });
+//        lpLink.setBackgroundDrawable(new SelectorItemDrawable(context));
+//        lpLink.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                AllInOneV2.get().enableGoToUrlDefinedPost();
+//                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getLastPostUrl());
+//            }
+//        });
 
         setOnClickListener(new OnClickListener() {
             @Override
@@ -173,9 +171,9 @@ public class TopicRowView extends BaseRowView {
         typeIndicator.setVisibility(View.VISIBLE);
     }
 
-    @Override
-    protected void drawableStateChanged() {
-        lpLink.getBackground().setState(this.getDrawableState());
-        super.drawableStateChanged();
-    }
+//    @Override
+//    protected void drawableStateChanged() {
+//        lpLink.getBackground().setState(this.getDrawableState());
+//        super.drawableStateChanged();
+//    }
 }

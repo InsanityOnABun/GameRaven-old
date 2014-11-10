@@ -52,7 +52,6 @@ public class TrackedTopicRowView extends BaseRowView {
     @Override
     protected void init(Context context) {
         myType = RowType.TRACKED_TOPIC;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.topicview, this, true);
 
         board = (TextView) findViewById(R.id.tvTC);
