@@ -614,8 +614,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
             ((TextView) findViewById(R.id.dwrExit)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
         }
 
-        boolean whiteText = settings.getBoolean("useWhiteAccentText", false);
-
         MessageRowView.setUsingAvatars(settings.getBoolean("usingAvatars", false));
 
         if (session != null) {
@@ -746,7 +744,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         replyIcon = menu.findItem(R.id.reply);
         refreshIcon = menu.findItem(R.id.refresh);
 
-        SearchView searchView = (SearchView) searchIcon.getActionView();
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchIcon);
         if (searchView != null) {
             SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
