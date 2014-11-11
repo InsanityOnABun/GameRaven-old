@@ -18,7 +18,7 @@ public abstract class BaseRowView extends CardView {
 
     protected final int PX = TypedValue.COMPLEX_UNIT_PX;
 
-    private Drawable background = null;
+    protected Drawable background;
 
     public BaseRowView(Context context) {
         super(context);
@@ -36,32 +36,15 @@ public abstract class BaseRowView extends CardView {
     }
 
     private void preInit(Context c) {
-        setCardElevation(Theming.convertDPtoPX(c, 2));
+        setCardElevation(Theming.convertDPtoPX(c, 1));
         setRadius(Theming.convertDPtoPX(c, 4));
 
-        if (background == null)
-            background = new RRDWSBackgroundHack(getResources(), Theming.cardBackgroundColor(), getRadius(), Theming.convertDPtoPX(c, 1), Theming.convertDPtoPX(c, 1));
+        background = new RRDWSBackgroundHack(getResources(), Theming.cardBackgroundColor(),
+                    getRadius(), Theming.convertDPtoPX(c, 1), Theming.convertDPtoPX(c, 1));
 
         setBackgroundDrawable(background);
 
         init(c);
-
-        switch (myType) {
-            case GAME_SEARCH:
-            case BOARD:
-            case TOPIC:
-            case AMP_TOPIC:
-            case TRACKED_TOPIC:
-            case MESSAGE:
-            case PM:
-            case PM_DETAIL:
-//                setBackgroundDrawable(new SelectorItemDrawable(getContext()));
-                break;
-            case USER_DETAIL:
-            case HIGHLIGHTED_USER:
-            case HEADER:
-                break;
-        }
 
         preRetheme();
     }

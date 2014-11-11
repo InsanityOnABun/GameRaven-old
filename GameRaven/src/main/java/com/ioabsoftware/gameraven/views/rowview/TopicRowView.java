@@ -73,14 +73,13 @@ public class TopicRowView extends BaseRowView {
             lpLinkTextSize = lpLink.getTextSize();
         }
 
-//        lpLink.setBackgroundDrawable(new SelectorItemDrawable(context));
-//        lpLink.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                AllInOneV2.get().enableGoToUrlDefinedPost();
-//                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getLastPostUrl());
-//            }
-//        });
+        lpLink.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AllInOneV2.get().enableGoToUrlDefinedPost();
+                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getLastPostUrl());
+            }
+        });
 
         setOnClickListener(new OnClickListener() {
             @Override
@@ -170,10 +169,4 @@ public class TopicRowView extends BaseRowView {
         typeIndicator.setImageResource(resId);
         typeIndicator.setVisibility(View.VISIBLE);
     }
-
-//    @Override
-//    protected void drawableStateChanged() {
-//        lpLink.getBackground().setState(this.getDrawableState());
-//        super.drawableStateChanged();
-//    }
 }
