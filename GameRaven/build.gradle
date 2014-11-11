@@ -14,10 +14,12 @@ dependencies {
     compile 'com.intellij:annotations:+@jar'
     compile 'com.github.codechimp-org.apprater:library:1.0.+'
     compile 'com.koushikdutta.ion:ion:2.+'
+    compile 'com.shamanland:fab:0.0.5'
     compile('de.keyboardsurfer.android.widget:crouton:1.8.5@aar') {
         // exclusion is not neccessary, but generally a good idea.
         exclude group: 'com.google.android', module: 'support-v4'
     }
+
     compile files('libs/jsoup-1.8.1.jar')
 }
 

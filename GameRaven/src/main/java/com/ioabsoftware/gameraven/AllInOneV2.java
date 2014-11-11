@@ -80,6 +80,7 @@ import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.shamanland.fab.ShowHideOnScroll;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -508,6 +509,19 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
 
         adapterRows.add(new HeaderRowData("Loading..."));
         contentList.setAdapter(viewAdapter);
+
+        View fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (pMode == PostMode.ON_BOARD)
+                    postSetup(false);
+                else if (pMode == PostMode.ON_TOPIC)
+                    postSetup(true);
+                else if (pMode == PostMode.NEW_PM)
+                    pmSetup(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+            }
+        });
 
         AppRater.app_launched(this);
 
