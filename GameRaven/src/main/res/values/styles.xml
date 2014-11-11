@@ -21,20 +21,20 @@
     </style>
 
     <style name="MyThemes.LightBase" parent="Theme.AppCompat.Light">
-        <item name="themedSearchIcon">@drawable/ic_search_white_36dp</item>
-        <item name="themedAddFavIcon">@drawable/ic_favorite_outline_white_36dp</item>
-        <item name="themedRemFavIcon">@drawable/ic_favorite_white_36dp</item>
-        <item name="themedTopicListIcon">@drawable/ic_list_white_36dp</item>
-        <item name="themedPMInboxIcon">@drawable/ic_inbox_white_36dp</item>
-        <item name="themedPMOutboxIcon">@drawable/ic_outbox_white_36dp</item>
-        <item name="themedSendUserPMIcon">@drawable/ic_mail_white_36dp</item>
-        <item name="themedTagUserIcon">@drawable/ic_label_white_36dp</item>
-        <item name="themedPostIcon">@drawable/ic_add_white_36dp</item>
-        <item name="themedReplyIcon">@drawable/ic_reply_white_36dp</item>
-        <item name="themedRefreshIcon">@drawable/ic_refresh_white_36dp</item>
+        <item name="themedSearchIcon">@drawable/ic_search_black_36dp</item>
+        <item name="themedAddFavIcon">@drawable/ic_favorite_outline_black_36dp</item>
+        <item name="themedRemFavIcon">@drawable/ic_favorite_black_36dp</item>
+        <item name="themedTopicListIcon">@drawable/ic_list_black_36dp</item>
+        <item name="themedPMInboxIcon">@drawable/ic_inbox_black_36dp</item>
+        <item name="themedPMOutboxIcon">@drawable/ic_outbox_black_36dp</item>
+        <item name="themedSendUserPMIcon">@drawable/ic_mail_black_36dp</item>
+        <item name="themedTagUserIcon">@drawable/ic_label_black_36dp</item>
+        <item name="themedPostIcon">@drawable/ic_add_black_36dp</item>
+        <item name="themedReplyIcon">@drawable/ic_reply_black_36dp</item>
+        <item name="themedRefreshIcon">@drawable/ic_refresh_black_36dp</item>
         <item name="themedTextColor">@color/black</item>
         <item name="themedPageJumperColor">@color/buttoncolors_light</item>
-        <item name="themedPostInfoIcon">@drawable/ic_info_outline_white_36dp</item>
+        <item name="themedPostInfoIcon">@drawable/ic_info_outline_black_36dp</item>
         <item name="themedDrawerHeaderColor">@color/drawerHeaderLight</item>
         <item name="themedBackground">@color/gf_background_light</item>
         <item name="themedCardBackgroundColor">@color/card_background_light</item>
