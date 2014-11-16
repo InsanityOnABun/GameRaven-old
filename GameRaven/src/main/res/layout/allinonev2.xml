@@ -170,6 +170,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:background="?attr/colorBackground"
             android:orientation="vertical"
             android:padding="5dp"
             android:visibility="visible">
@@ -456,8 +457,8 @@
             android:layout_alignBottom="@id/ptr_layout"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_marginBottom="20dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="8dp"
             android:src="?attr/themedPostIcon"
             android:visibility="gone"
             app:floatingActionButtonColor="?attr/colorPrimary"
