@@ -509,6 +509,11 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         if (BuildConfig.DEBUG) wtl("starting db creation");
         hlDB = new HighlightListDBHelper(this);
 
+        // 60dp
+        View foot = new View(this);
+        foot.setMinimumHeight(Theming.convertDPtoPX(this, 80));
+        contentList.addFooterView(foot);
+
         adapterRows.add(new HeaderRowData("Loading..."));
         contentList.setAdapter(viewAdapter);
 
@@ -1184,6 +1189,8 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
             clearPoll();
             messageIDForEditing = null;
 
+            fab.setVisibility(View.VISIBLE);
+
             hideSoftKeyboard(postBody);
         }
     }
@@ -1207,11 +1214,12 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
 
     public void preExecuteSetup(NetDesc desc) {
         if (BuildConfig.DEBUG) wtl("GRAIO dPreES fired --NEL, desc: " + desc.name());
-        swipeRefreshLayout.setRefreshing(true);
-        setAllMenuItemsEnabled(false);
 
         if (desc != NetDesc.POSTMSG_S1 && desc != NetDesc.POSTTPC_S1 && desc != NetDesc.EDIT_MSG)
             postInterfaceCleanup();
+
+        swipeRefreshLayout.setRefreshing(true);
+        setAllMenuItemsEnabled(false);
     }
 
     /*
@@ -2417,6 +2425,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
     private void postSetup(boolean postingOnTopic) {
         findViewById(R.id.aioHTMLScroller).scrollTo(0, 0);
         pageJumperWrapper.setVisibility(View.GONE);
+        fab.setVisibility(View.GONE);
         postSubmitButton.setEnabled(true);
         postCancelButton.setEnabled(true);
 
