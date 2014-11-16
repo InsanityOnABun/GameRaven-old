@@ -155,16 +155,16 @@ public class TopicRowView extends BaseRowView {
                 typeIndicator.setVisibility(View.GONE);
                 break;
             case POLL:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_poll_light : R.drawable.ic_poll);
+                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_poll_grey600_18dp : R.drawable.ic_poll_white_18dp);
                 break;
             case LOCKED:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_locked_light : R.drawable.ic_locked);
+                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_lock_grey600_18dp : R.drawable.ic_lock_white_18dp);
                 break;
             case ARCHIVED:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_archived_light : R.drawable.ic_archived);
+                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_save_grey600_18dp : R.drawable.ic_save_white_18dp);
                 break;
             case PINNED:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_pinned_light : R.drawable.ic_pinned);
+                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_whatshot_grey600_18dp : R.drawable.ic_whatshot_white_18dp);
                 break;
         }
     }

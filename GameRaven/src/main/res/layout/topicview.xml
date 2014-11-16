@@ -23,6 +23,7 @@
         android:layout_below="@+id/tvTopSpacer"
         android:layout_marginLeft="@dimen/item_padding_horizontal"
         android:layout_toRightOf="@+id/tvTypeIndicator"
+        android:layout_alignBaseline="@+id/tvTypeIndicator"
         android:text="Topic CreatorTC"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textSize="10sp" />
@@ -88,14 +89,10 @@
 
     <ImageView
         android:id="@+id/tvTypeIndicator"
-        android:layout_width="15dp"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/tvTC"
-        android:layout_alignTop="@+id/tvTC"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
         android:layout_alignWithParentIfMissing="true"
-        android:layout_marginLeft="@dimen/item_padding_horizontal"
-        android:layout_marginRight="@dimen/item_padding_horizontal_negative"
-        android:layout_toRightOf="@+id/tvStopTracking"
+        android:layout_alignLeft="@id/tvTitle"
         android:scaleType="fitStart"
-        android:src="@drawable/ic_archived" />
+        android:src="@drawable/ic_save_white_18dp" />
 </RelativeLayout>
