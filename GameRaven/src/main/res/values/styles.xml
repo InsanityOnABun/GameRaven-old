@@ -17,7 +17,7 @@
         <item name="themedPostIcon">@drawable/ic_add_white_36dp</item>
         <item name="themedReplyIcon">@drawable/ic_reply_white_36dp</item>
         <item name="themedRefreshIcon">@drawable/ic_refresh_white_36dp</item>
-        <item name="themedPostInfoIcon">@drawable/ic_info_outline_white_36dp</item>
+        <item name="themedPostInfoIcon">@drawable/ic_more_horiz_white_36dp</item>
     </style>
 
     <style name="MyThemes.LightBase" parent="Theme.AppCompat.Light">
@@ -37,7 +37,7 @@
         <item name="themedPostIcon">@drawable/ic_add_black_36dp</item>
         <item name="themedReplyIcon">@drawable/ic_reply_black_36dp</item>
         <item name="themedRefreshIcon">@drawable/ic_refresh_black_36dp</item>
-        <item name="themedPostInfoIcon">@drawable/ic_info_outline_black_36dp</item>
+        <item name="themedPostInfoIcon">@drawable/ic_more_horiz_black_36dp</item>
     </style>
 
     <style name="MyThemes.DarkBlue" parent="MyThemes.DarkBase">
