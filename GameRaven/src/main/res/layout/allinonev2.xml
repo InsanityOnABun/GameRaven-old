@@ -462,7 +462,7 @@
             android:layout_marginBottom="20dp"
             android:src="?attr/themedPostIcon"
             app:floatingActionButtonColor="?attr/colorPrimary"
-            app:floatingActionButtonSize="mini"
+            app:floatingActionButtonSize="normal"
             />
 
     </RelativeLayout>

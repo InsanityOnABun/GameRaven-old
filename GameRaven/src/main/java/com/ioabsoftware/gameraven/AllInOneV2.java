@@ -80,7 +80,6 @@ import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
-import com.shamanland.fab.ShowHideOnScroll;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
