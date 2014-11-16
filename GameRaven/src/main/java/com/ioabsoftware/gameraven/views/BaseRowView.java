@@ -2,14 +2,15 @@ package com.ioabsoftware.gameraven.views;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.RRDWSBackgroundHack;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.widget.LinearLayout;
 
 import com.ioabsoftware.gameraven.util.Theming;
 
-public abstract class BaseRowView extends CardView {
+import dreamers.graphics.RippleDrawable;
+
+public abstract class BaseRowView extends LinearLayout {
 
     protected RowType myType = null;
 
@@ -36,13 +37,9 @@ public abstract class BaseRowView extends CardView {
     }
 
     private void preInit(Context c) {
-        setCardElevation(Theming.convertDPtoPX(c, 1));
-        setRadius(Theming.convertDPtoPX(c, 4));
+        setOrientation(VERTICAL);
 
-        background = new RRDWSBackgroundHack(getResources(), Theming.cardBackgroundColor(),
-                    getRadius(), Theming.convertDPtoPX(c, 1), Theming.convertDPtoPX(c, 1));
-
-        setBackgroundDrawable(background);
+        RippleDrawable.makeFor(this, Theming.rippleStateList(), true);
 
         init(c);
 

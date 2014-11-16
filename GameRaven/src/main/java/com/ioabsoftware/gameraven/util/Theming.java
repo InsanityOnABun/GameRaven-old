@@ -2,6 +2,8 @@ package com.ioabsoftware.gameraven.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -19,6 +21,12 @@ public final class Theming {
             pageTitleTextBaseSize,
             pjButtonTextBaseSize,
             pjLabelTextBaseSize;
+
+    private static int theme;
+
+    public static int theme() {
+        return theme;
+    }
 
     private static int colorPrimary;
 
@@ -68,6 +76,12 @@ public final class Theming {
         return accentTextColor;
     }
 
+    private static ColorStateList rippleStateList;
+
+    public static ColorStateList rippleStateList() {
+        return rippleStateList;
+    }
+
     private static boolean useWhiteAccentText;
 
     public static boolean useWhiteAccentText() {
@@ -95,7 +109,7 @@ public final class Theming {
     private static Configuration croutonShort = new Configuration.Builder().setDuration(2500).build();
 
     public static void init(Context c, SharedPreferences settings) {
-        updateAccentColor(settings.getInt("accentColor", (c.getResources().getColor(R.color.holo_blue))), settings.getBoolean("useWhiteAccentText", false));
+        Resources resources = c.getResources();
         usingLightTheme = settings.getBoolean("useLightTheme", false);
         textScale = settings.getInt("textScale", 100) / 100f;
 
@@ -109,13 +123,30 @@ public final class Theming {
         });
 
         // Get the individual values
-        cardBackgroundColor = ta.getColor(0, c.getResources().getColor(R.color.card_background_dark));
-        colorPrimary = ta.getColor(1, c.getResources().getColor(R.color.gf_blue_dark));
-        colorPrimaryDark = ta.getColor(2, c.getResources().getColor(R.color.gf_blue_dark_secondary));
-        colorAccent = ta.getColor(3, c.getResources().getColor(R.color.gf_blue_dark_accent));
+        cardBackgroundColor = ta.getColor(0, resources.getColor(R.color.card_background_dark));
+        colorPrimary = ta.getColor(1, resources.getColor(R.color.gf_blue_dark));
+        colorPrimaryDark = ta.getColor(2, resources.getColor(R.color.gf_blue_dark_secondary));
+        colorAccent = ta.getColor(3, resources.getColor(R.color.gf_blue_dark_accent));
 
         // Finally, free the resources used by TypedArray
         ta.recycle();
+
+        int[][] states = new int[][] {
+                new int[] {android.R.attr.state_focused, -android.R.attr.state_pressed},
+                new int[] {-android.R.attr.state_focused, android.R.attr.state_pressed},
+                new int[] {android.R.attr.state_focused, android.R.attr.state_pressed},
+                new int[] {}
+        };
+
+        int[] colors = new int[] {
+                colorPrimaryDark,
+                colorPrimary,
+                colorPrimary,
+                cardBackgroundColor
+        };
+
+        rippleStateList = new ColorStateList(states, colors);
+        updateAccentColor(colorPrimaryDark, true);
     }
 
     public static void setTextSizeBases(float dwrHeader, float dwrButton, float pageTitle, float pjButton, float pjLabel) {
@@ -205,11 +236,11 @@ public final class Theming {
         //glow
         int glowDrawableId = context.getResources().getIdentifier("overscroll_glow", "drawable", "android");
         Drawable androidGlow = context.getResources().getDrawable(glowDrawableId);
-        androidGlow.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
+        androidGlow.setColorFilter(colorAccent, PorterDuff.Mode.SRC_IN);
         //edge
         int edgeDrawableId = context.getResources().getIdentifier("overscroll_edge", "drawable", "android");
         Drawable androidEdge = context.getResources().getDrawable(edgeDrawableId);
-        androidEdge.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
+        androidEdge.setColorFilter(colorAccent, PorterDuff.Mode.SRC_IN);
     }
 
     /**

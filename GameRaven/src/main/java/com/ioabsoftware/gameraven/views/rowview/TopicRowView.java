@@ -18,6 +18,8 @@ import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
 
+import dreamers.graphics.RippleDrawable;
+
 public class TopicRowView extends BaseRowView {
 
     TextView title;
@@ -87,6 +89,8 @@ public class TopicRowView extends BaseRowView {
                 AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getUrl());
             }
         });
+
+        RippleDrawable.makeFor(lpLink, Theming.rippleStateList(), false);
     }
 
     @Override
