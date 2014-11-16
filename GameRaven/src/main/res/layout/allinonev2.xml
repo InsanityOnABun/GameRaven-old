@@ -38,7 +38,7 @@
                     android:singleLine="true"
                     android:text="@string/gameraven"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="?attr/themedTextColor" />
+                    android:textColor="?attr/colorText" />
 
                 <RelativeLayout
                     android:id="@+id/aioPageJumperWrapper"
@@ -66,7 +66,7 @@
                         android:minHeight="32dp"
                         android:minWidth="54dp"
                         android:text="@string/firstpage"
-                        android:textColor="?attr/themedPageJumperColor" />
+                        android:textColor="?attr/colorPageJumper" />
 
                     <View
                         android:id="@+id/aioFirstPrevSep"
@@ -88,7 +88,7 @@
                         android:enabled="false"
                         android:minWidth="54dp"
                         android:text="@string/prevpage"
-                        android:textColor="?attr/themedPageJumperColor" />
+                        android:textColor="?attr/colorPageJumper" />
 
                     <Button
                         android:id="@+id/aioLastPage"
@@ -101,7 +101,7 @@
                         android:enabled="false"
                         android:minWidth="54dp"
                         android:text="@string/lastpage"
-                        android:textColor="?attr/themedPageJumperColor" />
+                        android:textColor="?attr/colorPageJumper" />
 
                     <View
                         android:id="@+id/aioNextLastSep"
@@ -123,7 +123,7 @@
                         android:enabled="false"
                         android:minWidth="54dp"
                         android:text="@string/nextpage"
-                        android:textColor="?attr/themedPageJumperColor" />
+                        android:textColor="?attr/colorPageJumper" />
 
                     <Button
                         android:id="@+id/aioPageLabel"
@@ -135,7 +135,7 @@
                         android:layout_toLeftOf="@+id/aioNextPage"
                         android:layout_toRightOf="@+id/aioPreviousPage"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="?attr/themedPageJumperColor" />
+                        android:textColor="?attr/colorPageJumper" />
                 </RelativeLayout>
             </RelativeLayout>
 
@@ -158,8 +158,7 @@
                 android:id="@+id/aioMainList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:divider="@null"
-                android:dividerHeight="5dp"
+                android:dividerHeight="1dp"
                 android:fastScrollEnabled="true"
                 android:paddingBottom="5dp"
                 android:paddingTop="5dp"
@@ -455,7 +454,7 @@
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
+            android:layout_alignBottom="@id/ptr_layout"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_marginRight="16dp"
@@ -475,7 +474,7 @@
         android:fadeScrollbars="false"
         android:scrollbarStyle="outsideOverlay"
         android:verticalScrollbarPosition="left"
-        android:background="?attr/themedBackground">
+        android:background="?attr/colorBackground">
 
         <LinearLayout
             android:id="@+id/dwrGlobalWrapper"
@@ -494,7 +493,7 @@
                 android:text="@string/logged_in_as"
                 android:textAllCaps="true"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="?attr/themedDrawerHeaderColor" />
+                android:textColor="?attr/colorDrawerHeader" />
 
             <View
                 android:id="@+id/dwrCAHSep"
@@ -528,7 +527,7 @@
                     android:text="@string/navigation"
                     android:textAllCaps="true"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="?attr/themedDrawerHeaderColor" />
+                    android:textColor="?attr/colorDrawerHeader" />
 
                 <View
                     android:id="@+id/dwrNavSep"
@@ -620,7 +619,7 @@
                 android:text="@string/functions"
                 android:textAllCaps="true"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="?attr/themedDrawerHeaderColor" />
+                android:textColor="?attr/colorDrawerHeader" />
 
             <View
                 android:id="@+id/dwrFuncSep"

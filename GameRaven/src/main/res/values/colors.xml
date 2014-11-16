@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="gf_background_dark">#0d0d0d</color>
-    <color name="gf_background_light">#f2f2f2</color>
-
-    <color name="card_background_dark">#333333</color>
-    <color name="card_background_light">#e6e6e6</color>
+    <color name="gf_background_dark">#333333</color>
+    <color name="gf_background_light">#e6e6e6</color>
 
     <color name="gf_blue_dark">#4659b9</color>
     <color name="gf_blue_dark_secondary">#313e81</color>

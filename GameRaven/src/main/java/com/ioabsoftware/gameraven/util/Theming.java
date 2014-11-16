@@ -28,6 +28,18 @@ public final class Theming {
         return theme;
     }
 
+    private static int colorBackground;
+
+    public static int colorBackground() {
+        return colorBackground;
+    }
+
+    private static int colorBackgroundInverseResource;
+
+    public static int colorBackgroundInverseResource() {
+        return colorBackgroundInverseResource;
+    }
+
     private static int colorPrimary;
 
     public static int colorPrimary() {
@@ -50,12 +62,6 @@ public final class Theming {
 
     public static boolean usingLightTheme() {
         return usingLightTheme;
-    }
-
-    private static int cardBackgroundColor;
-
-    public static int cardBackgroundColor() {
-        return cardBackgroundColor;
     }
 
     private static int accentColor;
@@ -116,17 +122,19 @@ public final class Theming {
         // Obtain the styled attributes. 'themedContext' is a context with a
         // theme, typically the current Activity (i.e. 'this')
         TypedArray ta = c.obtainStyledAttributes(new int[] {
-                R.attr.themedCardBackgroundColor,
+                R.attr.colorBackground,
+                R.attr.colorBackgroundInverse,
                 R.attr.colorPrimary,
                 R.attr.colorPrimaryDark,
                 R.attr.colorAccent
         });
 
         // Get the individual values
-        cardBackgroundColor = ta.getColor(0, resources.getColor(R.color.card_background_dark));
-        colorPrimary = ta.getColor(1, resources.getColor(R.color.gf_blue_dark));
-        colorPrimaryDark = ta.getColor(2, resources.getColor(R.color.gf_blue_dark_secondary));
-        colorAccent = ta.getColor(3, resources.getColor(R.color.gf_blue_dark_accent));
+        colorBackground = ta.getColor(0, resources.getColor(R.color.gf_background_dark));
+        colorBackgroundInverseResource = ta.getResourceId(1, R.color.gf_background_light);
+        colorPrimary = ta.getColor(2, resources.getColor(R.color.gf_blue_dark));
+        colorPrimaryDark = ta.getColor(3, resources.getColor(R.color.gf_blue_dark_secondary));
+        colorAccent = ta.getColor(4, resources.getColor(R.color.gf_blue_dark_accent));
 
         // Finally, free the resources used by TypedArray
         ta.recycle();
@@ -142,7 +150,7 @@ public final class Theming {
                 colorPrimaryDark,
                 colorPrimary,
                 colorPrimary,
-                cardBackgroundColor
+                colorBackground
         };
 
         rippleStateList = new ColorStateList(states, colors);

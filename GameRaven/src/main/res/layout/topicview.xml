@@ -66,7 +66,7 @@
         android:paddingRight="2dp"
         android:paddingTop="10dp"
         android:text="@string/last_post"
-        android:textColor="?attr/themedTextColor"
+        android:textColor="?attr/colorText"
         android:textSize="12sp" />
 
     <TextView
@@ -82,7 +82,7 @@
         android:paddingTop="10dp"
         android:text="X"
         android:lines="2"
-        android:textColor="?attr/themedTextColor"
+        android:textColor="?attr/colorText"
         android:textSize="12sp"
         android:visibility="gone" />
 

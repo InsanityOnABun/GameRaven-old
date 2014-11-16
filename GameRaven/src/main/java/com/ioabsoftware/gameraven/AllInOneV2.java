@@ -80,6 +80,7 @@ import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.shamanland.fab.FloatingActionButton;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -389,7 +390,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.ptr_layout);
         swipeRefreshLayout.setEnabled(false);
         swipeRefreshLayout.setColorSchemeColors(Theming.colorPrimary(), Theming.colorPrimaryDark());
-        swipeRefreshLayout.setProgressBackgroundColor(R.color.card_background_light);
+        swipeRefreshLayout.setProgressBackgroundColor(Theming.colorBackgroundInverseResource());
         swipeRefreshLayout.setOnRefreshListener(this);
 
         contentList = (ListView) findViewById(R.id.aioMainList);
@@ -509,7 +510,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         adapterRows.add(new HeaderRowData("Loading..."));
         contentList.setAdapter(viewAdapter);
 
-        View fab = findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1295,6 +1296,8 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
             boardListButton.setLongClickable(false);
         }
 
+        contentList.setDividerHeight(Theming.convertDPtoPX(this, 1));
+
         switch (desc) {
             case BOARD_JUMPER:
             case LOGIN_S2:
@@ -1705,6 +1708,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                 break;
 
             case TOPIC:
+                contentList.setDividerHeight(0);
                 boardID = parseBoardID(resUrl);
                 topicID = parseTopicID(resUrl);
 

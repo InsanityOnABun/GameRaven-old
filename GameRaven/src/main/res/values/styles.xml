@@ -1,6 +1,11 @@
 <resources>
 
     <style name="MyThemes.DarkBase" parent="Theme.AppCompat">
+        <item name="colorBackground">@color/gf_background_dark</item>
+        <item name="colorBackgroundInverse">@color/gf_background_light</item>
+        <item name="colorText">@color/white</item>
+        <item name="colorDrawerHeader">@color/drawerHeader</item>
+        <item name="colorPageJumper">@color/buttoncolors</item>
         <item name="themedSearchIcon">@drawable/ic_search_white_36dp</item>
         <item name="themedAddFavIcon">@drawable/ic_favorite_outline_white_36dp</item>
         <item name="themedRemFavIcon">@drawable/ic_favorite_white_36dp</item>
@@ -12,15 +17,15 @@
         <item name="themedPostIcon">@drawable/ic_add_white_36dp</item>
         <item name="themedReplyIcon">@drawable/ic_reply_white_36dp</item>
         <item name="themedRefreshIcon">@drawable/ic_refresh_white_36dp</item>
-        <item name="themedTextColor">@color/white</item>
-        <item name="themedPageJumperColor">@color/buttoncolors</item>
         <item name="themedPostInfoIcon">@drawable/ic_info_outline_white_36dp</item>
-        <item name="themedDrawerHeaderColor">@color/drawerHeader</item>
-        <item name="themedBackground">@color/gf_background_dark</item>
-        <item name="themedCardBackgroundColor">@color/card_background_dark</item>
     </style>
 
     <style name="MyThemes.LightBase" parent="Theme.AppCompat.Light">
+        <item name="colorBackground">@color/gf_background_light</item>
+        <item name="colorBackgroundInverse">@color/gf_background_dark</item>
+        <item name="colorText">@color/black</item>
+        <item name="colorDrawerHeader">@color/drawerHeaderLight</item>
+        <item name="colorPageJumper">@color/buttoncolors_light</item>
         <item name="themedSearchIcon">@drawable/ic_search_black_36dp</item>
         <item name="themedAddFavIcon">@drawable/ic_favorite_outline_black_36dp</item>
         <item name="themedRemFavIcon">@drawable/ic_favorite_black_36dp</item>
@@ -32,12 +37,7 @@
         <item name="themedPostIcon">@drawable/ic_add_black_36dp</item>
         <item name="themedReplyIcon">@drawable/ic_reply_black_36dp</item>
         <item name="themedRefreshIcon">@drawable/ic_refresh_black_36dp</item>
-        <item name="themedTextColor">@color/black</item>
-        <item name="themedPageJumperColor">@color/buttoncolors_light</item>
         <item name="themedPostInfoIcon">@drawable/ic_info_outline_black_36dp</item>
-        <item name="themedDrawerHeaderColor">@color/drawerHeaderLight</item>
-        <item name="themedBackground">@color/gf_background_light</item>
-        <item name="themedCardBackgroundColor">@color/card_background_light</item>
     </style>
 
     <style name="MyThemes.DarkBlue" parent="MyThemes.DarkBase">
