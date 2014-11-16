@@ -59,12 +59,6 @@
         android:title="@string/reply"
         android:visible="false" />
     <item
-        android:id="@+id/post"
-        android:icon="?attr/themedPostIcon"
-        app:showAsAction="always"
-        android:title="@string/post_new_"
-        android:visible="false" />
-    <item
         android:id="@+id/refresh"
         android:icon="?attr/themedRefreshIcon"
         app:showAsAction="always"

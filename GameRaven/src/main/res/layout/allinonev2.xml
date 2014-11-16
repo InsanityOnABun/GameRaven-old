@@ -2,8 +2,8 @@
 
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/aioDrawerLayout"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/aioGlobalWrapper"
@@ -60,11 +60,11 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"
                         android:layout_below="@+id/aioPJTopSep"
-                        android:paddingBottom="@dimen/item_padding_vertical"
-                        android:paddingTop="@dimen/item_padding_vertical"
                         android:enabled="false"
                         android:minHeight="32dp"
                         android:minWidth="54dp"
+                        android:paddingBottom="@dimen/item_padding_vertical"
+                        android:paddingTop="@dimen/item_padding_vertical"
                         android:text="@string/firstpage"
                         android:textColor="?attr/colorPageJumper" />
 
@@ -449,32 +449,31 @@
             </LinearLayout>
         </LinearLayout>
 
-        <com.shamanland.fab.FloatingActionButton
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+        <com.shamanland.fab.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/ptr_layout"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginRight="16dp"
+            android:layout_alignParentRight="true"
             android:layout_marginBottom="20dp"
+            android:layout_marginRight="16dp"
             android:src="?attr/themedPostIcon"
+            android:visibility="gone"
             app:floatingActionButtonColor="?attr/colorPrimary"
-            app:floatingActionButtonSize="normal"
-            />
+            app:floatingActionButtonSize="normal" />
 
     </RelativeLayout>
 
     <ScrollView
         android:id="@+id/dwrScroller"
-        android:layout_gravity="left"
         android:layout_width="320dp"
         android:layout_height="match_parent"
+        android:layout_gravity="left"
+        android:background="?attr/colorBackground"
         android:fadeScrollbars="false"
         android:scrollbarStyle="outsideOverlay"
-        android:verticalScrollbarPosition="left"
-        android:background="?attr/colorBackground">
+        android:verticalScrollbarPosition="left">
 
         <LinearLayout
             android:id="@+id/dwrGlobalWrapper"

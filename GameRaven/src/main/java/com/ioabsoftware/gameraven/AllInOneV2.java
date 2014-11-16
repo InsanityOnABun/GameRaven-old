@@ -240,13 +240,15 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
     private ScrollView drawerPullout;
     private ActionBarDrawerToggle drawerToggle;
 
+    private FloatingActionButton fab;
+
     private static AllInOneV2 me;
 
     public static AllInOneV2 get() {
         return me;
     }
 
-    Theming themingInstance;
+    private Theming themingInstance;
 
 
     /**
@@ -510,7 +512,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         adapterRows.add(new HeaderRowData("Loading..."));
         contentList.setAdapter(viewAdapter);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -736,7 +738,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         refreshClicked(null);
     }
 
-    private MenuItem refreshIcon, postIcon, replyIcon, pmInboxIcon, pmOutboxIcon,
+    private MenuItem refreshIcon, replyIcon, pmInboxIcon, pmOutboxIcon,
             addFavIcon, remFavIcon, searchIcon, topicListIcon, sendUserPMIcon, tagUserIcon;
 
     /**
@@ -754,7 +756,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         pmOutboxIcon = menu.findItem(R.id.pmOutbox);
         sendUserPMIcon = menu.findItem(R.id.sendUserPM);
         tagUserIcon = menu.findItem(R.id.tagUser);
-        postIcon = menu.findItem(R.id.post);
         replyIcon = menu.findItem(R.id.reply);
         refreshIcon = menu.findItem(R.id.refresh);
 
@@ -952,16 +953,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                 b.show();
                 return true;
 
-            case R.id.post:
-                if (pMode == PostMode.ON_BOARD)
-                    postSetup(false);
-                else if (pMode == PostMode.ON_TOPIC)
-                    postSetup(true);
-                else if (pMode == PostMode.NEW_PM)
-                    pmSetup(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-
-                return true;
-
             case R.id.reply:
                 pmSetup(replyTo, replySubject, EMPTY_STRING);
                 return true;
@@ -998,7 +989,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
 
     private void setAllMenuItemsExceptRefreshVisibility(boolean visible) {
         setMenuItemVisibility(searchIcon, visible);
-        setMenuItemVisibility(postIcon, visible);
         setMenuItemVisibility(replyIcon, visible);
         setMenuItemVisibility(pmInboxIcon, visible);
         setMenuItemVisibility(pmOutboxIcon, visible);
@@ -1007,12 +997,16 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         setMenuItemVisibility(addFavIcon, visible);
         setMenuItemVisibility(remFavIcon, visible);
         setMenuItemVisibility(topicListIcon, visible);
+
+        if (visible)
+            fab.setVisibility(View.VISIBLE);
+        else
+            fab.setVisibility(View.GONE);
     }
 
     private void setAllMenuItemsEnabled(boolean enabled) {
         setMenuItemEnabled(refreshIcon, enabled);
         setMenuItemEnabled(searchIcon, enabled);
-        setMenuItemEnabled(postIcon, enabled);
         setMenuItemEnabled(replyIcon, enabled);
         setMenuItemEnabled(pmInboxIcon, enabled);
         setMenuItemEnabled(pmOutboxIcon, enabled);
@@ -1021,6 +1015,8 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         setMenuItemEnabled(addFavIcon, enabled);
         setMenuItemEnabled(remFavIcon, enabled);
         setMenuItemEnabled(topicListIcon, enabled);
+
+        fab.setEnabled(enabled);
     }
 
     public void setLoginName(String name) {
@@ -1254,7 +1250,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         String headerTitle;
         String firstPage = null;
         String prevPage = null;
-        int[] pagesInfo = new int[] {1, 1};
+        int[] pagesInfo = new int[]{1, 1};
         String nextPage = null;
         String lastPage = null;
         String pagePrefix = null;
@@ -1373,7 +1369,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                     adapterRows.add(new HeaderRowData("There are no private messages here at this time."));
                 }
 
-                setMenuItemVisibility(postIcon, true);
+                fab.setVisibility(View.VISIBLE);
                 pMode = PostMode.NEW_PM;
 
                 if (isInbox)
@@ -2227,7 +2223,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
     }
 
     private int[] getPageJumperInfo(Element pj) {
-        int[] i = new int[] {1, 1};
+        int[] i = new int[]{1, 1};
         if (pj != null && !pj.hasClass("user") && !pj.hasClass("tsort")) {
             String currPage, pageCount;
 
@@ -2259,12 +2255,12 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
     private void updatePostingRights(Document pRes, boolean onTopic) {
         if (onTopic) {
             if (pRes.getElementsByClass("user").first().text().contains("Post New Message")) {
-                setMenuItemVisibility(postIcon, true);
+                fab.setVisibility(View.VISIBLE);
                 pMode = PostMode.ON_TOPIC;
             }
         } else {
             if (pRes.getElementsByClass("user").first().text().contains("New Topic")) {
-                setMenuItemVisibility(postIcon, true);
+                fab.setVisibility(View.VISIBLE);
                 pMode = PostMode.ON_BOARD;
             }
         }
@@ -2701,7 +2697,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         }
 
         if (Session.isLoggedIn()) {
-            if (postIcon != null && postIcon.isVisible())
+            if (fab != null && fab.getVisibility() == View.VISIBLE)
                 listBuilder.add("Quote");
             if (Session.getUser().trim().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
                 if (Session.userCanEditMsgs() && clickedMsg.isEditable())
