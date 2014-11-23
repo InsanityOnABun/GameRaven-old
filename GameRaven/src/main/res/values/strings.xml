@@ -15,9 +15,9 @@
     <string name="boldtag">&lt;b></string>
     <string name="italictag">&lt;i></string>
     <string name="codetag">&lt;code></string>
-    <string name="spoilertag">&lt;sp></string>
+    <string name="spoilertag">&lt;spoiler></string>
     <string name="citetag">&lt;cite></string>
-    <string name="quotetag">&lt;qu></string>
+    <string name="quotetag">&lt;quote></string>
     <string name="bodycounter">4096/4096</string>
     <string name="cancel">Cancel</string>
     <string name="poll">Poll…</string>
