@@ -8,6 +8,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 
 import com.ioabsoftware.gameraven.R;
 
@@ -241,14 +242,16 @@ public final class Theming {
      * @param context The context of the activity
      */
     public static void colorOverscroll(Context context) {
-        //glow
-        int glowDrawableId = context.getResources().getIdentifier("overscroll_glow", "drawable", "android");
-        Drawable androidGlow = context.getResources().getDrawable(glowDrawableId);
-        androidGlow.setColorFilter(colorAccent, PorterDuff.Mode.SRC_IN);
-        //edge
-        int edgeDrawableId = context.getResources().getIdentifier("overscroll_edge", "drawable", "android");
-        Drawable androidEdge = context.getResources().getDrawable(edgeDrawableId);
-        androidEdge.setColorFilter(colorAccent, PorterDuff.Mode.SRC_IN);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            //glow
+            int glowDrawableId = context.getResources().getIdentifier("overscroll_glow", "drawable", "android");
+            Drawable androidGlow = context.getResources().getDrawable(glowDrawableId);
+            androidGlow.setColorFilter(colorPrimary, PorterDuff.Mode.SRC_IN);
+            //edge
+            int edgeDrawableId = context.getResources().getIdentifier("overscroll_edge", "drawable", "android");
+            Drawable androidEdge = context.getResources().getDrawable(edgeDrawableId);
+            androidEdge.setColorFilter(colorPrimary, PorterDuff.Mode.SRC_IN);
+        }
     }
 
     /**
@@ -256,7 +259,7 @@ public final class Theming {
      *
      * @param c  Context needed to find the display density.
      * @param dp The DP value to convert to PX
-     * @return
+     * @return The dp value converted to pixels
      */
     public static int convertDPtoPX(Context c, float dp) {
         // Get the screen's density scale
