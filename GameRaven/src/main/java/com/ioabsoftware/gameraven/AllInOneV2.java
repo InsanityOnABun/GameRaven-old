@@ -2706,7 +2706,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         }
 
         if (Session.isLoggedIn()) {
-            if (postWrapper.getVisibility() == View.VISIBLE || (fab != null && fab.getVisibility() == View.VISIBLE))
+            if (postWrapper.getVisibility() == View.VISIBLE || fab.getVisibility() == View.VISIBLE)
                 listBuilder.add("Quote");
             if (Session.getUser().trim().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
                 if (Session.userCanEditMsgs() && clickedMsg.isEditable())
