@@ -8,8 +8,6 @@ import android.widget.LinearLayout;
 
 import com.ioabsoftware.gameraven.util.Theming;
 
-import dreamers.graphics.RippleDrawable;
-
 public abstract class BaseRowView extends LinearLayout {
 
     protected RowType myType = null;
@@ -38,8 +36,6 @@ public abstract class BaseRowView extends LinearLayout {
 
     private void preInit(Context c) {
         setOrientation(VERTICAL);
-
-        RippleDrawable.makeFor(this, Theming.rippleStateList(), true);
 
         init(c);
 
