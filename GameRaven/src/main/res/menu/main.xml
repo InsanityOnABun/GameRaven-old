@@ -19,13 +19,13 @@
     <item
         android:id="@+id/addFav"
         android:icon="?attr/themedAddFavIcon"
-        app:showAsAction="always"
+        app:showAsAction="never"
         android:title="@string/add_to_favorites"
         android:visible="false" />
     <item
         android:id="@+id/remFav"
         android:icon="?attr/themedRemFavIcon"
-        app:showAsAction="always"
+        app:showAsAction="never"
         android:title="@string/remove_from_favorites"
         android:visible="false" />
     <item
@@ -61,7 +61,7 @@
     <item
         android:id="@+id/refresh"
         android:icon="?attr/themedRefreshIcon"
-        app:showAsAction="always"
+        app:showAsAction="never"
         android:title="@string/refresh"
         android:visible="true" />
 
