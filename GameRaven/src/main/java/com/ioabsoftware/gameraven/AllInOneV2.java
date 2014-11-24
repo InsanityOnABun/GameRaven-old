@@ -111,6 +111,7 @@ import java.util.TimeZone;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
+@SuppressLint("RtlHardcoded")
 public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     public static final int SEND_PM_DIALOG = 102;
