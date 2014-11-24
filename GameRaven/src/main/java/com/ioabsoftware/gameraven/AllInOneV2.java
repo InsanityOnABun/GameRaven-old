@@ -21,6 +21,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Time;
@@ -278,6 +279,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
 
         AccountManager.init(this);
 
+        setSupportActionBar((Toolbar) findViewById(R.id.aioActionBar));
         ActionBar aBar = getSupportActionBar();
         assert aBar != null : "Action bar is null";
 

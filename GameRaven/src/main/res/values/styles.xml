@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="MyThemes.DarkBase" parent="Theme.AppCompat">
+    <style name="MyThemes.DarkBase" parent="Theme.AppCompat.NoActionBar">
         <item name="colorBackground">@color/gf_background_dark</item>
         <item name="colorBackgroundInverse">@color/gf_background_light</item>
         <item name="colorText">@color/white</item>
@@ -20,7 +20,7 @@
         <item name="themedPostInfoIcon">@drawable/ic_more_horiz_white_36dp</item>
     </style>
 
-    <style name="MyThemes.LightBase" parent="Theme.AppCompat.Light">
+    <style name="MyThemes.LightBase" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorBackground">@color/gf_background_light</item>
         <item name="colorBackgroundInverse">@color/gf_background_dark</item>
         <item name="colorText">@color/black</item>
