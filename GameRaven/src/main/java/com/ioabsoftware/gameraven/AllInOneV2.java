@@ -21,7 +21,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Time;
@@ -65,6 +64,7 @@ import com.ioabsoftware.gameraven.util.DocumentParser;
 import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
+import com.ioabsoftware.gameraven.views.MarqueeToolbar;
 import com.ioabsoftware.gameraven.views.ViewAdapter;
 import com.ioabsoftware.gameraven.views.rowdata.AMPRowData;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData;
@@ -212,7 +212,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
 
     private FavMode fMode;
 
-    private TextView title;
     private Button pageLabel;
     private Button firstPage, prevPage, nextPage, lastPage;
     private String firstPageUrl, prevPageUrl, nextPageUrl, lastPageUrl, jumperPageUrl;
@@ -280,12 +279,13 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
 
         AccountManager.init(this);
 
-        setSupportActionBar((Toolbar) findViewById(R.id.aioActionBar));
+        MarqueeToolbar toolbar = (MarqueeToolbar) findViewById(R.id.aioToolbar);
+        setSupportActionBar(toolbar);
         ActionBar aBar = getSupportActionBar();
         assert aBar != null : "Action bar is null";
 
         aBar.setDisplayHomeAsUpEnabled(true);
-        aBar.setDisplayShowTitleEnabled(false);
+        aBar.setDisplayShowTitleEnabled(true);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.aioDrawerLayout);
         drawerPullout = (ScrollView) findViewById(R.id.dwrScroller);
@@ -406,10 +406,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         titleCounter = (TextView) findViewById(R.id.aioPostTitleCounter);
         bodyCounter = (TextView) findViewById(R.id.aioPostBodyCounter);
 
-        title = (TextView) findViewById(R.id.aioTitle);
-        title.setSelected(true);
-
-        pageJumperWrapper = findViewById(R.id.aioPageJumperWrapper);
+        pageJumperWrapper = findViewById(R.id.aioHeader);
         firstPage = (Button) findViewById(R.id.aioFirstPage);
         firstPage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -448,7 +445,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
 
         Theming.setTextSizeBases(((TextView) findViewById(R.id.dwrChangeAccHeader)).getTextSize(),
                 ((TextView) findViewById(R.id.dwrChangeAcc)).getTextSize(),
-                title.getTextSize(),
                 firstPage.getTextSize(),
                 pageLabel.getTextSize());
 
@@ -616,8 +612,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         if (Theming.updateTextScale(settings.getInt("textScale", 100) / 100f)) {
             int px = TypedValue.COMPLEX_UNIT_PX;
 
-            title.setTextSize(px, Theming.getScaledPageTitleTextSize());
-
             firstPage.setTextSize(px, Theming.getScaledPJButtonTextSize());
             prevPage.setTextSize(px, Theming.getScaledPJButtonTextSize());
             nextPage.setTextSize(px, Theming.getScaledPJButtonTextSize());
@@ -668,8 +662,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                 session = new Session(this, null, null, initUrl, initDesc);
             }
         }
-
-        title.setSelected(true);
 
         if (!settings.contains("beenWelcomed")) {
             settings.edit().putBoolean("beenWelcomed", true).apply();
@@ -2065,7 +2057,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
 
             default:
                 if (BuildConfig.DEBUG) wtl("GRAIO hNR determined response type is unhandled");
-                title.setText("Page unhandled - " + resUrl);
+                getSupportActionBar().setTitle("Page unhandled - " + resUrl);
                 break;
         }
 
@@ -2318,7 +2310,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
             return;
         }
 
-        title.setText(titleIn);
+        getSupportActionBar().setTitle(titleIn);
 
         if (currPage == -1) {
             pageJumperWrapper.setVisibility(View.GONE);
@@ -2354,7 +2346,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                 lastPage.setEnabled(false);
             }
 
-            if (pageCount != 1 && pageCount != -1) {
+            if (pageCount != -1) {
                 jumperPageUrl = jumperPageIn;
 
                 final String[] items = new String[pageCount];
@@ -2384,10 +2376,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                 pageLabel.setText("~ " + currPage + " / " + pageCount + " ~");
             } else {
                 pageLabel.setEnabled(false);
-                if (pageCount == 1)
-                    pageLabel.setText(currPage + " / " + pageCount);
-                else
-                    pageLabel.setText(currPage + " / ???");
+                pageLabel.setText(currPage + " / ???");
             }
         }
     }

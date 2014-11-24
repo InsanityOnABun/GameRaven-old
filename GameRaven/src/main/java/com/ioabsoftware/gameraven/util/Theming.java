@@ -19,7 +19,6 @@ public final class Theming {
 
     private static float dwrHeaderTextBaseSize,
             dwrButtonTextBaseSize,
-            pageTitleTextBaseSize,
             pjButtonTextBaseSize,
             pjLabelTextBaseSize;
 
@@ -158,10 +157,9 @@ public final class Theming {
         updateAccentColor(colorPrimaryDark, true);
     }
 
-    public static void setTextSizeBases(float dwrHeader, float dwrButton, float pageTitle, float pjButton, float pjLabel) {
+    public static void setTextSizeBases(float dwrHeader, float dwrButton, float pjButton, float pjLabel) {
         dwrHeaderTextBaseSize = dwrHeader;
         dwrButtonTextBaseSize = dwrButton;
-        pageTitleTextBaseSize = pageTitle;
         pjButtonTextBaseSize = pjButton;
         pjLabelTextBaseSize = pjLabel;
     }
@@ -172,10 +170,6 @@ public final class Theming {
 
     public static float getScaledDwrButtonTextSize() {
         return dwrButtonTextBaseSize * textScale;
-    }
-
-    public static float getScaledPageTitleTextSize() {
-        return pageTitleTextBaseSize * textScale;
     }
 
     public static float getScaledPJButtonTextSize() {

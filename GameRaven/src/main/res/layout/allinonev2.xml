@@ -14,8 +14,8 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/aioActionBar"
+        <com.ioabsoftware.gameraven.views.MarqueeToolbar
+            android:id="@+id/aioToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
@@ -26,103 +26,80 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@id/aioActionBar"
+            android:layout_below="@id/aioToolbar"
             android:background="?attr/colorPrimaryDark"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/aioTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:layout_margin="5dp"
-                android:ellipsize="marquee"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:singleLine="true"
-                android:text="@string/gameraven"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/white" />
-
-            <View
-                android:id="@+id/aioSep"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="?attr/colorPrimary" />
-
-            <RelativeLayout
-                android:id="@+id/aioPageJumperWrapper"
+            <Button
+                android:background="?attr/selectableItemBackground"
+                android:id="@+id/aioFirstPage"
+                style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/aioTitle"
-                android:visibility="visible">
+                android:layout_alignParentLeft="true"
+                android:enabled="false"
+                android:minHeight="32dp"
+                android:minWidth="54dp"
+                android:paddingBottom="@dimen/item_padding_vertical"
+                android:paddingTop="@dimen/item_padding_vertical"
+                android:text="@string/firstpage"
+                android:textColor="?attr/colorPageJumper" />
 
-                <Button
-                    android:id="@+id/aioFirstPage"
-                    style="@android:style/Widget.Holo.ActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:enabled="false"
-                    android:minHeight="32dp"
-                    android:minWidth="54dp"
-                    android:paddingBottom="@dimen/item_padding_vertical"
-                    android:paddingTop="@dimen/item_padding_vertical"
-                    android:text="@string/firstpage"
-                    android:textColor="?attr/colorPageJumper" />
+            <Button
+                android:background="?attr/selectableItemBackground"
+                android:id="@+id/aioPreviousPage"
+                style="@android:style/Widget.Holo.ActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/aioFirstPage"
+                android:layout_alignTop="@+id/aioFirstPage"
+                android:layout_toRightOf="@+id/aioFirstPage"
+                android:enabled="false"
+                android:minWidth="54dp"
+                android:text="@string/prevpage"
+                android:textColor="?attr/colorPageJumper" />
 
-                <Button
-                    android:id="@+id/aioPreviousPage"
-                    style="@android:style/Widget.Holo.ActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/aioFirstPage"
-                    android:layout_alignTop="@+id/aioFirstPage"
-                    android:layout_toRightOf="@+id/aioFirstPage"
-                    android:enabled="false"
-                    android:minWidth="54dp"
-                    android:text="@string/prevpage"
-                    android:textColor="?attr/colorPageJumper" />
+            <Button
+                android:background="?attr/selectableItemBackground"
+                android:id="@+id/aioLastPage"
+                style="@android:style/Widget.Holo.ActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/aioFirstPage"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@+id/aioFirstPage"
+                android:enabled="false"
+                android:minWidth="54dp"
+                android:text="@string/lastpage"
+                android:textColor="?attr/colorPageJumper" />
 
-                <Button
-                    android:id="@+id/aioLastPage"
-                    style="@android:style/Widget.Holo.ActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/aioFirstPage"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignTop="@+id/aioFirstPage"
-                    android:enabled="false"
-                    android:minWidth="54dp"
-                    android:text="@string/lastpage"
-                    android:textColor="?attr/colorPageJumper" />
+            <Button
+                android:background="?attr/selectableItemBackground"
+                android:id="@+id/aioNextPage"
+                style="@android:style/Widget.Holo.ActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/aioFirstPage"
+                android:layout_alignTop="@+id/aioFirstPage"
+                android:layout_toLeftOf="@+id/aioLastPage"
+                android:enabled="false"
+                android:minWidth="54dp"
+                android:text="@string/nextpage"
+                android:textColor="?attr/colorPageJumper" />
 
-                <Button
-                    android:id="@+id/aioNextPage"
-                    style="@android:style/Widget.Holo.ActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/aioFirstPage"
-                    android:layout_alignTop="@+id/aioFirstPage"
-                    android:layout_toLeftOf="@+id/aioLastPage"
-                    android:enabled="false"
-                    android:minWidth="54dp"
-                    android:text="@string/nextpage"
-                    android:textColor="?attr/colorPageJumper" />
-
-                <Button
-                    android:id="@+id/aioPageLabel"
-                    style="@android:style/Widget.Holo.ActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/aioFirstPage"
-                    android:layout_alignTop="@+id/aioFirstPage"
-                    android:layout_toLeftOf="@+id/aioNextPage"
-                    android:layout_toRightOf="@+id/aioPreviousPage"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?attr/colorPageJumper"
-                    tools:ignore="RelativeOverlap" />
-            </RelativeLayout>
+            <Button
+                android:background="?attr/selectableItemBackground"
+                android:id="@+id/aioPageLabel"
+                style="@android:style/Widget.Holo.ActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/aioFirstPage"
+                android:layout_alignTop="@+id/aioFirstPage"
+                android:layout_toLeftOf="@+id/aioNextPage"
+                android:layout_toRightOf="@+id/aioPreviousPage"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="?attr/colorPageJumper"
+                tools:ignore="RelativeOverlap" />
         </RelativeLayout>
 
         <android.support.v4.widget.SwipeRefreshLayout
@@ -260,6 +237,7 @@
                             android:orientation="vertical">
 
                             <Button
+                                android:background="?attr/selectableItemBackground"
                                 android:id="@+id/aioBold"
                                 style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
@@ -277,6 +255,7 @@
                                 android:visibility="visible" />
 
                             <Button
+                                android:background="?attr/selectableItemBackground"
                                 android:id="@+id/aioItalic"
                                 style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
@@ -294,6 +273,7 @@
                                 android:visibility="visible" />
 
                             <Button
+                                android:background="?attr/selectableItemBackground"
                                 android:id="@+id/aioCode"
                                 style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
@@ -311,6 +291,7 @@
                                 android:visibility="visible" />
 
                             <Button
+                                android:background="?attr/selectableItemBackground"
                                 android:id="@+id/aioSpoiler"
                                 style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
@@ -327,6 +308,7 @@
                                 android:visibility="visible" />
 
                             <Button
+                                android:background="?attr/selectableItemBackground"
                                 android:id="@+id/aioCite"
                                 style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
@@ -343,6 +325,7 @@
                                 android:visibility="visible" />
 
                             <Button
+                                android:background="?attr/selectableItemBackground"
                                 android:id="@+id/aioQuote"
                                 style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
@@ -388,6 +371,7 @@
                 android:layout_height="wrap_content">
 
                 <Button
+                    android:background="?attr/selectableItemBackground"
                     android:id="@+id/aioPostCancel"
                     style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="0dp"
@@ -404,6 +388,7 @@
                     android:visibility="gone" />
 
                 <Button
+                    android:background="?attr/selectableItemBackground"
                     android:id="@+id/aioPollOptions"
                     style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="0dp"
@@ -421,6 +406,7 @@
                     android:visibility="visible" />
 
                 <Button
+                    android:background="?attr/selectableItemBackground"
                     android:id="@+id/aioPostDo"
                     style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="0dp"
