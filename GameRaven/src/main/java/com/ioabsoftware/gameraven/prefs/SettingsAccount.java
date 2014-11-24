@@ -14,10 +14,10 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -65,23 +65,22 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
 
     SharedPreferences settings;
 
+    private Toolbar mActionBar;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(Theming.theme());
         settings = PreferenceManager.getDefaultSharedPreferences(this);
-        if (Theming.usingLightTheme()) {
-            setTheme(R.style.MyThemes_LightBase);
-        }
-
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.settingsaccount);
+
+        mActionBar.setTitle(getTitle());
 
         accountVerifier = Ion.getInstance(this, ION_INSTANCE);
         accountVerifier.getCookieMiddleware().clear();
 
         Theming.colorOverscroll(this);
-
-        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         accounts = (PreferenceCategory) findPreference("accounts");
         updateAccountList();
@@ -96,15 +95,22 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                finish();
-                return true;
-        }
+    public void setContentView(int layoutResID) {
+        ViewGroup contentView = (ViewGroup) LayoutInflater.from(this).inflate(
+                R.layout.settings_activity, new LinearLayout(this), false);
 
-        return super.onOptionsItemSelected(item);
+        mActionBar = (Toolbar) contentView.findViewById(R.id.saToolbar);
+        mActionBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        ViewGroup contentWrapper = (ViewGroup) contentView.findViewById(R.id.saContentWrapper);
+        LayoutInflater.from(this).inflate(layoutResID, contentWrapper, true);
+
+        getWindow().setContentView(contentView);
     }
 
     @Override
@@ -116,7 +122,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
     private void updateAccountList() {
         accounts.removeAll();
 
-        String def = settings.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT);
+        String def = settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT);
 
         for (String s : AccountManager.getUsernames(this)) {
             Preference pref = new Preference(this);
@@ -244,7 +250,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
         final EditText sigContent = (EditText) v.findViewById(R.id.modaccSigContent);
         final TextView sigCounter = (TextView) v.findViewById(R.id.modaccSigCounter);
 
-        if (clickedAccount.getTitle().toString().equals(settings.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT)))
+        if (clickedAccount.getTitle().toString().equals(settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT)))
             defaultAcc.setChecked(true);
         else
             defaultAcc.setChecked(false);
@@ -253,14 +259,14 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    settings.edit().putString("defaultAccount", clickedAccount.getTitle().toString()).commit();
+                    settings.edit().putString("defaultAccount", clickedAccount.getTitle().toString()).apply();
                     Crouton.showText(SettingsAccount.this,
                             "Default account saved.",
                             Theming.croutonStyle(),
                             (ViewGroup) buttonView.getParent().getParent());
                 } else {
-                    settings.edit().putString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT).commit();
-                    settings.edit().putLong("notifsLastPost", 0).commit();
+                    settings.edit().putString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT).apply();
+                    settings.edit().putLong("notifsLastPost", 0).apply();
                     Crouton.showText(SettingsAccount.this,
                             "Default account removed.",
                             Theming.croutonStyle(),
@@ -272,10 +278,10 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
         deleteAcc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (clickedAccount.getTitle().toString().equals(settings.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT)))
-                    settings.edit().putString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT).commit();
+                if (clickedAccount.getTitle().toString().equals(settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT)))
+                    settings.edit().putString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT).apply();
 
-                settings.edit().remove("customSig" + clickedAccount.getTitle().toString()).commit();
+                settings.edit().remove("customSig" + clickedAccount.getTitle().toString()).apply();
 
                 AccountManager.removeUser(SettingsAccount.this, clickedAccount.getTitle().toString());
                 accounts.removePreference(clickedAccount);
@@ -316,7 +322,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
         b.setNeutralButton("Clear Sig", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                settings.edit().putString("customSig" + clickedAccount.getTitle().toString(), "").commit();
+                settings.edit().putString("customSig" + clickedAccount.getTitle().toString(), "").apply();
                 sigContent.setText("");
                 Crouton.showText(SettingsAccount.this, "Signature cleared and saved.", Theming.croutonStyle());
             }
@@ -342,7 +348,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
                         if (length < 161) {
                             if (lines < 2) {
                                 settings.edit().putString("customSig" + clickedAccount.getTitle().toString(),
-                                        sigContent.getText().toString()).commit();
+                                        sigContent.getText().toString()).apply();
 
                                 Crouton.showText(SettingsAccount.this, "Signature saved.", Theming.croutonStyle());
                                 d.dismiss();

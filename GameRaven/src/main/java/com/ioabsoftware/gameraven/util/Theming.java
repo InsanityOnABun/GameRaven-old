@@ -119,6 +119,9 @@ public final class Theming {
         usingLightTheme = settings.getBoolean("useLightTheme", false);
         textScale = settings.getInt("textScale", 100) / 100f;
 
+        // for now, just set theme manually
+        theme = R.style.MyThemes_DarkPurple;
+
         // Obtain the styled attributes. 'themedContext' is a context with a
         // theme, typically the current Activity (i.e. 'this')
         TypedArray ta = c.obtainStyledAttributes(new int[] {

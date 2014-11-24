@@ -56,9 +56,9 @@ import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
+import com.ioabsoftware.gameraven.prefs.HeaderSettings;
 import com.ioabsoftware.gameraven.prefs.SettingsAccount;
 import com.ioabsoftware.gameraven.prefs.SettingsHighlightedUsers;
-import com.ioabsoftware.gameraven.prefs.TabbedSettings;
 import com.ioabsoftware.gameraven.util.AccountManager;
 import com.ioabsoftware.gameraven.util.DocumentParser;
 import com.ioabsoftware.gameraven.util.Theming;
@@ -279,8 +279,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
 
         AccountManager.init(this);
 
-        MarqueeToolbar toolbar = (MarqueeToolbar) findViewById(R.id.aioToolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar((MarqueeToolbar) findViewById(R.id.aioToolbar));
         ActionBar aBar = getSupportActionBar();
         assert aBar != null : "Action bar is null";
 
@@ -366,7 +365,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
             @Override
             public void onClick(View v) {
                 drawerLayout.closeDrawers();
-                startActivity(new Intent(AllInOneV2.this, TabbedSettings.class));
+                startActivity(new Intent(AllInOneV2.this, HeaderSettings.class));
             }
         });
 
@@ -387,7 +386,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
             PreferenceManager.setDefaultValues(this, R.xml.prefsgeneral, false);
             PreferenceManager.setDefaultValues(this, R.xml.prefstheming, false);
             Editor sEditor = settings.edit();
-            sEditor.putString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT)
+            sEditor.putString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT)
                     .putString("timezone", TimeZone.getDefault().getID())
                     .apply();
         }
@@ -653,7 +652,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                     }
                 }
             }
-            String defaultAccount = settings.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT);
+            String defaultAccount = settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT);
             if (AccountManager.containsUser(this, defaultAccount)) {
                 if (BuildConfig.DEBUG) wtl("starting new session from onResume, logged in");
                 session = new Session(this, defaultAccount, AccountManager.getPassword(this, defaultAccount), initUrl, initDesc);
@@ -1241,7 +1240,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         adapterRows.clear();
 
         boolean isDefaultAcc = Session.getUser() != null &&
-                Session.getUser().equals(settings.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT));
+                Session.getUser().equals(settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT));
 
         if (BuildConfig.DEBUG) wtl("setting board, topic, message id to null");
         boardID = null;

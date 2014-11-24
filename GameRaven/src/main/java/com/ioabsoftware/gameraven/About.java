@@ -14,9 +14,7 @@ import com.ioabsoftware.gameraven.util.Theming;
 public class About extends ActionBarActivity {
 
     public void onCreate(Bundle savedInstanceState) {
-        if (Theming.usingLightTheme()) {
-            setTheme(R.style.MyThemes_LightBase);
-        }
+        setTheme(Theming.theme());
 
         super.onCreate(savedInstanceState);
 

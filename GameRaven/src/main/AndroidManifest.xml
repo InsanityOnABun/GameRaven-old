@@ -71,9 +71,6 @@
             android:finishOnTaskLaunch="true"
             android:launchMode="singleInstance"
             android:theme="@android:style/Theme.Holo.Dialog" />
-        <activity
-            android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
 
         <service
             android:name=".NotifierService"
@@ -87,7 +84,7 @@
         </receiver>
 
         <activity
-            android:name=".prefs.TabbedSettings"
+            android:name=".prefs.HeaderSettings"
             android:configChanges="orientation|screenSize" />
     </application>
 
