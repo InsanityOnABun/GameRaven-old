@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/tvRelativeWrapper"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground">
 
     <View
         android:id="@+id/tvTopSpacer"
@@ -20,10 +21,10 @@
         android:id="@+id/tvTC"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/tvTypeIndicator"
         android:layout_below="@+id/tvTopSpacer"
         android:layout_marginLeft="@dimen/item_padding_horizontal"
         android:layout_toRightOf="@+id/tvTypeIndicator"
-        android:layout_alignBaseline="@+id/tvTypeIndicator"
         android:text="Topic CreatorTC"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textSize="10sp" />
@@ -33,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/tvTC"
-        android:layout_toLeftOf="@+id/tvLastPostLink"
+        android:layout_toLeftOf="@+id/tvLPSep"
         android:text="500 Msgs, Last: 12/12 12:12PM"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textSize="10sp" />
@@ -45,7 +46,7 @@
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@+id/tvTC"
         android:layout_marginLeft="@dimen/item_padding_horizontal"
-        android:layout_toLeftOf="@+id/tvLastPostLink"
+        android:layout_toLeftOf="@+id/tvLPSep"
         android:layout_toRightOf="@+id/tvStopTracking"
         android:ellipsize="end"
         android:gravity="center_vertical"
@@ -54,6 +55,18 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="13sp" />
 
+    <View
+        android:id="@+id/tvLPSep"
+        android:layout_width="1dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/tvBottomSpacer"
+        android:layout_alignTop="@id/tvTopSpacer"
+        android:layout_marginBottom="6dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginTop="6dp"
+        android:layout_toLeftOf="@+id/tvLastPostLink"
+        android:background="#ff545454" />
+
     <TextView
         android:id="@+id/tvLastPostLink"
         android:layout_width="48dp"
@@ -61,7 +74,7 @@
         android:layout_alignBottom="@+id/tvBottomSpacer"
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/tvTopSpacer"
-        android:layout_marginLeft="6dp"
+        android:background="?attr/selectableItemBackground"
         android:gravity="center"
         android:paddingBottom="10dp"
         android:paddingRight="2dp"
@@ -77,12 +90,13 @@
         android:layout_alignBottom="@+id/tvBottomSpacer"
         android:layout_alignParentLeft="true"
         android:layout_alignTop="@+id/tvTopSpacer"
+        android:background="?attr/selectableItemBackground"
         android:layout_marginRight="1dp"
         android:gravity="center"
+        android:lines="2"
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
         android:text="X"
-        android:lines="2"
         android:textColor="?attr/colorText"
         android:textSize="12sp"
         android:visibility="gone" />
@@ -91,8 +105,8 @@
         android:id="@+id/tvTypeIndicator"
         android:layout_width="18dp"
         android:layout_height="18dp"
-        android:layout_alignWithParentIfMissing="true"
         android:layout_alignLeft="@id/tvTitle"
+        android:layout_alignWithParentIfMissing="true"
         android:scaleType="fitStart"
         android:src="@drawable/ic_save_white_18dp" />
 </RelativeLayout>
