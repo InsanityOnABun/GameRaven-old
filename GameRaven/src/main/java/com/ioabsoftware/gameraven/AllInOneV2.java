@@ -2313,6 +2313,11 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                               int pageCount, String nextPageIn, String lastPageIn,
                               String jumperPageIn, NetDesc desc) {
 
+        if (pageCount == 1) {
+            updateHeaderNoJumper(titleIn, desc);
+            return;
+        }
+
         title.setText(titleIn);
 
         if (currPage == -1) {
