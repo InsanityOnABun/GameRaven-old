@@ -43,14 +43,13 @@ public abstract class BaseRowView extends LinearLayout {
     }
 
     private void preRetheme() {
-        myColor = Theming.accentColor();
+        myColor = Theming.colorPrimary();
         myScale = Theming.textScale();
         retheme();
     }
 
     public void beginShowingView(BaseRowData data) {
-        if (Theming.accentColor() != myColor || Theming.textScale() != myScale) {
-            SelectorItemDrawable.rebuildColorFilter();
+        if (Theming.textScale() != myScale) {
             preRetheme();
         }
         showView(data);

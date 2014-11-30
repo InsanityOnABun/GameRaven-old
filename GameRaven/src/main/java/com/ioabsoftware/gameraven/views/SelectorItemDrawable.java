@@ -16,7 +16,7 @@ public class SelectorItemDrawable extends StateListDrawable {
         super();
 
         if (pressedFilter == null)
-            rebuildColorFilter();
+            pressedFilter = new PorterDuffColorFilter(Theming.colorPrimary(), PorterDuff.Mode.SRC_ATOP);
 
         if (!Theming.usingLightTheme())
             addState(new int[]{}, c.getResources().getDrawable(R.drawable.item_background));
@@ -39,9 +39,5 @@ public class SelectorItemDrawable extends StateListDrawable {
             clearColorFilter();
 
         return super.onStateChange(states);
-    }
-
-    public static void rebuildColorFilter() {
-        pressedFilter = new PorterDuffColorFilter(Theming.accentColor(), PorterDuff.Mode.SRC_ATOP);
     }
 }
