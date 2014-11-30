@@ -31,12 +31,12 @@
             android:orientation="vertical">
 
             <Button
-                android:background="?attr/selectableItemBackground"
                 android:id="@+id/aioFirstPage"
                 style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
+                android:background="?attr/selectableItemBackground"
                 android:enabled="false"
                 android:minHeight="32dp"
                 android:minWidth="54dp"
@@ -46,7 +46,6 @@
                 android:textColor="?attr/colorPageJumper" />
 
             <Button
-                android:background="?attr/selectableItemBackground"
                 android:id="@+id/aioPreviousPage"
                 style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="wrap_content"
@@ -54,13 +53,13 @@
                 android:layout_alignBottom="@+id/aioFirstPage"
                 android:layout_alignTop="@+id/aioFirstPage"
                 android:layout_toRightOf="@+id/aioFirstPage"
+                android:background="?attr/selectableItemBackground"
                 android:enabled="false"
                 android:minWidth="54dp"
                 android:text="@string/prevpage"
                 android:textColor="?attr/colorPageJumper" />
 
             <Button
-                android:background="?attr/selectableItemBackground"
                 android:id="@+id/aioLastPage"
                 style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="wrap_content"
@@ -68,13 +67,13 @@
                 android:layout_alignBottom="@+id/aioFirstPage"
                 android:layout_alignParentRight="true"
                 android:layout_alignTop="@+id/aioFirstPage"
+                android:background="?attr/selectableItemBackground"
                 android:enabled="false"
                 android:minWidth="54dp"
                 android:text="@string/lastpage"
                 android:textColor="?attr/colorPageJumper" />
 
             <Button
-                android:background="?attr/selectableItemBackground"
                 android:id="@+id/aioNextPage"
                 style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="wrap_content"
@@ -82,13 +81,13 @@
                 android:layout_alignBottom="@+id/aioFirstPage"
                 android:layout_alignTop="@+id/aioFirstPage"
                 android:layout_toLeftOf="@+id/aioLastPage"
+                android:background="?attr/selectableItemBackground"
                 android:enabled="false"
                 android:minWidth="54dp"
                 android:text="@string/nextpage"
                 android:textColor="?attr/colorPageJumper" />
 
             <Button
-                android:background="?attr/selectableItemBackground"
                 android:id="@+id/aioPageLabel"
                 style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="wrap_content"
@@ -97,6 +96,7 @@
                 android:layout_alignTop="@+id/aioFirstPage"
                 android:layout_toLeftOf="@+id/aioNextPage"
                 android:layout_toRightOf="@+id/aioPreviousPage"
+                android:background="?attr/selectableItemBackground"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="?attr/colorPageJumper"
                 tools:ignore="RelativeOverlap" />
@@ -237,11 +237,11 @@
                             android:orientation="vertical">
 
                             <Button
-                                android:background="?attr/selectableItemBackground"
                                 android:id="@+id/aioBold"
                                 style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:background="?attr/selectableItemBackground"
                                 android:onClick="htmlButtonClicked"
                                 android:text="@string/boldtag"
                                 android:textSize="14sp"
@@ -255,11 +255,11 @@
                                 android:visibility="visible" />
 
                             <Button
-                                android:background="?attr/selectableItemBackground"
                                 android:id="@+id/aioItalic"
                                 style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:background="?attr/selectableItemBackground"
                                 android:onClick="htmlButtonClicked"
                                 android:text="@string/italictag"
                                 android:textSize="14sp"
@@ -273,11 +273,11 @@
                                 android:visibility="visible" />
 
                             <Button
-                                android:background="?attr/selectableItemBackground"
                                 android:id="@+id/aioCode"
                                 style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:background="?attr/selectableItemBackground"
                                 android:onClick="htmlButtonClicked"
                                 android:text="@string/codetag"
                                 android:textSize="14sp"
@@ -291,11 +291,11 @@
                                 android:visibility="visible" />
 
                             <Button
-                                android:background="?attr/selectableItemBackground"
                                 android:id="@+id/aioSpoiler"
                                 style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:background="?attr/selectableItemBackground"
                                 android:onClick="htmlButtonClicked"
                                 android:text="@string/spoilertag"
                                 android:textSize="14sp" />
@@ -308,11 +308,11 @@
                                 android:visibility="visible" />
 
                             <Button
-                                android:background="?attr/selectableItemBackground"
                                 android:id="@+id/aioCite"
                                 style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:background="?attr/selectableItemBackground"
                                 android:onClick="htmlButtonClicked"
                                 android:text="@string/citetag"
                                 android:textSize="14sp" />
@@ -325,11 +325,11 @@
                                 android:visibility="visible" />
 
                             <Button
-                                android:background="?attr/selectableItemBackground"
                                 android:id="@+id/aioQuote"
                                 style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:background="?attr/selectableItemBackground"
                                 android:onClick="htmlButtonClicked"
                                 android:text="@string/quotetag"
                                 android:textSize="14sp" />
@@ -371,12 +371,12 @@
                 android:layout_height="wrap_content">
 
                 <Button
-                    android:background="?attr/selectableItemBackground"
                     android:id="@+id/aioPostCancel"
                     style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight=".5"
+                    android:background="?attr/selectableItemBackground"
                     android:onClick="postCancel"
                     android:text="@string/cancel" />
 
@@ -388,12 +388,12 @@
                     android:visibility="gone" />
 
                 <Button
-                    android:background="?attr/selectableItemBackground"
                     android:id="@+id/aioPollOptions"
                     style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight=".5"
+                    android:background="?attr/selectableItemBackground"
                     android:onClick="postPollOptions"
                     android:text="@string/poll"
                     android:visibility="gone" />
@@ -406,12 +406,12 @@
                     android:visibility="visible" />
 
                 <Button
-                    android:background="?attr/selectableItemBackground"
                     android:id="@+id/aioPostDo"
                     style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight=".5"
+                    android:background="?attr/selectableItemBackground"
                     android:onClick="postDo"
                     android:text="@string/post" />
             </LinearLayout>
@@ -438,6 +438,7 @@
         android:layout_width="320dp"
         android:layout_height="match_parent"
         android:layout_gravity="left"
+        android:layout_marginTop="?attr/actionBarSize"
         android:background="?attr/colorBackground"
         android:fadeScrollbars="false"
         android:scrollbarStyle="outsideOverlay"
