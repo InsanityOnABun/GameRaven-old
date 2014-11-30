@@ -13,7 +13,7 @@ dependencies {
     compile 'com.intellij:annotations:+@jar'
     compile 'com.github.codechimp-org.apprater:library:1.0.+'
     compile 'com.koushikdutta.ion:ion:2.+'
-    compile 'com.shamanland:fab:0.0.5'
+    compile 'com.shamanland:fab:0.0.6'
     compile('de.keyboardsurfer.android.widget:crouton:1.8.5@aar') {
         // exclusion is not neccessary, but generally a good idea.
         exclude group: 'com.google.android', module: 'support-v4'
@@ -26,6 +26,10 @@ android {
     compileSdkVersion 21
     buildToolsVersion "21.1.1"
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 19
