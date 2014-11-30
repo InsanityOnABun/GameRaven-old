@@ -22,6 +22,7 @@ public class About extends ActionBarActivity {
 
         Theming.colorOverscroll(this);
 
+        setSupportActionBar((android.support.v7.widget.Toolbar) findViewById(R.id.abtToolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         try {
