@@ -267,9 +267,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         themingInstance = new Theming();
         Theming.init(this, settings);
 
-        if (Theming.usingLightTheme()) {
-            setTheme(R.style.MyThemes_LightBase);
-        }
+        setTheme(Theming.theme());
 
         super.onCreate(savedInstanceState);
 

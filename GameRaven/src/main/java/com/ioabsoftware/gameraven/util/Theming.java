@@ -119,8 +119,39 @@ public final class Theming {
         usingLightTheme = settings.getBoolean("useLightTheme", false);
         textScale = settings.getInt("textScale", 100) / 100f;
 
-        // for now, just set theme manually
-        theme = R.style.MyThemes_DarkPurple;
+        String themePref = settings.getString("gfTheme", "Light Blue");
+        switch (themePref) {
+            case "Light Blue":
+                theme = R.style.MyThemes_LightBlue;
+                break;
+            case "Dark Blue":
+                theme = R.style.MyThemes_DarkBlue;
+                break;
+            case "Light Red":
+                theme = R.style.MyThemes_LightRed;
+                break;
+            case "Dark Red":
+                theme = R.style.MyThemes_DarkRed;
+                break;
+            case "Light Green":
+                theme = R.style.MyThemes_LightGreen;
+                break;
+            case "Dark Green":
+                theme = R.style.MyThemes_DarkGreen;
+                break;
+            case "Light Orange":
+                theme = R.style.MyThemes_LightOrange;
+                break;
+            case "Dark Orange":
+                theme = R.style.MyThemes_DarkOrange;
+                break;
+            case "Light Purple":
+                theme = R.style.MyThemes_LightPurple;
+                break;
+            case "Dark Purple":
+                theme = R.style.MyThemes_DarkPurple;
+                break;
+        }
 
         // Obtain the styled attributes. 'themedContext' is a context with a
         // theme, typically the current Activity (i.e. 'this')
