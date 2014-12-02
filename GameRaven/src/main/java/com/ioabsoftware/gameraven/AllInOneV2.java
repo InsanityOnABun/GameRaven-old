@@ -394,7 +394,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.ptr_layout);
         swipeRefreshLayout.setEnabled(false);
         swipeRefreshLayout.setColorSchemeColors(Theming.colorPrimary(), Theming.colorPrimaryDark());
-        swipeRefreshLayout.setProgressBackgroundColor(Theming.colorBackgroundInverseResource());
         swipeRefreshLayout.setOnRefreshListener(this);
 
         contentList = (ListView) findViewById(R.id.aioMainList);

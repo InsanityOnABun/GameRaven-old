@@ -2,10 +2,8 @@ package com.ioabsoftware.gameraven.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -58,46 +56,22 @@ public final class Theming {
         return colorAccent;
     }
 
-    private static boolean usingLightTheme;
+    private static int colorReadTopic;
 
-    public static boolean usingLightTheme() {
-        return usingLightTheme;
+    public static int colorReadTopic() {
+        return colorReadTopic;
     }
 
-    private static int accentColor;
+    private static int colorHiddenSpoiler;
 
-    public static int accentColor() {
-        return accentColor;
+    public static int colorHiddenSpoiler() {
+        return colorHiddenSpoiler;
     }
 
-    private static int moddedAccentColor;
+    private static int colorRevealedSpoiler;
 
-    public static int moddedAccentColor() {
-        return moddedAccentColor;
-    }
-
-    private static int accentTextColor;
-
-    public static int accentTextColor() {
-        return accentTextColor;
-    }
-
-    private static ColorStateList rippleStateList;
-
-    public static ColorStateList rippleStateList() {
-        return rippleStateList;
-    }
-
-    private static boolean useWhiteAccentText;
-
-    public static boolean useWhiteAccentText() {
-        return useWhiteAccentText;
-    }
-
-    private static boolean isAccentLight;
-
-    public static boolean isAccentLight() {
-        return isAccentLight;
+    public static int colorRevealedSpoiler() {
+        return colorRevealedSpoiler;
     }
 
     private static float textScale = 1f;
@@ -110,6 +84,12 @@ public final class Theming {
 
     public static Style croutonStyle() {
         return croutonStyle;
+    }
+
+    private static Drawable[] topicStatusIcons = new Drawable[4];
+
+    public static Drawable[] topicStatusIcons() {
+        return topicStatusIcons;
     }
 
     private static Configuration croutonShort = new Configuration.Builder().setDuration(2500).build();
@@ -152,7 +132,6 @@ public final class Theming {
 
     public static void init(Context c, SharedPreferences settings) {
         Resources resources = c.getResources();
-        usingLightTheme = settings.getBoolean("useLightTheme", false);
         textScale = settings.getInt("textScale", 100) / 100f;
 
         // Obtain the styled attributes. 'themedContext' is a context with a
@@ -162,7 +141,14 @@ public final class Theming {
                 R.attr.colorBackgroundInverse,
                 R.attr.colorPrimary,
                 R.attr.colorPrimaryDark,
-                R.attr.colorAccent
+                R.attr.colorAccent,
+                R.attr.hiddenSpoilerColor,
+                R.attr.revealedSpoilerColor,
+                R.attr.themedPollTopicIcon,
+                R.attr.themedLockedTopicIcon,
+                R.attr.themedArchivedTopicIcon,
+                R.attr.themedPinnedTopicIcon,
+                R.attr.readTopic
         });
 
         // Get the individual values
@@ -171,26 +157,16 @@ public final class Theming {
         colorPrimary = ta.getColor(2, resources.getColor(R.color.gf_blue_dark));
         colorPrimaryDark = ta.getColor(3, resources.getColor(R.color.gf_blue_dark_secondary));
         colorAccent = ta.getColor(4, resources.getColor(R.color.gf_blue_dark_accent));
+        colorHiddenSpoiler = ta.getColor(5, resources.getColor(R.color.white));
+        colorRevealedSpoiler = ta.getColor(6, resources.getColor(R.color.black));
+        topicStatusIcons[0] = ta.getDrawable(7);
+        topicStatusIcons[1] = ta.getDrawable(8);
+        topicStatusIcons[2] = ta.getDrawable(9);
+        topicStatusIcons[3] = ta.getDrawable(10);
+        colorReadTopic = ta.getColor(11, resources.getColor(R.color.read_topic));
 
         // Finally, free the resources used by TypedArray
         ta.recycle();
-
-        int[][] states = new int[][] {
-                new int[] {android.R.attr.state_focused, -android.R.attr.state_pressed},
-                new int[] {-android.R.attr.state_focused, android.R.attr.state_pressed},
-                new int[] {android.R.attr.state_focused, android.R.attr.state_pressed},
-                new int[] {}
-        };
-
-        int[] colors = new int[] {
-                colorPrimaryDark,
-                colorPrimary,
-                colorPrimary,
-                colorBackground
-        };
-
-        rippleStateList = new ColorStateList(states, colors);
-        updateAccentColor(colorPrimaryDark, true);
     }
 
     public static void setTextSizeBases(float dwrHeader, float dwrButton, float pjButton, float pjLabel) {
@@ -222,45 +198,6 @@ public final class Theming {
     public static boolean updateTextScale(float newScale) {
         if (textScale != newScale) {
             textScale = newScale;
-            return true;
-        } else
-            return false;
-    }
-
-    /**
-     * returns true if new color is different from old color
-     */
-    public static boolean updateAccentColor(int newAccentColor, boolean newUseWhiteAccentText) {
-        if (accentColor != newAccentColor || useWhiteAccentText != newUseWhiteAccentText) {
-            accentColor = newAccentColor;
-            useWhiteAccentText = newUseWhiteAccentText;
-
-            float[] hsv = new float[3];
-            Color.colorToHSV(accentColor, hsv);
-            if (useWhiteAccentText) {
-                // color is probably dark
-                if (hsv[2] > 0)
-                    hsv[2] *= 1.2f;
-                else
-                    hsv[2] = 0.2f;
-
-                accentTextColor = Color.WHITE;
-                isAccentLight = false;
-            } else {
-                // color is probably bright
-                hsv[2] *= 0.8f;
-                accentTextColor = Color.BLACK;
-                isAccentLight = true;
-            }
-
-            moddedAccentColor = Color.HSVToColor(hsv);
-
-            croutonStyle = new Style.Builder()
-                    .setBackgroundColorValue(accentColor)
-                    .setTextColorValue(accentTextColor)
-                    .setConfiguration(croutonShort)
-                    .build();
-
             return true;
         } else
             return false;

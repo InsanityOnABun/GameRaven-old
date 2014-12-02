@@ -15,7 +15,6 @@ import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
-import com.ioabsoftware.gameraven.views.SelectorItemDrawable;
 import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 
 public class TrackedTopicRowView extends BaseRowView {
@@ -93,7 +92,6 @@ public class TrackedTopicRowView extends BaseRowView {
             }
         });
 
-        lpLink.setBackgroundDrawable(new SelectorItemDrawable(context));
         lpLink.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,7 +100,6 @@ public class TrackedTopicRowView extends BaseRowView {
             }
         });
 
-        removeLink.setBackgroundDrawable(new SelectorItemDrawable(context));
         removeLink.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,14 +125,11 @@ public class TrackedTopicRowView extends BaseRowView {
         myData = (TrackedTopicRowData) data;
 
         if (myData.getStatus() == ReadStatus.READ) {
-            int readColor = Theming.usingLightTheme() ?
-                    getResources().getColor(R.color.read_topic_light) :
-                    getResources().getColor(R.color.read_topic);
-            board.setTextColor(readColor);
-            title.setTextColor(readColor);
-            msgLP.setTextColor(readColor);
-            lpLink.setTextColor(readColor);
-            removeLink.setTextColor(readColor);
+            board.setTextColor(Theming.colorReadTopic());
+            title.setTextColor(Theming.colorReadTopic());
+            msgLP.setTextColor(Theming.colorReadTopic());
+            lpLink.setTextColor(Theming.colorReadTopic());
+            removeLink.setTextColor(Theming.colorReadTopic());
         } else {
             board.setTextColor(defaultBoardColor);
             title.setTextColor(defaultTitleColor);

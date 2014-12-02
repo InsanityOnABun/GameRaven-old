@@ -4,8 +4,12 @@
     <declare-styleable name="customAttrs">
         <attr name="colorBackground" format="color" />
         <attr name="colorBackgroundInverse" format="reference" />
-        <attr name="colorText" format="color" />
         <attr name="colorDrawerHeader" format="color" />
+
+        <attr name="readTopic" format="color" />
+        <attr name="hiddenSpoilerColor" format="color" />
+        <attr name="revealedSpoilerColor" format="color" />
+
         <attr name="themedSearchIcon" format="reference" />
         <attr name="themedAddFavIcon" format="reference" />
         <attr name="themedRemFavIcon" format="reference" />
@@ -18,6 +22,11 @@
         <attr name="themedReplyIcon" format="reference" />
         <attr name="themedRefreshIcon" format="reference" />
         <attr name="themedPostInfoIcon" format="reference" />
+
+        <attr name="themedPollTopicIcon" format="reference" />
+        <attr name="themedLockedTopicIcon" format="reference" />
+        <attr name="themedArchivedTopicIcon" format="reference" />
+        <attr name="themedPinnedTopicIcon" format="reference" />
     </declare-styleable>
 
 </resources>

@@ -25,7 +25,7 @@ public class SpoilerBackgroundSpan extends BackgroundColorSpan {
 
     public void reveal() {
         backColor = revealedColor;
-        linkColor = Theming.accentColor();
+        linkColor = Theming.colorPrimary();
         updateDrawState(textPaint);
     }
 

@@ -13,7 +13,7 @@ public class GRQuoteSpan extends QuoteSpan {
 
     private static final int WIDTH = 4;
     private static final int GAP = 6;
-    private final int COLOR = Theming.accentColor();
+    private final int COLOR = Theming.colorPrimary();
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(COLOR);

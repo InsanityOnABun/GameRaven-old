@@ -54,10 +54,10 @@
     <color name="black">#000000</color>
 
     <color name="transparent">#00000000</color>
-    <color name="nearlytransparent">#01000000</color>
+    <color name="nearly_transparent">#01000000</color>
 
-    <color name="drawerHeader">#999999</color>
-    <color name="drawerHeaderLight">#555555</color>
+    <color name="drawer_header">#999999</color>
+    <color name="drawer_header_light">#555555</color>
 
     <color name="read_topic">#666666</color>
     <color name="read_topic_light">#aaaaaa</color>

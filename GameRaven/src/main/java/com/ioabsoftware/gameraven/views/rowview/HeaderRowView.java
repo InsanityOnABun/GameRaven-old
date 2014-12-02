@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.R;
-import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
@@ -43,7 +42,7 @@ public class HeaderRowView extends BaseRowView {
     @Override
     protected void retheme() {
         tView.setTextSize(PX, tSize * myScale);
-        tView.setTextColor(Theming.accentTextColor());
+//        tView.setTextColor(Theming.accentTextColor());
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.ioabsoftware.gameraven.views.rowview;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -110,13 +111,10 @@ public class TopicRowView extends BaseRowView {
 
         int hlColor = myData.getHLColor();
         if (myData.getStatus() == ReadStatus.READ) {
-            int readColor = Theming.usingLightTheme() ?
-                    getResources().getColor(R.color.read_topic_light) :
-                    getResources().getColor(R.color.read_topic);
-            tc.setTextColor(readColor);
-            title.setTextColor(readColor);
-            msgLP.setTextColor(readColor);
-            lpLink.setTextColor(readColor);
+            tc.setTextColor(Theming.colorReadTopic());
+            title.setTextColor(Theming.colorReadTopic());
+            msgLP.setTextColor(Theming.colorReadTopic());
+            lpLink.setTextColor(Theming.colorReadTopic());
         } else if (hlColor != 0) {
             tc.setTextColor(hlColor);
             title.setTextColor(hlColor);
@@ -151,22 +149,22 @@ public class TopicRowView extends BaseRowView {
                 typeIndicator.setVisibility(View.GONE);
                 break;
             case POLL:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_poll_grey600_18dp : R.drawable.ic_poll_white_18dp);
+                setTypeIndicator(Theming.topicStatusIcons()[0]);
                 break;
             case LOCKED:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_lock_grey600_18dp : R.drawable.ic_lock_white_18dp);
+                setTypeIndicator(Theming.topicStatusIcons()[1]);
                 break;
             case ARCHIVED:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_save_grey600_18dp : R.drawable.ic_save_white_18dp);
+                setTypeIndicator(Theming.topicStatusIcons()[2]);
                 break;
             case PINNED:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_whatshot_grey600_18dp : R.drawable.ic_whatshot_white_18dp);
+                setTypeIndicator(Theming.topicStatusIcons()[3]);
                 break;
         }
     }
 
-    private void setTypeIndicator(int resId) {
-        typeIndicator.setImageResource(resId);
+    private void setTypeIndicator(Drawable icon) {
+        typeIndicator.setImageDrawable(icon);
         typeIndicator.setVisibility(View.VISIBLE);
     }
 }

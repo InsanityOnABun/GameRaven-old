@@ -2,6 +2,6 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <solid android:color="@color/nearlytransparent" />
+    <solid android:color="@color/nearly_transparent" />
 
 </shape>

@@ -3,9 +3,12 @@
     <style name="MyThemes.DarkBase" parent="Theme.AppCompat.NoActionBar">
         <item name="colorBackground">@color/gf_background_dark</item>
         <item name="colorBackgroundInverse">@color/gf_background_light</item>
-        <item name="colorText">@color/white</item>
-        <item name="colorDrawerHeader">@color/drawerHeader</item>
-        
+        <item name="colorDrawerHeader">@color/drawer_header</item>
+
+        <item name="readTopic">@color/read_topic</item>
+        <item name="hiddenSpoilerColor">@color/white</item>
+        <item name="revealedSpoilerColor">@color/black</item>
+
         <item name="themedSearchIcon">@drawable/ic_search_white_36dp</item>
         <item name="themedAddFavIcon">@drawable/ic_favorite_outline_white_36dp</item>
         <item name="themedRemFavIcon">@drawable/ic_favorite_white_36dp</item>
@@ -19,14 +22,22 @@
         <item name="themedRefreshIcon">@drawable/ic_refresh_white_36dp</item>
         <item name="themedPostInfoIcon">@drawable/ic_more_horiz_white_36dp</item>
 
+        <item name="themedPollTopicIcon">@drawable/ic_poll_white_18dp</item>
+        <item name="themedLockedTopicIcon">@drawable/ic_lock_white_18dp</item>
+        <item name="themedArchivedTopicIcon">@drawable/ic_save_white_18dp</item>
+        <item name="themedPinnedTopicIcon">@drawable/ic_whatshot_white_18dp</item>
+
         <item name="windowActionModeOverlay">true</item>
     </style>
 
     <style name="MyThemes.LightBase" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorBackground">@color/gf_background_light</item>
         <item name="colorBackgroundInverse">@color/gf_background_dark</item>
-        <item name="colorText">@color/black</item>
-        <item name="colorDrawerHeader">@color/drawerHeaderLight</item>
+        <item name="colorDrawerHeader">@color/drawer_header_light</item>
+
+        <item name="readTopic">@color/read_topic_light</item>
+        <item name="hiddenSpoilerColor">@color/black</item>
+        <item name="revealedSpoilerColor">@color/white</item>
 
         <item name="themedSearchIcon">@drawable/ic_search_black_36dp</item>
         <item name="themedAddFavIcon">@drawable/ic_favorite_outline_black_36dp</item>
@@ -40,6 +51,11 @@
         <item name="themedReplyIcon">@drawable/ic_reply_black_36dp</item>
         <item name="themedRefreshIcon">@drawable/ic_refresh_black_36dp</item>
         <item name="themedPostInfoIcon">@drawable/ic_more_horiz_black_36dp</item>
+
+        <item name="themedPollTopicIcon">@drawable/ic_poll_grey600_18dp</item>
+        <item name="themedLockedTopicIcon">@drawable/ic_lock_grey600_18dp</item>
+        <item name="themedArchivedTopicIcon">@drawable/ic_save_grey600_18dp</item>
+        <item name="themedPinnedTopicIcon">@drawable/ic_whatshot_grey600_18dp</item>
 
         <item name="windowActionModeOverlay">true</item>
     </style>

@@ -94,8 +94,8 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 
         message.setLinkTextColor(Theming.colorAccent());
 
-        post.setTextColor(Theming.accentTextColor());
-        user.setTextColor(Theming.accentTextColor());
+//        post.setTextColor(Theming.accentTextColor());
+//        user.setTextColor(Theming.accentTextColor());
     }
 
     @Override

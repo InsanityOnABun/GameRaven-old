@@ -80,7 +80,6 @@
         android:paddingRight="2dp"
         android:paddingTop="10dp"
         android:text="@string/last_post"
-        android:textColor="?attr/colorText"
         android:textSize="12sp" />
 
     <TextView
@@ -97,7 +96,6 @@
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
         android:text="X"
-        android:textColor="?attr/colorText"
         android:textSize="12sp"
         android:visibility="gone" />
 
