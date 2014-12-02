@@ -239,17 +239,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 
             float[] hsv = new float[3];
             Color.colorToHSV(myColor, hsv);
-            if (Theming.useWhiteAccentText()) {
-                // color is probably dark
-                if (hsv[2] > 0)
-                    hsv[2] *= 1.2f;
-                else
-                    hsv[2] = 0.2f;
-            } else {
-                // color is probably bright
-                hsv[2] *= 0.8f;
-            }
-
+            hsv[2] *= 0.8f;
             myClickedColor = Color.HSVToColor(hsv);
 
             onStateChange(getState());
@@ -258,6 +248,8 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
         public void clearHighlightColor() {
             myColor = Theming.colorPrimary();
             myClickedColor = Theming.colorPrimaryDark();
+
+            onStateChange(getState());
         }
 
         @Override
@@ -272,10 +264,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
             if (isClicked) {
                 super.setColorFilter(myClickedColor, PorterDuff.Mode.SRC);
             } else {
-                if (myColor == Color.TRANSPARENT)
-                    super.clearColorFilter();
-                else
-                    super.setColorFilter(myColor, PorterDuff.Mode.SRC);
+                super.setColorFilter(myColor, PorterDuff.Mode.SRC);
             }
 
             return super.onStateChange(states);
