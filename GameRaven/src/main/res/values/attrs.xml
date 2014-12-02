@@ -6,7 +6,6 @@
         <attr name="colorBackgroundInverse" format="reference" />
         <attr name="colorText" format="color" />
         <attr name="colorDrawerHeader" format="color" />
-        <attr name="colorPageJumper" format="color" />
         <attr name="themedSearchIcon" format="reference" />
         <attr name="themedAddFavIcon" format="reference" />
         <attr name="themedRemFavIcon" format="reference" />

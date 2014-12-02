@@ -43,7 +43,7 @@
                 android:paddingBottom="@dimen/item_padding_vertical"
                 android:paddingTop="@dimen/item_padding_vertical"
                 android:text="@string/firstpage"
-                android:textColor="?attr/colorPageJumper" />
+                android:textColor="@color/page_jumper_button_colors" />
 
             <Button
                 android:id="@+id/aioPreviousPage"
@@ -57,7 +57,7 @@
                 android:enabled="false"
                 android:minWidth="54dp"
                 android:text="@string/prevpage"
-                android:textColor="?attr/colorPageJumper" />
+                android:textColor="@color/page_jumper_button_colors" />
 
             <Button
                 android:id="@+id/aioLastPage"
@@ -71,7 +71,7 @@
                 android:enabled="false"
                 android:minWidth="54dp"
                 android:text="@string/lastpage"
-                android:textColor="?attr/colorPageJumper" />
+                android:textColor="@color/page_jumper_button_colors" />
 
             <Button
                 android:id="@+id/aioNextPage"
@@ -85,7 +85,7 @@
                 android:enabled="false"
                 android:minWidth="54dp"
                 android:text="@string/nextpage"
-                android:textColor="?attr/colorPageJumper" />
+                android:textColor="@color/page_jumper_button_colors" />
 
             <Button
                 android:id="@+id/aioPageLabel"
@@ -98,7 +98,7 @@
                 android:layout_toRightOf="@+id/aioPreviousPage"
                 android:background="?attr/selectableItemBackground"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="?attr/colorPageJumper"
+                android:textColor="@color/page_jumper_button_colors"
                 tools:ignore="RelativeOverlap" />
         </RelativeLayout>
 

@@ -5,7 +5,6 @@
         <item name="colorBackgroundInverse">@color/gf_background_light</item>
         <item name="colorText">@color/white</item>
         <item name="colorDrawerHeader">@color/drawerHeader</item>
-        <item name="colorPageJumper">@color/buttoncolors</item>
         <item name="themedSearchIcon">@drawable/ic_search_white_36dp</item>
         <item name="themedAddFavIcon">@drawable/ic_favorite_outline_white_36dp</item>
         <item name="themedRemFavIcon">@drawable/ic_favorite_white_36dp</item>
@@ -25,7 +24,6 @@
         <item name="colorBackgroundInverse">@color/gf_background_dark</item>
         <item name="colorText">@color/black</item>
         <item name="colorDrawerHeader">@color/drawerHeaderLight</item>
-        <item name="colorPageJumper">@color/buttoncolors_light</item>
         <item name="themedSearchIcon">@drawable/ic_search_black_36dp</item>
         <item name="themedAddFavIcon">@drawable/ic_favorite_outline_black_36dp</item>
         <item name="themedRemFavIcon">@drawable/ic_favorite_black_36dp</item>
