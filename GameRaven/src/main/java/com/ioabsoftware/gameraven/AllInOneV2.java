@@ -264,10 +264,12 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         settings = PreferenceManager.getDefaultSharedPreferences(this);
 
         // get an instance of Theming to ensure values don't get GC'd
+        // Will they get GC'd? I have no idea. Better safe than sorry.
         themingInstance = new Theming();
-        Theming.init(this, settings);
 
+        Theming.preInit(settings);
         setTheme(Theming.theme());
+        Theming.init(this, settings);
 
         super.onCreate(savedInstanceState);
 

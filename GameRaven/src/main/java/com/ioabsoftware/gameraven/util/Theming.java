@@ -114,11 +114,7 @@ public final class Theming {
 
     private static Configuration croutonShort = new Configuration.Builder().setDuration(2500).build();
 
-    public static void init(Context c, SharedPreferences settings) {
-        Resources resources = c.getResources();
-        usingLightTheme = settings.getBoolean("useLightTheme", false);
-        textScale = settings.getInt("textScale", 100) / 100f;
-
+    public static void preInit(SharedPreferences settings) {
         String themePref = settings.getString("gfTheme", "Light Blue");
         switch (themePref) {
             case "Light Blue":
@@ -152,6 +148,12 @@ public final class Theming {
                 theme = R.style.MyThemes_DarkPurple;
                 break;
         }
+    }
+
+    public static void init(Context c, SharedPreferences settings) {
+        Resources resources = c.getResources();
+        usingLightTheme = settings.getBoolean("useLightTheme", false);
+        textScale = settings.getInt("textScale", 100) / 100f;
 
         // Obtain the styled attributes. 'themedContext' is a context with a
         // theme, typically the current Activity (i.e. 'this')
