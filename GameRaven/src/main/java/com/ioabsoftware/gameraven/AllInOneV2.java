@@ -11,6 +11,7 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -48,6 +49,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -81,6 +83,8 @@ import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.listeners.EventListener;
 import com.shamanland.fab.FloatingActionButton;
 
 import org.acra.ACRA;
@@ -96,7 +100,6 @@ import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -3055,17 +3058,22 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
     }
 
     public void tryCaught(String url, String desc, Throwable e, String source) {
-        ACRAConfiguration config = ACRA.getConfig();
-        config.setResToastText(R.string.bug_toast_text);
+        if (!BuildConfig.DEBUG) {
+            ACRAConfiguration config = ACRA.getConfig();
+            config.setResToastText(R.string.bug_toast_text);
 
-        ACRA.getErrorReporter().putCustomData("URL", url);
-        ACRA.getErrorReporter().putCustomData("NetDesc", desc);
-        ACRA.getErrorReporter().putCustomData("Page Source", StringEscapeUtils.escapeJava(source));
-        ACRA.getErrorReporter().putCustomData("Last Attempted Path", session.getLastAttemptedPath());
-        ACRA.getErrorReporter().putCustomData("Last Attempted Desc", session.getLastAttemptedDesc().toString());
-        ACRA.getErrorReporter().handleException(e);
+            ACRA.getErrorReporter().putCustomData("URL", url);
+            ACRA.getErrorReporter().putCustomData("NetDesc", desc);
+            ACRA.getErrorReporter().putCustomData("Page Source", StringEscapeUtils.escapeJava(source));
+            ACRA.getErrorReporter().putCustomData("Last Attempted Path", session.getLastAttemptedPath());
+            ACRA.getErrorReporter().putCustomData("Last Attempted Desc", session.getLastAttemptedDesc().toString());
+            ACRA.getErrorReporter().handleException(e);
 
-        config.setResToastText(R.string.crash_toast_text);
+            config.setResToastText(R.string.crash_toast_text);
+        }
+        else {
+            Log.e("tryCaught", "", e);
+        }
     }
 
     private String parseBoardID(String url) {
@@ -3194,31 +3202,32 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         postBody.getText().replace(Math.min(start, end), Math.max(start, end), insert, 0, insert.length());
     }
 
-    private boolean marqueeSpeedSet = false;
-
-    private void setMarqueeSpeed(TextView tv, float speed, boolean speedIsMultiplier) {
-        if (!marqueeSpeedSet) {
-            try {
-                Field f = tv.getClass().getDeclaredField("mMarquee");
-                f.setAccessible(true);
-                Object marquee = f.get(tv);
-                if (marquee != null) {
-                    Field mf = marquee.getClass().getDeclaredField("mScrollUnit");
-                    mf.setAccessible(true);
-                    float newSpeed = speed;
-                    float curSpeed = mf.getFloat(marquee);
-                    if (speedIsMultiplier) {
-                        newSpeed = curSpeed * speed;
-                    }
-                    mf.setFloat(marquee, newSpeed);
-                    if (BuildConfig.DEBUG)
-                        wtl("marquee speed set to " + newSpeed + ", from " + curSpeed);
-                    marqueeSpeedSet = true;
-                }
-            } catch (Exception e) {
-                // ignore, not implemented in current API level
-            }
+    private Snackbar sb;
+    public void showSnackbar(String msg) {
+        if (sb == null) {
+            sb = Snackbar.with(getApplicationContext())
+                    .eventListener(new EventListener() {
+                        @Override
+                        public void onShow(int height) {
+                            RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams)fab.getLayoutParams();
+                            p.bottomMargin += Theming.convertDPtoPX(AllInOneV2.this, 48); // in PX
+                            fab.setLayoutParams(p);
+                        }
+                        @Override
+                        public void onDismiss(int height) {
+                            RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams)fab.getLayoutParams();
+                            p.bottomMargin -= Theming.convertDPtoPX(AllInOneV2.this, 48); // in PX
+                            fab.setLayoutParams(p);
+                        }
+                    })
+                    .duration(Snackbar.SnackbarDuration.LENGTH_SHORT)
+                    .attachToAbsListView(contentList)
+                    .color(Theming.colorPrimary())
+                    .textColor(Color.WHITE);
         }
+
+        sb.text(msg);
+        sb.show(this);
     }
 
     private static final String[] bannedList = {
