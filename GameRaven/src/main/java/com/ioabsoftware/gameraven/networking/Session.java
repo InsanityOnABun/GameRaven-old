@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.util.Log;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.EditText;
@@ -257,8 +256,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         // clear out cookies
         Ion.getDefault(aio).getCookieMiddleware().clear();
 
-        if (BuildConfig.DEBUG)
-            Ion.getDefault(aio).configure().setLogging("IonLogs", Log.VERBOSE);
+//        if (BuildConfig.DEBUG)
+//            Ion.getDefault(aio).configure().setLogging("IonLogs", Log.VERBOSE);
 
         if (user == null) {
             if (BuildConfig.DEBUG) AllInOneV2.wtl("session constructor, user is null, starting logged out session");
