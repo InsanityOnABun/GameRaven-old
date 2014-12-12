@@ -77,18 +77,6 @@
         <item>720</item>
         <item>1440</item>
     </string-array>
-    <string-array name="themes">
-        <item>Light Blue</item>
-        <item>Dark Blue</item>
-        <item>Light Red</item>
-        <item>Dark Red</item>
-        <item>Light Green</item>
-        <item>Dark Green</item>
-        <item>Light Orange</item>
-        <item>Dark Orange</item>
-        <item>Light Orange</item>
-        <item>Dark Orange</item>
-    </string-array>
     <string-array name="timezones">
         <item>Africa/Abidjan</item>
         <item>Africa/Accra</item>

@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
@@ -21,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -66,9 +69,16 @@ public class HeaderSettings extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(Theming.theme());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(Theming.colorPrimaryDark());
+        }
+
         super.onCreate(savedInstanceState);
 
         mActionBar.setTitle(getTitle());
+        mActionBar.setTitleTextColor(Color.WHITE);
 
         notifPendingIntent = PendingIntent.getService(this, 0, new Intent(this, NotifierService.class), 0);
 
@@ -281,6 +291,92 @@ public class HeaderSettings extends PreferenceActivity {
                 findPreference("manageHighlightedUsers").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     public boolean onPreferenceClick(Preference preference) {
                         startActivity(new Intent(getActivity(), SettingsHighlightedUsers.class));
+                        return true;
+                    }
+                });
+                findPreference("gfTheme").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+                        LayoutInflater inflater = getActivity().getLayoutInflater();
+                        final View v = inflater.inflate(R.layout.themepicker, null);
+                        b.setView(v);
+                        b.setTitle("Select Theme");
+
+                        final TextView current = (TextView) v.findViewById(R.id.tpSelected);
+
+                        v.findViewById(R.id.tpBlueLight).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                AllInOneV2.getSettingsPref().edit().putString("gfTheme", "Light Blue").apply();
+                                current.setText("Selected: Light Blue");
+                            }
+                        });
+                        v.findViewById(R.id.tpBlueDark).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                AllInOneV2.getSettingsPref().edit().putString("gfTheme", "Dark Blue").apply();
+                                current.setText("Selected: Dark Blue");
+                            }
+                        });
+                        v.findViewById(R.id.tpRedLight).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                AllInOneV2.getSettingsPref().edit().putString("gfTheme", "Light Red").apply();
+                                current.setText("Selected: Light Red");
+                            }
+                        });
+                        v.findViewById(R.id.tpRedDark).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                AllInOneV2.getSettingsPref().edit().putString("gfTheme", "Dark Red").apply();
+                                current.setText("Selected: Dark Red");
+                            }
+                        });
+                        v.findViewById(R.id.tpGreenLight).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                AllInOneV2.getSettingsPref().edit().putString("gfTheme", "Light Green").apply();
+                                current.setText("Selected: Light Green");
+                            }
+                        });
+                        v.findViewById(R.id.tpGreenDark).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                AllInOneV2.getSettingsPref().edit().putString("gfTheme", "Dark Green").apply();
+                                current.setText("Selected: Dark Green");
+                            }
+                        });
+                        v.findViewById(R.id.tpOrangeLight).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                AllInOneV2.getSettingsPref().edit().putString("gfTheme", "Light Orange").apply();
+                                current.setText("Selected: Light Orange");
+                            }
+                        });
+                        v.findViewById(R.id.tpOrangeDark).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                AllInOneV2.getSettingsPref().edit().putString("gfTheme", "Dark Orange").apply();
+                                current.setText("Selected: Dark Orange");
+                            }
+                        });
+                        v.findViewById(R.id.tpPurpleLight).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                AllInOneV2.getSettingsPref().edit().putString("gfTheme", "Light Purple").apply();
+                                current.setText("Selected: Light Purple");
+                            }
+                        });
+                        v.findViewById(R.id.tpPurpleDark).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                AllInOneV2.getSettingsPref().edit().putString("gfTheme", "Dark Purple").apply();
+                                current.setText("Selected: Dark Purple");
+                            }
+                        });
+
+                        b.show();
                         return true;
                     }
                 });

@@ -13,17 +13,14 @@
             android:summary="Add, edit, and remove highlighted users."
             android:title="Manage Highlighted Users" />
 
-        <ListPreference
+        <Preference
             android:defaultValue="Light Blue"
-            android:entries="@array/themes"
-            android:entryValues="@array/themes"
             android:key="gfTheme"
             android:persistent="true"
             android:summary="Select the theme for the app. (Requires restart)"
             android:title="Theme" />
 
-        <com.robobunny.SeekBarPreference
-            xmlns:robobunny="http://robobunny.com"
+        <com.robobunny.SeekBarPreference xmlns:robobunny="http://robobunny.com"
             android:defaultValue="100"
             android:key="textScale"
             android:max="120"
