@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/aioDrawerLayout"
     android:layout_width="match_parent"
@@ -19,7 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
-            android:minHeight="?attr/actionBarSize" />
+            android:minHeight="?attr/actionBarSize"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
         <RelativeLayout
             android:id="@+id/aioHeader"
@@ -32,7 +34,6 @@
 
             <Button
                 android:id="@+id/aioFirstPage"
-                style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
@@ -47,7 +48,6 @@
 
             <Button
                 android:id="@+id/aioPreviousPage"
-                style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/aioFirstPage"
@@ -61,7 +61,6 @@
 
             <Button
                 android:id="@+id/aioLastPage"
-                style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/aioFirstPage"
@@ -75,7 +74,6 @@
 
             <Button
                 android:id="@+id/aioNextPage"
-                style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/aioFirstPage"
@@ -89,7 +87,6 @@
 
             <Button
                 android:id="@+id/aioPageLabel"
-                style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/aioFirstPage"
@@ -238,7 +235,6 @@
 
                             <Button
                                 android:id="@+id/aioBold"
-                                style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:background="?attr/selectableItemBackground"
@@ -256,7 +252,6 @@
 
                             <Button
                                 android:id="@+id/aioItalic"
-                                style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:background="?attr/selectableItemBackground"
@@ -274,7 +269,6 @@
 
                             <Button
                                 android:id="@+id/aioCode"
-                                style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:background="?attr/selectableItemBackground"
@@ -292,7 +286,6 @@
 
                             <Button
                                 android:id="@+id/aioSpoiler"
-                                style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:background="?attr/selectableItemBackground"
@@ -309,7 +302,6 @@
 
                             <Button
                                 android:id="@+id/aioCite"
-                                style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:background="?attr/selectableItemBackground"
@@ -326,7 +318,6 @@
 
                             <Button
                                 android:id="@+id/aioQuote"
-                                style="@android:style/Widget.Holo.ActionButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:background="?attr/selectableItemBackground"
@@ -372,7 +363,6 @@
 
                 <Button
                     android:id="@+id/aioPostCancel"
-                    style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight=".5"
@@ -389,7 +379,6 @@
 
                 <Button
                     android:id="@+id/aioPollOptions"
-                    style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight=".5"
@@ -407,7 +396,6 @@
 
                 <Button
                     android:id="@+id/aioPostDo"
-                    style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight=".5"
@@ -473,10 +461,12 @@
 
             <Button
                 android:id="@+id/dwrChangeAcc"
-                style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/listPreferredItemHeight"
+                android:background="?attr/selectableItemBackground"
                 android:gravity="left|center_vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:text="@string/change_acc_default" />
 
             <LinearLayout
@@ -509,11 +499,13 @@
 
                 <Button
                     android:id="@+id/dwrBoardJumper"
-                    style="@android:style/Widget.Holo.ActionButton"
                     android:layout_width="match_parent"
                     android:layout_height="?android:attr/listPreferredItemHeight"
+                    android:background="?attr/selectableItemBackground"
                     android:gravity="left|center_vertical"
                     android:longClickable="false"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
                     android:text="@string/board_jumper" />
 
                 <View
@@ -538,10 +530,12 @@
 
                         <Button
                             android:id="@+id/dwrAMPList"
-                            style="@android:style/Widget.Holo.ActionButton"
                             android:layout_width="match_parent"
                             android:layout_height="?android:attr/listPreferredItemHeight"
+                            android:background="?attr/selectableItemBackground"
                             android:gravity="left|center_vertical"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
                             android:text="@string/amp_list" />
 
                         <View
@@ -555,10 +549,12 @@
 
                     <Button
                         android:id="@+id/dwrTrackedTopics"
-                        style="@android:style/Widget.Holo.ActionButton"
                         android:layout_width="match_parent"
                         android:layout_height="?android:attr/listPreferredItemHeight"
+                        android:background="?attr/selectableItemBackground"
                         android:gravity="left|center_vertical"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
                         android:text="@string/tracked_topics" />
 
                     <View
@@ -571,10 +567,12 @@
 
                     <Button
                         android:id="@+id/dwrPMInbox"
-                        style="@android:style/Widget.Holo.ActionButton"
                         android:layout_width="match_parent"
                         android:layout_height="?android:attr/listPreferredItemHeight"
+                        android:background="?attr/selectableItemBackground"
                         android:gravity="left|center_vertical"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
                         android:text="@string/pm_inbox" />
                 </LinearLayout>
             </LinearLayout>
@@ -603,10 +601,12 @@
 
             <Button
                 android:id="@+id/dwrCopyCurrURL"
-                style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/listPreferredItemHeight"
+                android:background="?attr/selectableItemBackground"
                 android:gravity="left|center_vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:text="@string/copy_curr_page" />
 
             <View
@@ -619,10 +619,12 @@
 
             <Button
                 android:id="@+id/dwrHighlightList"
-                style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/listPreferredItemHeight"
+                android:background="?attr/selectableItemBackground"
                 android:gravity="left|center_vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:text="@string/manage_highlight_list" />
 
             <View
@@ -635,10 +637,12 @@
 
             <Button
                 android:id="@+id/dwrSettings"
-                style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/listPreferredItemHeight"
+                android:background="?attr/selectableItemBackground"
                 android:gravity="left|center_vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:text="@string/settings" />
 
             <View
@@ -651,10 +655,12 @@
 
             <Button
                 android:id="@+id/dwrExit"
-                style="@android:style/Widget.Holo.ActionButton"
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/listPreferredItemHeight"
+                android:background="?attr/selectableItemBackground"
                 android:gravity="left|center_vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:text="@string/exit_gameraven" />
         </LinearLayout>
 
