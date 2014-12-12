@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:text="User"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@android:color/black"
+                android:textColor="@color/white"
                 android:textSize="12sp" />
 
             <TextView
@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:text="#500, Posted 1/1/2014 12:00 AM"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@android:color/black"
+                android:textColor="@color/white"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -61,7 +61,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="@dimen/item_padding_horizontal"
-            android:src="?attr/themedPostInfoIcon" />
+            android:src="@drawable/ic_more_horiz_white_36dp" />
     </RelativeLayout>
 
     <LinearLayout
