@@ -414,7 +414,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginBottom="10dp"
             android:layout_marginRight="8dp"
-            android:src="?attr/themedPostIcon"
+            android:src="@drawable/ic_add_white_36dp"
             android:visibility="gone"
             app:floatingActionButtonColor="?attr/colorPrimary"
             app:floatingActionButtonSize="normal" />
