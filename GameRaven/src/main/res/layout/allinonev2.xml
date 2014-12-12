@@ -438,7 +438,6 @@
         android:layout_width="320dp"
         android:layout_height="match_parent"
         android:layout_gravity="left"
-        android:layout_marginTop="?attr/actionBarSize"
         android:background="?attr/colorBackground"
         android:fadeScrollbars="false"
         android:scrollbarStyle="outsideOverlay"
