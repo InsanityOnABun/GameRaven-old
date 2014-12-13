@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -167,6 +168,12 @@ public final class Theming {
 
         // Finally, free the resources used by TypedArray
         ta.recycle();
+
+        croutonStyle = new Style.Builder()
+                .setBackgroundColorValue(colorPrimaryDark)
+                .setTextColorValue(Color.WHITE)
+                .setConfiguration(croutonShort)
+                .build();
     }
 
     public static void setTextSizeBases(float dwrHeader, float dwrButton, float pjButton, float pjLabel) {
