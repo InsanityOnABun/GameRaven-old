@@ -13,20 +13,13 @@
         android:layout_margin="6dp"
         android:text="blah"
         android:textColor="@color/black" />
-    
-    <Space
-        android:id="@+id/tpVertSpacer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_centerHorizontal="true" />
 
     <LinearLayout
         android:id="@+id/tpLightWrapper"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tpSelected"
-        android:layout_toLeftOf="@id/tpVertSpacer"
-        android:orientation="vertical">
+        android:layout_centerHorizontal="true">
 
         <FrameLayout
             android:id="@+id/tpBlueLight"
@@ -190,9 +183,8 @@
         android:id="@+id/tpDarkWrapper"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tpSelected"
-        android:layout_toRightOf="@id/tpVertSpacer"
-        android:orientation="vertical">
+        android:layout_below="@id/tpLightWrapper"
+        android:layout_centerHorizontal="true">
 
         <FrameLayout
             android:id="@+id/tpBlueDark"

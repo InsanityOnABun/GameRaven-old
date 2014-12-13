@@ -376,6 +376,10 @@ public class HeaderSettings extends PreferenceActivity {
                             }
                         });
 
+                        current.setText("Selected: " + AllInOneV2.getSettingsPref().getString("gfTheme", "Light Blue"));
+
+                        b.setPositiveButton("OK", null);
+
                         b.show();
                         return true;
                     }

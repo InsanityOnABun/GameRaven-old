@@ -57,6 +57,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".prefs.HeaderSettings" />
         <activity
             android:name=".prefs.SettingsAccount"
             android:configChanges="orientation|screenSize" />
@@ -81,10 +82,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
-        <activity
-            android:name=".prefs.HeaderSettings"
-            android:configChanges="orientation|screenSize" />
     </application>
 
 </manifest>
