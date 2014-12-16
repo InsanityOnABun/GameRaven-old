@@ -10,7 +10,6 @@
         android:id="@+id/mvTopWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/msghead"
         android:clickable="true"
         android:paddingRight="@dimen/item_padding_horizontal">
 
@@ -78,7 +77,7 @@
         android:layout_marginBottom="@dimen/item_padding_vertical"
         android:layout_marginLeft="@dimen/item_padding_horizontal"
         android:layout_marginRight="@dimen/item_padding_horizontal"
-        android:text="This is a big long post. Man fan died room 97 etc.\n---\nThis is a sig."
+        android:text="post"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="15sp" />
 

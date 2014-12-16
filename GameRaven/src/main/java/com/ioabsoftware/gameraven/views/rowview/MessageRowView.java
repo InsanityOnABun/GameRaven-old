@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.text.method.ArrowKeyMovementMethod;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -81,7 +82,10 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
             messageTextSize = message.getTextSize();
         }
 
-        headerSelector = new MessageHeaderDrawable(new Drawable[]{getResources().getDrawable(R.drawable.msghead)});
+        ShapeDrawable d = new ShapeDrawable();
+        d.getPaint().setColor(Theming.colorPrimary());
+
+        headerSelector = new MessageHeaderDrawable(new Drawable[]{d});
         topWrapper.setBackgroundDrawable(headerSelector);
         topWrapper.setOnClickListener(this);
     }
@@ -93,9 +97,6 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
         message.setTextSize(PX, messageTextSize * myScale);
 
         message.setLinkTextColor(Theming.colorAccent());
-
-//        post.setTextColor(Theming.accentTextColor());
-//        user.setTextColor(Theming.accentTextColor());
     }
 
     @Override
