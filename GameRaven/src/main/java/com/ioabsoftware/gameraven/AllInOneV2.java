@@ -85,9 +85,9 @@ import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.melnykov.fab.FloatingActionButton;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.listeners.EventListener;
-import com.shamanland.fab.FloatingActionButton;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -517,9 +517,9 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         hlDB = new HighlightListDBHelper(this);
 
         // 60dp
-        View foot = new View(this);
-        foot.setMinimumHeight(Theming.convertDPtoPX(this, 80));
-        contentList.addFooterView(foot);
+//        View foot = new View(this);
+//        foot.setMinimumHeight(Theming.convertDPtoPX(this, 80));
+//        contentList.addFooterView(foot);
 
         adapterRows.add(new HeaderRowData("Loading..."));
         contentList.setAdapter(viewAdapter);
@@ -536,6 +536,8 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                     pmSetup(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
             }
         });
+
+        fab.attachToListView(contentList);
 
         AppRater.app_launched(this);
 

@@ -405,19 +405,19 @@
             </LinearLayout>
         </LinearLayout>
 
-        <com.shamanland.fab.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
+        <com.melnykov.fab.FloatingActionButton xmlns:fab="http://schemas.android.com/apk/res-auto"
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/ptr_layout"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_marginBottom="10dp"
-            android:layout_marginRight="8dp"
-            android:src="@drawable/ic_add_white_36dp"
-            android:visibility="gone"
-            app:floatingActionButtonColor="?attr/colorPrimary"
-            app:floatingActionButtonSize="normal" />
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_add_white_24dp"
+            android:visibility="visible"
+            fab:fab_colorNormal="?attr/colorPrimary"
+            fab:fab_colorPressed="?attr/colorPrimaryDark"
+            fab:fab_colorRipple="?attr/colorAccent" />
 
     </RelativeLayout>
 
