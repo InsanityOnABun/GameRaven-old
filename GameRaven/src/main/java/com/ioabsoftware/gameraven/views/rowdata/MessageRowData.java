@@ -11,7 +11,6 @@ import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
-import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 import android.text.util.Linkify;
 import android.view.View;
@@ -26,9 +25,8 @@ import com.ioabsoftware.gameraven.BuildConfig;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
-import com.ioabsoftware.gameraven.util.RichTextUtils;
+import com.ioabsoftware.gameraven.util.MyLinkifier;
 import com.ioabsoftware.gameraven.util.Theming;
-import com.ioabsoftware.gameraven.util.UrlSpanConverter;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.GRQuoteSpan;
 import com.ioabsoftware.gameraven.views.RowType;
@@ -285,7 +283,7 @@ public class MessageRowData extends BaseRowData {
         ssb.append('\n');
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("linkifying");
-        Linkify.addLinks(ssb, Linkify.WEB_URLS);
+        MyLinkifier.addLinks(ssb, Linkify.WEB_URLS);
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding spoiler spans");
         addSpoilerSpans(ssb);
@@ -303,7 +301,7 @@ public class MessageRowData extends BaseRowData {
         }
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("setting spannedMessage");
-        spannedMessage = RichTextUtils.replaceAll(ssb, URLSpan.class, new UrlSpanConverter());
+        spannedMessage = ssb;
     }
 
     public boolean isEdited() {

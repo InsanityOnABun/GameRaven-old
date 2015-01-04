@@ -1,20 +1,12 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
 import android.content.Context;
-import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.Spanned;
 import android.text.method.ArrowKeyMovementMethod;
-import android.text.style.URLSpan;
-import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.R;
-import com.ioabsoftware.gameraven.util.RichTextUtils;
-import com.ioabsoftware.gameraven.util.UrlSpanConverter;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
@@ -64,26 +56,11 @@ public class PMDetailRowView extends BaseRowView {
 
         myData = (PMDetailRowData) data;
 
-        messageView.setText(RichTextUtils.replaceAll(linkifyHtml(myData.getMessage(), Linkify.WEB_URLS), URLSpan.class, new UrlSpanConverter()));
+        messageView.setText(myData.getMessage());
 
         messageView.setMovementMethod(ArrowKeyMovementMethod.getInstance());
         messageView.setTextIsSelectable(true);
         // the autoLink attribute must be removed, if you hasn't set it then ok, otherwise call textView.setAutoLink(0);
-    }
-
-    public static Spannable linkifyHtml(String html, int linkifyMask) {
-        Spanned text = Html.fromHtml(html);
-        URLSpan[] currentSpans = text.getSpans(0, text.length(), URLSpan.class);
-
-        SpannableString buffer = new SpannableString(text);
-        Linkify.addLinks(buffer, linkifyMask);
-
-        for (URLSpan span : currentSpans) {
-            int end = text.getSpanEnd(span);
-            int start = text.getSpanStart(span);
-            buffer.setSpan(span, start, end, 0);
-        }
-        return buffer;
     }
 
 }
