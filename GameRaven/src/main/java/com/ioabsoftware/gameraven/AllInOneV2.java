@@ -1113,16 +1113,9 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
     private void postTimeoutCleanup() {
         AlertDialog.Builder b = new AlertDialog.Builder(AllInOneV2.this);
         b.setTitle("Post Timeout");
-        b.setMessage("Post timed out. Press refresh to check if your post made it through. Dismissing " +
+        b.setMessage("Post timed out. Refresh the page to check if your post made it through. Dismissing " +
                 "and posting again without first checking if the post went through may result in the post " +
                 "being submitted twice.");
-
-        b.setPositiveButton("Refresh", new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                session.get(Session.determineNetDesc(postPostUrl), postPostUrl);
-            }
-        });
 
         b.setNeutralButton("Copy Post to Clipboard", null);
 
@@ -1139,27 +1132,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         d.setOnShowListener(new OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
-                Button posButton = d.getButton(DialogInterface.BUTTON_POSITIVE);
-                final Button neuButton = d.getButton(DialogInterface.BUTTON_NEUTRAL);
-                Button negButton = d.getButton(DialogInterface.BUTTON_NEGATIVE);
-
-                LayoutParams posParams = (LayoutParams) posButton.getLayoutParams();
-                posParams.weight = 1;
-                posParams.width = LayoutParams.MATCH_PARENT;
-
-                LayoutParams neuParams = (LayoutParams) negButton.getLayoutParams();
-                neuParams.weight = 1.2f;
-                neuParams.width = LayoutParams.MATCH_PARENT;
-
-                LayoutParams negParams = (LayoutParams) negButton.getLayoutParams();
-                negParams.weight = 1;
-                negParams.width = LayoutParams.MATCH_PARENT;
-
-                posButton.setLayoutParams(posParams);
-                neuButton.setLayoutParams(neuParams);
-                negButton.setLayoutParams(negParams);
-
-                neuButton.setOnClickListener(new View.OnClickListener() {
+                d.getButton(DialogInterface.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         android.content.ClipboardManager clipboard =
@@ -1170,7 +1143,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                         Crouton.showText(AllInOneV2.this,
                                 "Message body copied to clipboard.",
                                 Theming.croutonStyle(),
-                                (ViewGroup) d.findViewById(android.R.id.message).getParent().getParent());
+                                (ViewGroup) v.getParent().getParent());
                     }
                 });
             }
