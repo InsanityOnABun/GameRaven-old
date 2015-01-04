@@ -1159,7 +1159,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
     private void postInterfaceCleanup() {
         if (!isRoR && postWrapper.getVisibility() == View.VISIBLE) {
             if (BuildConfig.DEBUG) wtl("postInterfaceCleanup fired --NEL");
-            pageJumperWrapper.setVisibility(View.VISIBLE);
             postWrapper.setVisibility(View.GONE);
             pollButton.setVisibility(View.GONE);
             pollSep.setVisibility(View.GONE);
@@ -1171,6 +1170,10 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
             fab.setVisibility(View.VISIBLE);
 
             hideSoftKeyboard(postBody);
+
+
+            if (!pageLabel.getText().toString().equals("~ 1 / 1 ~"))
+                pageJumperWrapper.setVisibility(View.VISIBLE);
         }
     }
 
@@ -2298,6 +2301,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
 
         if (currPage == -1) {
             pageJumperWrapper.setVisibility(View.GONE);
+            pageLabel.setText("~ 1 / 1 ~");
         } else {
             pageJumperWrapper.setVisibility(View.VISIBLE);
             pageJumperDesc = desc;
