@@ -194,7 +194,7 @@ public class HeaderSettings extends PreferenceActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 AllInOneV2.getSettingsPref().edit().putString("customSig", "").apply();
-                                Crouton.showText(getActivity(), "Signature cleared and saved.", Theming.croutonStyle());
+                                Toast.makeText(getActivity(), "Signature cleared and saved.", Toast.LENGTH_SHORT).show();
                             }
                         });
                         b.setNegativeButton("Cancel", null);
@@ -218,7 +218,7 @@ public class HeaderSettings extends PreferenceActivity {
                                         if (length < 161) {
                                             if (lines < 2) {
                                                 AllInOneV2.getSettingsPref().edit().putString("customSig", sigText.getText().toString()).apply();
-                                                Crouton.showText(getActivity(), "Signature saved.", Theming.croutonStyle());
+                                                Toast.makeText(getActivity(), "Signature saved.", Toast.LENGTH_SHORT).show();
                                                 d.dismiss();
                                             } else
                                                 Crouton.showText(getActivity(),
@@ -569,7 +569,7 @@ public class HeaderSettings extends PreferenceActivity {
                         buf.append("autoCensorEnable=false\n");
 
                     buf.close();
-                    Crouton.showText(getActivity(), "Backup done.", Theming.croutonStyle());
+                    Toast.makeText(getActivity(),"Backup done." ,Toast.LENGTH_SHORT).show();
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -578,7 +578,7 @@ public class HeaderSettings extends PreferenceActivity {
                 // Something else is wrong. It may be one of many other states, but all we need
                 //  to know is we can neither read nor write
                 Log.e("writeToLog", "error writing to log, external storage is not writable");
-                Crouton.showText(getActivity(), "Backup failed. External storage is most likely not accessible.", Theming.croutonStyle());
+                Toast.makeText(getActivity(),"Backup failed. Storage is most likely not accessible." ,Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -692,23 +692,22 @@ public class HeaderSettings extends PreferenceActivity {
                         if (AllInOneV2.getSettingsPref().getBoolean("notifsEnable", false))
                             enableNotifs(AllInOneV2.getSettingsPref().getString("notifsFrequency", "60"));
 
-//					Crouton.showText(this, "Restore done.", MainActivity.getCroutonStyle());
                         Toast.makeText(getActivity(), "Restore done.", Toast.LENGTH_SHORT).show();
                         getActivity().finish();
                         startActivity(getActivity().getIntent());
 
                     } catch (IOException e) {
                         e.printStackTrace();
-                        Crouton.showText(getActivity(), "Settings file is corrupt.", Theming.croutonStyle());
+                        Toast.makeText(getActivity(), "Settings file is corrupt.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Crouton.showText(getActivity(), "Settings file not found.", Theming.croutonStyle());
+                    Toast.makeText(getActivity(), "Settings file not found.", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 // Something else is wrong. It may be one of many other states, but all we need
                 //  to know is we can neither read nor write
                 Log.e("writeToLog", "error writing to log, external storage is not writable");
-                Crouton.showText(getActivity(), "Restore failed. External storage is most likely not accessible.", Theming.croutonStyle());
+                Toast.makeText(getActivity(), "Restore failed. Storage is most likely not accessible.", Toast.LENGTH_SHORT).show();
             }
         }
 
