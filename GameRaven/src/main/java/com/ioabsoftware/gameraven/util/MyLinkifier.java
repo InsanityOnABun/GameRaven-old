@@ -16,23 +16,18 @@
 
 package com.ioabsoftware.gameraven.util;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.method.MovementMethod;
-import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
 import android.util.Patterns;
-import android.view.View;
 import android.webkit.WebView;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
-import com.ioabsoftware.gameraven.networking.NetDesc;
-import com.ioabsoftware.gameraven.networking.Session;
+import com.ioabsoftware.gameraven.views.MessageLinkSpan;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -543,25 +538,4 @@ class LinkSpec {
     String url;
     int start;
     int end;
-}
-
-class MessageLinkSpan extends ClickableSpan {
-
-    String url;
-    AllInOneV2 aio;
-
-    public MessageLinkSpan(String urlIn, AllInOneV2 aioIn) {
-        url = Session.buildURL(urlIn, NetDesc.UNSPECIFIED);
-        aio = aioIn;
-    }
-
-    @Override
-    public void onClick(View arg0) {
-        NetDesc desc = Session.determineNetDesc(url);
-        if (desc != NetDesc.UNSPECIFIED)
-            aio.getSession().get(desc, url);
-        else
-            aio.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-    }
-
 }
