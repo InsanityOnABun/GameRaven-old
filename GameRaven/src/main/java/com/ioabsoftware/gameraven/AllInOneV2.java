@@ -49,7 +49,6 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -1114,7 +1113,14 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                 "and posting again without first checking if the post went through may result in the post " +
                 "being submitted twice.");
 
-        b.setNeutralButton("Copy Post to Clipboard", null);
+        b.setPositiveButton("Refresh", new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                session.get(Session.determineNetDesc(postPostUrl), postPostUrl);
+            }
+        });
+
+        b.setNeutralButton("Copy Post", null);
 
         b.setNegativeButton("Dismiss", new OnClickListener() {
             @Override
@@ -2883,26 +2889,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
 
 
         final AlertDialog d = accountChanger.create();
-        d.setOnShowListener(new OnShowListener() {
-
-            @Override
-            @SuppressWarnings("ConstantConditions")
-            public void onShow(DialogInterface dialog) {
-                Button posButton = d.getButton(DialogInterface.BUTTON_POSITIVE);
-                Button negButton = d.getButton(DialogInterface.BUTTON_NEGATIVE);
-
-                LayoutParams posParams = (LayoutParams) posButton.getLayoutParams();
-                posParams.weight = 1;
-                posParams.width = LayoutParams.MATCH_PARENT;
-
-                LayoutParams negParams = (LayoutParams) negButton.getLayoutParams();
-                negParams.weight = 1;
-                negParams.width = LayoutParams.MATCH_PARENT;
-
-                posButton.setLayoutParams(posParams);
-                negButton.setLayoutParams(negParams);
-            }
-        });
         d.setOnDismissListener(new DialogInterface.OnDismissListener() {
             public void onDismiss(DialogInterface dialog) {
                 removeDialog(CHANGE_LOGGED_IN_DIALOG);
