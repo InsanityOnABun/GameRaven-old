@@ -8,6 +8,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.DialogInterface.OnShowListener;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -20,6 +21,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -70,12 +72,16 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Theming.theme());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(Theming.colorPrimaryDark());
+        }
+
         settings = PreferenceManager.getDefaultSharedPreferences(this);
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.settingsaccount);
-
-        mActionBar.setTitle(getTitle());
 
         accountVerifier = Ion.getInstance(this, ION_INSTANCE);
         accountVerifier.getCookieMiddleware().clear();
@@ -106,6 +112,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
                 finish();
             }
         });
+        mActionBar.setTitle(getTitle());
 
         ViewGroup contentWrapper = (ViewGroup) contentView.findViewById(R.id.saContentWrapper);
         LayoutInflater.from(this).inflate(layoutResID, contentWrapper, true);

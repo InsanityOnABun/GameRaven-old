@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -77,9 +76,6 @@ public class HeaderSettings extends PreferenceActivity {
 
         super.onCreate(savedInstanceState);
 
-        mActionBar.setTitle(getTitle());
-        mActionBar.setTitleTextColor(Color.WHITE);
-
         notifPendingIntent = PendingIntent.getService(this, 0, new Intent(this, NotifierService.class), 0);
 
         ACCEPTED_KEYS.add("timezone");
@@ -115,6 +111,7 @@ public class HeaderSettings extends PreferenceActivity {
                 finish();
             }
         });
+        mActionBar.setTitle(getTitle());
 
         ViewGroup contentWrapper = (ViewGroup) contentView.findViewById(R.id.saContentWrapper);
         LayoutInflater.from(this).inflate(layoutResID, contentWrapper, true);
