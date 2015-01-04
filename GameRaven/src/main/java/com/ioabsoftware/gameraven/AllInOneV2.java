@@ -516,11 +516,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         if (BuildConfig.DEBUG) wtl("starting db creation");
         hlDB = new HighlightListDBHelper(this);
 
-        // 60dp
-//        View foot = new View(this);
-//        foot.setMinimumHeight(Theming.convertDPtoPX(this, 80));
-//        contentList.addFooterView(foot);
-
         adapterRows.add(new HeaderRowData("Loading..."));
         contentList.setAdapter(viewAdapter);
 
