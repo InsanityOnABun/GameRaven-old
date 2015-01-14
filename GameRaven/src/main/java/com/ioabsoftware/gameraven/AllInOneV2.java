@@ -50,6 +50,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -695,6 +696,24 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
             session.closeHistoryDB();
 
         super.onDestroy();
+    }
+
+    private AlertDialog loginDialog;
+    public void showLoggingInDialog(String user) {
+        if (loginDialog == null) {
+            AlertDialog.Builder b = new AlertDialog.Builder(this);
+            ProgressBar spinner = new ProgressBar(this);
+            spinner.setIndeterminate(true);
+            b.setView(spinner);
+            loginDialog = b.create();
+        }
+
+        loginDialog.setTitle("Logging in as " + user + "...");
+        loginDialog.show();
+    }
+
+    public void dismissLoginDialog() {
+        loginDialog.dismiss();
     }
 
     private boolean needToSetNavList = true;
