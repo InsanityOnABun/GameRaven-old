@@ -30,7 +30,7 @@ public class HistoryDBAdapter {
     public static final String COLUMN_HIST_VLOC_OFFSET = "vlocoffset";
 
     private static final String CREATE_TABLE_HISTORY =
-            "create table " + TABLE_HISTORY + "(" +
+            "create table if not exists " + TABLE_HISTORY + "(" +
                     COLUMN_HIST_ID + " integer primary key autoincrement, " +
                     COLUMN_HIST_PATH + " text not null, " +
                     COLUMN_HIST_DESC + " text not null, " +
@@ -70,6 +70,7 @@ public class HistoryDBAdapter {
     public HistoryDBAdapter open() {
         dbHelper = new DatabaseHelper(aio);
         db = dbHelper.getWritableDatabase();
+        updateHasHistory();
         return this;
     }
 
