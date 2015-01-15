@@ -639,14 +639,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
 
         MessageRowView.setUsingAvatars(settings.getBoolean("usingAvatars", false));
 
-        if (session != null) {
-            if (settings.getBoolean("reloadOnResume", false)) {
-                if (BuildConfig.DEBUG)
-                    wtl("session exists, reload on resume is true, refreshing page");
-                isRoR = true;
-                session.refresh();
-            }
-        } else {
+        if (session == null) {
             String initUrl = null;
             NetDesc initDesc = null;
             if (firstResume) {
@@ -692,8 +685,16 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
     protected void onDestroy() {
         Crouton.clearCroutonsForActivity(this);
 
-        if (session != null)
+
+        Editor e = settings.edit();
+        e.putBoolean("resumeSession", true);
+        if (session != null) {
+            session.addHistoryBeforeDestroy();
             session.closeHistoryDB();
+            if (Session.isLoggedIn()) {
+                e.putString("resumeSessionUser", Session.getUser());
+            }
+        }
 
         super.onDestroy();
     }
@@ -1173,10 +1174,8 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         d.show();
     }
 
-    private boolean isRoR = false;
-
     private void postInterfaceCleanup() {
-        if (!isRoR && postWrapper.getVisibility() == View.VISIBLE) {
+        if (postWrapper.getVisibility() == View.VISIBLE) {
             if (BuildConfig.DEBUG) wtl("postInterfaceCleanup fired --NEL");
             postWrapper.setVisibility(View.GONE);
             pollButton.setVisibility(View.GONE);
@@ -2287,9 +2286,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         ptrCleanup();
         if (desc == NetDesc.BOARD || desc == NetDesc.TOPIC)
             postInterfaceCleanup();
-
-        if (isRoR)
-            isRoR = false;
 
         System.gc();
     }

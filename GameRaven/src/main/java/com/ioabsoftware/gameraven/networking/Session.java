@@ -1082,7 +1082,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         applySavedScroll = true;
         savedScrollVal = h.getVertPos();
 
-        if (forceReload || AllInOneV2.getSettingsPref().getBoolean("reloadOnBack", false)) {
+        if (forceReload) {
             forceNoHistoryAddition();
             if (BuildConfig.DEBUG) AllInOneV2.wtl("going back in history, refreshing: " + h.getDesc().name() + " " + h.getPath());
             get(h.getDesc(), h.getPath());
@@ -1104,6 +1104,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
     public void closeHistoryDB() {
         hAdapter.close();
+    }
+
+    public void addHistoryBeforeDestroy() {
+        int[] vLoc = aio.getScrollerVertLoc();
+        hAdapter.insertHistory(lastPath, lastDesc.name(), lastResBodyAsBytes, vLoc[0], vLoc[1]);
     }
 
     public void setLastPathAndDesc(String path, NetDesc desc) {
