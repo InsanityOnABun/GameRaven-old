@@ -137,8 +137,6 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
     private static int userLevel = 0;
 
-    //	public static int getUserLevel()
-//	{return userLevel;}
     public static boolean userCanDeleteClose() {
         return userLevel > 13;
     }
@@ -184,6 +182,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
     private HistoryDBAdapter hAdapter;
 
+    public static String RESUME_INIT_URL = "RESUME-SESSION";
     private String initUrl = null;
     private NetDesc initDesc = null;
 
@@ -431,6 +430,9 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
             if (result != null && result.getResult() != null && result.getResult().doc != null) {
 
+                if (lastDesc == NetDesc.LOGIN_S2)
+                    aio.dismissLoginDialog();
+
                 result.getResult().doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
 
                 if (BuildConfig.DEBUG) AllInOneV2.wtl("parsing res");
@@ -675,9 +677,6 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     }
                 }
 
-                if (lastDesc == NetDesc.LOGIN_S2)
-                    aio.dismissLoginDialog();
-
                 switch (desc) {
                     case AMP_LIST:
                     case TRACKED_TOPICS:
@@ -749,7 +748,13 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                         if (initUrl != null) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("loading previous page");
-                            get(initDesc, initUrl);
+                            if (initUrl.equals(RESUME_INIT_URL)) {
+                                aio.dismissLoginDialog();
+                                goBack(false);
+                                aio.setNavList(isLoggedIn());
+                            }
+                            else
+                                get(initDesc, initUrl);
                         } else if (userCanViewAMP() && AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false)) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("loading AMP");
                             get(NetDesc.AMP_LIST, AllInOneV2.buildAMPLink());

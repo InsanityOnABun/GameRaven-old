@@ -651,8 +651,14 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                     }
                 }
             }
+
             String defaultAccount = settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT);
-            if (AccountManager.containsUser(this, defaultAccount)) {
+            String resumeAccount = settings.getString("resumeSessionUser", HeaderSettings.NO_DEFAULT_ACCOUNT);
+            boolean resumeSession = settings.getBoolean("resumeSession", false);
+
+            if (resumeSession && AccountManager.containsUser(this, resumeAccount)) {
+                session = new Session(this, resumeAccount, AccountManager.getPassword(this, resumeAccount), Session.RESUME_INIT_URL, NetDesc.UNSPECIFIED);
+            } else if (AccountManager.containsUser(this, defaultAccount)) {
                 if (BuildConfig.DEBUG) wtl("starting new session from onResume, logged in");
                 session = new Session(this, defaultAccount, AccountManager.getPassword(this, defaultAccount), initUrl, initDesc);
             } else {
@@ -683,6 +689,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
 
     @Override
     protected void onDestroy() {
+        if (BuildConfig.DEBUG) wtl("Destroying!");
         Crouton.clearCroutonsForActivity(this);
 
 
@@ -695,6 +702,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                 e.putString("resumeSessionUser", Session.getUser());
             }
         }
+        e.apply();
 
         super.onDestroy();
     }
@@ -730,6 +738,8 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
             findViewById(R.id.dwrLoggedInNav).setVisibility(View.VISIBLE);
         else
             findViewById(R.id.dwrLoggedInNav).setVisibility(View.GONE);
+
+        needToSetNavList = false;
     }
 
     @Override
@@ -2280,7 +2290,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
 
         if (needToSetNavList) {
             setNavList(Session.isLoggedIn());
-            needToSetNavList = false;
         }
 
         ptrCleanup();
@@ -3134,8 +3143,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
             session.goBack(false);
         } else {
             if (BuildConfig.DEBUG) wtl("back pressed, no history, exiting app");
-            session = null;
-            this.finish();
+            finish();
         }
     }
 
