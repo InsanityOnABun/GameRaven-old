@@ -78,6 +78,11 @@ public class HistoryDBAdapter {
         dbHelper.close();
     }
 
+    public void clearTable() {
+        db.delete(TABLE_HISTORY, null, null);
+        updateHasHistory();
+    }
+
     public void insertHistory(String pathIn, String descIn, byte[] srcIn, int vLocFirstVisIn, int vLocOffsetIn) {
         if (!lastAddedPath.equals(pathIn)) {
             if (BuildConfig.DEBUG) AllInOneV2.wtl("starting insert history method");

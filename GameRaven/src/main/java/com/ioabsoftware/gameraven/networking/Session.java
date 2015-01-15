@@ -245,6 +245,9 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         hAdapter = new HistoryDBAdapter(aio);
         openHistoryDB();
 
+        if (initUrl != null && !initUrl.equals(RESUME_INIT_URL))
+            hAdapter.clearTable();
+
         user = userIn;
         password = passwordIn;
 
@@ -630,51 +633,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                 }
 
                 if (addToHistory) {
-                    if (lastPath != null) {
-                        switch (lastDesc) {
-                            case AMP_LIST:
-                            case TRACKED_TOPICS:
-                            case BOARD:
-                            case BOARD_JUMPER:
-                            case TOPIC:
-                            case GAME_SEARCH:
-                            case BOARD_LIST:
-                            case MESSAGE_DETAIL:
-                            case USER_DETAIL:
-                            case MODHIST:
-                            case PM_INBOX:
-                            case PM_INBOX_DETAIL:
-                            case PM_OUTBOX:
-                            case PM_OUTBOX_DETAIL:
-                            case UNSPECIFIED:
-                                if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning history addition");
-                                int[] vLoc = aio.getScrollerVertLoc();
-                                hAdapter.insertHistory(lastPath, lastDesc.name(), lastResBodyAsBytes, vLoc[0], vLoc[1]);
-                                if (BuildConfig.DEBUG) AllInOneV2.wtl("finished history addition");
-                                break;
-
-                            case TAG_USER:
-                            case MARKMSG_S1:
-                            case MARKMSG_S2:
-                            case CLOSE_TOPIC:
-                            case DLTMSG_S1:
-                            case DLTMSG_S2:
-                            case LOGIN_S1:
-                            case LOGIN_S2:
-                            case EDIT_MSG:
-                            case POSTMSG_S1:
-                            case POSTMSG_S3:
-                            case POSTTPC_S1:
-                            case POSTTPC_S3:
-                            case VERIFY_ACCOUNT_S1:
-                            case VERIFY_ACCOUNT_S2:
-                            case SEND_PM_S1:
-                            case SEND_PM_S2:
-                                if (BuildConfig.DEBUG) AllInOneV2.wtl("not adding to history");
-                                break;
-
-                        }
-                    }
+                    addHistory();
                 }
 
                 switch (desc) {
@@ -748,7 +707,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                         if (initUrl != null) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("loading previous page");
-                            if (initUrl.equals(RESUME_INIT_URL)) {
+                            if (initUrl.equals(RESUME_INIT_URL) && canGoBack()) {
                                 aio.dismissLoginDialog();
                                 goBack(false);
                                 aio.setNavList(isLoggedIn());
@@ -1002,6 +961,54 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR finishing, desc: " + desc.name());
     }
 
+    private void addHistory() {
+        if (lastPath != null) {
+            switch (lastDesc) {
+                case AMP_LIST:
+                case TRACKED_TOPICS:
+                case BOARD:
+                case BOARD_JUMPER:
+                case TOPIC:
+                case GAME_SEARCH:
+                case BOARD_LIST:
+                case MESSAGE_DETAIL:
+                case USER_DETAIL:
+                case MODHIST:
+                case PM_INBOX:
+                case PM_INBOX_DETAIL:
+                case PM_OUTBOX:
+                case PM_OUTBOX_DETAIL:
+                case UNSPECIFIED:
+                    if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning history addition");
+                    int[] vLoc = aio.getScrollerVertLoc();
+                    hAdapter.insertHistory(lastPath, lastDesc.name(), lastResBodyAsBytes, vLoc[0], vLoc[1]);
+                    if (BuildConfig.DEBUG) AllInOneV2.wtl("finished history addition");
+                    break;
+
+                case TAG_USER:
+                case MARKMSG_S1:
+                case MARKMSG_S2:
+                case CLOSE_TOPIC:
+                case DLTMSG_S1:
+                case DLTMSG_S2:
+                case LOGIN_S1:
+                case LOGIN_S2:
+                case EDIT_MSG:
+                case POSTMSG_S1:
+                case POSTMSG_S3:
+                case POSTTPC_S1:
+                case POSTTPC_S3:
+                case VERIFY_ACCOUNT_S1:
+                case VERIFY_ACCOUNT_S2:
+                case SEND_PM_S1:
+                case SEND_PM_S2:
+                    if (BuildConfig.DEBUG) AllInOneV2.wtl("not adding to history");
+                    break;
+
+            }
+        }
+    }
+
     private void processTopicsAndMessages(Document doc, String resUrl, NetDesc successDesc) {
         if (!doc.select("p:contains(no longer available for viewing)").isEmpty()) {
             if (successDesc == NetDesc.TOPIC)
@@ -1112,8 +1119,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
     }
 
     public void addHistoryBeforeDestroy() {
-        int[] vLoc = aio.getScrollerVertLoc();
-        hAdapter.insertHistory(lastPath, lastDesc.name(), lastResBodyAsBytes, vLoc[0], vLoc[1]);
+        addHistory();
     }
 
     public void setLastPathAndDesc(String path, NetDesc desc) {

@@ -657,6 +657,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
             boolean resumeSession = settings.getBoolean("resumeSession", false);
 
             if (resumeSession && AccountManager.containsUser(this, resumeAccount)) {
+                settings.edit().putBoolean("resumeSession", false).apply();
                 session = new Session(this, resumeAccount, AccountManager.getPassword(this, resumeAccount), Session.RESUME_INIT_URL, NetDesc.UNSPECIFIED);
             } else if (AccountManager.containsUser(this, defaultAccount)) {
                 if (BuildConfig.DEBUG) wtl("starting new session from onResume, logged in");
