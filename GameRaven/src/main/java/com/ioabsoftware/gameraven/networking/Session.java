@@ -1088,6 +1088,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         return hAdapter.hasHistory();
     }
 
+    public void popHistory() {
+        if (canGoBack())
+            hAdapter.pullHistory();
+    }
+
     public void goBack(boolean forceReload) {
         History h = hAdapter.pullHistory();
 
@@ -1118,7 +1123,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         hAdapter.close();
     }
 
-    public void addHistoryBeforeDestroy() {
+    public void addHistoryBeforeStop() {
         addHistory();
     }
 

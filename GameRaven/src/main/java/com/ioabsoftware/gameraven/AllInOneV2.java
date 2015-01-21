@@ -656,8 +656,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
             String resumeAccount = settings.getString("resumeSessionUser", HeaderSettings.NO_DEFAULT_ACCOUNT);
             boolean resumeSession = settings.getBoolean("resumeSession", false);
 
-            if (resumeSession && AccountManager.containsUser(this, resumeAccount)) {
-                settings.edit().putBoolean("resumeSession", false).apply();
+            if (firstResume && resumeSession && AccountManager.containsUser(this, resumeAccount)) {
                 session = new Session(this, resumeAccount, AccountManager.getPassword(this, resumeAccount), Session.RESUME_INIT_URL, NetDesc.UNSPECIFIED);
             } else if (AccountManager.containsUser(this, defaultAccount)) {
                 if (BuildConfig.DEBUG) wtl("starting new session from onResume, logged in");
@@ -689,21 +688,34 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
     }
 
     @Override
+    protected void onStop () {
+        Editor e = settings.edit();
+        e.putBoolean("resumeSession", true);
+        session.addHistoryBeforeStop();
+        if (Session.isLoggedIn())
+            e.putString("resumeSessionUser", Session.getUser());
+
+        e.apply();
+
+        session.closeHistoryDB();
+
+        super.onStop();
+    }
+
+    @Override
+    protected void onRestart () {
+        super.onRestart();
+        session.openHistoryDB();
+        session.popHistory();
+    }
+
+    @Override
     protected void onDestroy() {
         if (BuildConfig.DEBUG) wtl("Destroying!");
         Crouton.clearCroutonsForActivity(this);
 
-
-        Editor e = settings.edit();
-        e.putBoolean("resumeSession", true);
-        if (session != null) {
-            session.addHistoryBeforeDestroy();
-            session.closeHistoryDB();
-            if (Session.isLoggedIn()) {
-                e.putString("resumeSessionUser", Session.getUser());
-            }
-        }
-        e.apply();
+        if (isFinishing())
+            settings.edit().putBoolean("resumeSession", false).apply();
 
         super.onDestroy();
     }
