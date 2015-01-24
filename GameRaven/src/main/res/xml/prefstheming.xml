@@ -13,34 +13,14 @@
             android:summary="Add, edit, and remove highlighted users."
             android:title="Manage Highlighted Users" />
 
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="useLightTheme"
-            android:persistent="true"
-            android:summary="Requires restart to take effect. (Menu -> Exit GameRaven)"
-            android:title="Light Theme" />
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="useWhiteAccentText"
-            android:persistent="true"
-            android:summary="Requires restart to take effect. (Menu -> Exit GameRaven)"
-            android:title="White Accent Text" />
-
-        <net.margaritov.preference.colorpicker.ColorPickerPreference
-            hexValue="true"
-            android:defaultValue="@color/holo_blue"
-            android:key="accentColor"
-            android:summary="Set the accent color. (Refresh to take complete effect)"
-            android:title="Accent Color" />
-
         <Preference
-            android:key="resetAccentColor"
-            android:persistent="false"
-            android:summary="Reset the accent color back to Holo Blue. (Refresh to take complete effect)"
-            android:title="Reset Accent Color" />
+            android:defaultValue="Light Blue"
+            android:key="gfTheme"
+            android:persistent="true"
+            android:summary="Select the theme for the app. (Requires restart)"
+            android:title="Theme" />
 
-        <com.robobunny.SeekBarPreference
-            xmlns:robobunny="http://robobunny.com"
+        <com.robobunny.SeekBarPreference xmlns:robobunny="http://robobunny.com"
             android:defaultValue="100"
             android:key="textScale"
             android:max="120"

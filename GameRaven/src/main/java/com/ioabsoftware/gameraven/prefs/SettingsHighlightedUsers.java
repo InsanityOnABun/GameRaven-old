@@ -1,7 +1,7 @@
 package com.ioabsoftware.gameraven.prefs;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -13,40 +13,37 @@ import com.ioabsoftware.gameraven.db.HlUDDismissListener;
 import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.rowview.HighlightedUserView;
 
-public class SettingsHighlightedUsers extends Activity implements HlUDDismissListener {
+public class SettingsHighlightedUsers extends ActionBarActivity implements HlUDDismissListener {
 
     private LinearLayout wrapper;
-    private HighlightedUserView addUser;
     private ScrollView scroller;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        if (Theming.usingLightTheme()) {
-            setTheme(R.style.MyThemes_LightTheme);
-        }
+        setTheme(Theming.theme());
 
         super.onCreate(savedInstanceState);
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        setContentView(R.layout.settings_highlightedusers);
+
+        setSupportActionBar((android.support.v7.widget.Toolbar) findViewById(R.id.hluToolbar));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         wrapper = new LinearLayout(this);
-        LinearLayout outerWrapper = new LinearLayout(this);
+        LinearLayout outerWrapper = (LinearLayout) findViewById(R.id.hluOuterWrapper);
 
         scroller = new ScrollView(this);
         scroller.setVerticalFadingEdgeEnabled(true);
 
         HighlightedUser newUser = new HighlightedUser(-1, "Add new highlighted user...", "Click to add new highlighted user.", 0);
-        addUser = new HighlightedUserView(this, newUser);
+        HighlightedUserView addUser = new HighlightedUserView(this, newUser);
 
         wrapper.setOrientation(LinearLayout.VERTICAL);
         outerWrapper.setOrientation(LinearLayout.VERTICAL);
 
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-
         scroller.addView(wrapper);
         outerWrapper.addView(addUser);
         outerWrapper.addView(scroller);
-        setContentView(outerWrapper, lp);
 
         Theming.colorOverscroll(this);
 

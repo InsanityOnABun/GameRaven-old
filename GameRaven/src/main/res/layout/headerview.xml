@@ -6,9 +6,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/item_padding_vertical"
-        android:background="@drawable/header_background"
+        android:background="?attr/colorPrimary"
         android:minLines="1"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@android:color/black" />
+        android:textColor="@color/white" />
 
 </merge>

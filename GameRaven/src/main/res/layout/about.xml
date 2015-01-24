@@ -1,64 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/abtGlobalWrapper"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/abtTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="GameRaven"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
-        android:id="@+id/abtBuildVer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="20dp"
-        android:text="**BUILD_VER_NOT_SET**"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:text="Copyright \u00a9 Insanity On A Bun Software"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <LinearLayout
-        android:id="@+id/abtBtnWrapper1"
+    <com.ioabsoftware.gameraven.views.MarqueeToolbar
+        android:id="@+id/abtToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="20dp" >
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-        <Button
-            android:id="@+id/abtFeatureRequest"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="featureRequest"
-            android:text="Send Feature Request" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/abtGenFeedback"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="genFeedback"
-            android:text="Send Feedback" />
+        <TextView
+            android:id="@+id/abtTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GameRaven"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <Button
-            android:id="@+id/abtPrivacyPolicy"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="viewPrivacyPolicy"
-            android:text="View Privacy Policy" />
+        <TextView
+            android:id="@+id/abtBuildVer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp"
+            android:text="**BUILD_VER_NOT_SET**"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="Copyright \u00a9 Insanity On A Bun Software"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <LinearLayout
+            android:id="@+id/abtBtnWrapper1"
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp">
+
+            <Button
+                android:id="@+id/abtFeatureRequest"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:onClick="featureRequest"
+                android:text="Send Feature Request" />
+
+            <Button
+                android:id="@+id/abtGenFeedback"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:onClick="genFeedback"
+                android:text="Send Feedback" />
+
+            <Button
+                android:id="@+id/abtPrivacyPolicy"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:onClick="viewPrivacyPolicy"
+                android:text="View Privacy Policy" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

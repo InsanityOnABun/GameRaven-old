@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.util.Log;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.EditText;
@@ -138,8 +137,6 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
     private static int userLevel = 0;
 
-    //	public static int getUserLevel()
-//	{return userLevel;}
     public static boolean userCanDeleteClose() {
         return userLevel > 13;
     }
@@ -185,6 +182,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
     private HistoryDBAdapter hAdapter;
 
+    public static String RESUME_INIT_URL = "RESUME-SESSION";
     private String initUrl = null;
     private NetDesc initDesc = null;
 
@@ -244,8 +242,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
         netManager = (ConnectivityManager) aio.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        hAdapter = new HistoryDBAdapter(aio);
+        hAdapter = new HistoryDBAdapter();
         openHistoryDB();
+
+        if (initUrl == null || !initUrl.equals(RESUME_INIT_URL))
+            hAdapter.clearTable();
 
         user = userIn;
         password = passwordIn;
@@ -257,9 +258,6 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         // clear out cookies
         Ion.getDefault(aio).getCookieMiddleware().clear();
 
-        if (BuildConfig.DEBUG)
-            Ion.getDefault(aio).configure().setLogging("IonLogs", Log.VERBOSE);
-
         if (user == null) {
             if (BuildConfig.DEBUG) AllInOneV2.wtl("session constructor, user is null, starting logged out session");
             get(NetDesc.BOARD_JUMPER, ROOT + "/boards");
@@ -268,6 +266,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             if (BuildConfig.DEBUG) AllInOneV2.wtl("session constructor, user is not null, starting logged in session");
             get(NetDesc.LOGIN_S1, ROOT + "/boards");
             aio.setLoginName(user);
+            aio.showLoggingInDialog(user);
         }
     }
 
@@ -434,6 +433,9 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
             if (result != null && result.getResult() != null && result.getResult().doc != null) {
 
+                if (lastDesc == NetDesc.LOGIN_S2)
+                    aio.dismissLoginDialog();
+
                 result.getResult().doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
 
                 if (BuildConfig.DEBUG) AllInOneV2.wtl("parsing res");
@@ -510,7 +512,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                 }
 
                 if (BuildConfig.DEBUG) AllInOneV2.wtl("checking for non-200 http response code");
-                int responseCode = result.getHeaders().getResponseCode();
+                int responseCode = result.getHeaders().code();
                 if (BuildConfig.DEBUG && responseCode != 200)
                     Crouton.showText(aio, "HTTP Response Code: " + responseCode, Theming.croutonStyle());
 
@@ -631,51 +633,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                 }
 
                 if (addToHistory) {
-                    if (lastPath != null) {
-                        switch (lastDesc) {
-                            case AMP_LIST:
-                            case TRACKED_TOPICS:
-                            case BOARD:
-                            case BOARD_JUMPER:
-                            case TOPIC:
-                            case GAME_SEARCH:
-                            case BOARD_LIST:
-                            case MESSAGE_DETAIL:
-                            case USER_DETAIL:
-                            case MODHIST:
-                            case PM_INBOX:
-                            case PM_INBOX_DETAIL:
-                            case PM_OUTBOX:
-                            case PM_OUTBOX_DETAIL:
-                            case UNSPECIFIED:
-                                if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning history addition");
-                                int[] vLoc = aio.getScrollerVertLoc();
-                                hAdapter.insertHistory(lastPath, lastDesc.name(), lastResBodyAsBytes, vLoc[0], vLoc[1]);
-                                if (BuildConfig.DEBUG) AllInOneV2.wtl("finished history addition");
-                                break;
-
-                            case TAG_USER:
-                            case MARKMSG_S1:
-                            case MARKMSG_S2:
-                            case CLOSE_TOPIC:
-                            case DLTMSG_S1:
-                            case DLTMSG_S2:
-                            case LOGIN_S1:
-                            case LOGIN_S2:
-                            case EDIT_MSG:
-                            case POSTMSG_S1:
-                            case POSTMSG_S3:
-                            case POSTTPC_S1:
-                            case POSTTPC_S3:
-                            case VERIFY_ACCOUNT_S1:
-                            case VERIFY_ACCOUNT_S2:
-                            case SEND_PM_S1:
-                            case SEND_PM_S2:
-                                if (BuildConfig.DEBUG) AllInOneV2.wtl("not adding to history");
-                                break;
-
-                        }
-                    }
+                    addHistory();
                 }
 
                 switch (desc) {
@@ -749,7 +707,13 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                         if (initUrl != null) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("loading previous page");
-                            get(initDesc, initUrl);
+                            if (initUrl.equals(RESUME_INIT_URL) && canGoBack()) {
+                                aio.dismissLoginDialog();
+                                goBack(false);
+                                aio.setNavList(isLoggedIn());
+                            }
+                            else
+                                get(initDesc, initUrl);
                         } else if (userCanViewAMP() && AllInOneV2.getSettingsPref().getBoolean("startAtAMP", false)) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("loading AMP");
                             get(NetDesc.AMP_LIST, AllInOneV2.buildAMPLink());
@@ -997,6 +961,54 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR finishing, desc: " + desc.name());
     }
 
+    private void addHistory() {
+        if (lastPath != null) {
+            switch (lastDesc) {
+                case AMP_LIST:
+                case TRACKED_TOPICS:
+                case BOARD:
+                case BOARD_JUMPER:
+                case TOPIC:
+                case GAME_SEARCH:
+                case BOARD_LIST:
+                case MESSAGE_DETAIL:
+                case USER_DETAIL:
+                case MODHIST:
+                case PM_INBOX:
+                case PM_INBOX_DETAIL:
+                case PM_OUTBOX:
+                case PM_OUTBOX_DETAIL:
+                case UNSPECIFIED:
+                    if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning history addition");
+                    int[] vLoc = aio.getScrollerVertLoc();
+                    hAdapter.insertHistory(lastPath, lastDesc.name(), lastResBodyAsBytes, vLoc[0], vLoc[1]);
+                    if (BuildConfig.DEBUG) AllInOneV2.wtl("finished history addition");
+                    break;
+
+                case TAG_USER:
+                case MARKMSG_S1:
+                case MARKMSG_S2:
+                case CLOSE_TOPIC:
+                case DLTMSG_S1:
+                case DLTMSG_S2:
+                case LOGIN_S1:
+                case LOGIN_S2:
+                case EDIT_MSG:
+                case POSTMSG_S1:
+                case POSTMSG_S3:
+                case POSTTPC_S1:
+                case POSTTPC_S3:
+                case VERIFY_ACCOUNT_S1:
+                case VERIFY_ACCOUNT_S2:
+                case SEND_PM_S1:
+                case SEND_PM_S2:
+                    if (BuildConfig.DEBUG) AllInOneV2.wtl("not adding to history");
+                    break;
+
+            }
+        }
+    }
+
     private void processTopicsAndMessages(Document doc, String resUrl, NetDesc successDesc) {
         if (!doc.select("p:contains(no longer available for viewing)").isEmpty()) {
             if (successDesc == NetDesc.TOPIC)
@@ -1076,13 +1088,18 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         return hAdapter.hasHistory();
     }
 
+    public void popHistory() {
+        if (canGoBack())
+            hAdapter.pullHistory();
+    }
+
     public void goBack(boolean forceReload) {
         History h = hAdapter.pullHistory();
 
         applySavedScroll = true;
         savedScrollVal = h.getVertPos();
 
-        if (forceReload || AllInOneV2.getSettingsPref().getBoolean("reloadOnBack", false)) {
+        if (forceReload) {
             forceNoHistoryAddition();
             if (BuildConfig.DEBUG) AllInOneV2.wtl("going back in history, refreshing: " + h.getDesc().name() + " " + h.getPath());
             get(h.getDesc(), h.getPath());
@@ -1099,11 +1116,15 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
     }
 
     public void openHistoryDB() {
-        hAdapter.open();
+        hAdapter.open(aio);
     }
 
     public void closeHistoryDB() {
         hAdapter.close();
+    }
+
+    public void addHistoryBeforeStop() {
+        addHistory();
     }
 
     public void setLastPathAndDesc(String path, NetDesc desc) {

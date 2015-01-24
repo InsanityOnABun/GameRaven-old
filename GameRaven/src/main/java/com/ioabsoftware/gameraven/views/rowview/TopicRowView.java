@@ -2,6 +2,7 @@ package com.ioabsoftware.gameraven.views.rowview;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +17,6 @@ import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
-import com.ioabsoftware.gameraven.views.SelectorItemDrawable;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
 
 public class TopicRowView extends BaseRowView {
@@ -53,7 +53,6 @@ public class TopicRowView extends BaseRowView {
     @Override
     protected void init(Context context) {
         myType = RowType.TOPIC;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.topicview, this, true);
 
         title = (TextView) findViewById(R.id.tvTitle);
@@ -75,7 +74,6 @@ public class TopicRowView extends BaseRowView {
             lpLinkTextSize = lpLink.getTextSize();
         }
 
-        lpLink.setBackgroundDrawable(new SelectorItemDrawable(context));
         lpLink.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,13 +111,10 @@ public class TopicRowView extends BaseRowView {
 
         int hlColor = myData.getHLColor();
         if (myData.getStatus() == ReadStatus.READ) {
-            int readColor = Theming.usingLightTheme() ?
-                    getResources().getColor(R.color.read_topic_light) :
-                    getResources().getColor(R.color.read_topic);
-            tc.setTextColor(readColor);
-            title.setTextColor(readColor);
-            msgLP.setTextColor(readColor);
-            lpLink.setTextColor(readColor);
+            tc.setTextColor(Theming.colorReadTopic());
+            title.setTextColor(Theming.colorReadTopic());
+            msgLP.setTextColor(Theming.colorReadTopic());
+            lpLink.setTextColor(Theming.colorReadTopic());
         } else if (hlColor != 0) {
             tc.setTextColor(hlColor);
             title.setTextColor(hlColor);
@@ -154,28 +149,22 @@ public class TopicRowView extends BaseRowView {
                 typeIndicator.setVisibility(View.GONE);
                 break;
             case POLL:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_poll_light : R.drawable.ic_poll);
+                setTypeIndicator(Theming.topicStatusIcons()[0]);
                 break;
             case LOCKED:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_locked_light : R.drawable.ic_locked);
+                setTypeIndicator(Theming.topicStatusIcons()[1]);
                 break;
             case ARCHIVED:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_archived_light : R.drawable.ic_archived);
+                setTypeIndicator(Theming.topicStatusIcons()[2]);
                 break;
             case PINNED:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_pinned_light : R.drawable.ic_pinned);
+                setTypeIndicator(Theming.topicStatusIcons()[3]);
                 break;
         }
     }
 
-    private void setTypeIndicator(int resId) {
-        typeIndicator.setImageResource(resId);
+    private void setTypeIndicator(Drawable icon) {
+        typeIndicator.setImageDrawable(icon);
         typeIndicator.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    protected void drawableStateChanged() {
-        lpLink.getBackground().setState(this.getDrawableState());
-        super.drawableStateChanged();
     }
 }

@@ -1,8 +1,6 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,14 +9,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.R;
-import com.ioabsoftware.gameraven.prefs.SettingsHighlightedUsers;
 import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
+import com.ioabsoftware.gameraven.prefs.SettingsHighlightedUsers;
 import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
-import com.ioabsoftware.gameraven.views.SelectorSolidDrawable;
 
 public class HighlightedUserView extends BaseRowView implements OnClickListener {
 
@@ -28,8 +25,6 @@ public class HighlightedUserView extends BaseRowView implements OnClickListener 
 
     private LinearLayout colorFrame;
     private TextView nameView, labelView;
-
-    private SelectorSolidDrawable back;
 
     public HighlightedUserView(Context context) {
         super(context);
@@ -55,17 +50,13 @@ public class HighlightedUserView extends BaseRowView implements OnClickListener 
         nameView = (TextView) findViewById(R.id.hvName);
         labelView = (TextView) findViewById(R.id.hvLabel);
         colorFrame = (LinearLayout) findViewById(R.id.hvColorFrame);
-        findViewById(R.id.hvSep).setBackgroundColor(Theming.accentColor());
+        findViewById(R.id.hvSep).setBackgroundColor(Theming.colorPrimary());
 
         nameView.setText(user.getName());
         labelView.setText(user.getLabel());
 
         if (user.getColor() != 0)
             colorFrame.setBackgroundColor(user.getColor());
-
-        back = new SelectorSolidDrawable(new Drawable[] {getResources().getDrawable(R.drawable.selector_solid)});
-        back.setMyColor(Color.TRANSPARENT);
-        setBackgroundDrawable(back);
 
         setOnClickListener(this);
     }

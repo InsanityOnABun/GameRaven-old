@@ -1,8 +1,6 @@
 package com.ioabsoftware.gameraven;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.SearchManager;
@@ -13,15 +11,25 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Time;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -30,8 +38,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -41,9 +49,10 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
-import android.widget.SearchView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -51,18 +60,17 @@ import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
+import com.ioabsoftware.gameraven.prefs.HeaderSettings;
 import com.ioabsoftware.gameraven.prefs.SettingsAccount;
 import com.ioabsoftware.gameraven.prefs.SettingsHighlightedUsers;
-import com.ioabsoftware.gameraven.prefs.TabbedSettings;
 import com.ioabsoftware.gameraven.util.AccountManager;
 import com.ioabsoftware.gameraven.util.DocumentParser;
 import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
+import com.ioabsoftware.gameraven.views.MarqueeToolbar;
 import com.ioabsoftware.gameraven.views.ViewAdapter;
 import com.ioabsoftware.gameraven.views.rowdata.AMPRowData;
-import com.ioabsoftware.gameraven.views.rowdata.AdGFAQsRowData;
-import com.ioabsoftware.gameraven.views.rowdata.AdmobRowData;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData.BoardType;
 import com.ioabsoftware.gameraven.views.rowdata.GameSearchRowData;
@@ -74,15 +82,12 @@ import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData.TopicType;
 import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
-import com.ioabsoftware.gameraven.views.rowview.AdmobRowView;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
-
-import net.margaritov.preference.colorpicker.ColorPickerPreference;
-import net.simonvt.menudrawer.MenuDrawer;
-import net.simonvt.menudrawer.MenuDrawer.OnDrawerStateChangeListener;
-import net.simonvt.menudrawer.MenuDrawer.Type;
+import com.melnykov.fab.FloatingActionButton;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.listeners.EventListener;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -97,7 +102,6 @@ import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -111,13 +115,9 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
-import uk.co.senab.actionbarpulltorefresh.library.Options;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
-public class AllInOneV2 extends Activity {
+@SuppressLint("RtlHardcoded")
+public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     public static final int SEND_PM_DIALOG = 102;
     public static final int MESSAGE_ACTION_DIALOG = 103;
@@ -204,7 +204,7 @@ public class AllInOneV2 extends Activity {
 
     private LinearLayout postWrapper;
 
-    private PullToRefreshLayout ptrLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private ListView contentList;
 
     private String tlUrl;
@@ -217,7 +217,6 @@ public class AllInOneV2 extends Activity {
 
     private FavMode fMode;
 
-    private TextView title;
     private Button pageLabel;
     private Button firstPage, prevPage, nextPage, lastPage;
     private String firstPageUrl, prevPageUrl, nextPageUrl, lastPageUrl, jumperPageUrl;
@@ -243,7 +242,11 @@ public class AllInOneV2 extends Activity {
         return hlDB;
     }
 
-    private MenuDrawer drawer;
+    private DrawerLayout drawerLayout;
+    private ScrollView drawerPullout;
+    private ActionBarDrawerToggle drawerToggle;
+
+    private FloatingActionButton fab;
 
     private static AllInOneV2 me;
 
@@ -251,7 +254,7 @@ public class AllInOneV2 extends Activity {
         return me;
     }
 
-    Theming themingInstance;
+    private Theming themingInstance;
 
 
     /**
@@ -266,11 +269,16 @@ public class AllInOneV2 extends Activity {
         settings = PreferenceManager.getDefaultSharedPreferences(this);
 
         // get an instance of Theming to ensure values don't get GC'd
+        // Will they get GC'd? I have no idea. Better safe than sorry.
         themingInstance = new Theming();
+
+        Theming.preInit(settings);
+        setTheme(Theming.theme());
         Theming.init(this, settings);
 
-        if (Theming.usingLightTheme()) {
-            setTheme(R.style.MyThemes_LightTheme);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(Theming.colorPrimaryDark());
         }
 
         super.onCreate(savedInstanceState);
@@ -281,121 +289,105 @@ public class AllInOneV2 extends Activity {
 
         AccountManager.init(this);
 
-        ActionBar aBar = getActionBar();
+        setSupportActionBar((MarqueeToolbar) findViewById(R.id.aioToolbar));
+        ActionBar aBar = getSupportActionBar();
         assert aBar != null : "Action bar is null";
 
         aBar.setDisplayHomeAsUpEnabled(true);
-        aBar.setDisplayShowTitleEnabled(false);
+        aBar.setDisplayShowTitleEnabled(true);
 
-        drawer = MenuDrawer.attach(this, Type.OVERLAY);
-        drawer.setContentView(R.layout.allinonev2);
-        drawer.setMenuView(R.layout.drawer);
-        drawer.setMenuSize(Theming.convertDPtoPX(this, 300));
+        drawerLayout = (DrawerLayout) findViewById(R.id.aioDrawerLayout);
+        drawerPullout = (ScrollView) findViewById(R.id.dwrScroller);
 
-        drawer.setOnDrawerStateChangeListener(new OnDrawerStateChangeListener() {
-
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close) {
             @Override
-            public void onDrawerStateChange(int oldState, int newState) {
-                if (newState == MenuDrawer.STATE_CLOSED)
-                    drawer.findViewById(R.id.dwrScroller).scrollTo(0, 0);
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                drawerPullout.scrollTo(0, 0);
             }
+        };
 
-            @Override
-            public void onDrawerSlide(float openRatio, int offsetPixels) {
-                // not needed
-            }
-        });
-
-        if (Theming.usingLightTheme())
-            drawer.findViewById(R.id.dwrScroller).setBackgroundResource(android.R.drawable.screen_background_light);
-        else
-            drawer.findViewById(R.id.dwrScroller).setBackgroundResource(android.R.drawable.screen_background_dark_transparent);
+        drawerLayout.setDrawerListener(drawerToggle);
 
 
-        drawer.findViewById(R.id.dwrChangeAcc).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrChangeAcc).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
+                drawerLayout.closeDrawers();
                 showDialog(CHANGE_LOGGED_IN_DIALOG);
             }
         });
 
-        boardListButton = (Button) drawer.findViewById(R.id.dwrBoardJumper);
+        boardListButton = (Button) findViewById(R.id.dwrBoardJumper);
         boardListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
+                drawerLayout.closeDrawers();
                 session.get(NetDesc.BOARD_JUMPER, "/boards");
             }
         });
 
-        drawer.findViewById(R.id.dwrAMPList).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrAMPList).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
+                drawerLayout.closeDrawers();
                 session.get(NetDesc.AMP_LIST, buildAMPLink());
             }
         });
 
-        drawer.findViewById(R.id.dwrTrackedTopics).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrTrackedTopics).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
+                drawerLayout.closeDrawers();
                 session.get(NetDesc.TRACKED_TOPICS, "/boards/tracked");
             }
         });
 
-        drawer.findViewById(R.id.dwrPMInbox).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrPMInbox).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
+                drawerLayout.closeDrawers();
                 session.get(NetDesc.PM_INBOX, "/pm/");
             }
         });
 
-        drawer.findViewById(R.id.dwrCopyCurrURL).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrCopyCurrURL).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 android.content.ClipboardManager clipboard =
                         (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
                 clipboard.setPrimaryClip(android.content.ClipData.newPlainText("simple text", session.getLastPath()));
-                drawer.closeMenu(true);
+                drawerLayout.closeDrawers();
                 Crouton.showText(AllInOneV2.this, "URL copied to clipboard.", Theming.croutonStyle());
             }
         });
 
-        drawer.findViewById(R.id.dwrHighlightList).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrHighlightList).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(false);
+                drawerLayout.closeDrawers();
                 startActivity(new Intent(AllInOneV2.this, SettingsHighlightedUsers.class));
             }
         });
 
-        drawer.findViewById(R.id.dwrSettings).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrSettings).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(false);
-                startActivity(new Intent(AllInOneV2.this, TabbedSettings.class));
+                drawerLayout.closeDrawers();
+                startActivity(new Intent(AllInOneV2.this, HeaderSettings.class));
             }
         });
 
-        drawer.findViewById(R.id.dwrExit).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrExit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AllInOneV2.this.finish();
             }
         });
 
-        // The drawable that replaces the up indicator in the action bar
-        if (Theming.usingLightTheme())
-            drawer.setSlideDrawable(R.drawable.ic_drawer_light);
-        else
-            drawer.setSlideDrawable(R.drawable.ic_drawer);
-
-        // Whether the previous drawable should be shown
-        drawer.setDrawerIndicatorEnabled(true);
+        aBar.setDisplayHomeAsUpEnabled(true);
+        aBar.setHomeButtonEnabled(true);
 
         if (!settings.contains("defaultAccount")) {
             // settings need to be set to default
@@ -404,30 +396,15 @@ public class AllInOneV2 extends Activity {
             PreferenceManager.setDefaultValues(this, R.xml.prefsgeneral, false);
             PreferenceManager.setDefaultValues(this, R.xml.prefstheming, false);
             Editor sEditor = settings.edit();
-            sEditor.putString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT)
+            sEditor.putString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT)
                     .putString("timezone", TimeZone.getDefault().getID())
                     .apply();
         }
 
-        ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
-
-        // Now setup the PullToRefreshLayout
-        ActionBarPullToRefresh.from(this)
-                .options(Options.create()
-                        .noMinimize()
-                        .refreshOnUp(true)
-                        .build())
-                        // Mark All Children as pullable
-                .allChildrenArePullable()
-                        // Set the OnRefreshListener
-                .listener(new OnRefreshListener() {
-                    @Override
-                    public void onRefreshStarted(View view) {
-                        refreshClicked(view);
-                    }
-                })
-                        // Finally commit the setup to our PullToRefreshLayout
-                .setup(ptrLayout);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.ptr_layout);
+        swipeRefreshLayout.setEnabled(false);
+        swipeRefreshLayout.setColorSchemeColors(Theming.colorPrimary(), Theming.colorPrimaryDark());
+        swipeRefreshLayout.setOnRefreshListener(this);
 
         contentList = (ListView) findViewById(R.id.aioMainList);
 
@@ -437,10 +414,7 @@ public class AllInOneV2 extends Activity {
         titleCounter = (TextView) findViewById(R.id.aioPostTitleCounter);
         bodyCounter = (TextView) findViewById(R.id.aioPostBodyCounter);
 
-        title = (TextView) findViewById(R.id.aioTitle);
-        title.setSelected(true);
-
-        pageJumperWrapper = findViewById(R.id.aioPageJumperWrapper);
+        pageJumperWrapper = findViewById(R.id.aioHeader);
         firstPage = (Button) findViewById(R.id.aioFirstPage);
         firstPage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -477,9 +451,8 @@ public class AllInOneV2 extends Activity {
             }
         });
 
-        Theming.setTextSizeBases(((TextView) drawer.findViewById(R.id.dwrChangeAccHeader)).getTextSize(),
-                ((TextView) drawer.findViewById(R.id.dwrChangeAcc)).getTextSize(),
-                title.getTextSize(),
+        Theming.setTextSizeBases(((TextView) findViewById(R.id.dwrChangeAccHeader)).getTextSize(),
+                ((TextView) findViewById(R.id.dwrChangeAcc)).getTextSize(),
                 firstPage.getTextSize(),
                 pageLabel.getTextSize());
 
@@ -544,12 +517,33 @@ public class AllInOneV2 extends Activity {
         hlDB = new HighlightListDBHelper(this);
 
         adapterRows.add(new HeaderRowData("Loading..."));
-        adapterRows.add(new AdmobRowData());
         contentList.setAdapter(viewAdapter);
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (pMode == PostMode.ON_BOARD)
+                    postSetup(false);
+                else if (pMode == PostMode.ON_TOPIC)
+                    postSetup(true);
+                else if (pMode == PostMode.NEW_PM)
+                    pmSetup(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+            }
+        });
+
+        fab.attachToListView(contentList);
 
         AppRater.app_launched(this);
 
         if (BuildConfig.DEBUG) wtl("onCreate finishing");
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        drawerToggle.syncState();
     }
 
     @Override
@@ -571,9 +565,7 @@ public class AllInOneV2 extends Activity {
         if (BuildConfig.DEBUG) wtl("onResume fired");
         super.onResume();
 
-        AdmobRowView.resumeAd();
-
-        ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
+        swipeRefreshLayout.setEnabled(settings.getBoolean("enablePTR", false));
 
         int lastUpdateYear = settings.getInt("lastUpdateYear", 0);
         int lastUpdateYearDay = settings.getInt("lastUpdateYearDay", 0);
@@ -625,66 +617,29 @@ public class AllInOneV2 extends Activity {
         if (Theming.updateTextScale(settings.getInt("textScale", 100) / 100f)) {
             int px = TypedValue.COMPLEX_UNIT_PX;
 
-            title.setTextSize(px, Theming.getScaledPageTitleTextSize());
-
             firstPage.setTextSize(px, Theming.getScaledPJButtonTextSize());
             prevPage.setTextSize(px, Theming.getScaledPJButtonTextSize());
             nextPage.setTextSize(px, Theming.getScaledPJButtonTextSize());
             lastPage.setTextSize(px, Theming.getScaledPJButtonTextSize());
             pageLabel.setTextSize(px, Theming.getScaledPJLabelTextSize());
 
-            ((TextView) drawer.findViewById(R.id.dwrChangeAccHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrChangeAcc)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrNavHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
+            ((TextView) findViewById(R.id.dwrChangeAccHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
+            ((TextView) findViewById(R.id.dwrChangeAcc)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrNavHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
             boardListButton.setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrAMPList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrTrackedTopics)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrPMInbox)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrFuncHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrCopyCurrURL)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrHighlightList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrSettings)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrExit)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-        }
-
-        int color = settings.getInt("accentColor", (getResources().getColor(R.color.holo_blue)));
-        boolean whiteText = settings.getBoolean("useWhiteAccentText", false);
-
-        if (Theming.updateAccentColor(color, whiteText) || firstResume) {
-
-            ((DefaultHeaderTransformer) ptrLayout.getHeaderTransformer()).setProgressBarColor(Theming.accentColor());
-
-            findViewById(R.id.aioPJTopSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioFirstPrevSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioNextLastSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostWrapperSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostTitleSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostBodySep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioBoldSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioItalicSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioCodeSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioSpoilerSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioCiteSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioHTMLSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostButtonSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPollSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostSep).setBackgroundColor(Theming.accentColor());
-            drawer.findViewById(R.id.dwrCAHSep).setBackgroundColor(Theming.accentColor());
-            drawer.findViewById(R.id.dwrNavSep).setBackgroundColor(Theming.accentColor());
-            drawer.findViewById(R.id.dwrFuncSep).setBackgroundColor(Theming.accentColor());
+            ((TextView) findViewById(R.id.dwrAMPList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrTrackedTopics)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrPMInbox)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrFuncHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
+            ((TextView) findViewById(R.id.dwrCopyCurrURL)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrHighlightList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrSettings)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrExit)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
         }
 
         MessageRowView.setUsingAvatars(settings.getBoolean("usingAvatars", false));
 
-        if (session != null) {
-            if (settings.getBoolean("reloadOnResume", false)) {
-                if (BuildConfig.DEBUG)
-                    wtl("session exists, reload on resume is true, refreshing page");
-                isRoR = true;
-                session.refresh();
-            }
-        } else {
+        if (session == null) {
             String initUrl = null;
             NetDesc initDesc = null;
             if (firstResume) {
@@ -696,8 +651,14 @@ public class AllInOneV2 extends Activity {
                     }
                 }
             }
-            String defaultAccount = settings.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT);
-            if (AccountManager.containsUser(this, defaultAccount)) {
+
+            String defaultAccount = settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT);
+            String resumeAccount = settings.getString("resumeSessionUser", HeaderSettings.NO_DEFAULT_ACCOUNT);
+            boolean resumeSession = settings.getBoolean("resumeSession", false);
+
+            if (firstResume && resumeSession && AccountManager.containsUser(this, resumeAccount)) {
+                session = new Session(this, resumeAccount, AccountManager.getPassword(this, resumeAccount), Session.RESUME_INIT_URL, NetDesc.UNSPECIFIED);
+            } else if (AccountManager.containsUser(this, defaultAccount)) {
                 if (BuildConfig.DEBUG) wtl("starting new session from onResume, logged in");
                 session = new Session(this, defaultAccount, AccountManager.getPassword(this, defaultAccount), initUrl, initDesc);
             } else {
@@ -705,8 +666,6 @@ public class AllInOneV2 extends Activity {
                 session = new Session(this, null, null, initUrl, initDesc);
             }
         }
-
-        title.setSelected(true);
 
         if (!settings.contains("beenWelcomed")) {
             settings.edit().putBoolean("beenWelcomed", true).apply();
@@ -729,56 +688,104 @@ public class AllInOneV2 extends Activity {
     }
 
     @Override
-    protected void onPause() {
-        AdmobRowView.pauseAd();
-        super.onPause();
+    protected void onStop () {
+        Editor e = settings.edit();
+        e.putBoolean("resumeSession", true);
+        session.addHistoryBeforeStop();
+        if (Session.isLoggedIn())
+            e.putString("resumeSessionUser", Session.getUser());
+
+        e.apply();
+
+        session.closeHistoryDB();
+
+        super.onStop();
+    }
+
+    @Override
+    protected void onRestart () {
+        super.onRestart();
+        session.openHistoryDB();
+        session.popHistory();
     }
 
     @Override
     protected void onDestroy() {
+        if (BuildConfig.DEBUG) wtl("Destroying!");
         Crouton.clearCroutonsForActivity(this);
-        AdmobRowView.destroyAd();
 
-        if (session != null)
-            session.closeHistoryDB();
+        if (isFinishing())
+            settings.edit().putBoolean("resumeSession", false).apply();
 
         super.onDestroy();
+    }
+
+    private AlertDialog loginDialog;
+    public void showLoggingInDialog(String user) {
+        if (loginDialog == null) {
+            AlertDialog.Builder b = new AlertDialog.Builder(this);
+            ProgressBar spinner = new ProgressBar(this);
+            spinner.setIndeterminate(true);
+            b.setView(spinner);
+            loginDialog = b.create();
+        }
+
+        loginDialog.setTitle("Logging in as " + user + "...");
+        loginDialog.show();
+    }
+
+    public void dismissLoginDialog() {
+        loginDialog.dismiss();
     }
 
     private boolean needToSetNavList = true;
 
     public void disableNavList() {
-        drawer.findViewById(R.id.dwrNavWrapper).setVisibility(View.GONE);
+        findViewById(R.id.dwrNavWrapper).setVisibility(View.GONE);
         needToSetNavList = true;
     }
 
     public void setNavList(boolean isLoggedIn) {
-        drawer.findViewById(R.id.dwrNavWrapper).setVisibility(View.VISIBLE);
+        findViewById(R.id.dwrNavWrapper).setVisibility(View.VISIBLE);
         if (isLoggedIn)
-            drawer.findViewById(R.id.dwrLoggedInNav).setVisibility(View.VISIBLE);
+            findViewById(R.id.dwrLoggedInNav).setVisibility(View.VISIBLE);
         else
-            drawer.findViewById(R.id.dwrLoggedInNav).setVisibility(View.GONE);
+            findViewById(R.id.dwrLoggedInNav).setVisibility(View.GONE);
+
+        needToSetNavList = false;
     }
 
     @Override
     public boolean onSearchRequested() {
         if (searchIcon != null && searchIcon.isVisible())
-            searchIcon.expandActionView();
+            MenuItemCompat.expandActionView(searchIcon);
 
         return false;
+    }
+
+    public void toggleMenu() {
+        if (drawerLayout.isDrawerOpen(Gravity.LEFT))
+            drawerLayout.closeDrawers();
+        else
+            drawerLayout.openDrawer(Gravity.LEFT);
     }
 
     @Override
     public boolean onKeyUp(int keyCode, @NotNull KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_MENU) {
-            drawer.toggleMenu();
+            toggleMenu();
             return true;
         } else {
             return super.onKeyUp(keyCode, event);
         }
     }
 
-    private MenuItem refreshIcon, postIcon, replyIcon, pmInboxIcon, pmOutboxIcon,
+    @Override
+    public void onRefresh() {
+        refreshClicked(null);
+    }
+
+    private MenuItem refreshIcon, replyIcon, pmInboxIcon, pmOutboxIcon,
             addFavIcon, remFavIcon, searchIcon, topicListIcon, sendUserPMIcon, tagUserIcon;
 
     /**
@@ -796,11 +803,10 @@ public class AllInOneV2 extends Activity {
         pmOutboxIcon = menu.findItem(R.id.pmOutbox);
         sendUserPMIcon = menu.findItem(R.id.sendUserPM);
         tagUserIcon = menu.findItem(R.id.tagUser);
-        postIcon = menu.findItem(R.id.post);
         replyIcon = menu.findItem(R.id.reply);
         refreshIcon = menu.findItem(R.id.refresh);
 
-        SearchView searchView = (SearchView) searchIcon.getActionView();
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchIcon);
         if (searchView != null) {
             SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -842,16 +848,16 @@ public class AllInOneV2 extends Activity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         // Handle item selection
         switch (item.getItemId()) {
-            case android.R.id.home:
-                if (BuildConfig.DEBUG) wtl("toggling drawer");
-                drawer.toggleMenu();
-                return true;
-
             case R.id.search:
                 onSearchRequested();
-//    		MenuItemCompat.expandActionView(searchIcon);
                 return true;
 
             case R.id.addFav:
@@ -994,16 +1000,6 @@ public class AllInOneV2 extends Activity {
                 b.show();
                 return true;
 
-            case R.id.post:
-                if (pMode == PostMode.ON_BOARD)
-                    postSetup(false);
-                else if (pMode == PostMode.ON_TOPIC)
-                    postSetup(true);
-                else if (pMode == PostMode.NEW_PM)
-                    pmSetup(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-
-                return true;
-
             case R.id.reply:
                 pmSetup(replyTo, replySubject, EMPTY_STRING);
                 return true;
@@ -1040,7 +1036,6 @@ public class AllInOneV2 extends Activity {
 
     private void setAllMenuItemsExceptRefreshVisibility(boolean visible) {
         setMenuItemVisibility(searchIcon, visible);
-        setMenuItemVisibility(postIcon, visible);
         setMenuItemVisibility(replyIcon, visible);
         setMenuItemVisibility(pmInboxIcon, visible);
         setMenuItemVisibility(pmOutboxIcon, visible);
@@ -1049,12 +1044,16 @@ public class AllInOneV2 extends Activity {
         setMenuItemVisibility(addFavIcon, visible);
         setMenuItemVisibility(remFavIcon, visible);
         setMenuItemVisibility(topicListIcon, visible);
+
+        if (visible)
+            fab.setVisibility(View.VISIBLE);
+        else
+            fab.setVisibility(View.GONE);
     }
 
     private void setAllMenuItemsEnabled(boolean enabled) {
         setMenuItemEnabled(refreshIcon, enabled);
         setMenuItemEnabled(searchIcon, enabled);
-        setMenuItemEnabled(postIcon, enabled);
         setMenuItemEnabled(replyIcon, enabled);
         setMenuItemEnabled(pmInboxIcon, enabled);
         setMenuItemEnabled(pmOutboxIcon, enabled);
@@ -1063,6 +1062,8 @@ public class AllInOneV2 extends Activity {
         setMenuItemEnabled(addFavIcon, enabled);
         setMenuItemEnabled(remFavIcon, enabled);
         setMenuItemEnabled(topicListIcon, enabled);
+
+        fab.setEnabled(enabled);
     }
 
     public void setLoginName(String name) {
@@ -1151,7 +1152,7 @@ public class AllInOneV2 extends Activity {
     private void postTimeoutCleanup() {
         AlertDialog.Builder b = new AlertDialog.Builder(AllInOneV2.this);
         b.setTitle("Post Timeout");
-        b.setMessage("Post timed out. Press refresh to check if your post made it through. Dismissing " +
+        b.setMessage("Post timed out. Refresh the page to check if your post made it through. Dismissing " +
                 "and posting again without first checking if the post went through may result in the post " +
                 "being submitted twice.");
 
@@ -1162,7 +1163,7 @@ public class AllInOneV2 extends Activity {
             }
         });
 
-        b.setNeutralButton("Copy Post to Clipboard", null);
+        b.setNeutralButton("Copy Post", null);
 
         b.setNegativeButton("Dismiss", new OnClickListener() {
             @Override
@@ -1177,27 +1178,7 @@ public class AllInOneV2 extends Activity {
         d.setOnShowListener(new OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
-                Button posButton = d.getButton(DialogInterface.BUTTON_POSITIVE);
-                final Button neuButton = d.getButton(DialogInterface.BUTTON_NEUTRAL);
-                Button negButton = d.getButton(DialogInterface.BUTTON_NEGATIVE);
-
-                LayoutParams posParams = (LayoutParams) posButton.getLayoutParams();
-                posParams.weight = 1;
-                posParams.width = LayoutParams.MATCH_PARENT;
-
-                LayoutParams neuParams = (LayoutParams) negButton.getLayoutParams();
-                neuParams.weight = 1.2f;
-                neuParams.width = LayoutParams.MATCH_PARENT;
-
-                LayoutParams negParams = (LayoutParams) negButton.getLayoutParams();
-                negParams.weight = 1;
-                negParams.width = LayoutParams.MATCH_PARENT;
-
-                posButton.setLayoutParams(posParams);
-                neuButton.setLayoutParams(neuParams);
-                negButton.setLayoutParams(negParams);
-
-                neuButton.setOnClickListener(new View.OnClickListener() {
+                d.getButton(DialogInterface.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         android.content.ClipboardManager clipboard =
@@ -1208,7 +1189,7 @@ public class AllInOneV2 extends Activity {
                         Crouton.showText(AllInOneV2.this,
                                 "Message body copied to clipboard.",
                                 Theming.croutonStyle(),
-                                (ViewGroup) d.findViewById(android.R.id.message).getParent().getParent());
+                                (ViewGroup) v.getParent().getParent());
                     }
                 });
             }
@@ -1216,12 +1197,9 @@ public class AllInOneV2 extends Activity {
         d.show();
     }
 
-    private boolean isRoR = false;
-
     private void postInterfaceCleanup() {
-        if (!isRoR && postWrapper.getVisibility() == View.VISIBLE) {
+        if (postWrapper.getVisibility() == View.VISIBLE) {
             if (BuildConfig.DEBUG) wtl("postInterfaceCleanup fired --NEL");
-            pageJumperWrapper.setVisibility(View.VISIBLE);
             postWrapper.setVisibility(View.GONE);
             pollButton.setVisibility(View.GONE);
             pollSep.setVisibility(View.GONE);
@@ -1230,12 +1208,18 @@ public class AllInOneV2 extends Activity {
             clearPoll();
             messageIDForEditing = null;
 
+            fab.setVisibility(View.VISIBLE);
+
             hideSoftKeyboard(postBody);
+
+
+            if (!pageLabel.getText().toString().equals("~ 1 / 1 ~"))
+                pageJumperWrapper.setVisibility(View.VISIBLE);
         }
     }
 
     private void ptrCleanup() {
-        ptrLayout.setRefreshing(false);
+        swipeRefreshLayout.setRefreshing(false);
         setAllMenuItemsEnabled(true);
         if (postWrapper.getVisibility() == View.VISIBLE) {
             postSubmitButton.setEnabled(true);
@@ -1253,11 +1237,12 @@ public class AllInOneV2 extends Activity {
 
     public void preExecuteSetup(NetDesc desc) {
         if (BuildConfig.DEBUG) wtl("GRAIO dPreES fired --NEL, desc: " + desc.name());
-        ptrLayout.setRefreshing(true);
-        setAllMenuItemsEnabled(false);
 
         if (desc != NetDesc.POSTMSG_S1 && desc != NetDesc.POSTTPC_S1 && desc != NetDesc.EDIT_MSG)
             postInterfaceCleanup();
+
+        swipeRefreshLayout.setRefreshing(true);
+        setAllMenuItemsEnabled(false);
     }
 
     /*
@@ -1269,27 +1254,12 @@ public class AllInOneV2 extends Activity {
     ArrayList<BaseRowData> adapterRows = new ArrayList<BaseRowData>();
     ViewAdapter viewAdapter = new ViewAdapter(this, adapterRows);
 
-    WebView web;
-    String adBaseUrl;
-    StringBuilder adBuilder = new StringBuilder();
-    Runnable postProcessRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (web.getParent() != null)
-                ((View) web.getParent()).setMinimumHeight(web.getHeight());
-
-            web.loadDataWithBaseURL(adBaseUrl, adBuilder.toString(), null, "iso-8859-1", null);
-            adBuilder.setLength(0);
-            setMarqueeSpeed(title, 4, false);
-        }
-    };
-
     @SuppressLint("SetJavaScriptEnabled")
     public void processContent(NetDesc desc, Document doc, String resUrl) {
 
         if (BuildConfig.DEBUG) wtl("GRAIO hNR fired, desc: " + desc.name());
 
-        ptrLayout.setEnabled(false);
+        swipeRefreshLayout.setEnabled(false);
 
         if (searchIcon != null)
             searchIcon.collapseActionView();
@@ -1299,7 +1269,7 @@ public class AllInOneV2 extends Activity {
         adapterRows.clear();
 
         boolean isDefaultAcc = Session.getUser() != null &&
-                Session.getUser().equals(settings.getString("defaultAccount", TabbedSettings.NO_DEFAULT_ACCOUNT));
+                Session.getUser().equals(settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT));
 
         if (BuildConfig.DEBUG) wtl("setting board, topic, message id to null");
         boardID = null;
@@ -1311,44 +1281,10 @@ public class AllInOneV2 extends Activity {
         String headerTitle;
         String firstPage = null;
         String prevPage = null;
-        int[] pagesInfo = new int[] {1, 1};
+        int[] pagesInfo = new int[]{1, 1};
         String nextPage = null;
         String lastPage = null;
         String pagePrefix = null;
-
-        if (BuildConfig.DEBUG) wtl("initial adbuilder appending");
-        adBuilder.append("<html>\n<head>\n");
-        adBuilder.append(doc.head().html());
-        adBuilder.append("<style>\n* {background-color: ");
-        adBuilder.append(ColorPickerPreference.convertToRGB(Theming.backgroundColor()));
-        adBuilder.append(";}\n</style>\n</head>\n");
-        adBuilder.append("<body>");
-
-        if (BuildConfig.DEBUG) wtl("appending ad elements to adbuilder");
-        for (Element e : doc.body().getElementsByClass("ad")) {
-            adBuilder.append(e.outerHtml());
-            e.remove();
-        }
-
-        if (BuildConfig.DEBUG) wtl("appending script elements to adbuilder");
-        for (Element e : doc.body().getElementsByTag("script")) {
-            adBuilder.append(e.outerHtml());
-        }
-
-        if (BuildConfig.DEBUG) wtl("appending closing tags to adbuilder");
-        adBuilder.append("</body></html>");
-
-        adBaseUrl = resUrl;
-
-        if (BuildConfig.DEBUG) wtl("checking if webView is null, creating if so");
-        if (web == null) {
-            web = new WebView(this);
-            web.getSettings();
-            web.setBackgroundColor(Theming.backgroundColor());
-        }
-
-        if (BuildConfig.DEBUG) wtl("enabling javascript");
-        web.getSettings().setJavaScriptEnabled(settings.getBoolean("enableJS", true));
 
         if (BuildConfig.DEBUG) wtl("checking for board quick list");
         Element boardsDropdown = null;
@@ -1386,6 +1322,8 @@ public class AllInOneV2 extends Activity {
             boardListButton.setText(getResources().getString(R.string.board_jumper));
             boardListButton.setLongClickable(false);
         }
+
+        contentList.setDividerHeight(Theming.convertDPtoPX(this, 1));
 
         switch (desc) {
             case BOARD_JUMPER:
@@ -1462,7 +1400,7 @@ public class AllInOneV2 extends Activity {
                     adapterRows.add(new HeaderRowData("There are no private messages here at this time."));
                 }
 
-                setMenuItemVisibility(postIcon, true);
+                fab.setVisibility(View.VISIBLE);
                 pMode = PostMode.NEW_PM;
 
                 if (isInbox)
@@ -1797,6 +1735,7 @@ public class AllInOneV2 extends Activity {
                 break;
 
             case TOPIC:
+                contentList.setDividerHeight(0);
                 boardID = parseBoardID(resUrl);
                 topicID = parseTopicID(resUrl);
 
@@ -2146,13 +2085,9 @@ public class AllInOneV2 extends Activity {
 
             default:
                 if (BuildConfig.DEBUG) wtl("GRAIO hNR determined response type is unhandled");
-                title.setText("Page unhandled - " + resUrl);
+                getSupportActionBar().setTitle("Page unhandled - " + resUrl);
                 break;
         }
-
-        adapterRows.add(new AdmobRowData());
-        adapterRows.add(new AdGFAQsRowData(web));
-        contentList.post(postProcessRunnable);
 
         Element pmInboxLink = doc.select("div.masthead_user").first().select("a[href=/pm/]").first();
         String pmButtonLabel = getResources().getString(R.string.pm_inbox);
@@ -2208,7 +2143,7 @@ public class AllInOneV2 extends Activity {
 
         ((Button) findViewById(R.id.dwrTrackedTopics)).setText(ttButtonLabel);
 
-        ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
+        swipeRefreshLayout.setEnabled(settings.getBoolean("enablePTR", false));
 
         viewAdapter.notifyDataSetChanged();
 
@@ -2238,8 +2173,8 @@ public class AllInOneV2 extends Activity {
             });
         }
 
-        if (ptrLayout.isRefreshing())
-            ptrLayout.setRefreshComplete();
+        if (swipeRefreshLayout.isRefreshing())
+            swipeRefreshLayout.setRefreshing(false);
 
         if (BuildConfig.DEBUG) wtl("GRAIO hNR finishing");
     }
@@ -2319,7 +2254,7 @@ public class AllInOneV2 extends Activity {
     }
 
     private int[] getPageJumperInfo(Element pj) {
-        int[] i = new int[] {1, 1};
+        int[] i = new int[]{1, 1};
         if (pj != null && !pj.hasClass("user") && !pj.hasClass("tsort")) {
             String currPage, pageCount;
 
@@ -2351,12 +2286,12 @@ public class AllInOneV2 extends Activity {
     private void updatePostingRights(Document pRes, boolean onTopic) {
         if (onTopic) {
             if (pRes.getElementsByClass("user").first().text().contains("Post New Message")) {
-                setMenuItemVisibility(postIcon, true);
+                fab.setVisibility(View.VISIBLE);
                 pMode = PostMode.ON_TOPIC;
             }
         } else {
             if (pRes.getElementsByClass("user").first().text().contains("New Topic")) {
-                setMenuItemVisibility(postIcon, true);
+                fab.setVisibility(View.VISIBLE);
                 pMode = PostMode.ON_BOARD;
             }
         }
@@ -2368,15 +2303,11 @@ public class AllInOneV2 extends Activity {
 
         if (needToSetNavList) {
             setNavList(Session.isLoggedIn());
-            needToSetNavList = false;
         }
 
         ptrCleanup();
         if (desc == NetDesc.BOARD || desc == NetDesc.TOPIC)
             postInterfaceCleanup();
-
-        if (isRoR)
-            isRoR = false;
 
         System.gc();
     }
@@ -2398,10 +2329,16 @@ public class AllInOneV2 extends Activity {
                               int pageCount, String nextPageIn, String lastPageIn,
                               String jumperPageIn, NetDesc desc) {
 
-        title.setText(titleIn);
+        if (pageCount == 1) {
+            updateHeaderNoJumper(titleIn, desc);
+            return;
+        }
+
+        getSupportActionBar().setTitle(titleIn);
 
         if (currPage == -1) {
             pageJumperWrapper.setVisibility(View.GONE);
+            pageLabel.setText("~ 1 / 1 ~");
         } else {
             pageJumperWrapper.setVisibility(View.VISIBLE);
             pageJumperDesc = desc;
@@ -2434,7 +2371,7 @@ public class AllInOneV2 extends Activity {
                 lastPage.setEnabled(false);
             }
 
-            if (pageCount != 1 && pageCount != -1) {
+            if (pageCount != -1) {
                 jumperPageUrl = jumperPageIn;
 
                 final String[] items = new String[pageCount];
@@ -2464,10 +2401,7 @@ public class AllInOneV2 extends Activity {
                 pageLabel.setText("~ " + currPage + " / " + pageCount + " ~");
             } else {
                 pageLabel.setEnabled(false);
-                if (pageCount == 1)
-                    pageLabel.setText(currPage + " / " + pageCount);
-                else
-                    pageLabel.setText(currPage + " / ???");
+                pageLabel.setText(currPage + " / ???");
             }
         }
     }
@@ -2513,6 +2447,7 @@ public class AllInOneV2 extends Activity {
     private void postSetup(boolean postingOnTopic) {
         findViewById(R.id.aioHTMLScroller).scrollTo(0, 0);
         pageJumperWrapper.setVisibility(View.GONE);
+        fab.setVisibility(View.GONE);
         postSubmitButton.setEnabled(true);
         postCancelButton.setEnabled(true);
 
@@ -2793,7 +2728,7 @@ public class AllInOneV2 extends Activity {
         }
 
         if (Session.isLoggedIn()) {
-            if (postIcon != null && postIcon.isVisible())
+            if (postWrapper.getVisibility() == View.VISIBLE || fab.getVisibility() == View.VISIBLE)
                 listBuilder.add("Quote");
             if (Session.getUser().trim().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
                 if (Session.userCanEditMsgs() && clickedMsg.isEditable())
@@ -2995,26 +2930,6 @@ public class AllInOneV2 extends Activity {
 
 
         final AlertDialog d = accountChanger.create();
-        d.setOnShowListener(new OnShowListener() {
-
-            @Override
-            @SuppressWarnings("ConstantConditions")
-            public void onShow(DialogInterface dialog) {
-                Button posButton = d.getButton(DialogInterface.BUTTON_POSITIVE);
-                Button negButton = d.getButton(DialogInterface.BUTTON_NEGATIVE);
-
-                LayoutParams posParams = (LayoutParams) posButton.getLayoutParams();
-                posParams.weight = 1;
-                posParams.width = LayoutParams.MATCH_PARENT;
-
-                LayoutParams negParams = (LayoutParams) negButton.getLayoutParams();
-                negParams.weight = 1;
-                negParams.width = LayoutParams.MATCH_PARENT;
-
-                posButton.setLayoutParams(posParams);
-                negButton.setLayoutParams(negParams);
-            }
-        });
         d.setOnDismissListener(new DialogInterface.OnDismissListener() {
             public void onDismiss(DialogInterface dialog) {
                 removeDialog(CHANGE_LOGGED_IN_DIALOG);
@@ -3037,7 +2952,7 @@ public class AllInOneV2 extends Activity {
                 session.get(NetDesc.BOARD, boardQuickListLinks[which]);
             }
         });
-        drawer.closeMenu(true);
+        drawerLayout.closeDrawers();
         b.show();
     }
 
@@ -3147,17 +3062,22 @@ public class AllInOneV2 extends Activity {
     }
 
     public void tryCaught(String url, String desc, Throwable e, String source) {
-        ACRAConfiguration config = ACRA.getConfig();
-        config.setResToastText(R.string.bug_toast_text);
+        if (!BuildConfig.DEBUG) {
+            ACRAConfiguration config = ACRA.getConfig();
+            config.setResToastText(R.string.bug_toast_text);
 
-        ACRA.getErrorReporter().putCustomData("URL", url);
-        ACRA.getErrorReporter().putCustomData("NetDesc", desc);
-        ACRA.getErrorReporter().putCustomData("Page Source", StringEscapeUtils.escapeJava(source));
-        ACRA.getErrorReporter().putCustomData("Last Attempted Path", session.getLastAttemptedPath());
-        ACRA.getErrorReporter().putCustomData("Last Attempted Desc", session.getLastAttemptedDesc().toString());
-        ACRA.getErrorReporter().handleException(e);
+            ACRA.getErrorReporter().putCustomData("URL", url);
+            ACRA.getErrorReporter().putCustomData("NetDesc", desc);
+            ACRA.getErrorReporter().putCustomData("Page Source", StringEscapeUtils.escapeJava(source));
+            ACRA.getErrorReporter().putCustomData("Last Attempted Path", session.getLastAttemptedPath());
+            ACRA.getErrorReporter().putCustomData("Last Attempted Desc", session.getLastAttemptedDesc().toString());
+            ACRA.getErrorReporter().handleException(e);
 
-        config.setResToastText(R.string.crash_toast_text);
+            config.setResToastText(R.string.crash_toast_text);
+        }
+        else {
+            Log.e("tryCaught", "", e);
+        }
     }
 
     private String parseBoardID(String url) {
@@ -3221,8 +3141,8 @@ public class AllInOneV2 extends Activity {
     public void onBackPressed() {
         if (searchIcon != null && searchIcon.isActionViewExpanded()) {
             searchIcon.collapseActionView();
-        } else if (drawer.isMenuVisible()) {
-            drawer.closeMenu(true);
+        } else if (drawerLayout.isDrawerOpen(Gravity.LEFT)) {
+            drawerLayout.closeDrawers();
         } else if (postWrapper.getVisibility() == View.VISIBLE) {
             postCancel(postCancelButton);
         } else {
@@ -3236,8 +3156,7 @@ public class AllInOneV2 extends Activity {
             session.goBack(false);
         } else {
             if (BuildConfig.DEBUG) wtl("back pressed, no history, exiting app");
-            session = null;
-            this.finish();
+            finish();
         }
     }
 
@@ -3286,31 +3205,32 @@ public class AllInOneV2 extends Activity {
         postBody.getText().replace(Math.min(start, end), Math.max(start, end), insert, 0, insert.length());
     }
 
-    private boolean marqueeSpeedSet = false;
-
-    private void setMarqueeSpeed(TextView tv, float speed, boolean speedIsMultiplier) {
-        if (!marqueeSpeedSet) {
-            try {
-                Field f = tv.getClass().getDeclaredField("mMarquee");
-                f.setAccessible(true);
-                Object marquee = f.get(tv);
-                if (marquee != null) {
-                    Field mf = marquee.getClass().getDeclaredField("mScrollUnit");
-                    mf.setAccessible(true);
-                    float newSpeed = speed;
-                    float curSpeed = mf.getFloat(marquee);
-                    if (speedIsMultiplier) {
-                        newSpeed = curSpeed * speed;
-                    }
-                    mf.setFloat(marquee, newSpeed);
-                    if (BuildConfig.DEBUG)
-                        wtl("marquee speed set to " + newSpeed + ", from " + curSpeed);
-                    marqueeSpeedSet = true;
-                }
-            } catch (Exception e) {
-                // ignore, not implemented in current API level
-            }
+    private Snackbar sb;
+    public void showSnackbar(String msg) {
+        if (sb == null) {
+            sb = Snackbar.with(getApplicationContext())
+                    .eventListener(new EventListener() {
+                        @Override
+                        public void onShow(int height) {
+                            RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams)fab.getLayoutParams();
+                            p.bottomMargin += Theming.convertDPtoPX(AllInOneV2.this, 48); // in PX
+                            fab.setLayoutParams(p);
+                        }
+                        @Override
+                        public void onDismiss(int height) {
+                            RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams)fab.getLayoutParams();
+                            p.bottomMargin -= Theming.convertDPtoPX(AllInOneV2.this, 48); // in PX
+                            fab.setLayoutParams(p);
+                        }
+                    })
+                    .duration(Snackbar.SnackbarDuration.LENGTH_SHORT)
+                    .attachToAbsListView(contentList)
+                    .color(Theming.colorPrimary())
+                    .textColor(Color.WHITE);
         }
+
+        sb.text(msg);
+        sb.show(this);
     }
 
     private static final String[] bannedList = {

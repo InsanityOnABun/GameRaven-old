@@ -5,5 +5,4 @@
 
     <dimen name="item_padding_vertical">3dp</dimen>
     <dimen name="item_padding_horizontal">5dp</dimen>
-    <dimen name="item_padding_horizontal_negative">-5dp</dimen>
 </resources>

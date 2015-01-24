@@ -1,6 +1,5 @@
 package com.ioabsoftware.gameraven.views.rowdata;
 
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -12,7 +11,6 @@ import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
-import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 import android.text.util.Linkify;
 import android.view.View;
@@ -27,9 +25,8 @@ import com.ioabsoftware.gameraven.BuildConfig;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
-import com.ioabsoftware.gameraven.util.RichTextUtils;
+import com.ioabsoftware.gameraven.util.MyLinkifier;
 import com.ioabsoftware.gameraven.util.Theming;
-import com.ioabsoftware.gameraven.util.UrlSpanConverter;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.GRQuoteSpan;
 import com.ioabsoftware.gameraven.views.RowType;
@@ -193,7 +190,7 @@ public class MessageRowData extends BaseRowData {
             pollInnerWrapper.setOrientation(LinearLayout.VERTICAL);
 
             Drawable s = aio.getResources().getDrawable(R.drawable.item_background);
-            s.setColorFilter(Theming.accentColor(), PorterDuff.Mode.SRC_ATOP);
+            s.setColorFilter(Theming.colorPrimary(), PorterDuff.Mode.SRC_ATOP);
             poll.setBackgroundDrawable(s);
 
             HeaderRowView h = new HeaderRowView(aio);
@@ -213,7 +210,7 @@ public class MessageRowData extends BaseRowData {
                     if (!c.get(0).children().isEmpty()) {
                         SpannableStringBuilder votedFor = new SpannableStringBuilder(text);
                         votedFor.setSpan(new StyleSpan(Typeface.BOLD), 0, text.length(), 0);
-                        votedFor.setSpan(new ForegroundColorSpan(Theming.accentColor()), 0, text.length(), 0);
+                        votedFor.setSpan(new ForegroundColorSpan(Theming.colorPrimary()), 0, text.length(), 0);
                         t.setText(votedFor);
                     } else
                         t.setText(text);
@@ -283,19 +280,10 @@ public class MessageRowData extends BaseRowData {
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding quote spans");
         addQuoteSpans(ssb);
 
-        if (BuildConfig.DEBUG) AllInOneV2.wtl("getting text colors for spoilers");
-        if (Theming.usingLightTheme()) {
-            revealedSpoilerColor = Color.WHITE;
-            hiddenSpoilerColor = Color.BLACK;
-        } else {
-            revealedSpoilerColor = Color.BLACK;
-            hiddenSpoilerColor = Color.WHITE;
-        }
-
         ssb.append('\n');
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("linkifying");
-        Linkify.addLinks(ssb, Linkify.WEB_URLS);
+        MyLinkifier.addLinks(ssb, Linkify.WEB_URLS);
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("adding spoiler spans");
         addSpoilerSpans(ssb);
@@ -313,7 +301,7 @@ public class MessageRowData extends BaseRowData {
         }
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("setting spannedMessage");
-        spannedMessage = RichTextUtils.replaceAll(ssb, URLSpan.class, new UrlSpanConverter());
+        spannedMessage = ssb;
     }
 
     public boolean isEdited() {
@@ -401,7 +389,6 @@ public class MessageRowData extends BaseRowData {
 
     public static final String SPOILER_START = "<s>";
     public static final String SPOILER_END = "</s>";
-    private int hiddenSpoilerColor, revealedSpoilerColor;
 
     private void addSpoilerSpans(SpannableStringBuilder ssb) {
         // initialize array
@@ -419,7 +406,7 @@ public class MessageRowData extends BaseRowData {
             ssb.delete(startEnd[1], startEnd[1] + SPOILER_END.length());
 
             // apply styles
-            SpoilerBackgroundSpan spoiler = new SpoilerBackgroundSpan(hiddenSpoilerColor, revealedSpoilerColor);
+            SpoilerBackgroundSpan spoiler = new SpoilerBackgroundSpan(Theming.colorHiddenSpoiler(), Theming.colorRevealedSpoiler());
             SpoilerClickSpan spoilerClick = new SpoilerClickSpan(spoiler);
             ssb.setSpan(spoiler, startEnd[0], startEnd[1], 0);
             ssb.setSpan(spoilerClick, startEnd[0], startEnd[1], 0);

@@ -1,6 +1,7 @@
 package com.ioabsoftware.gameraven.views;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.widget.LinearLayout;
@@ -15,6 +16,8 @@ public abstract class BaseRowView extends LinearLayout {
     protected float myScale = 0;
 
     protected final int PX = TypedValue.COMPLEX_UNIT_PX;
+
+    protected Drawable background;
 
     public BaseRowView(Context context) {
         super(context);
@@ -32,39 +35,21 @@ public abstract class BaseRowView extends LinearLayout {
     }
 
     private void preInit(Context c) {
-        init(c);
+        setOrientation(VERTICAL);
 
-        switch (myType) {
-            case GAME_SEARCH:
-            case BOARD:
-            case TOPIC:
-            case AMP_TOPIC:
-            case TRACKED_TOPIC:
-            case MESSAGE:
-            case PM:
-            case PM_DETAIL:
-                setBackgroundDrawable(new SelectorItemDrawable(getContext()));
-                break;
-            case USER_DETAIL:
-            case HIGHLIGHTED_USER:
-            case HEADER:
-            case ADMOB_AD:
-            case GFAQS_AD:
-                break;
-        }
+        init(c);
 
         preRetheme();
     }
 
     private void preRetheme() {
-        myColor = Theming.accentColor();
+        myColor = Theming.colorPrimary();
         myScale = Theming.textScale();
         retheme();
     }
 
     public void beginShowingView(BaseRowData data) {
-        if (Theming.accentColor() != myColor || Theming.textScale() != myScale) {
-            SelectorItemDrawable.rebuildColorFilter();
+        if (Theming.textScale() != myScale) {
             preRetheme();
         }
         showView(data);

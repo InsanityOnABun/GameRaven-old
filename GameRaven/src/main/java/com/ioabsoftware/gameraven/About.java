@@ -1,23 +1,26 @@
 package com.ioabsoftware.gameraven;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.util.Theming;
 
-public class About extends Activity {
+public class About extends ActionBarActivity {
 
     public void onCreate(Bundle savedInstanceState) {
-        if (Theming.usingLightTheme()) {
-            setTheme(R.style.MyThemes_LightTheme);
+        setTheme(Theming.theme());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(Theming.colorPrimaryDark());
         }
 
         super.onCreate(savedInstanceState);
@@ -26,16 +29,8 @@ public class About extends Activity {
 
         Theming.colorOverscroll(this);
 
-        Drawable aBarDrawable;
-        if (Theming.usingLightTheme())
-            aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);
-        else
-            aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_light_holo);
-
-        aBarDrawable.setColorFilter(Theming.accentColor(), PorterDuff.Mode.SRC_ATOP);
-        getActionBar().setBackgroundDrawable(aBarDrawable);
-
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        setSupportActionBar((android.support.v7.widget.Toolbar) findViewById(R.id.abtToolbar));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         try {
             ((TextView) findViewById(R.id.abtBuildVer)).setText(this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName);

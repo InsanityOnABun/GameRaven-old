@@ -1,7 +1,11 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.text.method.ArrowKeyMovementMethod;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -17,7 +21,6 @@ import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.ClickableLinksTextView;
 import com.ioabsoftware.gameraven.views.RowType;
-import com.ioabsoftware.gameraven.views.SelectorSolidDrawable;
 import com.ioabsoftware.gameraven.views.rowdata.MessageRowData;
 import com.koushikdutta.ion.Ion;
 
@@ -39,7 +42,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 
     MessageRowData myData;
 
-    SelectorSolidDrawable headerSelector;
+    MessageHeaderDrawable headerSelector;
 
     boolean isHighlighted = false;
     boolean isShowingPoll = false;
@@ -60,7 +63,6 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
     @Override
     protected void init(Context context) {
         myType = RowType.MESSAGE;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.msgview, this, true);
 
         topWrapper = findViewById(R.id.mvTopWrapper);
@@ -80,12 +82,12 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
             messageTextSize = message.getTextSize();
         }
 
-        headerSelector = new SelectorSolidDrawable(new Drawable[]{getResources().getDrawable(R.drawable.msghead)});
+        ShapeDrawable d = new ShapeDrawable();
+        d.getPaint().setColor(Theming.colorPrimary());
+
+        headerSelector = new MessageHeaderDrawable(new Drawable[]{d});
         topWrapper.setBackgroundDrawable(headerSelector);
         topWrapper.setOnClickListener(this);
-
-        if (Theming.isAccentLight())
-            ((ImageView) findViewById(R.id.mvMessageMenuIcon)).setImageResource(R.drawable.ic_info_light);
     }
 
     @Override
@@ -94,11 +96,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
         post.setTextSize(PX, postTextSize * myScale);
         message.setTextSize(PX, messageTextSize * myScale);
 
-        message.setLinkTextColor(myColor);
-        headerSelector.setMyColor(myColor);
-
-        post.setTextColor(Theming.accentTextColor());
-        user.setTextColor(Theming.accentTextColor());
+        message.setLinkTextColor(Theming.colorAccent());
     }
 
     @Override
@@ -127,11 +125,11 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
         if (myData.getHLColor() == 0) {
             if (isHighlighted) {
                 isHighlighted = false;
-                headerSelector.setMyColor(Theming.accentColor());
+                headerSelector.clearHighlightColor();
             }
         } else {
             isHighlighted = true;
-            headerSelector.setMyColor(myData.getHLColor());
+            headerSelector.setHighlightColor(myData.getHLColor());
         }
 
         if (isUsingAvatars != globalIsUsingAvatars) {
@@ -142,11 +140,12 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
                 avatar.setVisibility(View.GONE);
             }
         }
+        // http://www.nostlagiasky.pw/gamefaqs-avatars/avatars/Corrupt_Power.png
         if (isUsingAvatars)
             Ion.with(avatar)
                     .placeholder(R.drawable.avatar_placeholder)
                     .error(R.drawable.avatar_default)
-                    .load("http://weblab.cs.uml.edu/~rdupuis/gamefaqs-avatars/avatars/" + myData.getUser().replace(" ", "%20") + ".png");
+                    .load("http://www.nostlagiasky.pw/gamefaqs-avatars/avatars/" + myData.getUser().replace(" ", "%20") + ".png");
 
         message.setText(myData.getSpannedMessage());
 
@@ -219,6 +218,64 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 
     public static void setUsingAvatars(boolean set) {
         globalIsUsingAvatars = set;
+    }
+
+
+
+
+
+
+
+    public class MessageHeaderDrawable extends LayerDrawable {
+
+        private int myColor, myClickedColor;
+
+        public MessageHeaderDrawable(Drawable[] layers) {
+            super(layers);
+            clearHighlightColor();
+        }
+
+        public void setHighlightColor(int myColorIn) {
+            myColor = myColorIn;
+
+            float[] hsv = new float[3];
+            Color.colorToHSV(myColor, hsv);
+            hsv[2] *= 0.8f;
+            myClickedColor = Color.HSVToColor(hsv);
+
+            onStateChange(getState());
+        }
+
+        public void clearHighlightColor() {
+            myColor = Theming.colorPrimary();
+            myClickedColor = Theming.colorPrimaryDark();
+
+            onStateChange(getState());
+        }
+
+        @Override
+        protected boolean onStateChange(int[] states) {
+            boolean isClicked = false;
+            for (int state : states) {
+                if (state == android.R.attr.state_focused || state == android.R.attr.state_pressed) {
+                    isClicked = true;
+                }
+            }
+
+            if (isClicked) {
+                super.setColorFilter(myClickedColor, PorterDuff.Mode.SRC);
+            } else {
+                super.setColorFilter(myColor, PorterDuff.Mode.SRC);
+            }
+
+            return super.onStateChange(states);
+        }
+
+        @Override
+        public boolean isStateful() {
+            return true;
+        }
+
     }
 
 }

@@ -1,5 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <color name="gf_background_dark">#333333</color>
+    <color name="gf_background_light">#e6e6e6</color>
+
+    <color name="gf_blue_dark">#4659b9</color>
+    <color name="gf_blue_dark_secondary">#313e81</color>
+    <color name="gf_blue_dark_accent">#c8cdea</color>
+
+    <color name="gf_blue_light">#3951c6</color>
+    <color name="gf_blue_light_secondary">#28398a</color>
+    <color name="gf_blue_light_accent">#7585d7</color>
+
+    <color name="gf_red_dark">#b94646</color>
+    <color name="gf_red_dark_secondary">#813131</color>
+    <color name="gf_red_dark_accent">#eac8c8</color>
+
+    <color name="gf_red_light">#c63939</color>
+    <color name="gf_red_light_secondary">#8a2828</color>
+    <color name="gf_red_light_accent">#d16161</color>
+
+    <color name="gf_green_dark">#80b946</color>
+    <color name="gf_green_dark_secondary">#598131</color>
+    <color name="gf_green_dark_accent">#d9eac8</color>
+
+    <color name="gf_green_light">#80c639</color>
+    <color name="gf_green_light_secondary">#598a28</color>
+    <color name="gf_green_light_accent">#73b234</color>
+
+    <color name="gf_orange_dark">#cc6633</color>
+    <color name="gf_orange_dark_secondary">#8f4724</color>
+    <color name="gf_orange_dark_accent">#f0d1c2</color>
+
+    <color name="gf_orange_light">#cc6633</color>
+    <color name="gf_orange_light_secondary">#8f4724</color>
+    <color name="gf_orange_light_accent">#d6855c</color>
+
+    <color name="gf_purple_dark">#4c0099</color>
+    <color name="gf_purple_dark_secondary">#26004d</color>
+    <color name="gf_purple_dark_accent">#d9b3ff</color>
+
+    <color name="gf_purple_light">#4c0099</color>
+    <color name="gf_purple_light_secondary">#26004d</color>
+    <color name="gf_purple_light_accent">#5900b3</color>
+
+
+
     <color name="holo_blue">#33B5E5</color>
     <color name="holo_blue_dark">#0099CC</color>
 
@@ -8,16 +54,13 @@
     <color name="black">#000000</color>
 
     <color name="transparent">#00000000</color>
-    <color name="nearlytransparent">#01000000</color>
+    <color name="nearly_transparent">#01000000</color>
 
-    <color name="drawerHeader">#999999</color>
-    <color name="drawerHeaderLight">#555555</color>
+    <color name="drawer_header">#999999</color>
+    <color name="drawer_header_light">#555555</color>
 
     <color name="read_topic">#666666</color>
     <color name="read_topic_light">#aaaaaa</color>
-
-    <color name="background">#222222</color>
-    <color name="background_light">#dddddd</color>
 
     <color name="item_line">#363636</color>
     <color name="item_line_light">#d8d8d8</color>

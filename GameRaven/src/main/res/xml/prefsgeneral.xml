@@ -20,18 +20,6 @@
             android:title="Start on AMP List" />
         <SwitchPreference
             android:defaultValue="false"
-            android:key="reloadOnBack"
-            android:persistent="true"
-            android:summary="Reload page when navigating back."
-            android:title="Reload On Back" />
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="reloadOnResume"
-            android:persistent="true"
-            android:summary="Reload page when resuming app."
-            android:title="Reload On Resume" />
-        <SwitchPreference
-            android:defaultValue="false"
             android:key="enablePTR"
             android:persistent="true"
             android:summary="Pull past the top of the page to refresh."

@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/tpSelected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="6dp"
+        android:text="blah"
+        android:textColor="@color/black" />
+
+    <LinearLayout
+        android:id="@+id/tpLightWrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tpSelected"
+        android:layout_centerHorizontal="true">
+
+        <FrameLayout
+            android:id="@+id/tpBlueLight"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="3dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/theme_background_light" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="6dp"
+                android:src="@drawable/theme_blue_light" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="15dp"
+                android:src="@drawable/theme_blue_light_secondary" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="24dp"
+                android:src="@drawable/theme_blue_light_accent" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/tpRedLight"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="3dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/theme_background_light" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="6dp"
+                android:src="@drawable/theme_red_light" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="15dp"
+                android:src="@drawable/theme_red_light_secondary" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="24dp"
+                android:src="@drawable/theme_red_light_accent" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/tpGreenLight"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="3dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/theme_background_light" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="6dp"
+                android:src="@drawable/theme_green_light" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="15dp"
+                android:src="@drawable/theme_green_light_secondary" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="24dp"
+                android:src="@drawable/theme_green_light_accent" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/tpOrangeLight"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="3dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/theme_background_light" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="6dp"
+                android:src="@drawable/theme_orange_light" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="15dp"
+                android:src="@drawable/theme_orange_light_secondary" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="24dp"
+                android:src="@drawable/theme_orange_light_accent" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/tpPurpleLight"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="3dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/theme_background_light" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="6dp"
+                android:src="@drawable/theme_purple_light" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="15dp"
+                android:src="@drawable/theme_purple_light_secondary" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="24dp"
+                android:src="@drawable/theme_purple_light_accent" />
+
+        </FrameLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/tpDarkWrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tpLightWrapper"
+        android:layout_centerHorizontal="true">
+
+        <FrameLayout
+            android:id="@+id/tpBlueDark"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="3dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/theme_background_dark" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="6dp"
+                android:src="@drawable/theme_blue_dark" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="15dp"
+                android:src="@drawable/theme_blue_dark_secondary" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="24dp"
+                android:src="@drawable/theme_blue_dark_accent" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/tpRedDark"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="3dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/theme_background_dark" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="6dp"
+                android:src="@drawable/theme_red_dark" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="15dp"
+                android:src="@drawable/theme_red_dark_secondary" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="24dp"
+                android:src="@drawable/theme_red_dark_accent" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/tpGreenDark"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="3dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/theme_background_dark" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="6dp"
+                android:src="@drawable/theme_green_dark" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="15dp"
+                android:src="@drawable/theme_green_dark_secondary" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="24dp"
+                android:src="@drawable/theme_green_dark_accent" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/tpOrangeDark"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="3dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/theme_background_dark" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="6dp"
+                android:src="@drawable/theme_orange_dark" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="15dp"
+                android:src="@drawable/theme_orange_dark_secondary" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="24dp"
+                android:src="@drawable/theme_orange_dark_accent" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/tpPurpleDark"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="3dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/theme_background_dark" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="6dp"
+                android:src="@drawable/theme_purple_dark" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="15dp"
+                android:src="@drawable/theme_purple_dark_secondary" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="24dp"
+                android:src="@drawable/theme_purple_dark_accent" />
+
+        </FrameLayout>
+
+
+    </LinearLayout>
+</RelativeLayout>

@@ -40,7 +40,6 @@ public class BoardRowView extends BaseRowView {
     @Override
     protected void init(Context context) {
         myType = RowType.BOARD;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.boardview, this, true);
 
         desc = (TextView) findViewById(R.id.bvDesc);
