@@ -245,7 +245,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         hAdapter = new HistoryDBAdapter();
         openHistoryDB();
 
-        if (initUrl != null && !initUrl.equals(RESUME_INIT_URL))
+        if (initUrl == null || !initUrl.equals(RESUME_INIT_URL))
             hAdapter.clearTable();
 
         user = userIn;
