@@ -19,7 +19,7 @@ import java.util.zip.Inflater;
 public class HistoryDBAdapter {
 
     private static final String DATABASE_NAME = "history.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     public static final String TABLE_HISTORY = "history";
     public static final String COLUMN_HIST_ID = "_id";
