@@ -242,7 +242,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
         netManager = (ConnectivityManager) aio.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        hAdapter = new HistoryDBAdapter(aio);
+        hAdapter = new HistoryDBAdapter();
         openHistoryDB();
 
         if (initUrl != null && !initUrl.equals(RESUME_INIT_URL))
@@ -1116,7 +1116,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
     }
 
     public void openHistoryDB() {
-        hAdapter.open();
+        hAdapter.open(aio);
     }
 
     public void closeHistoryDB() {

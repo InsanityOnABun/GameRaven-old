@@ -42,10 +42,10 @@ public class HistoryDBAdapter {
     private String lastAddedPath = AllInOneV2.EMPTY_STRING;
 
     private DatabaseHelper dbHelper;
-    private SQLiteDatabase db;
-    private final AllInOneV2 aio;
 
     private static class DatabaseHelper extends SQLiteOpenHelper {
+
+        private static DatabaseHelper sInstance;
 
         DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -61,15 +61,22 @@ public class HistoryDBAdapter {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_HISTORY);
             onCreate(db);
         }
+
+        public static DatabaseHelper getInstance(Context context) {
+
+            // Use the application context, which will ensure that you
+            // don't accidentally leak an Activity's context.
+            // See this article for more information: http://bit.ly/6LRzfx
+            if (sInstance == null) {
+                sInstance = new DatabaseHelper(context.getApplicationContext());
+            }
+            return sInstance;
+        }
     }
 
-    public HistoryDBAdapter(AllInOneV2 aioIn) {
-        aio = aioIn;
-    }
-
-    public HistoryDBAdapter open() {
-        dbHelper = new DatabaseHelper(aio);
-        db = dbHelper.getWritableDatabase();
+    public HistoryDBAdapter open(Context context) {
+        dbHelper = DatabaseHelper.getInstance(context);
+        dbHelper.getWritableDatabase();
         updateHasHistory();
         return this;
     }
@@ -79,7 +86,7 @@ public class HistoryDBAdapter {
     }
 
     public void clearTable() {
-        db.delete(TABLE_HISTORY, null, null);
+        dbHelper.getWritableDatabase().delete(TABLE_HISTORY, null, null);
         updateHasHistory();
     }
 
@@ -96,7 +103,7 @@ public class HistoryDBAdapter {
             vals.put(COLUMN_HIST_VLOC_FIRSTVIS, vLocFirstVisIn);
             vals.put(COLUMN_HIST_VLOC_OFFSET, vLocOffsetIn);
             if (BuildConfig.DEBUG) AllInOneV2.wtl("inserting row");
-            db.insert(TABLE_HISTORY, null, vals);
+            dbHelper.getWritableDatabase().insert(TABLE_HISTORY, null, vals);
             if (BuildConfig.DEBUG) AllInOneV2.wtl("trimming history");
             trimHistory();
             if (BuildConfig.DEBUG) AllInOneV2.wtl("updating hasHistory");
@@ -106,7 +113,7 @@ public class HistoryDBAdapter {
     }
 
     public History pullHistory() {
-        Cursor cur = db.query(TABLE_HISTORY, null, null, null, null, null, COLUMN_HIST_ID + " DESC", "2");
+        Cursor cur = dbHelper.getWritableDatabase().query(TABLE_HISTORY, null, null, null, null, null, COLUMN_HIST_ID + " DESC", "2");
 
         cur.moveToFirst();
         long id = cur.getLong(0);
@@ -123,24 +130,24 @@ public class HistoryDBAdapter {
 
         cur.close();
 
-        db.delete(TABLE_HISTORY, COLUMN_HIST_ID + " = " + id, null);
+        dbHelper.getWritableDatabase().delete(TABLE_HISTORY, COLUMN_HIST_ID + " = " + id, null);
         updateHasHistory();
 
         return h;
     }
 
     private void trimHistory() {
-        while (DatabaseUtils.queryNumEntries(db, TABLE_HISTORY) > 15) {
-            Cursor cur = db.query(TABLE_HISTORY, new String[]{COLUMN_HIST_ID}, null, null, null, null, COLUMN_HIST_ID, "1");
+        while (DatabaseUtils.queryNumEntries(dbHelper.getWritableDatabase(), TABLE_HISTORY) > 15) {
+            Cursor cur = dbHelper.getWritableDatabase().query(TABLE_HISTORY, new String[]{COLUMN_HIST_ID}, null, null, null, null, COLUMN_HIST_ID, "1");
             cur.moveToFirst();
             long id = cur.getLong(0);
             cur.close();
-            db.delete(TABLE_HISTORY, COLUMN_HIST_ID + " = " + id, null);
+            dbHelper.getWritableDatabase().delete(TABLE_HISTORY, COLUMN_HIST_ID + " = " + id, null);
         }
     }
 
     private void updateHasHistory() {
-        hasHistory = DatabaseUtils.queryNumEntries(db, TABLE_HISTORY) > 0;
+        hasHistory = DatabaseUtils.queryNumEntries(dbHelper.getWritableDatabase(), TABLE_HISTORY) > 0;
     }
 
     public boolean hasHistory() {
