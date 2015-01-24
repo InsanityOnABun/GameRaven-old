@@ -410,14 +410,14 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
 
                 currentDesc = NetDesc.VERIFY_ACCOUNT_S2;
                 accountVerifier.build(this)
-                        .load("POST", Session.ROOT)
+                        .load("POST", Session.ROOT + "/user/login.html")
                         .setBodyParameters(loginData)
                         .as(new DocumentParser())
                         .withResponse()
                         .setCallback(SettingsAccount.this);
             }
             else if (currentDesc == NetDesc.VERIFY_ACCOUNT_S2) {
-                if (!result.getRequest().getUri().toString().equals(Session.ROOT + "/user/login.html")) {
+                if (!result.getRequest().getUri().toString().endsWith("/user/login.html")) {
                     AccountManager.addUser(SettingsAccount.this, verifyUser, verifyPass);
                     dismissDialog(VERIFY_ACCOUNT_DIALOG);
                     removeDialog(ADD_ACCOUNT_DIALOG);
