@@ -709,7 +709,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("loading previous page");
                             if (initUrl.equals(RESUME_INIT_URL) && canGoBack()) {
                                 aio.dismissLoginDialog();
-                                goBack(false);
+                                goBack(true);
                                 aio.setNavList(isLoggedIn());
                             }
                             else
