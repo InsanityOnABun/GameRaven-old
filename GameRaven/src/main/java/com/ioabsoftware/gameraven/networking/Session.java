@@ -1099,7 +1099,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         applySavedScroll = true;
         savedScrollVal = h.getVertPos();
 
-        if (forceReload) {
+        if (forceReload || AllInOneV2.getSettingsPref().getBoolean("reloadOnBack", false)) {
             forceNoHistoryAddition();
             if (BuildConfig.DEBUG) AllInOneV2.wtl("going back in history, refreshing: " + h.getDesc().name() + " " + h.getPath());
             get(h.getDesc(), h.getPath());

@@ -665,6 +665,13 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                 if (BuildConfig.DEBUG) wtl("starting new session from onResume, no login");
                 session = new Session(this, null, null, initUrl, initDesc);
             }
+        } else {
+            if (settings.getBoolean("reloadOnResume", false)) {
+                    if (BuildConfig.DEBUG)
+                            wtl("session exists, reload on resume is true, refreshing page");
+                    isRoR = true;
+                    session.refresh();
+                }
         }
 
         if (!settings.contains("beenWelcomed")) {
@@ -1197,8 +1204,9 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         d.show();
     }
 
+    private boolean isRoR = false;
     private void postInterfaceCleanup() {
-        if (postWrapper.getVisibility() == View.VISIBLE) {
+        if (!isRoR && postWrapper.getVisibility() == View.VISIBLE) {
             if (BuildConfig.DEBUG) wtl("postInterfaceCleanup fired --NEL");
             postWrapper.setVisibility(View.GONE);
             pollButton.setVisibility(View.GONE);
@@ -2308,6 +2316,9 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         ptrCleanup();
         if (desc == NetDesc.BOARD || desc == NetDesc.TOPIC)
             postInterfaceCleanup();
+
+        if (isRoR)
+            isRoR = false;
 
         System.gc();
     }

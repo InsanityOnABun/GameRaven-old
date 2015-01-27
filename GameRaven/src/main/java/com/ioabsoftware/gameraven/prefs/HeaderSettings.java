@@ -84,6 +84,8 @@ public class HeaderSettings extends PreferenceActivity {
         ACCEPTED_KEYS.add("notifsTTEnable");
         ACCEPTED_KEYS.add("notifsPMEnable");
         ACCEPTED_KEYS.add("notifsFrequency");
+        ACCEPTED_KEYS.add("reloadOnBack");
+        ACCEPTED_KEYS.add("reloadOnResume");
         ACCEPTED_KEYS.add("enablePTR");
         ACCEPTED_KEYS.add("defaultAccount");
         ACCEPTED_KEYS.add("grBackupVer");
@@ -523,6 +525,16 @@ public class HeaderSettings extends PreferenceActivity {
                         buf.append("startAtAMP=true\n");
                     else
                         buf.append("startAtAMP=false\n");
+
+                    if (AllInOneV2.getSettingsPref().getBoolean("reloadOnBack", false))
+                            buf.append("reloadOnBack=true\n");
+                    else
+                        buf.append("reloadOnBack=false\n");
+
+                            if (AllInOneV2.getSettingsPref().getBoolean("reloadOnResume", false))
+                            buf.append("reloadOnResume=true\n");
+                    else
+                        buf.append("reloadOnResume=false\n");
 
                     if (AllInOneV2.getSettingsPref().getBoolean("enablePTR", false))
                         buf.append("enablePTR=true\n");
