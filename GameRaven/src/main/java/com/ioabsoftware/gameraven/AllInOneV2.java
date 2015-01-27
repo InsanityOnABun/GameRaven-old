@@ -516,6 +516,10 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         if (BuildConfig.DEBUG) wtl("starting db creation");
         hlDB = new HighlightListDBHelper(this);
 
+        View foot = new View(this);
+        foot.setMinimumHeight(Theming.convertDPtoPX(this, 80));
+        contentList.addFooterView(foot);
+
         adapterRows.add(new HeaderRowData("Loading..."));
         contentList.setAdapter(viewAdapter);
 
@@ -531,8 +535,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                     pmSetup(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
             }
         });
-
-        fab.attachToListView(contentList);
+        fab.setVisibility(View.GONE);
 
         AppRater.app_launched(this);
 
