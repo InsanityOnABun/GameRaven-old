@@ -731,9 +731,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                         HashMap<String, List<String>> msg1Data = new HashMap<String, List<String>>();
                         msg1Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
-                        msg1Data.put("custom_sig", Arrays.asList(aio.getSig()));
                         msg1Data.put("key", Arrays.asList(msg1Key));
                         msg1Data.put("post", Arrays.asList("Post Message"));
+                        if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
+                            msg1Data.put("custom_sig", Arrays.asList(aio.getSig()));
 
                         post(NetDesc.POSTMSG_S3, lastPath, msg1Data);
                         break;
@@ -755,10 +756,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                             HashMap<String, List<String>> msg3Data = new HashMap<String, List<String>>();
                             msg3Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
-                            msg3Data.put("custom_sig", Arrays.asList(aio.getSig()));
                             msg3Data.put("post", Arrays.asList("Post Message"));
                             msg3Data.put("key", Arrays.asList(msg3Key));
                             msg3Data.put("override", Arrays.asList("checked"));
+                            if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
+                                msg3Data.put("custom_sig", Arrays.asList(aio.getSig()));
 
                             showAutoFlagWarning(lastPath, msg3Data, NetDesc.POSTMSG_S3, msg);
                             postErrorDetected = true;
@@ -778,9 +780,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         HashMap<String, List<String>> tpc1Data = new HashMap<String, List<String>>();
                         tpc1Data.put("topictitle", Arrays.asList(aio.getSavedPostTitle()));
                         tpc1Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
-                        tpc1Data.put("custom_sig", Arrays.asList(aio.getSig()));
                         tpc1Data.put("key", Arrays.asList(tpc1Key));
                         tpc1Data.put("post", Arrays.asList("Post Message"));
+                        if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
+                            tpc1Data.put("custom_sig", Arrays.asList(aio.getSig()));
 
                         if (aio.isUsingPoll()) {
                             tpc1Data.put("poll_text", Arrays.asList(aio.getPollTitle()));
@@ -814,10 +817,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             HashMap<String, List<String>> tpc3Data = new HashMap<String, List<String>>();
                             tpc3Data.put("topictitle", Arrays.asList(aio.getSavedPostTitle()));
                             tpc3Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
-                            tpc3Data.put("custom_sig", Arrays.asList(aio.getSig()));
                             tpc3Data.put("post", Arrays.asList("Post Message"));
                             tpc3Data.put("key", Arrays.asList(tpc3Key));
                             tpc3Data.put("override", Arrays.asList("checked"));
+                            if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
+                                tpc3Data.put("custom_sig", Arrays.asList(aio.getSig()));
 
                             showAutoFlagWarning(lastPath, tpc3Data, NetDesc.POSTTPC_S3, msg);
                             postErrorDetected = true;

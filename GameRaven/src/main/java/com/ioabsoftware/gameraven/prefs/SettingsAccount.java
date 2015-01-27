@@ -64,6 +64,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
 
     PreferenceCategory accounts;
     Preference clickedAccount;
+    String clickedAccountName;
 
     SharedPreferences settings;
 
@@ -246,18 +247,20 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
     }
 
     private Dialog createModifyAccountV2Dialog() {
+        clickedAccountName = clickedAccount.getTitle().toString();
         AlertDialog.Builder b = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         final View v = inflater.inflate(R.layout.modifyaccountv2, null);
         b.setView(v);
-        b.setTitle("Modify " + clickedAccount.getTitle().toString());
+        b.setTitle("Modify " + clickedAccountName);
 
         Button deleteAcc = (Button) v.findViewById(R.id.modaccDeleteAcc);
         final CheckBox defaultAcc = (CheckBox) v.findViewById(R.id.modaccDefaultAccount);
+        final CheckBox useGFAQsSig = (CheckBox) v.findViewById(R.id.modaccUseGfaqsSig);
         final EditText sigContent = (EditText) v.findViewById(R.id.modaccSigContent);
         final TextView sigCounter = (TextView) v.findViewById(R.id.modaccSigCounter);
 
-        if (clickedAccount.getTitle().toString().equals(settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT)))
+        if (clickedAccountName.equals(settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT)))
             defaultAcc.setChecked(true);
         else
             defaultAcc.setChecked(false);
@@ -266,7 +269,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    settings.edit().putString("defaultAccount", clickedAccount.getTitle().toString()).apply();
+                    settings.edit().putString("defaultAccount", clickedAccountName).apply();
                     Crouton.showText(SettingsAccount.this,
                             "Default account saved.",
                             Theming.croutonStyle(),
@@ -282,20 +285,14 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
             }
         });
 
-        deleteAcc.setOnClickListener(new View.OnClickListener() {
+        useGFAQsSig.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                if (clickedAccount.getTitle().toString().equals(settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT)))
-                    settings.edit().putString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT).apply();
-
-                settings.edit().remove("customSig" + clickedAccount.getTitle().toString()).apply();
-
-                AccountManager.removeUser(SettingsAccount.this, clickedAccount.getTitle().toString());
-                accounts.removePreference(clickedAccount);
-                dismissDialog(MODIFY_ACCOUNT_DIALOG);
-                Crouton.showText(SettingsAccount.this, "Account removed.", Theming.croutonStyle());
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                settings.edit().putBoolean("useGFAQsSig" + clickedAccountName, isChecked).apply();
+                sigContent.setEnabled(!isChecked);
             }
         });
+        useGFAQsSig.setChecked(settings.getBoolean("useGFAQsSig" + clickedAccountName, false));
 
         sigContent.addTextChangedListener(new TextWatcher() {
             @Override
@@ -322,14 +319,29 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
             }
         });
 
-        sigContent.setText(settings.getString("customSig" + clickedAccount.getTitle().toString(), ""));
+        sigContent.setText(settings.getString("customSig" + clickedAccountName, ""));
+
+        deleteAcc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (clickedAccountName.equals(settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT)))
+                    settings.edit().putString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT).apply();
+
+                settings.edit().remove("customSig" + clickedAccountName).apply();
+
+                AccountManager.removeUser(SettingsAccount.this, clickedAccountName);
+                accounts.removePreference(clickedAccount);
+                dismissDialog(MODIFY_ACCOUNT_DIALOG);
+                Crouton.showText(SettingsAccount.this, "Account removed.", Theming.croutonStyle());
+            }
+        });
 
         b.setPositiveButton("Save Sig", null);
 
         b.setNeutralButton("Clear Sig", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                settings.edit().putString("customSig" + clickedAccount.getTitle().toString(), "").apply();
+                settings.edit().putString("customSig" + clickedAccountName, "").apply();
                 sigContent.setText("");
                 Crouton.showText(SettingsAccount.this, "Signature cleared and saved.", Theming.croutonStyle());
             }
@@ -354,7 +366,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
 
                         if (length < 161) {
                             if (lines < 2) {
-                                settings.edit().putString("customSig" + clickedAccount.getTitle().toString(),
+                                settings.edit().putString("customSig" + clickedAccountName,
                                         sigContent.getText().toString()).apply();
 
                                 Crouton.showText(SettingsAccount.this, "Signature saved.", Theming.croutonStyle());

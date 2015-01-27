@@ -471,6 +471,7 @@ public class HeaderSettings extends PreferenceActivity {
 
                         buf.append(s).append("\n");
                         buf.append(AccountManager.getPassword(getActivity(), s)).append("\n");
+                        buf.append(String.valueOf(AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + s, false)));
 
                         buf.append("[CUSTOM_SIG]\n");
                         buf.append(AllInOneV2.getSettingsPref().getString("customSig" + s, "")).append('\n');
@@ -608,6 +609,8 @@ public class HeaderSettings extends PreferenceActivity {
 
                                             users.add(user);
                                             passwords.add(br.readLine());
+                                            keys.add("useGFAQsSig" + user);
+                                            values.add(br.readLine());
 
                                             br.readLine();
                                             String sig = "";
