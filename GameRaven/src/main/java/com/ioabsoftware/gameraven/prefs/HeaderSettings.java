@@ -87,6 +87,7 @@ public class HeaderSettings extends PreferenceActivity {
         ACCEPTED_KEYS.add("reloadOnBack");
         ACCEPTED_KEYS.add("reloadOnResume");
         ACCEPTED_KEYS.add("enablePTR");
+        ACCEPTED_KEYS.add("enableFastScroll");
         ACCEPTED_KEYS.add("defaultAccount");
         ACCEPTED_KEYS.add("grBackupVer");
         ACCEPTED_KEYS.add("startAtAMP");
@@ -541,6 +542,11 @@ public class HeaderSettings extends PreferenceActivity {
                         buf.append("enablePTR=true\n");
                     else
                         buf.append("enablePTR=false\n");
+
+                    if (AllInOneV2.getSettingsPref().getBoolean("enableFastScroll", true))
+                        buf.append("enableFastScroll=true\n");
+                    else
+                        buf.append("enableFastScroll=false\n");
 
                     buf.append("textScale=").append(String.valueOf(AllInOneV2.getSettingsPref().getInt("textScale", 100))).append('\n');
 

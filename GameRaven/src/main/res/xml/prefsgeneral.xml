@@ -36,6 +36,12 @@
             android:persistent="true"
             android:summary="Pull past the top of the page to refresh."
             android:title="Pull-To-Refresh" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="enableFastScroll"
+            android:persistent="true"
+            android:summary="Show the fast-scroll tab on the scroll indicator."
+            android:title="Fast Scroll" />
 
         <ListPreference
             android:defaultValue="-1"

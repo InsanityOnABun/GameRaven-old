@@ -569,6 +569,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         super.onResume();
 
         swipeRefreshLayout.setEnabled(settings.getBoolean("enablePTR", false));
+        contentList.setFastScrollEnabled(settings.getBoolean("enableFastScroll", true));
 
         int lastUpdateYear = settings.getInt("lastUpdateYear", 0);
         int lastUpdateYearDay = settings.getInt("lastUpdateYearDay", 0);
