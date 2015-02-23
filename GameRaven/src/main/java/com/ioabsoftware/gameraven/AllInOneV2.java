@@ -686,7 +686,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
             b.setPositiveButton("Yes", new OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/InsanityOnABun/GameRaven/wiki")));
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://ioabsoftware.com/gameraven/quickstart.html")));
                 }
             });
             b.setNegativeButton("No", null);
