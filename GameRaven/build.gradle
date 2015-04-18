@@ -19,8 +19,7 @@ dependencies {
         // exclusion is not neccessary, but generally a good idea.
         exclude group: 'com.google.android', module: 'support-v4'
     }
-
-    compile files('libs/jsoup-1.8.1.jar')
+    compile files('libs/jsoup-1.8.2.jar')
 }
 
 android {
