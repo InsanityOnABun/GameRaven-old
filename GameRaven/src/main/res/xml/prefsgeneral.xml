@@ -64,11 +64,5 @@
             android:persistent="true"
             android:summary="A confirmation dialog will show when submitting a post."
             android:title="Confirm Post Submission" />
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="autoCensorEnable"
-            android:persistent="true"
-            android:summary="Automatically censors banned words."
-            android:title="AutoCensor" />
     </PreferenceCategory>
 </PreferenceScreen>

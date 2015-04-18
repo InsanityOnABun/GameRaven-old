@@ -143,19 +143,13 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
     private String savedPostBody;
 
     public String getSavedPostBody() {
-        if (settings.getBoolean("autoCensorEnable", true))
-            return autoCensor(savedPostBody);
-        else
-            return savedPostBody;
+        return savedPostBody;
     }
 
     private String savedPostTitle;
 
     public String getSavedPostTitle() {
-        if (settings.getBoolean("autoCensorEnable", true))
-            return autoCensor(savedPostTitle);
-        else
-            return savedPostTitle;
+        return savedPostTitle;
     }
 
     private static SharedPreferences settings = null;
@@ -3179,15 +3173,6 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         return "/boards/myposts.php?lp=" + settings.getString("ampSortOption", "-1");
     }
 
-    private String autoCensor(String text) {
-        StringBuilder builder = new StringBuilder(text);
-        String textLower = text.toLowerCase(Locale.US);
-        for (String word : bannedList)
-            censorWord(builder, textLower, word.toLowerCase(Locale.US));
-
-        return builder.toString();
-    }
-
     private void censorWord(StringBuilder builder, String textLower, String word) {
         int length = word.length();
         String replacement = "";
@@ -3247,90 +3232,4 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
         sb.text(msg);
         sb.show(this);
     }
-
-    private static final String[] bannedList = {
-            "shit",
-            "tits",
-            "twat",
-            "pussy",
-            "jism",
-            "jizm",
-            "nigger",
-            "fag",
-            "bitch",
-            "asshole",
-            "cunt",
-            "clit",
-            "arse-hole",
-            "ass-hole",
-            "dildo",
-            "pussies",
-            "ibtl",
-            "kevan.org",
-            "nigga",
-            "lesbo",
-            "arsehole",
-            "ass hole",
-            "arse hole",
-            "‹^›",
-            "fuck",
-            "sash.rar",
-            "shiz",
-            "WWWWWWWWWW",
-            "bukkake",
-            "wigger",
-            "wigga",
-            "gook",
-            "urbandictionary",
-            "outwar.com",
-            "kingsofchaos",
-            "jizz",
-            "titties",
-            "titty",
-            "@@@@@@@@@@",
-            "outpimp",
-            "echo j",
-            "format c:",
-            "lue2.com",
-            "mp3players4free.com",
-            "ds4free.com",
-            "lurkerfaqs",
-            "(void*)shellcode",
-            "fcuk",
-            "ngger",
-            "nggr",
-            "huntard",
-            "retardin",
-            "ritard",
-            "wiitard",
-            "narutard",
-            "/b/tard",
-            "netbux",
-            "treasuretrooper",
-            "rewardhits",
-            "gaminglagoon.com",
-            "pihb",
-            "n_gger",
-            "donkeymails.com",
-            "no-minimum.com",
-            "internetisseriousbus",
-            "rialliance.net/test.",
-            "kike",
-            "2g1c",
-            "2g1f",
-            "2girls1finger",
-            "2girls1cup",
-            "swap.avi",
-            "myminicity",
-            "2girls 1cup",
-            "2 girls 1 cup",
-            "raygoldmodels.com",
-            "wootability.com",
-            "TR4Q",
-            "potd.com",
-            "tw@",
-            "mybrute.com",
-            "................................................................................",
-            "lockerz",
-            "cheathappens"};
 }

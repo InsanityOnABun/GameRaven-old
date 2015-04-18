@@ -95,7 +95,6 @@ public class HeaderSettings extends PreferenceActivity {
         ACCEPTED_KEYS.add("ampSortOption");
         ACCEPTED_KEYS.add("confirmPostCancel");
         ACCEPTED_KEYS.add("confirmPostSubmit");
-        ACCEPTED_KEYS.add("autoCensorEnable");
         ACCEPTED_KEYS.add("textScale");
         ACCEPTED_KEYS.add("usingAvatars");
     }
@@ -566,11 +565,6 @@ public class HeaderSettings extends PreferenceActivity {
                         buf.append("confirmPostSubmit=true\n");
                     else
                         buf.append("confirmPostSubmit=false\n");
-
-                    if (AllInOneV2.getSettingsPref().getBoolean("autoCensorEnable", true))
-                        buf.append("autoCensorEnable=true\n");
-                    else
-                        buf.append("autoCensorEnable=false\n");
 
                     buf.close();
                     Toast.makeText(getActivity(),"Backup done." ,Toast.LENGTH_SHORT).show();
