@@ -11,6 +11,8 @@ import com.koushikdutta.async.parser.ByteBufferListParser;
 
 import org.jsoup.Jsoup;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 
 public class DocumentParser implements AsyncParser<FinalDoc> {
@@ -33,5 +35,11 @@ public class DocumentParser implements AsyncParser<FinalDoc> {
     @Override
     public void write(DataSink sink, FinalDoc value, CompletedCallback completed) {
         new ByteBufferListParser().write(sink, new ByteBufferList(value.bytes), completed);
+    }
+
+    // https://github.com/koush/AndroidAsync/blob/e53e1b267ea919cb0ac3e39533ac9de9a4ed7cfc/AndroidAsync/src/com/koushikdutta/async/parser/AsyncParserBase.java
+    @Override
+    public Type getType() {
+        return ((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 }
