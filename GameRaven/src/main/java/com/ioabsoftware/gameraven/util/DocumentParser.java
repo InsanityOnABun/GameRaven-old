@@ -11,6 +11,7 @@ import com.koushikdutta.async.parser.ByteBufferListParser;
 
 import org.jsoup.Jsoup;
 
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 
 public class DocumentParser implements AsyncParser<FinalDoc> {
@@ -33,5 +34,10 @@ public class DocumentParser implements AsyncParser<FinalDoc> {
     @Override
     public void write(DataSink sink, FinalDoc value, CompletedCallback completed) {
         new ByteBufferListParser().write(sink, new ByteBufferList(value.bytes), completed);
+    }
+
+    @Override
+    public Type getType() {
+        return (getClass().getGenericSuperclass());
     }
 }
