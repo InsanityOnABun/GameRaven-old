@@ -11,7 +11,6 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -51,7 +50,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -86,8 +84,6 @@ import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.melnykov.fab.FloatingActionButton;
-import com.nispok.snackbar.Snackbar;
-import com.nispok.snackbar.listeners.EventListener;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -3203,33 +3199,5 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
             insert = open + close;
 
         postBody.getText().replace(Math.min(start, end), Math.max(start, end), insert, 0, insert.length());
-    }
-
-    private Snackbar sb;
-    public void showSnackbar(String msg) {
-        if (sb == null) {
-            sb = Snackbar.with(getApplicationContext())
-                    .eventListener(new EventListener() {
-                        @Override
-                        public void onShow(int height) {
-                            RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams)fab.getLayoutParams();
-                            p.bottomMargin += Theming.convertDPtoPX(AllInOneV2.this, 48); // in PX
-                            fab.setLayoutParams(p);
-                        }
-                        @Override
-                        public void onDismiss(int height) {
-                            RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams)fab.getLayoutParams();
-                            p.bottomMargin -= Theming.convertDPtoPX(AllInOneV2.this, 48); // in PX
-                            fab.setLayoutParams(p);
-                        }
-                    })
-                    .duration(Snackbar.SnackbarDuration.LENGTH_SHORT)
-                    .attachToAbsListView(contentList)
-                    .color(Theming.colorPrimary())
-                    .textColor(Color.WHITE);
-        }
-
-        sb.text(msg);
-        sb.show(this);
     }
 }

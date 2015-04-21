@@ -9,11 +9,10 @@ dependencies {
     compile 'com.android.support:support-v13:22.0.0'
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile 'ch.acra:acra:4.5.0'
-    compile 'com.intellij:annotations:+@jar'
-    compile 'com.github.codechimp-org.apprater:library:1.0.+'
-    compile 'com.koushikdutta.ion:ion:2.+'
-    compile 'com.melnykov:floatingactionbutton:1.1.0'
-    compile 'com.nispok:snackbar:2.4.0'
+    compile 'com.intellij:annotations:12.0@jar'
+    compile 'com.github.codechimp-org.apprater:library:1.0.28'
+    compile 'com.koushikdutta.ion:ion:2.1.3'
+    compile 'com.melnykov:floatingactionbutton:1.3.0'
     compile('de.keyboardsurfer.android.widget:crouton:1.8.5@aar') {
         // exclusion is not neccessary, but generally a good idea.
         exclude group: 'com.google.android', module: 'support-v4'
@@ -32,8 +31,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 19
-        versionCode 303
-        versionName "3.0.3"
+        versionCode 304
+        versionName "3.0.4"
     }
     signingConfigs {
         release {
