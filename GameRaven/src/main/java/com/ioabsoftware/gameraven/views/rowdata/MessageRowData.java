@@ -230,10 +230,19 @@ public class MessageRowData extends BaseRowData {
                 final String action = "/boards/" + boardID + "/" + topicID;
                 String key = pollElem.getElementsByAttributeValue("name", "key").attr("value");
 
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, Theming.convertDPtoPX(aio, 1));
                 int x = 0;
                 for (Element e : pollElem.getElementsByAttributeValue("name", "poll_vote")) {
+                    if (x > 0) {
+                        View v = new View(aio);
+                        v.setLayoutParams(lp);
+                        v.setBackgroundColor(Theming.colorPrimary());
+                        pollInnerWrapper.addView(v);
+                    }
                     x++;
                     Button b = new Button(aio);
+                    b.setBackgroundDrawable(Theming.selectableItemBackground());
                     b.setText(e.nextElementSibling().text());
                     final HashMap<String, List<String>> data = new HashMap<String, List<String>>();
                     data.put("key", Arrays.asList(key));
@@ -249,7 +258,13 @@ public class MessageRowData extends BaseRowData {
                     pollInnerWrapper.addView(b);
                 }
 
+                View v = new View(aio);
+                v.setLayoutParams(lp);
+                v.setBackgroundColor(Theming.colorPrimary());
+                pollInnerWrapper.addView(v);
+
                 Button b = new Button(aio);
+                b.setBackgroundDrawable(Theming.selectableItemBackground());
                 b.setText("View Results");
                 b.setOnClickListener(new OnClickListener() {
                     @Override

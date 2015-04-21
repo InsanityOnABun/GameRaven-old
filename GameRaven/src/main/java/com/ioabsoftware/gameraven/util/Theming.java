@@ -93,6 +93,12 @@ public final class Theming {
         return topicStatusIcons;
     }
 
+    private static Drawable selectableItemBackground;
+
+    public static Drawable selectableItemBackground() {
+        return selectableItemBackground.getConstantState().newDrawable().mutate();
+    }
+
     private static Configuration croutonShort = new Configuration.Builder().setDuration(2500).build();
 
     public static void preInit(SharedPreferences settings) {
@@ -149,7 +155,8 @@ public final class Theming {
                 R.attr.themedLockedTopicIcon,
                 R.attr.themedArchivedTopicIcon,
                 R.attr.themedPinnedTopicIcon,
-                R.attr.readTopic
+                R.attr.readTopic,
+                android.R.attr.selectableItemBackground
         });
 
         // Get the individual values
@@ -165,6 +172,7 @@ public final class Theming {
         topicStatusIcons[2] = ta.getDrawable(9);
         topicStatusIcons[3] = ta.getDrawable(10);
         colorReadTopic = ta.getColor(11, resources.getColor(R.color.read_topic));
+        selectableItemBackground = ta.getDrawable(12);
 
         // Finally, free the resources used by TypedArray
         ta.recycle();
