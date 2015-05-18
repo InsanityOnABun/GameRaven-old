@@ -34,12 +34,11 @@ import static org.acra.ReportField.USER_CRASH_DATE;
 import static org.acra.ReportField.USER_EMAIL;
 
 @ReportsCrashes(
-        formKey = "",
         formUri = "https://ioabsoftware.cloudant.com/acra-gameraven/_design/acra-storage/_update/report",
         reportType = org.acra.sender.HttpSender.Type.JSON,
         httpMethod = org.acra.sender.HttpSender.Method.PUT,
-        formUriBasicAuthLogin = "somedfoldersessesetteade",
-        formUriBasicAuthPassword = "Kg4y3nMrROogBSvqV87ASVJM",
+        formUriBasicAuthLogin = "leyedwastorwhastoldamigh",
+        formUriBasicAuthPassword = "S3wytv8XJsOMY8tnUchU1m72",
 
         customReportContent = {
                 REPORT_ID,

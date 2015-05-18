@@ -836,19 +836,22 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case MARKMSG_S1:
                         if (doc.select("p:contains(you selected is no longer available for viewing.)").isEmpty()) {
                             HashMap<String, List<String>> markData = new HashMap<String, List<String>>();
-                            markData.put("reason", Arrays.asList(aio.getReportCode()));
+                            markData.put("target_id", Arrays.asList(aio.getReportCode()));
+                            markData.put("action", Arrays.asList("mod"));
+                            markData.put("submit", Arrays.asList("Report Message"));
                             markData.put("key", Arrays.asList(doc.select("input[name=key]").first().attr("value")));
 
-                            post(NetDesc.MARKMSG_S2, resUrl + "?action=mod", markData);
+                            post(NetDesc.MARKMSG_S2, resUrl.replace("/boards/", "/boardaction/"), markData);
                         } else
                             Crouton.showText(aio, "The topic has already been removed!", Theming.croutonStyle());
 
                         break;
 
                     case MARKMSG_S2:
-                        //This message has been marked for moderation.
                         if (!doc.select("p:contains(This message has been marked for moderation.)").isEmpty())
                             Crouton.showText(aio, "Message marked successfully.", Theming.croutonStyle());
+                        else if (!doc.select("p:contains(You do not need to mark it a second time.)").isEmpty())
+                            Crouton.showText(aio, "You have already marked this message for moderation. You do not need to mark it a second time.", Theming.croutonStyle());
                         else
                             Crouton.showText(aio, "There was an error marking the message.", Theming.croutonStyle());
 
@@ -856,12 +859,12 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         break;
 
                     case DLTMSG_S1:
-                        String delKey = doc.getElementsByAttributeValue("name", "key").attr("value");
                         HashMap<String, List<String>> delData = new HashMap<String, List<String>>();
                         delData.put("YES", Arrays.asList("Delete this Post"));
-                        delData.put("key", Arrays.asList(delKey));
+                        delData.put("action", Arrays.asList("delete"));
+                        delData.put("key", Arrays.asList(doc.select("input[name=key]").first().attr("value")));
 
-                        post(NetDesc.DLTMSG_S2, resUrl + "?action=delete", delData);
+                        post(NetDesc.DLTMSG_S2, resUrl.replace("/boards/", "/boardaction/"), delData);
                         break;
 
                     case DLTMSG_S2:
