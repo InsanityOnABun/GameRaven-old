@@ -649,9 +649,15 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case VERIFY_ACCOUNT_S1:
                     case VERIFY_ACCOUNT_S2:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning lastDesc, lastRes, etc. setting");
+
                         lastDesc = desc;
                         lastResBodyAsBytes = result.getResult().bytes;
                         lastPath = resUrl;
+
+                        // replace boardaction part of url, don't want it being added to history
+                        if (lastPath.contains("/boardaction/"))
+                            lastPath = lastPath.replace("/boardaction/", "/boards/");
+
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing lastDesc, lastRes, etc. setting");
                         break;
 
