@@ -82,6 +82,19 @@
         android:text="@string/last_post"
         android:textSize="12sp" />
 
+    <View
+        android:id="@+id/tvSTSep"
+        android:layout_width="1dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/tvBottomSpacer"
+        android:layout_alignTop="@id/tvTopSpacer"
+        android:layout_marginBottom="6dp"
+        android:layout_marginRight="6dp"
+        android:layout_marginTop="6dp"
+        android:layout_toRightOf="@+id/tvStopTracking"
+        android:background="#ff545454"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/tvStopTracking"
         android:layout_width="45dp"
@@ -89,8 +102,8 @@
         android:layout_alignBottom="@+id/tvBottomSpacer"
         android:layout_alignParentLeft="true"
         android:layout_alignTop="@+id/tvTopSpacer"
-        android:background="?attr/selectableItemBackground"
         android:layout_marginRight="1dp"
+        android:background="?attr/selectableItemBackground"
         android:gravity="center"
         android:lines="2"
         android:paddingBottom="10dp"

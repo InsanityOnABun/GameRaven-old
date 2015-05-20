@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
@@ -59,8 +60,11 @@ public class TrackedTopicRowView extends BaseRowView {
         lpLink = (TextView) findViewById(R.id.tvLastPostLink);
         removeLink = (TextView) findViewById(R.id.tvStopTracking);
 
+        // always display the "pinned" type indicator for tracked topics, mainly for layout
+        ((ImageView) findViewById(R.id.tvTypeIndicator)).setImageDrawable(Theming.topicStatusIcons()[3]);
+
         removeLink.setVisibility(View.VISIBLE);
-        findViewById(R.id.tvTypeIndicator).setVisibility(View.GONE);
+        findViewById(R.id.tvSTSep).setVisibility(View.VISIBLE);
 
         defaultBoardColor = board.getCurrentTextColor();
         defaultTitleColor = title.getCurrentTextColor();
