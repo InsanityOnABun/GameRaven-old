@@ -247,11 +247,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
         if (user == null) {
             if (BuildConfig.DEBUG) AllInOneV2.wtl("session constructor, user is null, starting logged out session");
-            get(NetDesc.BOARD_JUMPER, ROOT + "/boards");
+            get(NetDesc.BOARD_JUMPER, ROOT + "/boards/?message_beta=off");
             aio.setLoginName("Logged Out");
         } else {
             if (BuildConfig.DEBUG) AllInOneV2.wtl("session constructor, user is not null, starting logged in session");
-            get(NetDesc.LOGIN_S1, ROOT + "/boards");
+            get(NetDesc.LOGIN_S1, ROOT + "/boards/?message_beta=off");
             aio.setLoginName(user);
             aio.showLoggingInDialog(user);
         }
