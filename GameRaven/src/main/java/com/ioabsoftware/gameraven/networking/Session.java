@@ -34,9 +34,8 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.net.UnknownHostException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
@@ -55,11 +54,6 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
      * The root of GFAQs.
      */
     public static final String ROOT = "http://www.gamefaqs.com";
-
-    /**
-     * Holds all cookies for the session
-     */
-    private Map<String, String> cookies = new LinkedHashMap<String, String>();
 
     private String lastAttemptedPath = "not set";
 
@@ -99,13 +93,6 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
      * The latest Response body as an array of bytes.
      */
     private byte[] lastResBodyAsBytes = null;
-
-    /**
-     * Get's the Response body as an array of bytes from the latest page.
-     */
-    public byte[] getLastResBodyAsBytes() {
-        return lastResBodyAsBytes;
-    }
 
     /**
      * The latest description.
@@ -494,14 +481,14 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     b.setPositiveButton("Login", new OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            HashMap<String, List<String>> loginData = new HashMap<String, List<String>>();
+                            HashMap<String, List<String>> loginData = new HashMap<>();
                             // "EMAILADDR", user, "PASSWORD", password, "path", lastPath, "key", key
-                            loginData.put("EMAILADDR", Arrays.asList(user));
-                            loginData.put("PASSWORD", Arrays.asList(password));
-                            loginData.put("path", Arrays.asList(ROOT));
-                            loginData.put("key", Arrays.asList(key));
-                            loginData.put("recaptcha_challenge_field", Arrays.asList(form.getText().toString()));
-                            loginData.put("recaptcha_response_field", Arrays.asList("manual_challenge"));
+                            loginData.put("EMAILADDR", Collections.singletonList(user));
+                            loginData.put("PASSWORD", Collections.singletonList(password));
+                            loginData.put("path", Collections.singletonList(ROOT));
+                            loginData.put("key", Collections.singletonList(key));
+                            loginData.put("recaptcha_challenge_field", Collections.singletonList(form.getText().toString()));
+                            loginData.put("recaptcha_response_field", Collections.singletonList("manual_challenge"));
 
                             post(NetDesc.LOGIN_S2, "/user/login_captcha.html", loginData);
                         }
@@ -690,12 +677,12 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is login step 1");
                         String loginKey = doc.getElementsByAttributeValue("name", "key").attr("value");
 
-                        HashMap<String, List<String>> loginData = new HashMap<String, List<String>>();
+                        HashMap<String, List<String>> loginData = new HashMap<>();
                         // "EMAILADDR", user, "PASSWORD", password, "path", lastPath, "key", key
-                        loginData.put("EMAILADDR", Arrays.asList(user));
-                        loginData.put("PASSWORD", Arrays.asList(password));
-                        loginData.put("path", Arrays.asList(lastPath));
-                        loginData.put("key", Arrays.asList(loginKey));
+                        loginData.put("EMAILADDR", Collections.singletonList(user));
+                        loginData.put("PASSWORD", Collections.singletonList(password));
+                        loginData.put("path", Collections.singletonList(lastPath));
+                        loginData.put("key", Collections.singletonList(loginKey));
 
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing login step 1, sending step 2");
                         post(NetDesc.LOGIN_S2, "/user/login.html", loginData);
@@ -729,12 +716,12 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post message step 1");
                         String msg1Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 
-                        HashMap<String, List<String>> msg1Data = new HashMap<String, List<String>>();
-                        msg1Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
-                        msg1Data.put("key", Arrays.asList(msg1Key));
-                        msg1Data.put("post", Arrays.asList("Post Message"));
+                        HashMap<String, List<String>> msg1Data = new HashMap<>();
+                        msg1Data.put("messagetext", Collections.singletonList(aio.getSavedPostBody()));
+                        msg1Data.put("key", Collections.singletonList(msg1Key));
+                        msg1Data.put("post", Collections.singletonList("Post Message"));
                         if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
-                            msg1Data.put("custom_sig", Arrays.asList(aio.getSig()));
+                            msg1Data.put("custom_sig", Collections.singletonList(aio.getSig()));
 
                         post(NetDesc.POSTMSG_S3, lastPath, msg1Data);
                         break;
@@ -754,13 +741,13 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                             String msg3Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 
-                            HashMap<String, List<String>> msg3Data = new HashMap<String, List<String>>();
-                            msg3Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
-                            msg3Data.put("post", Arrays.asList("Post Message"));
-                            msg3Data.put("key", Arrays.asList(msg3Key));
-                            msg3Data.put("override", Arrays.asList("checked"));
+                            HashMap<String, List<String>> msg3Data = new HashMap<>();
+                            msg3Data.put("messagetext", Collections.singletonList(aio.getSavedPostBody()));
+                            msg3Data.put("post", Collections.singletonList("Post Message"));
+                            msg3Data.put("key", Collections.singletonList(msg3Key));
+                            msg3Data.put("override", Collections.singletonList("checked"));
                             if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
-                                msg3Data.put("custom_sig", Arrays.asList(aio.getSig()));
+                                msg3Data.put("custom_sig", Collections.singletonList(aio.getSig()));
 
                             showAutoFlagWarning(lastPath, msg3Data, NetDesc.POSTMSG_S3, msg);
                             postErrorDetected = true;
@@ -777,23 +764,23 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post topic step 1");
                         String tpc1Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 
-                        HashMap<String, List<String>> tpc1Data = new HashMap<String, List<String>>();
-                        tpc1Data.put("topictitle", Arrays.asList(aio.getSavedPostTitle()));
-                        tpc1Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
-                        tpc1Data.put("key", Arrays.asList(tpc1Key));
-                        tpc1Data.put("post", Arrays.asList("Post Message"));
+                        HashMap<String, List<String>> tpc1Data = new HashMap<>();
+                        tpc1Data.put("topictitle", Collections.singletonList(aio.getSavedPostTitle()));
+                        tpc1Data.put("messagetext", Collections.singletonList(aio.getSavedPostBody()));
+                        tpc1Data.put("key", Collections.singletonList(tpc1Key));
+                        tpc1Data.put("post", Collections.singletonList("Post Message"));
                         if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
-                            tpc1Data.put("custom_sig", Arrays.asList(aio.getSig()));
+                            tpc1Data.put("custom_sig", Collections.singletonList(aio.getSig()));
 
                         if (aio.isUsingPoll()) {
-                            tpc1Data.put("poll_text", Arrays.asList(aio.getPollTitle()));
+                            tpc1Data.put("poll_text", Collections.singletonList(aio.getPollTitle()));
                             for (int x = 0; x < 10; x++) {
                                 if (aio.getPollOptions()[x].length() != 0)
-                                    tpc1Data.put("poll_option_" + (x + 1), Arrays.asList(aio.getPollOptions()[x]));
+                                    tpc1Data.put("poll_option_" + (x + 1), Collections.singletonList(aio.getPollOptions()[x]));
                                 else
                                     x = 11;
                             }
-                            tpc1Data.put("min_level", Arrays.asList(aio.getPollMinLevel()));
+                            tpc1Data.put("min_level", Collections.singletonList(aio.getPollMinLevel()));
                         }
 
                         post(NetDesc.POSTTPC_S3, lastPath, tpc1Data);
@@ -814,14 +801,14 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                             String tpc3Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 
-                            HashMap<String, List<String>> tpc3Data = new HashMap<String, List<String>>();
-                            tpc3Data.put("topictitle", Arrays.asList(aio.getSavedPostTitle()));
-                            tpc3Data.put("messagetext", Arrays.asList(aio.getSavedPostBody()));
-                            tpc3Data.put("post", Arrays.asList("Post Message"));
-                            tpc3Data.put("key", Arrays.asList(tpc3Key));
-                            tpc3Data.put("override", Arrays.asList("checked"));
+                            HashMap<String, List<String>> tpc3Data = new HashMap<>();
+                            tpc3Data.put("topictitle", Collections.singletonList(aio.getSavedPostTitle()));
+                            tpc3Data.put("messagetext", Collections.singletonList(aio.getSavedPostBody()));
+                            tpc3Data.put("post", Collections.singletonList("Post Message"));
+                            tpc3Data.put("key", Collections.singletonList(tpc3Key));
+                            tpc3Data.put("override", Collections.singletonList("checked"));
                             if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
-                                tpc3Data.put("custom_sig", Arrays.asList(aio.getSig()));
+                                tpc3Data.put("custom_sig", Collections.singletonList(aio.getSig()));
 
                             showAutoFlagWarning(lastPath, tpc3Data, NetDesc.POSTTPC_S3, msg);
                             postErrorDetected = true;
@@ -835,11 +822,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                     case MARKMSG_S1:
                         if (doc.select("p:contains(you selected is no longer available for viewing.)").isEmpty()) {
-                            HashMap<String, List<String>> markData = new HashMap<String, List<String>>();
-                            markData.put("target_id", Arrays.asList(aio.getReportCode()));
-                            markData.put("action", Arrays.asList("mod"));
-                            markData.put("submit", Arrays.asList("Report Message"));
-                            markData.put("key", Arrays.asList(doc.select("input[name=key]").first().attr("value")));
+                            HashMap<String, List<String>> markData = new HashMap<>();
+                            markData.put("target_id", Collections.singletonList(aio.getReportCode()));
+                            markData.put("action", Collections.singletonList("mod"));
+                            markData.put("submit", Collections.singletonList("Report Message"));
+                            markData.put("key", Collections.singletonList(doc.select("input[name=key]").first().attr("value")));
 
                             post(NetDesc.MARKMSG_S2, resUrl.replace("/boards/", "/boardaction/"), markData);
                         } else
@@ -859,10 +846,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         break;
 
                     case DLTMSG_S1:
-                        HashMap<String, List<String>> delData = new HashMap<String, List<String>>();
-                        delData.put("YES", Arrays.asList("Delete this Post"));
-                        delData.put("action", Arrays.asList("delete"));
-                        delData.put("key", Arrays.asList(doc.select("input[name=key]").first().attr("value")));
+                        HashMap<String, List<String>> delData = new HashMap<>();
+                        delData.put("YES", Collections.singletonList("Delete this Post"));
+                        delData.put("action", Collections.singletonList("delete"));
+                        delData.put("key", Collections.singletonList(doc.select("input[name=key]").first().attr("value")));
 
                         post(NetDesc.DLTMSG_S2, resUrl.replace("/boards/", "/boardaction/"), delData);
                         break;
@@ -880,12 +867,12 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case SEND_PM_S1:
                         String pmKey = doc.getElementsByAttributeValue("name", "key").attr("value");
 
-                        HashMap<String, List<String>> pmData = new HashMap<String, List<String>>();
-                        pmData.put("key", Arrays.asList(pmKey));
-                        pmData.put("to", Arrays.asList(aio.savedTo));
-                        pmData.put("subject", Arrays.asList(aio.savedSubject));
-                        pmData.put("message", Arrays.asList(aio.savedMessage));
-                        pmData.put("submit", Arrays.asList("Send Message"));
+                        HashMap<String, List<String>> pmData = new HashMap<>();
+                        pmData.put("key", Collections.singletonList(pmKey));
+                        pmData.put("to", Collections.singletonList(aio.savedTo));
+                        pmData.put("subject", Collections.singletonList(aio.savedSubject));
+                        pmData.put("message", Collections.singletonList(aio.savedMessage));
+                        pmData.put("submit", Collections.singletonList("Send Message"));
 
                         post(NetDesc.SEND_PM_S2, "/pm/new", pmData);
                         break;
