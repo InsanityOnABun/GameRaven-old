@@ -20,8 +20,8 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -103,6 +103,7 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -113,7 +114,7 @@ import java.util.TimeZone;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 @SuppressLint("RtlHardcoded")
-public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     public static final int SEND_PM_DIALOG = 102;
     public static final int MESSAGE_ACTION_DIALOG = 103;
@@ -206,6 +207,7 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
     private enum FavMode {ON_BOARD, ON_TOPIC}
 
     private FavMode fMode;
+    private String favKey;
 
     private Button pageLabel;
     private Button firstPage, prevPage, nextPage, lastPage;
@@ -865,21 +867,19 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                 AlertDialog.Builder afb = new AlertDialog.Builder(this);
                 afb.setNegativeButton("No", null);
 
+                final HashMap<String, List<String>> afData = new HashMap<>();
+                afData.put("key", Collections.singletonList(favKey));
+
+                final String afPath = session.getLastPath().replace("/boards/", "/boardaction/");
+
                 switch (fMode) {
                     case ON_BOARD:
                         afb.setTitle("Add Board to Favorites?");
                         afb.setPositiveButton("Yes", new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String addFavUrl = session.getLastPath();
-                                if (addFavUrl.contains("remfav"))
-                                    addFavUrl = addFavUrl.replace("remfav", "addfav");
-                                else if (addFavUrl.indexOf('?') != -1)
-                                    addFavUrl += "&action=addfav";
-                                else
-                                    addFavUrl += "?action=addfav";
-
-                                session.get(NetDesc.BOARD, addFavUrl);
+                                afData.put("action", Collections.singletonList("addfav"));
+                                session.post(NetDesc.BOARD, afPath, afData);
                             }
                         });
                         break;
@@ -888,19 +888,8 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                         afb.setPositiveButton("Yes", new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String addFavUrl = session.getLastPath();
-                                int x = addFavUrl.indexOf('#');
-                                if (x != -1)
-                                    addFavUrl = addFavUrl.substring(0, x);
-
-                                if (addFavUrl.contains("stoptrack"))
-                                    addFavUrl = addFavUrl.replace("stoptrack", "tracktopic");
-                                else if (addFavUrl.indexOf('?') != -1)
-                                    addFavUrl += "&action=tracktopic";
-                                else
-                                    addFavUrl += "?action=tracktopic";
-
-                                session.get(NetDesc.TOPIC, addFavUrl);
+                                afData.put("action", Collections.singletonList("tracktopic"));
+                                session.post(NetDesc.TOPIC, afPath, afData);
                             }
                         });
                         break;
@@ -914,21 +903,19 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                 AlertDialog.Builder rfb = new AlertDialog.Builder(this);
                 rfb.setNegativeButton("No", null);
 
+                final HashMap<String, List<String>> rfData = new HashMap<>();
+                rfData.put("key", Collections.singletonList(favKey));
+
+                final String rfPath = session.getLastPath().replace("/boards/", "/boardaction/");
+
                 switch (fMode) {
                     case ON_BOARD:
                         rfb.setTitle("Remove Board from Favorites?");
                         rfb.setPositiveButton("Yes", new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String remFavUrl = session.getLastPath();
-                                if (remFavUrl.contains("addfav"))
-                                    remFavUrl = remFavUrl.replace("addfav", "remfav");
-                                else if (remFavUrl.indexOf('?') != -1)
-                                    remFavUrl += "&action=remfav";
-                                else
-                                    remFavUrl += "?action=remfav";
-
-                                session.get(NetDesc.BOARD, remFavUrl);
+                                rfData.put("action", Collections.singletonList("remfav"));
+                                session.post(NetDesc.BOARD, rfPath, rfData);
                             }
                         });
                         break;
@@ -937,19 +924,8 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                         rfb.setPositiveButton("Yes", new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String remFavUrl = session.getLastPath();
-                                int x = remFavUrl.indexOf('#');
-                                if (x != -1)
-                                    remFavUrl = remFavUrl.substring(0, x);
-
-                                if (remFavUrl.contains("tracktopic"))
-                                    remFavUrl = remFavUrl.replace("tracktopic", "stoptrack");
-                                else if (remFavUrl.indexOf('?') != -1)
-                                    remFavUrl += "&action=stoptrack";
-                                else
-                                    remFavUrl += "?action=stoptrack";
-
-                                session.get(NetDesc.TOPIC, remFavUrl);
+                                rfData.put("action", Collections.singletonList("stoptrack"));
+                                session.post(NetDesc.TOPIC, rfPath, rfData);
                             }
                         });
                         break;
@@ -1651,13 +1627,18 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                     setMenuItemVisibility(searchIcon, true);
 
                     if (Session.isLoggedIn()) {
-                        String favtext = doc.getElementsByClass("user").first().text().toLowerCase(Locale.US);
-                        if (favtext.contains("add to favorites")) {
-                            setMenuItemVisibility(addFavIcon, true);
+                        Element favbtn = doc.getElementsByClass("user").first().getElementsByAttributeValueStarting("onclick", "post_click").first();
+                        if (favbtn != null) {
+                            String favtext = favbtn.text().toLowerCase();
+                            String onclick = favbtn.attr("onclick");
+                            int endPoint = onclick.lastIndexOf('\'');
+                            int startPoint = onclick.lastIndexOf('\'', endPoint - 1) + 1;
+                            favKey = onclick.substring(startPoint, endPoint);
                             fMode = FavMode.ON_BOARD;
-                        } else if (favtext.contains("remove favorite")) {
-                            setMenuItemVisibility(remFavIcon, true);
-                            fMode = FavMode.ON_BOARD;
+                            if (favtext.contains("add to favorites"))
+                                setMenuItemVisibility(addFavIcon, true);
+                            else if (favtext.contains("remove favorite"))
+                                setMenuItemVisibility(remFavIcon, true);
                         }
 
                         updatePostingRights(doc, false);
@@ -1785,13 +1766,18 @@ public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.
                         pagesInfo[1], nextPage, lastPage, pagePrefix, NetDesc.TOPIC);
 
                 if (Session.isLoggedIn()) {
-                    String favtext = doc.getElementsByClass("user").first().text().toLowerCase(Locale.US);
-                    if (favtext.contains("track topic")) {
-                        setMenuItemVisibility(addFavIcon, true);
+                    Element favbtn = doc.getElementsByClass("user").first().getElementsByAttributeValueStarting("onclick", "post_click").first();
+                    if (favbtn != null) {
+                        String favtext = favbtn.text().toLowerCase();
+                        String onclick = favbtn.attr("onclick");
+                        int endPoint = onclick.lastIndexOf('\'');
+                        int startPoint = onclick.lastIndexOf('\'', endPoint - 1) + 1;
+                        favKey = onclick.substring(startPoint, endPoint);
                         fMode = FavMode.ON_TOPIC;
-                    } else if (favtext.contains("stop tracking")) {
-                        setMenuItemVisibility(remFavIcon, true);
-                        fMode = FavMode.ON_TOPIC;
+                        if (favtext.contains("track topic"))
+                            setMenuItemVisibility(addFavIcon, true);
+                        else if (favtext.contains("stop tracking"))
+                            setMenuItemVisibility(remFavIcon, true);
                     }
 
                     updatePostingRights(doc, true);
