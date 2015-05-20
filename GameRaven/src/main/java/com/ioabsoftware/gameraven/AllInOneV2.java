@@ -20,8 +20,8 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -113,7 +113,7 @@ import java.util.TimeZone;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 @SuppressLint("RtlHardcoded")
-public class AllInOneV2 extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     public static final int SEND_PM_DIALOG = 102;
     public static final int MESSAGE_ACTION_DIALOG = 103;
