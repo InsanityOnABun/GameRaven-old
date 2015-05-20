@@ -22,7 +22,7 @@ public final class AccountManager {
                 secureSalt = settings.getString("secureSalt", null);
             else {
                 secureSalt = UUID.randomUUID().toString();
-                settings.edit().putString("secureSalt", secureSalt).commit();
+                settings.edit().putString("secureSalt", secureSalt).apply();
             }
 
             accounts = new SecurePreferences(c, ACCOUNTS_PREFNAME, secureSalt, false);
