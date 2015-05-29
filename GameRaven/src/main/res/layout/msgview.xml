@@ -81,4 +81,35 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="15sp" />
 
+    <RelativeLayout
+        android:id="@+id/mvDeletedMessageWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/item_padding_vertical"
+        android:clickable="false"
+        android:visibility="gone">
+
+        <View
+            android:id="@+id/mvDMSep"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginBottom="@dimen/item_padding_vertical"
+            android:layout_marginTop="@dimen/item_padding_vertical"
+            android:background="#ff545454" />
+
+        <TextView
+            android:id="@+id/mvDMText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/mvDMSep"
+            android:layout_marginBottom="@dimen/item_padding_vertical"
+            android:layout_marginLeft="@dimen/item_padding_horizontal"
+            android:text="(message deleted)"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
+
 </LinearLayout>

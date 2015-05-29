@@ -93,7 +93,6 @@ import org.codechimp.apprater.AppRater;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.io.File;
@@ -1785,7 +1784,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
                 String goToThisPost = null;
                 if (goToUrlDefinedPost) {
-                    goToThisPost = resUrl.substring(resUrl.indexOf('#') + 1);
+                    goToThisPost = resUrl.substring(resUrl.indexOf('#'));
                 }
 
                 Elements rows = doc.select("table.board").first().getElementsByTag("tr");
@@ -1797,93 +1796,76 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 for (int x = 0; x < rowCount; x++) {
                     Element row = rows.get(x);
 
-                    String user;
-                    String postNum;
-                    String mID = null;
-                    String userTitles = EMPTY_STRING;
-                    String postTimeText = EMPTY_STRING;
-                    String postTime = EMPTY_STRING;
-                    Element msgBody;
+                    if (row.select("div.msg_deleted").isEmpty()) {
 
-                    if (row.hasClass("left")) {
-                        // message poster display set to left of message
+                        String user;
+                        String postNum;
+                        String postTime;
+                        String mID = null;
+                        String userTitles = EMPTY_STRING;
+                        Element msgBody;
 
-                        Elements authorData = row.getElementsByClass("author_data");
-                        user = row.getElementsByTag("b").first().text();
-                        postNum = row.getElementsByTag("a").first().attr("name");
+                        boolean canReport = false, canDelete = false, canEdit = false, canQuote = false;
 
-                        for (int i = 1; i < authorData.size(); i++) {
-                            Element e = authorData.get(i);
-                            String t = e.text();
-                            if (t.startsWith("("))
-                                userTitles += " " + t;
+                        Element infoBox = row.select("div.msg_infobox").first();
+                        user = infoBox.getElementsByTag("b").first().text();
 
-                            else if (e.hasClass("tag"))
-                                userTitles += " (" + t + ")";
+                        Element userInfo = infoBox.select("span.user_info").first();
+                        if (userInfo != null)
+                            userTitles = " " + userInfo.text();
 
-                            else if (t.startsWith("Posted"))
-                                postTime = t;
+                        Element userTag = infoBox.select("span.tag").first();
+                        if (userTag != null)
+                            userTitles += " (" + userTag.text() + ")";
 
-                            else if (t.equals("message detail"))
-                                mID = parseMessageID(e.child(0).attr("href"));
+                        postTime = infoBox.select("span.post_time").first().text();
+
+                        Element number = infoBox.select("span.message_num").first();
+                        postNum = number.text();
+                        if (!number.children().isEmpty()) {
+                            mID = parseMessageID(number.child(0).attr("href"));
                         }
 
-                        msgBody = row.child(1).child(0);
-                    } else {
-                        // message poster display set to above message
+                        msgBody = row.select("div.msg_body").first();
 
-                        List<TextNode> textNodes = row.child(0).child(0).textNodes();
-                        Elements elements = row.child(0).child(0).children();
-
-                        for (TextNode textNode : textNodes) {
-                            String text = textNode.text();
-                            if (text.startsWith("Posted"))
-                                postTimeText = text;
-                            else if (text.contains("(")) {
-                                userTitles += " " + text.substring(text.indexOf('('), text.lastIndexOf(')') + 1);
-                            }
-                        }
-
-                        user = elements.get(0).text();
-                        int anchorCount = row.getElementsByTag("a").size();
-                        postNum = row.getElementsByTag("a").get((anchorCount > 1 ? 1 : 0)).attr("name");
-                        for (Element e : elements) {
-                            if (e.hasClass("tag"))
-                                userTitles += " (" + e.text() + ")";
-
-                            else if (e.text().equals("message detail"))
-                                mID = parseMessageID(e.attr("href"));
-                        }
-                        //Posted 11/15/2012 11:20:27&nbsp;AM | (edited) [if archived]
-                        if (postTimeText.contains("(edited)"))
+                        Element msgBelow = row.select("div.msg_below").first();
+                        Element edited = msgBelow.select("span.edited").first();
+                        if (edited != null)
                             userTitles += " (edited)";
 
-                        int endPoint = postTimeText.indexOf('|') - 1;
-                        if (endPoint < 0)
-                            endPoint = postTimeText.length();
-                        postTime = postTimeText.substring(0, endPoint);
+                        Element belowOptions = msgBelow.select("span.options").first();
+                        if (belowOptions != null) {
+                            String options = belowOptions.text();
+                            if (options.contains("report"))
+                                canReport = true;
+                            if (options.contains("delete"))
+                                canDelete = true;
+                            if (options.contains("edit"))
+                                canEdit = true;
+                            if (options.contains("quote"))
+                                canQuote = true;
+                        }
 
-                        x++;
-                        msgBody = rows.get(x).child(0).child(0);
+                        int hlColor = 0;
+                        if (hlUsers.contains(user.toLowerCase(Locale.US))) {
+                            HighlightedUser hUser = hlDB
+                                    .getHighlightedUsers().get(
+                                            user.toLowerCase(Locale.US));
+                            hlColor = hUser.getColor();
+                            userTitles += " (" + hUser.getLabel() + ")";
+                        }
+
+                        if (goToUrlDefinedPost) {
+                            if (postNum.equals(goToThisPost))
+                                goToThisIndex = msgIndex;
+                        }
+
+                        if (BuildConfig.DEBUG) wtl("creating messagerowdata object");
+                        adapterRows.add(new MessageRowData(user, userTitles, postNum,
+                                postTime, msgBody, boardID, topicID, mID, hlColor, canReport, canDelete, canEdit, canQuote));
+                    } else {
+                        adapterRows.add(new MessageRowData(true));
                     }
-
-                    int hlColor = 0;
-                    if (hlUsers.contains(user.toLowerCase(Locale.US))) {
-                        HighlightedUser hUser = hlDB
-                                .getHighlightedUsers().get(
-                                        user.toLowerCase(Locale.US));
-                        hlColor = hUser.getColor();
-                        userTitles += " (" + hUser.getLabel() + ")";
-                    }
-
-                    if (goToUrlDefinedPost) {
-                        if (postNum.equals(goToThisPost))
-                            goToThisIndex = msgIndex;
-                    }
-
-                    if (BuildConfig.DEBUG) wtl("creating messagerowdata object");
-                    adapterRows.add(new MessageRowData(user, userTitles, postNum,
-                            postTime, msgBody, boardID, topicID, mID, hlColor));
 
                     msgIndex++;
                 }
@@ -1895,34 +1877,58 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
                 boardID = parseBoardID(resUrl);
                 topicID = parseTopicID(resUrl);
+                String mID = parseMessageID(resUrl);
 
-                Elements msgDRows = doc.getElementsByTag("tr");
-
-                String user = msgDRows.first().child(0).child(0).text();
-
+                Elements msgRows = doc.select("td.msg");
                 adapterRows.add(new HeaderRowData("Current Version"));
 
-                Element currRow, body;
                 MessageRowData msg;
-                String postTime;
-                String mID = parseMessageID(resUrl);
-                for (int x = 0; x < msgDRows.size(); x++) {
+
+                int msgRowCount = msgRows.size();
+                for (int x = 0; x < msgRowCount; x++) {
                     if (x == 1)
                         adapterRows.add(new HeaderRowData("Previous Version(s)"));
-                    else {
-                        currRow = msgDRows.get(x);
 
-                        if (currRow.child(0).textNodes().size() > 1)
-                            postTime = currRow.child(0).textNodes().get(1).text();
-                        else
-                            postTime = currRow.child(0).textNodes().get(0).text();
+                    Element currRow = msgRows.get(x);
+                    Element msgInfobox = currRow.select("div.msg_infobox").first();
+                    Element msgBody = currRow.select("div.msg_body").first();
 
-                        body = currRow.child(1);
-                        msg = new MessageRowData(user, null, null, postTime, body, boardID, topicID, mID, 0);
-                        msg.disableTopClick();
-                        adapterRows.add(msg);
-                    }
+                    String user = msgInfobox.getElementsByTag("b").first().text();
+                    String postTime = msgInfobox.select("span.post_time").first().text();
+
+                    msg = new MessageRowData(user, EMPTY_STRING, "#" + (msgRowCount - x), postTime,
+                            msgBody, boardID, topicID, mID, 0, false, false, false, false);
+                    msg.disableTopClick();
+                    adapterRows.add(msg);
                 }
+
+//                Elements msgDRows = doc.getElementsByTag("tr");
+//
+//                String user = msgDRows.first().child(0).child(0).text();
+//
+//                adapterRows.add(new HeaderRowData("Current Version"));
+//
+//                Element currRow, body;
+//                MessageRowData msg;
+//                String postTime;
+//                String mID = parseMessageID(resUrl);
+//                for (int x = 0; x < msgDRows.size(); x++) {
+//                    if (x == 1)
+//                        adapterRows.add(new HeaderRowData("Previous Version(s)"));
+//                    else {
+//                        currRow = msgDRows.get(x);
+//
+//                        if (currRow.child(0).textNodes().size() > 1)
+//                            postTime = currRow.child(0).textNodes().get(1).text();
+//                        else
+//                            postTime = currRow.child(0).textNodes().get(0).text();
+//
+//                        body = currRow.child(1);
+//                        msg = new MessageRowData(user, null, null, postTime, body, boardID, topicID, mID, 0, "");
+//                        msg.disableTopClick();
+//                        adapterRows.add(msg);
+//                    }
+//                }
 
                 break;
 
@@ -2682,7 +2688,33 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 reportCode = getResources().getStringArray(R.array.msgReportCodes)[which];
-                session.get(NetDesc.MARKMSG_S1, clickedMsg.getMessageDetailLink());
+
+                /*
+                <form action="http://www.gamefaqs.com/features/board_mark/pick.php" method="post">
+                <input type="hidden" name="b" value="848">
+                <input type="hidden" name="t" value="71881473">
+                <input type="hidden" name="m" value="821951056">
+                <input type="hidden" name="r" value="8">
+                <input type="hidden" name="rt" value="Testing">
+                <input type="hidden" name="i" value="0">
+                <input type="hidden" name="key" value="[session key]">
+                <input type="submit">
+                </form>
+                 */
+
+                HashMap<String, List<String>> markData = new HashMap<>();
+                markData.put("b", Collections.singletonList(boardID));
+                markData.put("t", Collections.singletonList(topicID));
+                markData.put("m", Collections.singletonList(clickedMsg.getMessageID()));
+                markData.put("r", Collections.singletonList(reportCode));
+                markData.put("rt", Collections.singletonList(EMPTY_STRING));
+                markData.put("i", Collections.singletonList("0"));
+                markData.put("key", Collections.singletonList(session.getSessionKey()));
+
+                session.post(NetDesc.MARKMSG, "/features/board_mark/pick.php", markData);
+
+
+//                session.get(NetDesc.MARKMSG_S1, clickedMsg.getMessageDetailLink());
             }
         });
 
@@ -2718,17 +2750,14 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 listBuilder.add("Message Detail");
         }
 
-        if (Session.isLoggedIn()) {
-            if (postWrapper.getVisibility() == View.VISIBLE || fab.getVisibility() == View.VISIBLE)
-                listBuilder.add("Quote");
-            if (Session.getUser().trim().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
-                if (Session.userCanEditMsgs() && clickedMsg.isEditable())
-                    listBuilder.add("Edit");
-                if (Session.userCanDeleteClose() && clickedMsg.getMessageID() != null)
-                    listBuilder.add("Delete");
-            } else if (Session.userCanMarkMsgs())
-                listBuilder.add("Report");
-        }
+        if (clickedMsg.canQuote())
+            listBuilder.add("Quote");
+        if (clickedMsg.canEdit())
+            listBuilder.add("Edit");
+        if (clickedMsg.canDelete())
+            listBuilder.add("Delete");
+        if (clickedMsg.canReport())
+            listBuilder.add("Report");
 
         listBuilder.add("Highlight User");
         listBuilder.add("User Details");
@@ -2748,20 +2777,32 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 assert selected != null : "selected is null";
                 if (selected.equals("View Previous Version(s)") || selected.equals("Message Detail")) {
                     session.get(NetDesc.MESSAGE_DETAIL, clickedMsg.getMessageDetailLink());
+
                 } else if (selected.equals("Quote")) {
                     String msg = (quoteSelection != null ? quoteSelection : clickedMsg.getMessageForQuoting());
                     quoteSetup(clickedMsg.getUser(), msg);
+
                 } else if (selected.equals("Edit")) {
                     editPostSetup(clickedMsg.getMessageForEditing(), clickedMsg.getMessageID());
+
                 } else if (selected.equals("Delete")) {
-                    session.get(NetDesc.DLTMSG_S1, clickedMsg.getMessageDetailLink());
+                    HashMap<String, List<String>> delData = new HashMap<>();
+                    delData.put("action", Collections.singletonList("delete"));
+                    delData.put("key", Collections.singletonList(session.getSessionKey()));
+
+                    session.post(NetDesc.DELETEMSG,
+                            clickedMsg.getMessageDetailLink().replace("/boards/", "/boardaction/"), delData);
+
                 } else if (selected.equals("Report")) {
                     showDialog(REPORT_MESSAGE_DIALOG);
+
                 } else if (selected.equals("Highlight User")) {
                     HighlightedUser user = hlDB.getHighlightedUsers().get(clickedMsg.getUser().toLowerCase(Locale.US));
                     HighlightListDBHelper.showHighlightUserDialog(AllInOneV2.this, user, clickedMsg.getUser(), null);
+
                 } else if (selected.equals("User Details")) {
                     session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink());
+
                 } else {
                     Crouton.showText(AllInOneV2.this, "not recognized: " + selected, Theming.croutonStyle());
                 }

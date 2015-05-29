@@ -5,8 +5,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.format.DateUtils;
-import android.text.format.Time;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
@@ -38,14 +36,9 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 public class MessageRowData extends BaseRowData {
 
@@ -59,6 +52,9 @@ public class MessageRowData extends BaseRowData {
     private int hlColor;
 
     private boolean topClickable = true;
+    private boolean isDeleted = false;
+
+    private boolean canReport = false, canDelete = false, canEdit = false, canQuote = false;
 
     @Override
     public String toString() {
@@ -81,6 +77,10 @@ public class MessageRowData extends BaseRowData {
 
     public boolean topClickable() {
         return topClickable;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
     }
 
     public String getUser() {
@@ -117,6 +117,22 @@ public class MessageRowData extends BaseRowData {
 
     public String getBoardID() {
         return boardID;
+    }
+
+    public boolean canReport() {
+        return canReport;
+    }
+
+    public boolean canDelete() {
+        return canDelete;
+    }
+
+    public boolean canEdit() {
+        return canEdit;
+    }
+
+    public boolean canQuote() {
+        return canQuote;
     }
 
     public String getUnprocessedMessageText() {
@@ -157,8 +173,14 @@ public class MessageRowData extends BaseRowData {
         return RowType.MESSAGE;
     }
 
+    public MessageRowData(boolean isDeletedIn) {
+        isDeleted = isDeletedIn;
+        unprocessedMessageText = "";
+    }
+
     public MessageRowData(String userIn, String userTitlesIn, String postNumIn, String postTimeIn,
-                          Element messageIn, String BID, String TID, String MID, int hlColorIn) {
+                          Element messageIn, String BID, String TID, String MID, int hlColorIn,
+                          boolean cReport, boolean cDelete, boolean cEdit, boolean cQuote) {
 
         if (aio == null || aio != AllInOneV2.get())
             aio = AllInOneV2.get();
@@ -172,6 +194,11 @@ public class MessageRowData extends BaseRowData {
         topicID = TID;
         messageID = MID;
         hlColor = hlColorIn;
+
+        canReport = cReport;
+        canDelete = cDelete;
+        canEdit = cEdit;
+        canQuote = cQuote;
 
         if (!Session.isLoggedIn())
             messageIn.select("div.message_mpu").remove();
@@ -321,34 +348,6 @@ public class MessageRowData extends BaseRowData {
 
     public boolean isEdited() {
         return userTitles != null && userTitles.contains("(edited)");
-    }
-
-    public boolean isEditable() {
-        // Posted 8/1/2013 1:40:38 AM
-        // Posted 8/1/2013 1:02:05 AM
-        // Posted 3/18/2007 11:42:33 PM
-        try {
-            String id = AllInOneV2.getSettingsPref().getString("timezone", TimeZone.getDefault().getID());
-
-            SimpleDateFormat sdf = new SimpleDateFormat("'Posted 'M/d/yyyy h:mm:ss a", Locale.US);
-            sdf.setTimeZone(TimeZone.getTimeZone(id));
-            Date date = sdf.parse(postTime);
-
-            Time now = new Time(id);
-            Time then = new Time(id);
-
-            then.set(date.getTime());
-            then.normalize(true);
-
-            now.setToNow();
-            now.normalize(true);
-
-            return (now.toMillis(false) - then.toMillis(false)) / ((float) DateUtils.HOUR_IN_MILLIS) < 1f;
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 
     private static void addGenericSpans(SpannableStringBuilder ssb, String tag, String endTag, CharacterStyle... cs) {

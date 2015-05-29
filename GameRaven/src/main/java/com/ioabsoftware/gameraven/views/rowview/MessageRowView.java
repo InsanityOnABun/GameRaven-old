@@ -28,7 +28,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 
     View topWrapper;
 
-    ImageView avatar;
+    ImageView avatar, overflowIcon;
 
     TextView user;
     TextView post;
@@ -47,6 +47,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
     boolean isHighlighted = false;
     boolean isShowingPoll = false;
     boolean isUsingAvatars = false;
+    boolean isDeleted = false;
 
     public MessageRowView(Context context) {
         super(context);
@@ -68,6 +69,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
         topWrapper = findViewById(R.id.mvTopWrapper);
 
         avatar = (ImageView) findViewById(R.id.mvAvatar);
+        overflowIcon = (ImageView) findViewById(R.id.mvMessageMenuIcon);
 
         user = (TextView) findViewById(R.id.mvUser);
         post = (TextView) findViewById(R.id.mvPostNumber);
@@ -106,10 +108,33 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 
         myData = (MessageRowData) data;
 
-        topWrapper.setClickable(myData.topClickable());
+        if (isDeleted != myData.isDeleted()) {
+            isDeleted = myData.isDeleted();
+            if (isDeleted) {
+                findViewById(R.id.mvDeletedMessageWrapper).setVisibility(View.VISIBLE);
+                findViewById(R.id.mvDMSep).setBackgroundColor(Theming.colorPrimary());
+                topWrapper.setVisibility(View.GONE);
+                pollWrapper.setVisibility(View.GONE);
+                message.setVisibility(View.GONE);
+            } else {
+                findViewById(R.id.mvDeletedMessageWrapper).setVisibility(View.GONE);
+                topWrapper.setVisibility(View.VISIBLE);
+                pollWrapper.setVisibility(View.VISIBLE);
+                message.setVisibility(View.VISIBLE);
+            }
+        }
 
-        user.setText((myData.hasTitles() ? myData.getUser() + myData.getUserTitles() : myData.getUser()));
-        post.setText((myData.hasMsgID() ? "#" + myData.getPostNum() + ", " + myData.getPostTime() : myData.getPostTime()));
+        if (isDeleted)
+            return;
+
+        topWrapper.setClickable(myData.topClickable());
+        if (myData.topClickable())
+            overflowIcon.setVisibility(View.VISIBLE);
+        else
+            overflowIcon.setVisibility(View.INVISIBLE);
+
+        user.setText(myData.getUser() + myData.getUserTitles());
+        post.setText(myData.getPostNum() + ", Posted " + myData.getPostTime());
 
         if (myData.hasPoll()) {
             isShowingPoll = true;
@@ -202,10 +227,6 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
         return myData.getPostNum();
     }
 
-    public boolean isEditable() {
-        return myData.isEditable();
-    }
-
     public String getMessageForQuoting() {
         return myData.getMessageForQuoting();
     }
@@ -218,6 +239,22 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 
     public static void setUsingAvatars(boolean set) {
         globalIsUsingAvatars = set;
+    }
+
+    public boolean canReport() {
+        return myData.canReport();
+    }
+
+    public boolean canDelete() {
+        return myData.canDelete();
+    }
+
+    public boolean canEdit() {
+        return myData.canEdit();
+    }
+
+    public boolean canQuote() {
+        return myData.canQuote();
     }
 
 

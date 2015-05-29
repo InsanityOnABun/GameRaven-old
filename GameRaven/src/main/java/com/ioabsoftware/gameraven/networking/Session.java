@@ -137,7 +137,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
     }
 
     public static boolean userCanEditMsgs() {
-        return userLevel > 24;
+        return userLevel > 19;
     }
 
     /**
@@ -154,6 +154,9 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
      * The password of the user for this session.
      */
     private String password = null;
+
+    private String sessionKey;
+    public String getSessionKey() {return sessionKey;}
 
     /**
      * The current activity.
@@ -247,11 +250,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
         if (user == null) {
             if (BuildConfig.DEBUG) AllInOneV2.wtl("session constructor, user is null, starting logged out session");
-            get(NetDesc.BOARD_JUMPER, ROOT + "/boards/?message_beta=off");
+            get(NetDesc.BOARD_JUMPER, ROOT + "/boards/");
             aio.setLoginName("Logged Out");
         } else {
             if (BuildConfig.DEBUG) AllInOneV2.wtl("session constructor, user is not null, starting logged in session");
-            get(NetDesc.LOGIN_S1, ROOT + "/boards/?message_beta=off");
+            get(NetDesc.LOGIN_S1, ROOT + "/boards/");
             aio.setLoginName(user);
             aio.showLoggingInDialog(user);
         }
@@ -388,9 +391,9 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             case PM_INBOX_DETAIL:
             case PM_OUTBOX:
             case PM_OUTBOX_DETAIL:
-            case MARKMSG_S1:
+            case MARKMSG:
             case CLOSE_TOPIC:
-            case DLTMSG_S1:
+            case DELETEMSG:
             case LOGIN_S1:
             case EDIT_MSG:
             case POSTMSG_S1:
@@ -400,8 +403,6 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                 break;
 
             case LOGIN_S2:
-            case MARKMSG_S2:
-            case DLTMSG_S2:
             case POSTMSG_S3:
             case POSTTPC_S3:
             case VERIFY_ACCOUNT_S1:
@@ -596,8 +597,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case UNSPECIFIED:
                     case LOGIN_S1:
                     case LOGIN_S2:
-                    case DLTMSG_S1:
-                    case DLTMSG_S2:
+                    case DELETEMSG:
                     case EDIT_MSG:
                     case POSTMSG_S1:
                     case POSTMSG_S3:
@@ -609,8 +609,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         break;
 
                     case TAG_USER:
-                    case MARKMSG_S1:
-                    case MARKMSG_S2:
+                    case MARKMSG:
                     case CLOSE_TOPIC:
                     case SEND_PM_S1:
                     case SEND_PM_S2:
@@ -638,6 +637,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case PM_INBOX_DETAIL:
                     case PM_OUTBOX:
                     case PM_OUTBOX_DETAIL:
+                    case DELETEMSG:
                     case UNSPECIFIED:
                     case LOGIN_S1:
                     case LOGIN_S2:
@@ -663,11 +663,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
 
                     case TAG_USER:
-                    case MARKMSG_S1:
-                    case MARKMSG_S2:
+                    case MARKMSG:
                     case CLOSE_TOPIC:
-                    case DLTMSG_S1:
-                    case DLTMSG_S2:
                     case SEND_PM_S1:
                     case SEND_PM_S2:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("not setting lastDesc, lastRes, etc.");
@@ -698,6 +695,9 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is login step 2");
                         aio.setAMPLinkVisible(userCanViewAMP());
 
+                        sessionKey = doc.getElementById("polloftheday").
+                                getElementsByAttributeValue("name", "key").first().attr("value");
+
                         if (initUrl != null) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("loading previous page");
                             if (initUrl.equals(RESUME_INIT_URL) && canGoBack()) {
@@ -720,11 +720,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case POSTMSG_S1:
                     case EDIT_MSG:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post message step 1");
-                        String msg1Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 
                         HashMap<String, List<String>> msg1Data = new HashMap<>();
                         msg1Data.put("messagetext", Collections.singletonList(aio.getSavedPostBody()));
-                        msg1Data.put("key", Collections.singletonList(msg1Key));
+                        msg1Data.put("key", Collections.singletonList(sessionKey));
                         msg1Data.put("post", Collections.singletonList("Post Message"));
                         if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
                             msg1Data.put("custom_sig", Collections.singletonList(aio.getSig()));
@@ -745,12 +744,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("autoflag got tripped in post msg step 3, getting data and showing autoflag dialog");
                             String msg = ((TextNode) msg3AutoFlag.first().nextSibling().nextSibling()).text();
 
-                            String msg3Key = doc.getElementsByAttributeValue("name", "key").attr("value");
-
                             HashMap<String, List<String>> msg3Data = new HashMap<>();
                             msg3Data.put("messagetext", Collections.singletonList(aio.getSavedPostBody()));
                             msg3Data.put("post", Collections.singletonList("Post Message"));
-                            msg3Data.put("key", Collections.singletonList(msg3Key));
+                            msg3Data.put("key", Collections.singletonList(sessionKey));
                             msg3Data.put("override", Collections.singletonList("checked"));
                             if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
                                 msg3Data.put("custom_sig", Collections.singletonList(aio.getSig()));
@@ -768,12 +765,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                     case POSTTPC_S1:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post topic step 1");
-                        String tpc1Key = doc.getElementsByAttributeValue("name", "key").attr("value");
 
                         HashMap<String, List<String>> tpc1Data = new HashMap<>();
                         tpc1Data.put("topictitle", Collections.singletonList(aio.getSavedPostTitle()));
                         tpc1Data.put("messagetext", Collections.singletonList(aio.getSavedPostBody()));
-                        tpc1Data.put("key", Collections.singletonList(tpc1Key));
+                        tpc1Data.put("key", Collections.singletonList(sessionKey));
                         tpc1Data.put("post", Collections.singletonList("Post Message"));
                         if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
                             tpc1Data.put("custom_sig", Collections.singletonList(aio.getSig()));
@@ -805,13 +801,11 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("autoflag got tripped in post msg step 3, getting data and showing autoflag dialog");
                             String msg = ((TextNode) tpc3AutoFlag.first().nextSibling().nextSibling()).text();
 
-                            String tpc3Key = doc.getElementsByAttributeValue("name", "key").attr("value");
-
                             HashMap<String, List<String>> tpc3Data = new HashMap<>();
                             tpc3Data.put("topictitle", Collections.singletonList(aio.getSavedPostTitle()));
                             tpc3Data.put("messagetext", Collections.singletonList(aio.getSavedPostBody()));
                             tpc3Data.put("post", Collections.singletonList("Post Message"));
-                            tpc3Data.put("key", Collections.singletonList(tpc3Key));
+                            tpc3Data.put("key", Collections.singletonList(sessionKey));
                             tpc3Data.put("override", Collections.singletonList("checked"));
                             if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
                                 tpc3Data.put("custom_sig", Collections.singletonList(aio.getSig()));
@@ -826,42 +820,20 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         }
                         break;
 
-                    case MARKMSG_S1:
-                        if (doc.select("p:contains(you selected is no longer available for viewing.)").isEmpty()) {
-                            HashMap<String, List<String>> markData = new HashMap<>();
-                            markData.put("target_id", Collections.singletonList(aio.getReportCode()));
-                            markData.put("action", Collections.singletonList("mod"));
-                            markData.put("submit", Collections.singletonList("Report Message"));
-                            markData.put("key", Collections.singletonList(doc.select("input[name=key]").first().attr("value")));
-
-                            post(NetDesc.MARKMSG_S2, resUrl.replace("/boards/", "/boardaction/"), markData);
-                        } else
-                            Crouton.showText(aio, "The topic has already been removed!", Theming.croutonStyle());
-
+                    case MARKMSG:
+                        String response = doc.text();
+                        int start = response.indexOf("\":\"") + 3;
+                        int end = response.indexOf("\",\"");
+                        String markMessage = response.substring(start, end);
+                        Crouton.showText(aio, markMessage, Theming.croutonStyle());
                         break;
 
-                    case MARKMSG_S2:
-                        if (!doc.select("p:contains(This message has been marked for moderation.)").isEmpty())
-                            Crouton.showText(aio, "Message marked successfully.", Theming.croutonStyle());
-                        else if (!doc.select("p:contains(You do not need to mark it a second time.)").isEmpty())
-                            Crouton.showText(aio, "You have already marked this message for moderation. You do not need to mark it a second time.", Theming.croutonStyle());
-                        else
-                            Crouton.showText(aio, "There was an error marking the message.", Theming.croutonStyle());
-
-                        refresh();
-                        break;
-
-                    case DLTMSG_S1:
-                        HashMap<String, List<String>> delData = new HashMap<>();
-                        delData.put("YES", Collections.singletonList("Delete this Post"));
-                        delData.put("action", Collections.singletonList("delete"));
-                        delData.put("key", Collections.singletonList(doc.select("input[name=key]").first().attr("value")));
-
-                        post(NetDesc.DLTMSG_S2, resUrl.replace("/boards/", "/boardaction/"), delData);
-                        break;
-
-                    case DLTMSG_S2:
-                        goBack(true);
+                    case DELETEMSG:
+                        Crouton.showText(aio, "Message deleted.", Theming.croutonStyle());
+                        applySavedScroll = true;
+                        savedScrollVal = aio.getScrollerVertLoc();
+                        lastDesc = NetDesc.TOPIC;
+                        processTopicsAndMessages(doc, resUrl, NetDesc.TOPIC);
                         break;
 
                     case CLOSE_TOPIC:
@@ -869,12 +841,9 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         goBack(true);
                         break;
 
-
                     case SEND_PM_S1:
-                        String pmKey = doc.getElementsByAttributeValue("name", "key").attr("value");
-
                         HashMap<String, List<String>> pmData = new HashMap<>();
-                        pmData.put("key", Collections.singletonList(pmKey));
+                        pmData.put("key", Collections.singletonList(sessionKey));
                         pmData.put("to", Collections.singletonList(aio.savedTo));
                         pmData.put("subject", Collections.singletonList(aio.savedSubject));
                         pmData.put("message", Collections.singletonList(aio.savedMessage));
@@ -978,6 +947,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                 case PM_INBOX_DETAIL:
                 case PM_OUTBOX:
                 case PM_OUTBOX_DETAIL:
+                case DELETEMSG:
                 case UNSPECIFIED:
                     if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning history addition");
                     int[] vLoc = aio.getScrollerVertLoc();
@@ -986,11 +956,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     break;
 
                 case TAG_USER:
-                case MARKMSG_S1:
-                case MARKMSG_S2:
+                case MARKMSG:
                 case CLOSE_TOPIC:
-                case DLTMSG_S1:
-                case DLTMSG_S2:
                 case LOGIN_S1:
                 case LOGIN_S2:
                 case EDIT_MSG:
@@ -1048,6 +1015,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             case PM_INBOX_DETAIL:
             case PM_OUTBOX:
             case PM_OUTBOX_DETAIL:
+            case MARKMSG:
+            case DELETEMSG:
             case CLOSE_TOPIC:
             case GAME_SEARCH:
             case BOARD_LIST:
@@ -1066,10 +1035,6 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
             case LOGIN_S1:
             case LOGIN_S2:
-            case MARKMSG_S1:
-            case MARKMSG_S2:
-            case DLTMSG_S1:
-            case DLTMSG_S2:
             case EDIT_MSG:
             case POSTMSG_S1:
             case POSTTPC_S1:
