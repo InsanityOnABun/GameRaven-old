@@ -1651,7 +1651,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                     }
 
                     Element table = doc.select("table.board").first();
-                    if (table != null) {
+                    if (table != null && !table.select("td").first().hasAttr("colspan")) {
 
                         table.getElementsByTag("col").get(2).remove();
                         table.getElementsByTag("th").get(2).remove();
