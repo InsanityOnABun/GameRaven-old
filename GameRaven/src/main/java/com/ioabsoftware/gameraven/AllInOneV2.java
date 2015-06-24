@@ -1864,7 +1864,13 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                         adapterRows.add(new MessageRowData(user, userTitles, postNum,
                                 postTime, msgBody, boardID, topicID, mID, hlColor, canReport, canDelete, canEdit, canQuote));
                     } else {
-                        adapterRows.add(new MessageRowData(true));
+                        String postNum = row.select("span.message_num").first().text();
+                        if (goToUrlDefinedPost) {
+                            if (postNum.equals(goToThisPost))
+                                goToThisIndex = msgIndex;
+                        }
+
+                        adapterRows.add(new MessageRowData(true, postNum));
                     }
 
                     msgIndex++;

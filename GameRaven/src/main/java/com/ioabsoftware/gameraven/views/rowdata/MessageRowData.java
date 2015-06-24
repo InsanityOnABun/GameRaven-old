@@ -173,8 +173,9 @@ public class MessageRowData extends BaseRowData {
         return RowType.MESSAGE;
     }
 
-    public MessageRowData(boolean isDeletedIn) {
+    public MessageRowData(boolean isDeletedIn, String postNumIn) {
         isDeleted = isDeletedIn;
+        postNum = postNumIn;
         unprocessedMessageText = "";
     }
 
