@@ -1784,7 +1784,11 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
                 String goToThisPost = null;
                 if (goToUrlDefinedPost) {
-                    goToThisPost = resUrl.substring(resUrl.indexOf('#'));
+                    if (resUrl.indexOf('#') != -1)
+                        goToThisPost = resUrl.substring(resUrl.indexOf('#'));
+                    else
+                        // goToUrlDefinedPost is true when there is no url defined post, oops
+                        goToUrlDefinedPost = false;
                 }
 
                 Elements rows = doc.select("table.board").first().getElementsByTag("tr");
