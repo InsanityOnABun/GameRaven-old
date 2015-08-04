@@ -6,12 +6,6 @@
         android:orderingFromXml="true"
         android:persistent="false"
         android:title="Advanced Settings">
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="enableJS"
-            android:persistent="true"
-            android:summary="Some ads loaded from GFAQs use javascript."
-            android:title="Javascript" />
 
         <Preference
             android:key="backupSettings"
