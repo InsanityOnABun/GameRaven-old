@@ -387,12 +387,6 @@ public class HeaderSettings extends PreferenceActivity {
              */
             else if ("general".equals(settings)) {
                 addPreferencesFromResource(R.xml.prefsgeneral);
-            }
-            /**
-             * ADVANCED SETTINGS
-             */
-            else if ("advanced".equals(settings)) {
-                addPreferencesFromResource(R.xml.prefsadvanced);
                 findPreference("backupSettings").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     public boolean onPreferenceClick(Preference preference) {
                         AlertDialog.Builder bb = new AlertDialog.Builder(getActivity());
