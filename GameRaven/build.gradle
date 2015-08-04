@@ -5,8 +5,8 @@ repositories {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:22.1.1'
-    compile 'com.android.support:support-v13:22.1.1'
+    compile 'com.android.support:appcompat-v7:22.2.1'
+    compile 'com.android.support:support-v13:22.2.1'
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'ch.acra:acra:4.6.2'
     compile 'com.intellij:annotations:12.0@jar'
@@ -17,7 +17,7 @@ dependencies {
         // exclusion is not neccessary, but generally a good idea.
         exclude group: 'com.google.android', module: 'support-v4'
     }
-    compile files('libs/jsoup-1.8.2.jar')
+    compile files('libs/jsoup-1.8.3.jar')
 }
 
 android {
