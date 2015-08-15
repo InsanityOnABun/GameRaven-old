@@ -244,7 +244,7 @@ public class HeaderSettings extends PreferenceActivity {
                         if ((Boolean) newValue) {
                             // enabling notifications
                             if (AllInOneV2.getSettingsPref().getString("defaultAccount", NO_DEFAULT_ACCOUNT).equals(NO_DEFAULT_ACCOUNT)) {
-                                Crouton.showText(getActivity(), "You have no default account set!", Theming.croutonStyle());
+                                Crouton.showText(getActivity(), "You have no default account set!", Theming.croutonStyle(), (ViewGroup) getView());
                                 return false;
                             } else {
                                 enableNotifs(AllInOneV2.getSettingsPref().getString("notifsFrequency", "60"));
