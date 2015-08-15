@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -112,6 +113,7 @@ public class HeaderSettings extends PreferenceActivity {
             }
         });
         mActionBar.setTitle(getTitle());
+        mActionBar.setTitleTextColor(Color.WHITE);
 
         ViewGroup contentWrapper = (ViewGroup) contentView.findViewById(R.id.saContentWrapper);
         LayoutInflater.from(this).inflate(layoutResID, contentWrapper, true);

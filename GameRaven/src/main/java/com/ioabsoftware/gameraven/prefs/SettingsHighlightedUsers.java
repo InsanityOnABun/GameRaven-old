@@ -1,7 +1,9 @@
 package com.ioabsoftware.gameraven.prefs;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -26,7 +28,9 @@ public class SettingsHighlightedUsers extends ActionBarActivity implements HlUDD
 
         setContentView(R.layout.settings_highlightedusers);
 
-        setSupportActionBar((android.support.v7.widget.Toolbar) findViewById(R.id.hluToolbar));
+        Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.hluToolbar);
+        toolbar.setTitleTextColor(Color.WHITE);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         wrapper = new LinearLayout(this);

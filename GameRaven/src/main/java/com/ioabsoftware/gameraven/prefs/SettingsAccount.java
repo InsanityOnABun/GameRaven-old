@@ -8,6 +8,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.DialogInterface.OnShowListener;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -45,6 +46,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.nodes.Document;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -114,6 +116,7 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
             }
         });
         mActionBar.setTitle(getTitle());
+        mActionBar.setTitleTextColor(Color.WHITE);
 
         ViewGroup contentWrapper = (ViewGroup) contentView.findViewById(R.id.saContentWrapper);
         LayoutInflater.from(this).inflate(layoutResID, contentWrapper, true);
@@ -415,10 +418,10 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
                 String loginKey = doc.getElementsByAttributeValue("name", "key").attr("value");
                 HashMap<String, List<String>> loginData = new HashMap<String, List<String>>();
                 // "EMAILADDR", user, "PASSWORD", password, "path", lastPath, "key", key
-                loginData.put("EMAILADDR", Arrays.asList(verifyUser));
-                loginData.put("PASSWORD", Arrays.asList(verifyPass));
-                loginData.put("path", Arrays.asList(Session.ROOT));
-                loginData.put("key", Arrays.asList(loginKey));
+                loginData.put("EMAILADDR", Collections.singletonList(verifyUser));
+                loginData.put("PASSWORD", Collections.singletonList(verifyPass));
+                loginData.put("path", Collections.singletonList(Session.ROOT));
+                loginData.put("key", Collections.singletonList(loginKey));
 
                 currentDesc = NetDesc.VERIFY_ACCOUNT_S2;
                 accountVerifier.build(this)
