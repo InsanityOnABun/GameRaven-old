@@ -18,10 +18,4 @@
         <!-- key/value pairs can be included as arguments for the fragment. -->
         <extra android:name="settings" android:value="general" />
     </header>
-    <header
-        android:fragment="com.ioabsoftware.gameraven.prefs.HeaderSettings$SettingsFragment"
-        android:title="Advanced" >
-        <!-- key/value pairs can be included as arguments for the fragment. -->
-        <extra android:name="settings" android:value="advanced" />
-    </header>
 </preference-headers>
