@@ -107,7 +107,6 @@
             android:layout_marginLeft="@dimen/item_padding_horizontal"
             android:text="(message deleted)"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/white"
             android:textSize="12sp" />
 
         <TextView
