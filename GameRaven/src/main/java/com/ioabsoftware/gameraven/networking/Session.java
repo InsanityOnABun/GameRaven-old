@@ -688,15 +688,14 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         loginData.put("key", Collections.singletonList(loginKey));
 
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing login step 1, sending step 2");
-                        post(NetDesc.LOGIN_S2, "/user/login.html", loginData);
+                        post(NetDesc.LOGIN_S2, "/user/login", loginData);
                         break;
 
                     case LOGIN_S2:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is login step 2");
                         aio.setAMPLinkVisible(userCanViewAMP());
 
-                        sessionKey = doc.getElementById("polloftheday").
-                                getElementsByAttributeValue("name", "key").first().attr("value");
+                        sessionKey = doc.getElementsByAttributeValue("name", "key").first().attr("value");
 
                         if (initUrl != null) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("loading previous page");
