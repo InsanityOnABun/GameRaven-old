@@ -684,7 +684,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         // "EMAILADDR", user, "PASSWORD", password, "path", lastPath, "key", key
                         loginData.put("EMAILADDR", Collections.singletonList(user));
                         loginData.put("PASSWORD", Collections.singletonList(password));
-                        loginData.put("path", Collections.singletonList(lastPath));
+                        loginData.put("path", Collections.singletonList(buildURL("answers", NetDesc.UNSPECIFIED)));
                         loginData.put("key", Collections.singletonList(loginKey));
 
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing login step 1, sending step 2");
