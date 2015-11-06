@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -57,7 +58,7 @@ public class HeaderSettings extends PreferenceActivity {
 
     public static final String NO_DEFAULT_ACCOUNT = "N/A";
 
-    public static final ArrayList<String> ACCEPTED_KEYS = new ArrayList<String>();
+    public static final ArrayList<String> ACCEPTED_KEYS = new ArrayList<>();
 
     private PendingIntent notifPendingIntent;
     public PendingIntent getNotifPendingIntent() {
@@ -91,7 +92,7 @@ public class HeaderSettings extends PreferenceActivity {
         ACCEPTED_KEYS.add("defaultAccount");
         ACCEPTED_KEYS.add("grBackupVer");
         ACCEPTED_KEYS.add("startAtAMP");
-        ACCEPTED_KEYS.add("enableJS");
+        ACCEPTED_KEYS.add("enableJS"); // leave accepted for now to avoid confusing key not recognized messages for users
         ACCEPTED_KEYS.add("ampSortOption");
         ACCEPTED_KEYS.add("confirmPostCancel");
         ACCEPTED_KEYS.add("confirmPostSubmit");
@@ -112,6 +113,7 @@ public class HeaderSettings extends PreferenceActivity {
             }
         });
         mActionBar.setTitle(getTitle());
+        mActionBar.setTitleTextColor(Color.WHITE);
 
         ViewGroup contentWrapper = (ViewGroup) contentView.findViewById(R.id.saContentWrapper);
         LayoutInflater.from(this).inflate(layoutResID, contentWrapper, true);
@@ -242,7 +244,7 @@ public class HeaderSettings extends PreferenceActivity {
                         if ((Boolean) newValue) {
                             // enabling notifications
                             if (AllInOneV2.getSettingsPref().getString("defaultAccount", NO_DEFAULT_ACCOUNT).equals(NO_DEFAULT_ACCOUNT)) {
-                                Crouton.showText(getActivity(), "You have no default account set!", Theming.croutonStyle());
+                                Crouton.showText(getActivity(), "You have no default account set!", Theming.croutonStyle(), (ViewGroup) getView());
                                 return false;
                             } else {
                                 enableNotifs(AllInOneV2.getSettingsPref().getString("notifsFrequency", "60"));
@@ -387,12 +389,6 @@ public class HeaderSettings extends PreferenceActivity {
              */
             else if ("general".equals(settings)) {
                 addPreferencesFromResource(R.xml.prefsgeneral);
-            }
-            /**
-             * ADVANCED SETTINGS
-             */
-            else if ("advanced".equals(settings)) {
-                addPreferencesFromResource(R.xml.prefsadvanced);
                 findPreference("backupSettings").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     public boolean onPreferenceClick(Preference preference) {
                         AlertDialog.Builder bb = new AlertDialog.Builder(getActivity());
@@ -549,11 +545,6 @@ public class HeaderSettings extends PreferenceActivity {
 
                     buf.append("textScale=").append(String.valueOf(AllInOneV2.getSettingsPref().getInt("textScale", 100))).append('\n');
 
-                    if (AllInOneV2.getSettingsPref().getBoolean("enableJS", true))
-                        buf.append("enableJS=true\n");
-                    else
-                        buf.append("enableJS=false\n");
-
                     buf.append("ampSortOption=").append(AllInOneV2.getSettingsPref().getString("ampSortOption", "-1")).append('\n');
 
                     if (AllInOneV2.getSettingsPref().getBoolean("confirmPostCancel", false))
@@ -593,10 +584,10 @@ public class HeaderSettings extends PreferenceActivity {
                         BufferedReader br = new BufferedReader(new FileReader(settingsFile));
                         String line;
                         String[] splitLine;
-                        ArrayList<String> users = new ArrayList<String>();
-                        ArrayList<String> passwords = new ArrayList<String>();
-                        ArrayList<String> keys = new ArrayList<String>();
-                        ArrayList<String> values = new ArrayList<String>();
+                        ArrayList<String> users = new ArrayList<>();
+                        ArrayList<String> passwords = new ArrayList<>();
+                        ArrayList<String> keys = new ArrayList<>();
+                        ArrayList<String> values = new ArrayList<>();
 
                         while ((line = br.readLine()) != null) {
                             if (!line.startsWith("//")) {

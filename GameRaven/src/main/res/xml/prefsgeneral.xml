@@ -64,5 +64,16 @@
             android:persistent="true"
             android:summary="A confirmation dialog will show when submitting a post."
             android:title="Confirm Post Submission" />
+        <Preference
+            android:key="backupSettings"
+            android:summary="Passwords are stored as plain text! Back up settings to sdcard/gameraven/gameraven_settings"
+            android:title="Back Up Settings" />
+        <Preference
+            android:key="restoreSettings"
+            android:summary="This will remove any previously added accounts! Restore settings from sdcard/gameraven/gameraven_settings"
+            android:title="Restore Settings" />
+        <Preference
+            android:key="aboutFeedback"
+            android:title="About &amp; Feedback" />
     </PreferenceCategory>
 </PreferenceScreen>

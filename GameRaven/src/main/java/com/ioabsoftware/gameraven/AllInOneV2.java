@@ -1651,7 +1651,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                     }
 
                     Element table = doc.select("table.board").first();
-                    if (table != null) {
+                    if (table != null && !table.select("td").first().hasAttr("colspan")) {
 
                         table.getElementsByTag("col").get(2).remove();
                         table.getElementsByTag("th").get(2).remove();
@@ -1784,7 +1784,11 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
                 String goToThisPost = null;
                 if (goToUrlDefinedPost) {
-                    goToThisPost = resUrl.substring(resUrl.indexOf('#'));
+                    if (resUrl.indexOf('#') != -1)
+                        goToThisPost = resUrl.substring(resUrl.indexOf('#'));
+                    else
+                        // goToUrlDefinedPost is true when there is no url defined post, oops
+                        goToUrlDefinedPost = false;
                 }
 
                 Elements rows = doc.select("table.board").first().getElementsByTag("tr");
@@ -1864,7 +1868,13 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                         adapterRows.add(new MessageRowData(user, userTitles, postNum,
                                 postTime, msgBody, boardID, topicID, mID, hlColor, canReport, canDelete, canEdit, canQuote));
                     } else {
-                        adapterRows.add(new MessageRowData(true));
+                        String postNum = row.select("span.message_num").first().text();
+                        if (goToUrlDefinedPost) {
+                            if (postNum.equals(goToThisPost))
+                                goToThisIndex = msgIndex;
+                        }
+
+                        adapterRows.add(new MessageRowData(true, postNum));
                     }
 
                     msgIndex++;

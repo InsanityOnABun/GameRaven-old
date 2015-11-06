@@ -33,7 +33,9 @@ public class About extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         try {
-            ((TextView) findViewById(R.id.abtBuildVer)).setText(this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName);
+            String ver = "Version " + this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName +
+                    "\nBuild Number " + this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionCode;
+            ((TextView) findViewById(R.id.abtBuildVer)).setText(ver);
         } catch (NameNotFoundException e) {
             ((TextView) findViewById(R.id.abtBuildVer)).setText("Build version not set. Stupid developer.");
         }

@@ -124,8 +124,10 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
             }
         }
 
-        if (isDeleted)
+        if (isDeleted) {
+            ((TextView)findViewById(R.id.mvDMNum)).setText(myData.getPostNum());
             return;
+        }
 
         topWrapper.setClickable(myData.topClickable());
         if (myData.topClickable())

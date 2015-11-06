@@ -107,6 +107,18 @@
             android:layout_marginLeft="@dimen/item_padding_horizontal"
             android:text="(message deleted)"
             android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/mvDMNum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/mvDMSep"
+            android:layout_marginBottom="@dimen/item_padding_vertical"
+            android:layout_marginRight="@dimen/item_padding_horizontal"
+            android:text="#500"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/white"
             android:textSize="12sp" />
 
