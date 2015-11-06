@@ -733,10 +733,10 @@ public class HeaderSettings extends PreferenceActivity {
                         bb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M)
-                                    checkForWritePermissions();
-                                else
+                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
                                     ((HeaderSettings)getActivity()).backupSettings();
+                                else
+                                    checkForWritePermissions();
                             }
                         });
                         bb.setNegativeButton("Cancel", null);
@@ -756,10 +756,10 @@ public class HeaderSettings extends PreferenceActivity {
                         rb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M)
-                                    checkForReadPermissions();
-                                else
+                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
                                     ((HeaderSettings)getActivity()).restoreSettings();
+                                else
+                                    checkForReadPermissions();
                             }
                         });
                         rb.setNegativeButton("Cancel", null);
