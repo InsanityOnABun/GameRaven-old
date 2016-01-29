@@ -9,12 +9,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.R;
-import com.ioabsoftware.gameraven.SettingsHighlightedUsers;
 import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
+import com.ioabsoftware.gameraven.prefs.SettingsHighlightedUsers;
 import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
+import com.ioabsoftware.gameraven.views.RowType;
 
 public class HighlightedUserView extends BaseRowView implements OnClickListener {
 
@@ -49,15 +50,13 @@ public class HighlightedUserView extends BaseRowView implements OnClickListener 
         nameView = (TextView) findViewById(R.id.hvName);
         labelView = (TextView) findViewById(R.id.hvLabel);
         colorFrame = (LinearLayout) findViewById(R.id.hvColorFrame);
-        findViewById(R.id.hvSep).setBackgroundColor(Theming.accentColor());
+        findViewById(R.id.hvSep).setBackgroundColor(Theming.colorPrimary());
 
         nameView.setText(user.getName());
         labelView.setText(user.getLabel());
 
         if (user.getColor() != 0)
             colorFrame.setBackgroundColor(user.getColor());
-
-        setBackgroundDrawable(getSelector());
 
         setOnClickListener(this);
     }
@@ -69,11 +68,11 @@ public class HighlightedUserView extends BaseRowView implements OnClickListener 
 
     @Override
     protected void init(Context context) {
-        // nada
+        myType = RowType.HIGHLIGHTED_USER;
     }
 
     @Override
-    protected void retheme(int color, float scale) {
+    protected void retheme() {
         // nada
     }
 

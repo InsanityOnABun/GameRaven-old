@@ -6,4 +6,7 @@ public abstract class BaseRowData {
     }
 
     public abstract RowType getRowType();
+
+    @Override
+    public abstract String toString();
 }

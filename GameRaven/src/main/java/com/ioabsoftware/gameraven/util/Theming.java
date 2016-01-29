@@ -2,9 +2,12 @@ package com.ioabsoftware.gameraven.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 
 import com.ioabsoftware.gameraven.R;
 
@@ -15,38 +18,61 @@ public final class Theming {
 
     private static float dwrHeaderTextBaseSize,
             dwrButtonTextBaseSize,
-            pageTitleTextBaseSize,
             pjButtonTextBaseSize,
             pjLabelTextBaseSize;
 
-    private static boolean usingLightTheme;
+    private static int theme;
 
-    public static boolean usingLightTheme() {
-        return usingLightTheme;
+    public static int theme() {
+        return theme;
     }
 
-    private static int accentColor;
+    private static int colorBackground;
 
-    public static int accentColor() {
-        return accentColor;
+    public static int colorBackground() {
+        return colorBackground;
     }
 
-    private static int accentTextColor;
+    private static int colorBackgroundInverseResource;
 
-    public static int accentTextColor() {
-        return accentTextColor;
+    public static int colorBackgroundInverseResource() {
+        return colorBackgroundInverseResource;
     }
 
-    private static boolean useWhiteAccentText;
+    private static int colorPrimary;
 
-    public static boolean useWhiteAccentText() {
-        return useWhiteAccentText;
+    public static int colorPrimary() {
+        return colorPrimary;
     }
 
-    private static boolean isAccentLight;
+    private static int colorPrimaryDark;
 
-    public static boolean isAccentLight() {
-        return isAccentLight;
+    public static int colorPrimaryDark() {
+        return colorPrimaryDark;
+    }
+
+    private static int colorAccent;
+
+    public static int colorAccent() {
+        return colorAccent;
+    }
+
+    private static int colorReadTopic;
+
+    public static int colorReadTopic() {
+        return colorReadTopic;
+    }
+
+    private static int colorHiddenSpoiler;
+
+    public static int colorHiddenSpoiler() {
+        return colorHiddenSpoiler;
+    }
+
+    private static int colorRevealedSpoiler;
+
+    public static int colorRevealedSpoiler() {
+        return colorRevealedSpoiler;
     }
 
     private static float textScale = 1f;
@@ -61,18 +87,106 @@ public final class Theming {
         return croutonStyle;
     }
 
-    private static Configuration croutonShort = new Configuration.Builder().setDuration(2500).build();
+    private static Drawable[] topicStatusIcons = new Drawable[4];
 
-    public static void init(Context c, SharedPreferences settings) {
-        updateAccentColor(settings.getInt("accentColor", (c.getResources().getColor(R.color.holo_blue))), settings.getBoolean("useWhiteAccentText", false));
-        usingLightTheme = settings.getBoolean("useLightTheme", false);
-        textScale = settings.getInt("textScale", 100) / 100f;
+    public static Drawable[] topicStatusIcons() {
+        return topicStatusIcons;
     }
 
-    public static void setTextSizeBases(float dwrHeader, float dwrButton, float pageTitle, float pjButton, float pjLabel) {
+    private static Drawable selectableItemBackground;
+
+    public static Drawable selectableItemBackground() {
+        return selectableItemBackground.getConstantState().newDrawable().mutate();
+    }
+
+    private static Configuration croutonShort = new Configuration.Builder().setDuration(2500).build();
+
+    public static void preInit(SharedPreferences settings) {
+        String themePref = settings.getString("gfTheme", "Light Blue");
+        switch (themePref) {
+            case "Light Blue":
+                theme = R.style.MyThemes_LightBlue;
+                break;
+            case "Dark Blue":
+                theme = R.style.MyThemes_DarkBlue;
+                break;
+            case "Light Red":
+                theme = R.style.MyThemes_LightRed;
+                break;
+            case "Dark Red":
+                theme = R.style.MyThemes_DarkRed;
+                break;
+            case "Light Green":
+                theme = R.style.MyThemes_LightGreen;
+                break;
+            case "Dark Green":
+                theme = R.style.MyThemes_DarkGreen;
+                break;
+            case "Light Orange":
+                theme = R.style.MyThemes_LightOrange;
+                break;
+            case "Dark Orange":
+                theme = R.style.MyThemes_DarkOrange;
+                break;
+            case "Light Purple":
+                theme = R.style.MyThemes_LightPurple;
+                break;
+            case "Dark Purple":
+                theme = R.style.MyThemes_DarkPurple;
+                break;
+        }
+    }
+
+    public static void init(Context c, SharedPreferences settings) {
+        Resources resources = c.getResources();
+        textScale = settings.getInt("textScale", 100) / 100f;
+
+        // Obtain the styled attributes. 'themedContext' is a context with a
+        // theme, typically the current Activity (i.e. 'this')
+        TypedArray ta = c.obtainStyledAttributes(new int[] {
+                R.attr.colorBackground,
+                R.attr.colorBackgroundInverse,
+                R.attr.colorPrimary,
+                R.attr.colorPrimaryDark,
+                R.attr.colorAccent,
+                R.attr.hiddenSpoilerColor,
+                R.attr.revealedSpoilerColor,
+                R.attr.themedPollTopicIcon,
+                R.attr.themedLockedTopicIcon,
+                R.attr.themedArchivedTopicIcon,
+                R.attr.themedPinnedTopicIcon,
+                R.attr.readTopic,
+                android.R.attr.selectableItemBackground
+        });
+
+        // Get the individual values
+        colorBackground = ta.getColor(0, resources.getColor(R.color.gf_background_dark));
+        colorBackgroundInverseResource = ta.getResourceId(1, R.color.gf_background_light);
+        colorPrimary = ta.getColor(2, resources.getColor(R.color.gf_blue_dark));
+        colorPrimaryDark = ta.getColor(3, resources.getColor(R.color.gf_blue_dark_secondary));
+        colorAccent = ta.getColor(4, resources.getColor(R.color.gf_blue_dark_accent));
+        colorHiddenSpoiler = ta.getColor(5, resources.getColor(R.color.white));
+        colorRevealedSpoiler = ta.getColor(6, resources.getColor(R.color.black));
+        topicStatusIcons[0] = ta.getDrawable(7);
+        topicStatusIcons[1] = ta.getDrawable(8);
+        topicStatusIcons[2] = ta.getDrawable(9);
+        topicStatusIcons[3] = ta.getDrawable(10);
+        colorReadTopic = ta.getColor(11, resources.getColor(R.color.read_topic));
+        selectableItemBackground = ta.getDrawable(12);
+
+        // Finally, free the resources used by TypedArray
+        ta.recycle();
+
+        croutonStyle = new Style.Builder()
+                .setBackgroundColorValue(colorPrimaryDark)
+                .setTextColorValue(Color.WHITE)
+                .setConfiguration(croutonShort)
+                .build();
+    }
+
+    public static void setTextSizeBases(float dwrHeader, float dwrButton, float pjButton, float pjLabel) {
         dwrHeaderTextBaseSize = dwrHeader;
         dwrButtonTextBaseSize = dwrButton;
-        pageTitleTextBaseSize = pageTitle;
         pjButtonTextBaseSize = pjButton;
         pjLabelTextBaseSize = pjLabel;
     }
@@ -83,10 +197,6 @@ public final class Theming {
 
     public static float getScaledDwrButtonTextSize() {
         return dwrButtonTextBaseSize * textScale;
-    }
-
-    public static float getScaledPageTitleTextSize() {
-        return pageTitleTextBaseSize * textScale;
     }
 
     public static float getScaledPJButtonTextSize() {
@@ -109,56 +219,35 @@ public final class Theming {
     }
 
     /**
-     * returns true if new color is different from old color
-     */
-    public static boolean updateAccentColor(int newAccentColor, boolean newUseWhiteAccentText) {
-        if (accentColor != newAccentColor || useWhiteAccentText != newUseWhiteAccentText) {
-            accentColor = newAccentColor;
-            useWhiteAccentText = newUseWhiteAccentText;
-
-            float[] hsv = new float[3];
-            Color.colorToHSV(accentColor, hsv);
-            if (useWhiteAccentText) {
-                // color is probably dark
-                if (hsv[2] > 0)
-                    hsv[2] *= 1.2f;
-                else
-                    hsv[2] = 0.2f;
-
-                accentTextColor = Color.WHITE;
-                isAccentLight = false;
-            } else {
-                // color is probably bright
-                hsv[2] *= 0.8f;
-                accentTextColor = Color.BLACK;
-                isAccentLight = true;
-            }
-
-            croutonStyle = new Style.Builder()
-                    .setBackgroundColorValue(accentColor)
-                    .setTextColorValue(accentTextColor)
-                    .setConfiguration(croutonShort)
-                    .build();
-
-            return true;
-        } else
-            return false;
-    }
-
-    /**
      * Colors the overscroll of the activity
      *
      * @param context The context of the activity
      */
     public static void colorOverscroll(Context context) {
-        //glow
-        int glowDrawableId = context.getResources().getIdentifier("overscroll_glow", "drawable", "android");
-        Drawable androidGlow = context.getResources().getDrawable(glowDrawableId);
-        androidGlow.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
-        //edge
-        int edgeDrawableId = context.getResources().getIdentifier("overscroll_edge", "drawable", "android");
-        Drawable androidEdge = context.getResources().getDrawable(edgeDrawableId);
-        androidEdge.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            //glow
+            int glowDrawableId = context.getResources().getIdentifier("overscroll_glow", "drawable", "android");
+            Drawable androidGlow = context.getResources().getDrawable(glowDrawableId);
+            androidGlow.setColorFilter(colorPrimary, PorterDuff.Mode.SRC_IN);
+            //edge
+            int edgeDrawableId = context.getResources().getIdentifier("overscroll_edge", "drawable", "android");
+            Drawable androidEdge = context.getResources().getDrawable(edgeDrawableId);
+            androidEdge.setColorFilter(colorPrimary, PorterDuff.Mode.SRC_IN);
+        }
+    }
+
+    /**
+     * Converts a DP value into a PX value, based on the current device's density
+     *
+     * @param c  Context needed to find the display density.
+     * @param dp The DP value to convert to PX
+     * @return The dp value converted to pixels
+     */
+    public static int convertDPtoPX(Context c, float dp) {
+        // Get the screen's density scale
+        final float scale = c.getResources().getDisplayMetrics().density;
+        // Convert the dps to pixels, based on density scale
+        return ((int) (dp * scale + 0.5f));
     }
 
 }

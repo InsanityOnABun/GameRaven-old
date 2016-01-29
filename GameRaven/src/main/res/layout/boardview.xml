@@ -1,64 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bvTopWrapper"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground">
 
-    <RelativeLayout
-        android:id="@+id/bvTopWrapper"
+    <TextView
+        android:id="@+id/bvTpcMsgDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/item_padding_horizontal"
+        android:layout_marginTop="@dimen/item_padding_vertical"
+        android:layout_toLeftOf="@+id/bvLastPost"
+        android:text="Tpcs: 58456426 // Msgs: 65445665"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/bvDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/bvTpcMsgDetails"
+        android:layout_alignRight="@+id/bvLastPost"
+        android:layout_below="@+id/bvName"
+        android:layout_marginBottom="@dimen/item_padding_vertical"
+        android:gravity="center_vertical"
+        android:minLines="1"
+        android:text="Description"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/bvName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp" >
+        android:layout_alignLeft="@+id/bvTpcMsgDetails"
+        android:layout_alignRight="@+id/bvLastPost"
+        android:layout_below="@+id/bvTpcMsgDetails"
+        android:maxLines="2"
+        android:text="Android"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="15sp" />
 
-        <TextView
-            android:id="@+id/bvTpcMsgDetails"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/bvLastPost"
-            android:text="Tpcs: 58456426 // Msgs: 65445665"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="10sp" />
+    <TextView
+        android:id="@+id/bvLastPost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/bvTpcMsgDetails"
+        android:layout_marginRight="@dimen/item_padding_horizontal"
+        android:text="Last Post: 12/12 12:12PM"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="10sp" />
 
-        <TextView
-            android:id="@+id/bvDesc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/bvName"
-            android:text="Description"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="10sp" />
-
-        <TextView
-            android:id="@+id/bvName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/bvLastPost"
-            android:maxLines="2"
-            android:text="Android"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/bvLastPost"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:text="Last Post: 12/12 12:12PM"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="10sp" />
-
-        <View
-            android:id="@+id/bvSep"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/bvDesc"
-            android:layout_marginTop="2dp"
-            android:background="#33B5E5"
-            android:visibility="visible" />
-
-    </RelativeLayout>
-
-</merge>
+</RelativeLayout>

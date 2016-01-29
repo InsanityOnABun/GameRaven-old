@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+    <header
+        android:fragment="com.ioabsoftware.gameraven.prefs.HeaderSettings$SettingsFragment"
+        android:title="Accounts &amp; Notifications" >
+        <!-- key/value pairs can be included as arguments for the fragment. -->
+        <extra android:name="settings" android:value="accountsnotifs" />
+    </header>
+    <header
+        android:fragment="com.ioabsoftware.gameraven.prefs.HeaderSettings$SettingsFragment"
+        android:title="Theming" >
+        <!-- key/value pairs can be included as arguments for the fragment. -->
+        <extra android:name="settings" android:value="theming" />
+    </header>
+    <header
+        android:fragment="com.ioabsoftware.gameraven.prefs.HeaderSettings$SettingsFragment"
+        android:title="General" >
+        <!-- key/value pairs can be included as arguments for the fragment. -->
+        <extra android:name="settings" android:value="general" />
+    </header>
+</preference-headers>

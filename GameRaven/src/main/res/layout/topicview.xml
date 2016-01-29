@@ -1,94 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tvGlobalWrapper"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tvRelativeWrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="2dp"
-    android:orientation="vertical" >
-
-    <RelativeLayout
-        android:id="@+id/tvRelativeWrapper"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp" >
-
-        <TextView
-            android:id="@+id/tvTC"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/tvTypeIndicator"
-            android:text="Topic CreatorTC"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="10sp" />
-
-        <TextView
-            android:id="@+id/tvMsgCountLastPost"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/tvLPSep"
-            android:text="500 Msgs, Last: 12/12 12:12PM"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="10sp" />
-
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/tvTC"
-            android:layout_toLeftOf="@+id/tvLPSep"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:lines="2"
-            android:text="man fan died at the room shot up to 97 degrees asdf asdf asdf "
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/tvLastPostLink"
-            style="@android:style/Widget.Holo.ActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/tvTitle"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/tvMsgCountLastPost"
-            android:text="@string/last_post"
-            android:textColor="?attr/themedTextColor"
-            android:textSize="12sp" />
-
-        <View
-            android:id="@+id/tvLPSep"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/tvLastPostLink"
-            android:layout_alignTop="@+id/tvLastPostLink"
-            android:layout_marginBottom="3dp"
-            android:layout_marginLeft="3dp"
-            android:layout_marginTop="3dp"
-            android:layout_toLeftOf="@+id/tvLastPostLink"
-            android:background="#33B5E5"
-            android:visibility="visible" />
-
-        <ImageView
-            android:id="@+id/tvTypeIndicator"
-            android:layout_width="15dp"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/tvTC"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignTop="@+id/tvTC"
-            android:scaleType="fitStart"
-            android:src="@drawable/ic_archived" />
-    </RelativeLayout>
+    android:background="?attr/selectableItemBackground">
 
     <View
-        android:id="@+id/tvSep"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="2dp"
-        android:background="#33B5E5"
-        android:visibility="visible" />
+        android:id="@+id/tvTopSpacer"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/item_padding_vertical"
+        android:layout_alignParentTop="true" />
 
-</LinearLayout>
+    <View
+        android:id="@+id/tvBottomSpacer"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/item_padding_vertical"
+        android:layout_below="@+id/tvTitle" />
+
+    <TextView
+        android:id="@+id/tvTC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/tvTypeIndicator"
+        android:layout_below="@+id/tvTopSpacer"
+        android:layout_marginLeft="@dimen/item_padding_horizontal"
+        android:layout_toRightOf="@+id/tvTypeIndicator"
+        android:text="Topic CreatorTC"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/tvMsgCountLastPost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/tvTC"
+        android:layout_toLeftOf="@+id/tvLPSep"
+        android:text="500 Msgs, Last: 12/12 12:12PM"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_below="@+id/tvTC"
+        android:layout_marginLeft="@dimen/item_padding_horizontal"
+        android:layout_toLeftOf="@+id/tvLPSep"
+        android:layout_toRightOf="@+id/tvStopTracking"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:lines="2"
+        android:text="man fan died at the room shot up to 97 degrees asdf asdf asdf"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="13sp" />
+
+    <View
+        android:id="@+id/tvLPSep"
+        android:layout_width="1dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/tvBottomSpacer"
+        android:layout_alignTop="@id/tvTopSpacer"
+        android:layout_marginBottom="6dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginTop="6dp"
+        android:layout_toLeftOf="@+id/tvLastPostLink"
+        android:background="#ff545454" />
+
+    <TextView
+        android:id="@+id/tvLastPostLink"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/tvBottomSpacer"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/tvTopSpacer"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:paddingBottom="10dp"
+        android:paddingRight="2dp"
+        android:paddingTop="10dp"
+        android:text="@string/last_post"
+        android:textSize="12sp" />
+
+    <View
+        android:id="@+id/tvSTSep"
+        android:layout_width="1dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/tvBottomSpacer"
+        android:layout_alignTop="@id/tvTopSpacer"
+        android:layout_marginBottom="6dp"
+        android:layout_marginRight="6dp"
+        android:layout_marginTop="6dp"
+        android:layout_toRightOf="@+id/tvStopTracking"
+        android:background="#ff545454"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvStopTracking"
+        android:layout_width="45dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/tvBottomSpacer"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/tvTopSpacer"
+        android:layout_marginRight="1dp"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:lines="2"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:text="X"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/tvTypeIndicator"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_alignLeft="@id/tvTitle"
+        android:layout_alignWithParentIfMissing="true"
+        android:scaleType="fitStart"
+        android:src="@drawable/ic_save_white_18dp" />
+</RelativeLayout>

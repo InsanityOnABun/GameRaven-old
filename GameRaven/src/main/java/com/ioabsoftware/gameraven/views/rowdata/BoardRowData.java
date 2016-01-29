@@ -57,4 +57,14 @@ public class BoardRowData extends BaseRowData {
         return RowType.BOARD;
     }
 
+    @Override
+    public String toString() {
+        return "boardType: " + boardType.name() +
+                "\nname: " + name +
+                "\ndesc: " + desc +
+                "\nlastPost: " + lastPost +
+                "\ntCount: " + tCount +
+                "\nmCount: " + mCount +
+                "\nurl: " + url;
+    }
 }

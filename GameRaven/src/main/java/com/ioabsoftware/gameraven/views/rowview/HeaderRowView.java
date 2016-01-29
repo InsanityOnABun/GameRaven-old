@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.R;
-import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
@@ -33,22 +32,17 @@ public class HeaderRowView extends BaseRowView {
     @Override
     public void init(Context context) {
         myType = RowType.HEADER;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.headerview, this, true);
         tView = (TextView) findViewById(R.id.hdrText);
 
         if (tSize == 0)
             tSize = tView.getTextSize();
-
-        retheme(Theming.accentColor(), Theming.textScale());
     }
 
     @Override
-    protected void retheme(int color, float scale) {
-        tView.setTextSize(PX, tSize * scale);
-        tView.setTextColor(Theming.accentTextColor());
-
-        setBackgroundColor(color);
+    protected void retheme() {
+        tView.setTextSize(PX, tSize * myScale);
+//        tView.setTextColor(Theming.accentTextColor());
     }
 
     @Override

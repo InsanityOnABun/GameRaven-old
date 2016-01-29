@@ -1,8 +1,6 @@
 package com.ioabsoftware.gameraven;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.SearchManager;
@@ -13,17 +11,24 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.Time;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -32,8 +37,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -43,10 +48,9 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
-import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -54,14 +58,17 @@ import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
+import com.ioabsoftware.gameraven.prefs.HeaderSettings;
+import com.ioabsoftware.gameraven.prefs.SettingsAccount;
+import com.ioabsoftware.gameraven.prefs.SettingsHighlightedUsers;
 import com.ioabsoftware.gameraven.util.AccountManager;
+import com.ioabsoftware.gameraven.util.DocumentParser;
 import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowData.ReadStatus;
+import com.ioabsoftware.gameraven.views.MarqueeToolbar;
 import com.ioabsoftware.gameraven.views.ViewAdapter;
 import com.ioabsoftware.gameraven.views.rowdata.AMPRowData;
-import com.ioabsoftware.gameraven.views.rowdata.AdGFAQsRowData;
-import com.ioabsoftware.gameraven.views.rowdata.AdmobRowData;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData.BoardType;
 import com.ioabsoftware.gameraven.views.rowdata.GameSearchRowData;
@@ -73,26 +80,29 @@ import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData.TopicType;
 import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
-import com.ioabsoftware.gameraven.views.rowview.AdmobRowView;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
-
-import net.simonvt.menudrawer.MenuDrawer;
-import net.simonvt.menudrawer.MenuDrawer.OnDrawerStateChangeListener;
-import net.simonvt.menudrawer.MenuDrawer.Type;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+import com.melnykov.fab.FloatingActionButton;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.codechimp.apprater.AppRater;
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.io.File;
-import java.lang.reflect.Field;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -101,13 +111,9 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
-import uk.co.senab.actionbarpulltorefresh.library.Options;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
-public class AllInOneV2 extends Activity {
+@SuppressLint("RtlHardcoded")
+public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     public static final int SEND_PM_DIALOG = 102;
     public static final int MESSAGE_ACTION_DIALOG = 103;
@@ -133,19 +139,13 @@ public class AllInOneV2 extends Activity {
     private String savedPostBody;
 
     public String getSavedPostBody() {
-        if (settings.getBoolean("autoCensorEnable", true))
-            return autoCensor(savedPostBody);
-        else
-            return savedPostBody;
+        return savedPostBody;
     }
 
     private String savedPostTitle;
 
     public String getSavedPostTitle() {
-        if (settings.getBoolean("autoCensorEnable", true))
-            return autoCensor(savedPostTitle);
-        else
-            return savedPostTitle;
+        return savedPostTitle;
     }
 
     private static SharedPreferences settings = null;
@@ -161,8 +161,8 @@ public class AllInOneV2 extends Activity {
     private TextView titleCounter;
     private TextView bodyCounter;
 
-    private Button postButton;
-    private Button cancelButton;
+    private Button postSubmitButton;
+    private Button postCancelButton;
     private Button pollButton;
 
     private View pollSep;
@@ -194,19 +194,8 @@ public class AllInOneV2 extends Activity {
 
     private LinearLayout postWrapper;
 
-    private PullToRefreshLayout ptrLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private ListView contentList;
-
-    private ActionBar aBar;
-    private MenuItem refreshIcon;
-    private MenuItem postIcon;
-    private MenuItem replyIcon;
-    private MenuItem pmInboxIcon;
-    private MenuItem pmOutboxIcon;
-    private MenuItem addFavIcon;
-    private MenuItem remFavIcon;
-    private MenuItem searchIcon;
-    private MenuItem topicListIcon;
 
     private String tlUrl;
 
@@ -217,12 +206,13 @@ public class AllInOneV2 extends Activity {
     private enum FavMode {ON_BOARD, ON_TOPIC}
 
     private FavMode fMode;
+    private String favKey;
 
-    private TextView title;
+    private Button pageLabel;
     private Button firstPage, prevPage, nextPage, lastPage;
-    private String firstPageUrl, prevPageUrl, nextPageUrl, lastPageUrl;
+    private String firstPageUrl, prevPageUrl, nextPageUrl, lastPageUrl, jumperPageUrl;
+    private AlertDialog.Builder jumperDialogBuilder;
     private NetDesc pageJumperDesc;
-    private TextView pageLabel;
 
     private View pageJumperWrapper;
 
@@ -243,7 +233,11 @@ public class AllInOneV2 extends Activity {
         return hlDB;
     }
 
-    private MenuDrawer drawer;
+    private DrawerLayout drawerLayout;
+    private ScrollView drawerPullout;
+    private ActionBarDrawerToggle drawerToggle;
+
+    private FloatingActionButton fab;
 
     private static AllInOneV2 me;
 
@@ -251,7 +245,7 @@ public class AllInOneV2 extends Activity {
         return me;
     }
 
-    Theming themingInstance;
+    private Theming themingInstance;
 
 
     /**
@@ -266,11 +260,16 @@ public class AllInOneV2 extends Activity {
         settings = PreferenceManager.getDefaultSharedPreferences(this);
 
         // get an instance of Theming to ensure values don't get GC'd
+        // Will they get GC'd? I have no idea. Better safe than sorry.
         themingInstance = new Theming();
+
+        Theming.preInit(settings);
+        setTheme(Theming.theme());
         Theming.init(this, settings);
 
-        if (Theming.usingLightTheme()) {
-            setTheme(R.style.MyThemes_LightTheme);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(Theming.colorPrimaryDark());
         }
 
         super.onCreate(savedInstanceState);
@@ -281,148 +280,122 @@ public class AllInOneV2 extends Activity {
 
         AccountManager.init(this);
 
-        aBar = getActionBar();
+        setSupportActionBar((MarqueeToolbar) findViewById(R.id.aioToolbar));
+        ActionBar aBar = getSupportActionBar();
         assert aBar != null : "Action bar is null";
 
         aBar.setDisplayHomeAsUpEnabled(true);
-        aBar.setDisplayShowTitleEnabled(false);
+        aBar.setDisplayShowTitleEnabled(true);
 
-        drawer = MenuDrawer.attach(this, Type.OVERLAY);
-        drawer.setContentView(R.layout.allinonev2);
-        drawer.setMenuView(R.layout.drawer);
+        drawerLayout = (DrawerLayout) findViewById(R.id.aioDrawerLayout);
+        drawerPullout = (ScrollView) findViewById(R.id.dwrScroller);
 
-        drawer.setOnDrawerStateChangeListener(new OnDrawerStateChangeListener() {
-
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close) {
             @Override
-            public void onDrawerStateChange(int oldState, int newState) {
-                if (newState == MenuDrawer.STATE_CLOSED)
-                    drawer.findViewById(R.id.dwrScroller).scrollTo(0, 0);
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                drawerPullout.scrollTo(0, 0);
             }
+        };
 
-            @Override
-            public void onDrawerSlide(float openRatio, int offsetPixels) {
-                // not needed
-            }
-        });
-
-        if (Theming.usingLightTheme())
-            drawer.findViewById(R.id.dwrScroller).setBackgroundResource(android.R.drawable.screen_background_light);
-        else
-            drawer.findViewById(R.id.dwrScroller).setBackgroundResource(android.R.drawable.screen_background_dark_transparent);
+        drawerLayout.setDrawerListener(drawerToggle);
 
 
-        drawer.findViewById(R.id.dwrChangeAcc).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrChangeAcc).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
+                drawerLayout.closeDrawers();
                 showDialog(CHANGE_LOGGED_IN_DIALOG);
             }
         });
 
-        drawer.findViewById(R.id.dwrBoardJumper).setOnClickListener(new View.OnClickListener() {
+        boardListButton = (Button) findViewById(R.id.dwrBoardJumper);
+        boardListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
-                session.get(NetDesc.BOARD_JUMPER, "/boards", null);
+                drawerLayout.closeDrawers();
+                session.get(NetDesc.BOARD_JUMPER, "/boards");
             }
         });
 
-        drawer.findViewById(R.id.dwrAMPList).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrAMPList).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
-                session.get(NetDesc.AMP_LIST, buildAMPLink(), null);
+                drawerLayout.closeDrawers();
+                session.get(NetDesc.AMP_LIST, buildAMPLink());
             }
         });
 
-        drawer.findViewById(R.id.dwrTrackedTopics).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrTrackedTopics).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
-                session.get(NetDesc.TRACKED_TOPICS, "/boards/tracked", null);
+                drawerLayout.closeDrawers();
+                session.get(NetDesc.TRACKED_TOPICS, "/boards/tracked");
             }
         });
 
-        drawer.findViewById(R.id.dwrPMInbox).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrPMInbox).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(true);
-                session.get(NetDesc.PM_INBOX, "/pm/", null);
+                drawerLayout.closeDrawers();
+                session.get(NetDesc.PM_INBOX, "/pm/");
             }
         });
 
-        drawer.findViewById(R.id.dwrCopyCurrURL).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrCopyCurrURL).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 android.content.ClipboardManager clipboard =
                         (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
                 clipboard.setPrimaryClip(android.content.ClipData.newPlainText("simple text", session.getLastPath()));
-                drawer.closeMenu(true);
+                drawerLayout.closeDrawers();
                 Crouton.showText(AllInOneV2.this, "URL copied to clipboard.", Theming.croutonStyle());
             }
         });
 
-        drawer.findViewById(R.id.dwrHighlightList).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrHighlightList).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(false);
+                drawerLayout.closeDrawers();
                 startActivity(new Intent(AllInOneV2.this, SettingsHighlightedUsers.class));
             }
         });
 
-        drawer.findViewById(R.id.dwrSettings).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrSettings).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.closeMenu(false);
-                startActivity(new Intent(AllInOneV2.this, SettingsMain.class));
+                drawerLayout.closeDrawers();
+                startActivity(new Intent(AllInOneV2.this, HeaderSettings.class));
             }
         });
 
-        drawer.findViewById(R.id.dwrExit).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.dwrExit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AllInOneV2.this.finish();
             }
         });
 
-        // The drawable that replaces the up indicator in the action bar
-        if (Theming.usingLightTheme())
-            drawer.setSlideDrawable(R.drawable.ic_drawer_light);
-        else
-            drawer.setSlideDrawable(R.drawable.ic_drawer);
-
-        // Whether the previous drawable should be shown
-        drawer.setDrawerIndicatorEnabled(true);
+        aBar.setDisplayHomeAsUpEnabled(true);
+        aBar.setHomeButtonEnabled(true);
 
         if (!settings.contains("defaultAccount")) {
             // settings need to be set to default
-            PreferenceManager.setDefaultValues(this, R.xml.settingsmain, false);
+            PreferenceManager.setDefaultValues(this, R.xml.prefsaccountsnotifs, false);
+            PreferenceManager.setDefaultValues(this, R.xml.prefsadvanced, false);
+            PreferenceManager.setDefaultValues(this, R.xml.prefsgeneral, false);
+            PreferenceManager.setDefaultValues(this, R.xml.prefstheming, false);
             Editor sEditor = settings.edit();
-            sEditor.putString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)
+            sEditor.putString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT)
                     .putString("timezone", TimeZone.getDefault().getID())
-                    .commit();
+                    .apply();
         }
 
-        ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
-
-        // Now setup the PullToRefreshLayout
-        ActionBarPullToRefresh.from(this)
-                .options(Options.create()
-                        .noMinimize()
-                        .refreshOnUp(true)
-                        .build())
-                        // Mark All Children as pullable
-                .allChildrenArePullable()
-                        // Set the OnRefreshListener
-                .listener(new OnRefreshListener() {
-                    @Override
-                    public void onRefreshStarted(View view) {
-                        refreshClicked(view);
-                    }
-                })
-                        // Finally commit the setup to our PullToRefreshLayout
-                .setup(ptrLayout);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.ptr_layout);
+        swipeRefreshLayout.setEnabled(false);
+        swipeRefreshLayout.setColorSchemeColors(Theming.colorPrimary(), Theming.colorPrimaryDark());
+        swipeRefreshLayout.setOnRefreshListener(this);
 
         contentList = (ListView) findViewById(R.id.aioMainList);
 
@@ -432,51 +405,52 @@ public class AllInOneV2 extends Activity {
         titleCounter = (TextView) findViewById(R.id.aioPostTitleCounter);
         bodyCounter = (TextView) findViewById(R.id.aioPostBodyCounter);
 
-        title = (TextView) findViewById(R.id.aioTitle);
-        title.setSelected(true);
-
-        pageJumperWrapper = findViewById(R.id.aioPageJumperWrapper);
+        pageJumperWrapper = findViewById(R.id.aioHeader);
         firstPage = (Button) findViewById(R.id.aioFirstPage);
         firstPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                session.get(pageJumperDesc, firstPageUrl, null);
+                session.get(pageJumperDesc, firstPageUrl);
             }
         });
         prevPage = (Button) findViewById(R.id.aioPreviousPage);
         prevPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                session.get(pageJumperDesc, prevPageUrl, null);
+                session.get(pageJumperDesc, prevPageUrl);
             }
         });
         nextPage = (Button) findViewById(R.id.aioNextPage);
         nextPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                session.get(pageJumperDesc, nextPageUrl, null);
+                session.get(pageJumperDesc, nextPageUrl);
             }
         });
         lastPage = (Button) findViewById(R.id.aioLastPage);
         lastPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                session.get(pageJumperDesc, lastPageUrl, null);
+                session.get(pageJumperDesc, lastPageUrl);
             }
         });
-        pageLabel = (TextView) findViewById(R.id.aioPageLabel);
+        pageLabel = (Button) findViewById(R.id.aioPageLabel);
+        pageLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                jumperDialogBuilder.show();
+            }
+        });
 
-        Theming.setTextSizeBases(((TextView) drawer.findViewById(R.id.dwrChangeAccHeader)).getTextSize(),
-                ((TextView) drawer.findViewById(R.id.dwrChangeAcc)).getTextSize(),
-                title.getTextSize(),
+        Theming.setTextSizeBases(((TextView) findViewById(R.id.dwrChangeAccHeader)).getTextSize(),
+                ((TextView) findViewById(R.id.dwrChangeAcc)).getTextSize(),
                 firstPage.getTextSize(),
                 pageLabel.getTextSize());
 
         postTitle.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                String escapedTitle = StringEscapeUtils.escapeHtml4(postTitle.getText().toString());
-                titleCounter.setText(escapedTitle.length() + "/80");
+                titleCounter.setText(StringEscapeUtils.escapeHtml4(s.toString()).length() + "/80");
             }
 
             @Override
@@ -494,9 +468,8 @@ public class AllInOneV2 extends Activity {
         postBody.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                String escapedBody = StringEscapeUtils.escapeHtml4(postBody.getText().toString());
                 // GFAQs adds 13(!) characters onto bodies when they have a sig, apparently.
-                int length = escapedBody.length() + getSig().length() + 13;
+                int length = StringEscapeUtils.escapeHtml4(s.toString()).length() + getSig().length() + 13;
                 bodyCounter.setText(length + "/4096");
             }
 
@@ -512,27 +485,59 @@ public class AllInOneV2 extends Activity {
             }
         });
 
-        postButton = (Button) findViewById(R.id.aioPostDo);
-        cancelButton = (Button) findViewById(R.id.aioPostCancel);
+        postSubmitButton = (Button) findViewById(R.id.aioPostDo);
+        postCancelButton = (Button) findViewById(R.id.aioPostCancel);
         pollButton = (Button) findViewById(R.id.aioPollOptions);
         pollSep = findViewById(R.id.aioPollSep);
 
         postWrapper = (LinearLayout) findViewById(R.id.aioPostWrapper);
 
-        wtl("creating default sig");
+        if (BuildConfig.DEBUG) wtl("creating default sig");
         defaultSig = "Posted with GameRaven *grver*";
 
-        wtl("getting css directory");
+        if (BuildConfig.DEBUG) wtl("getting css directory");
         File cssDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/gameraven");
         if (!cssDirectory.exists()) {
-            wtl("css directory does not exist, creating");
-            cssDirectory.mkdir();
+            if (BuildConfig.DEBUG) wtl("css directory does not exist, creating");
+            if (cssDirectory.mkdir())
+                if (BuildConfig.DEBUG) wtl("css directory created");
+                else if (BuildConfig.DEBUG) wtl("css directory creation failed");
         }
 
-        wtl("starting db creation");
+        if (BuildConfig.DEBUG) wtl("starting db creation");
         hlDB = new HighlightListDBHelper(this);
 
-        wtl("onCreate finishing");
+        View foot = new View(this);
+        foot.setMinimumHeight(Theming.convertDPtoPX(this, 80));
+        contentList.addFooterView(foot);
+
+        adapterRows.add(new HeaderRowData("Loading..."));
+        contentList.setAdapter(viewAdapter);
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (pMode == PostMode.ON_BOARD)
+                    postSetup(false);
+                else if (pMode == PostMode.ON_TOPIC)
+                    postSetup(true);
+                else if (pMode == PostMode.NEW_PM)
+                    pmSetup(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+            }
+        });
+        fab.setVisibility(View.GONE);
+
+        AppRater.app_launched(this);
+
+        if (BuildConfig.DEBUG) wtl("onCreate finishing");
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        drawerToggle.syncState();
     }
 
     @Override
@@ -541,7 +546,7 @@ public class AllInOneV2 extends Activity {
             String url = intent.getData().getPath();
             NetDesc desc = Session.determineNetDesc(url);
             if (desc != NetDesc.UNSPECIFIED)
-                session.get(desc, url, null);
+                session.get(desc, url);
             else
                 Crouton.showText(this, "Page not recognized: " + url, Theming.croutonStyle());
         }
@@ -551,17 +556,61 @@ public class AllInOneV2 extends Activity {
 
     @Override
     protected void onResume() {
-        wtl("onResume fired");
+        if (BuildConfig.DEBUG) wtl("onResume fired");
         super.onResume();
 
-        AdmobRowView.resumeAd();
+        swipeRefreshLayout.setEnabled(settings.getBoolean("enablePTR", false));
+        contentList.setFastScrollEnabled(settings.getBoolean("enableFastScroll", true));
 
-        ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
+        int lastUpdateYear = settings.getInt("lastUpdateYear", 0);
+        int lastUpdateYearDay = settings.getInt("lastUpdateYearDay", 0);
+        Time now = new Time();
+        now.setToNow();
+        if (lastUpdateYear != now.year || lastUpdateYearDay != now.yearDay) {
+            if (BuildConfig.DEBUG) wtl("checking for update");
+            try {
+                if (BuildConfig.DEBUG) wtl("my version is " + BuildConfig.VERSION_CODE);
+                Ion.with(this)
+                        .load("GET", "http://ioabsoftware.com/gameraven/latest.txt")
+                        .asString()
+                        .setCallback(new FutureCallback<String>() {
+                            @Override
+                            public void onCompleted(Exception e, String result) {
+                                if (NumberUtils.isNumber(result)) {
+                                    int netVersion = Integer.valueOf(result);
+                                    if (BuildConfig.DEBUG) wtl("net version is " + netVersion);
+
+                                    if (netVersion > BuildConfig.VERSION_CODE) {
+                                        AlertDialog.Builder b = new AlertDialog.Builder(AllInOneV2.this);
+                                        b.setTitle("New Version Found");
+                                        b.setMessage("Open Google Play Market to download new version? Note that although " +
+                                                "care is taken to make sure this notification only goes out once the update " +
+                                                "has spread to all Google servers, there is still a chance the update may not " +
+                                                "show up in the Play Store at first. Rest assured, there is a new version. " +
+                                                "It just hasn't reached your local Google Play server yet.");
+                                        b.setPositiveButton("Yes", new OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Intent i = new Intent(Intent.ACTION_VIEW);
+                                                i.setData(Uri.parse("market://details?id=com.ioabsoftware.gameraven"));
+                                                AllInOneV2.this.startActivity(i);
+                                            }
+                                        });
+                                        b.setNegativeButton("No", null);
+                                        b.show();
+                                    }
+                                }
+                            }
+                        });
+
+                settings.edit().putInt("lastUpdateYear", now.year).putInt("lastUpdateYearDay", now.yearDay).apply();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+        }
 
         if (Theming.updateTextScale(settings.getInt("textScale", 100) / 100f)) {
             int px = TypedValue.COMPLEX_UNIT_PX;
-
-            title.setTextSize(px, Theming.getScaledPageTitleTextSize());
 
             firstPage.setTextSize(px, Theming.getScaledPJButtonTextSize());
             prevPage.setTextSize(px, Theming.getScaledPJButtonTextSize());
@@ -569,64 +618,23 @@ public class AllInOneV2 extends Activity {
             lastPage.setTextSize(px, Theming.getScaledPJButtonTextSize());
             pageLabel.setTextSize(px, Theming.getScaledPJLabelTextSize());
 
-            ((TextView) drawer.findViewById(R.id.dwrChangeAccHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrChangeAcc)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrNavHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrBoardJumper)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrAMPList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrTrackedTopics)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrPMInbox)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrFuncHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrCopyCurrURL)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrHighlightList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrSettings)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) drawer.findViewById(R.id.dwrExit)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrChangeAccHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
+            ((TextView) findViewById(R.id.dwrChangeAcc)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrNavHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
+            boardListButton.setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrAMPList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrTrackedTopics)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrPMInbox)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrFuncHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
+            ((TextView) findViewById(R.id.dwrCopyCurrURL)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrHighlightList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrSettings)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
+            ((TextView) findViewById(R.id.dwrExit)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
         }
 
-        int color = settings.getInt("accentColor", (getResources().getColor(R.color.holo_blue)));
-        boolean whiteText = settings.getBoolean("useWhiteAccentText", false);
+        MessageRowView.setUsingAvatars(settings.getBoolean("usingAvatars", false));
 
-        if (Theming.updateAccentColor(color, whiteText) || firstResume) {
-            Drawable aBarDrawable;
-            if (Theming.usingLightTheme())
-                aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_dark_holo);
-            else
-                aBarDrawable = getResources().getDrawable(R.drawable.ab_transparent_light_holo);
-
-            aBarDrawable.setColorFilter(Theming.accentColor(), PorterDuff.Mode.SRC_ATOP);
-            aBar.setBackgroundDrawable(aBarDrawable);
-
-            ((DefaultHeaderTransformer) ptrLayout.getHeaderTransformer()).setProgressBarColor(Theming.accentColor());
-
-            findViewById(R.id.aioPJTopSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioFirstPrevSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioNextLastSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostWrapperSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostTitleSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostBodySep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioBoldSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioItalicSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioCodeSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioSpoilerSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioCiteSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioHTMLSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostButtonSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPollSep).setBackgroundColor(Theming.accentColor());
-            findViewById(R.id.aioPostSep).setBackgroundColor(Theming.accentColor());
-            drawer.findViewById(R.id.dwrCAHSep).setBackgroundColor(Theming.accentColor());
-            drawer.findViewById(R.id.dwrNavSep).setBackgroundColor(Theming.accentColor());
-            drawer.findViewById(R.id.dwrFuncSep).setBackgroundColor(Theming.accentColor());
-        }
-
-
-        if (session != null) {
-            if (settings.getBoolean("reloadOnResume", false)) {
-                wtl("session exists, reload on resume is true, refreshing page");
-                isRoR = true;
-                session.refresh();
-            }
-        } else {
+        if (session == null) {
             String initUrl = null;
             NetDesc initDesc = null;
             if (firstResume) {
@@ -638,17 +646,28 @@ public class AllInOneV2 extends Activity {
                     }
                 }
             }
-            String defaultAccount = settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT);
-            if (AccountManager.containsUser(this, defaultAccount)) {
-                wtl("starting new session from onResume, logged in");
+
+            String defaultAccount = settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT);
+            String resumeAccount = settings.getString("resumeSessionUser", HeaderSettings.NO_DEFAULT_ACCOUNT);
+            boolean resumeSession = settings.getBoolean("resumeSession", false);
+
+            if (firstResume && resumeSession && AccountManager.containsUser(this, resumeAccount)) {
+                session = new Session(this, resumeAccount, AccountManager.getPassword(this, resumeAccount), Session.RESUME_INIT_URL, NetDesc.UNSPECIFIED);
+            } else if (AccountManager.containsUser(this, defaultAccount)) {
+                if (BuildConfig.DEBUG) wtl("starting new session from onResume, logged in");
                 session = new Session(this, defaultAccount, AccountManager.getPassword(this, defaultAccount), initUrl, initDesc);
             } else {
-                wtl("starting new session from onResume, no login");
+                if (BuildConfig.DEBUG) wtl("starting new session from onResume, no login");
                 session = new Session(this, null, null, initUrl, initDesc);
             }
+        } else {
+            if (settings.getBoolean("reloadOnResume", false)) {
+                    if (BuildConfig.DEBUG)
+                            wtl("session exists, reload on resume is true, refreshing page");
+                    isRoR = true;
+                    session.refresh();
+                }
         }
-
-        title.setSelected(true);
 
         if (!settings.contains("beenWelcomed")) {
             settings.edit().putBoolean("beenWelcomed", true).apply();
@@ -658,66 +677,118 @@ public class AllInOneV2 extends Activity {
             b.setPositiveButton("Yes", new OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/InsanityOnABun/GameRaven/wiki")));
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://ioabsoftware.com/gameraven/quickstart.html")));
                 }
             });
             b.setNegativeButton("No", null);
-            b.create().show();
+            b.show();
         }
 
         firstResume = false;
 
-        wtl("onResume finishing");
+        if (BuildConfig.DEBUG) wtl("onResume finishing");
     }
 
     @Override
-    protected void onPause() {
-        AdmobRowView.pauseAd();
-        super.onPause();
+    protected void onStop () {
+        Editor e = settings.edit();
+        e.putBoolean("resumeSession", true);
+        session.addHistoryBeforeStop();
+        if (Session.isLoggedIn())
+            e.putString("resumeSessionUser", Session.getUser());
+
+        e.apply();
+
+        session.closeHistoryDB();
+
+        super.onStop();
+    }
+
+    @Override
+    protected void onRestart () {
+        super.onRestart();
+        session.openHistoryDB();
+        session.popHistory();
     }
 
     @Override
     protected void onDestroy() {
+        if (BuildConfig.DEBUG) wtl("Destroying!");
         Crouton.clearCroutonsForActivity(this);
-        AdmobRowView.destroyAd();
 
-        if (session != null)
-            session.closeHistoryDB();
+        if (isFinishing())
+            settings.edit().putBoolean("resumeSession", false).apply();
 
         super.onDestroy();
+    }
+
+    private AlertDialog loginDialog;
+    public void showLoggingInDialog(String user) {
+        if (loginDialog == null) {
+            AlertDialog.Builder b = new AlertDialog.Builder(this);
+            ProgressBar spinner = new ProgressBar(this);
+            spinner.setIndeterminate(true);
+            b.setView(spinner);
+            loginDialog = b.create();
+        }
+
+        loginDialog.setTitle("Logging in as " + user + "...");
+        loginDialog.show();
+    }
+
+    public void dismissLoginDialog() {
+        loginDialog.dismiss();
     }
 
     private boolean needToSetNavList = true;
 
     public void disableNavList() {
-        drawer.findViewById(R.id.dwrNavWrapper).setVisibility(View.GONE);
+        findViewById(R.id.dwrNavWrapper).setVisibility(View.GONE);
         needToSetNavList = true;
     }
 
     public void setNavList(boolean isLoggedIn) {
-        drawer.findViewById(R.id.dwrNavWrapper).setVisibility(View.VISIBLE);
+        findViewById(R.id.dwrNavWrapper).setVisibility(View.VISIBLE);
         if (isLoggedIn)
-            drawer.findViewById(R.id.dwrLoggedInNav).setVisibility(View.VISIBLE);
+            findViewById(R.id.dwrLoggedInNav).setVisibility(View.VISIBLE);
         else
-            drawer.findViewById(R.id.dwrLoggedInNav).setVisibility(View.GONE);
+            findViewById(R.id.dwrLoggedInNav).setVisibility(View.GONE);
+
+        needToSetNavList = false;
     }
 
     @Override
     public boolean onSearchRequested() {
         if (searchIcon != null && searchIcon.isVisible())
-            searchIcon.expandActionView();
+            MenuItemCompat.expandActionView(searchIcon);
 
         return false;
     }
 
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
+    public void toggleMenu() {
+        if (drawerLayout.isDrawerOpen(Gravity.LEFT))
+            drawerLayout.closeDrawers();
+        else
+            drawerLayout.openDrawer(Gravity.LEFT);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, @NotNull KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_MENU) {
-            drawer.toggleMenu();
+            toggleMenu();
             return true;
         } else {
             return super.onKeyUp(keyCode, event);
         }
     }
+
+    @Override
+    public void onRefresh() {
+        refreshClicked(null);
+    }
+
+    private MenuItem refreshIcon, replyIcon, pmInboxIcon, pmOutboxIcon,
+            addFavIcon, remFavIcon, searchIcon, topicListIcon, sendUserPMIcon, tagUserIcon;
 
     /**
      * Adds menu items
@@ -732,11 +803,12 @@ public class AllInOneV2 extends Activity {
         remFavIcon = menu.findItem(R.id.remFav);
         pmInboxIcon = menu.findItem(R.id.pmInbox);
         pmOutboxIcon = menu.findItem(R.id.pmOutbox);
-        postIcon = menu.findItem(R.id.post);
+        sendUserPMIcon = menu.findItem(R.id.sendUserPM);
+        tagUserIcon = menu.findItem(R.id.tagUser);
         replyIcon = menu.findItem(R.id.reply);
         refreshIcon = menu.findItem(R.id.refresh);
 
-        SearchView searchView = (SearchView) searchIcon.getActionView();
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchIcon);
         if (searchView != null) {
             SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -748,48 +820,56 @@ public class AllInOneV2 extends Activity {
                 }
 
                 public boolean onQueryTextSubmit(String query) {
-                    HashMap<String, String> data = new HashMap<String, String>();
-                    if (session.getLastDesc() == NetDesc.BOARD) {
-                        wtl("searching board for query");
-                        data.put("search", query);
-                        session.get(NetDesc.BOARD, session.getLastPathWithoutData(), data);
-                    } else if (session.getLastDesc() == NetDesc.BOARD_JUMPER || session.getLastDesc() == NetDesc.GAME_SEARCH) {
-                        wtl("searching for games");
-                        data.put("game", query);
-                        session.get(NetDesc.GAME_SEARCH, "/search/index.html", data);
+                    try {
+                        String encodedQuery = URLEncoder.encode(query, DocumentParser.CHARSET_NAME);
+                        if (session.getLastDesc() == NetDesc.BOARD) {
+                            if (BuildConfig.DEBUG) wtl("searching board for query");
+                            session.get(NetDesc.BOARD, session.getLastPathWithoutData() + "?search=" + encodedQuery);
+                        } else if (session.getLastDesc() == NetDesc.BOARD_JUMPER || session.getLastDesc() == NetDesc.GAME_SEARCH) {
+                            if (BuildConfig.DEBUG) wtl("searching for games");
+                            session.get(NetDesc.GAME_SEARCH, "/search/index.html?game=" + encodedQuery);
+                        }
+                    } catch (UnsupportedEncodingException e) {
+                        throw new AssertionError(DocumentParser.CHARSET_NAME + " is unknown");
+                        // shouldn't ever happen
                     }
                     return true;
                 }
             };
 
             searchView.setOnQueryTextListener(queryTextListener);
-        } else {
-//        	throw new NullPointerException("searchView is null");
         }
 
         return true;
     }
+
+    UserDetailRowData userDetailData;
 
     /**
      * fires when a menu option is selected
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         // Handle item selection
         switch (item.getItemId()) {
-            case android.R.id.home:
-                wtl("toggling drawer");
-                drawer.toggleMenu();
-                return true;
-
             case R.id.search:
                 onSearchRequested();
-//    		MenuItemCompat.expandActionView(searchIcon);
                 return true;
 
             case R.id.addFav:
                 AlertDialog.Builder afb = new AlertDialog.Builder(this);
                 afb.setNegativeButton("No", null);
+
+                final HashMap<String, List<String>> afData = new HashMap<>();
+                afData.put("key", Collections.singletonList(favKey));
+
+                final String afPath = session.getLastPath().replace("/boards/", "/boardaction/");
 
                 switch (fMode) {
                     case ON_BOARD:
@@ -797,15 +877,8 @@ public class AllInOneV2 extends Activity {
                         afb.setPositiveButton("Yes", new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String addFavUrl = session.getLastPath();
-                                if (addFavUrl.contains("remfav"))
-                                    addFavUrl = addFavUrl.replace("remfav", "addfav");
-                                else if (addFavUrl.indexOf('?') != -1)
-                                    addFavUrl += "&action=addfav";
-                                else
-                                    addFavUrl += "?action=addfav";
-
-                                session.get(NetDesc.BOARD, addFavUrl, null);
+                                afData.put("action", Collections.singletonList("addfav"));
+                                session.post(NetDesc.BOARD, afPath, afData);
                             }
                         });
                         break;
@@ -814,25 +887,14 @@ public class AllInOneV2 extends Activity {
                         afb.setPositiveButton("Yes", new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String addFavUrl = session.getLastPath();
-                                int x = addFavUrl.indexOf('#');
-                                if (x != -1)
-                                    addFavUrl = addFavUrl.substring(0, x);
-
-                                if (addFavUrl.contains("stoptrack"))
-                                    addFavUrl = addFavUrl.replace("stoptrack", "tracktopic");
-                                else if (addFavUrl.indexOf('?') != -1)
-                                    addFavUrl += "&action=tracktopic";
-                                else
-                                    addFavUrl += "?action=tracktopic";
-
-                                session.get(NetDesc.TOPIC, addFavUrl, null);
+                                afData.put("action", Collections.singletonList("tracktopic"));
+                                session.post(NetDesc.TOPIC, afPath, afData);
                             }
                         });
                         break;
                 }
 
-                afb.create().show();
+                afb.show();
 
                 return true;
 
@@ -840,21 +902,19 @@ public class AllInOneV2 extends Activity {
                 AlertDialog.Builder rfb = new AlertDialog.Builder(this);
                 rfb.setNegativeButton("No", null);
 
+                final HashMap<String, List<String>> rfData = new HashMap<>();
+                rfData.put("key", Collections.singletonList(favKey));
+
+                final String rfPath = session.getLastPath().replace("/boards/", "/boardaction/");
+
                 switch (fMode) {
                     case ON_BOARD:
                         rfb.setTitle("Remove Board from Favorites?");
                         rfb.setPositiveButton("Yes", new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String remFavUrl = session.getLastPath();
-                                if (remFavUrl.contains("addfav"))
-                                    remFavUrl = remFavUrl.replace("addfav", "remfav");
-                                else if (remFavUrl.indexOf('?') != -1)
-                                    remFavUrl += "&action=remfav";
-                                else
-                                    remFavUrl += "?action=remfav";
-
-                                session.get(NetDesc.BOARD, remFavUrl, null);
+                                rfData.put("action", Collections.singletonList("remfav"));
+                                session.post(NetDesc.BOARD, rfPath, rfData);
                             }
                         });
                         break;
@@ -863,48 +923,57 @@ public class AllInOneV2 extends Activity {
                         rfb.setPositiveButton("Yes", new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String remFavUrl = session.getLastPath();
-                                int x = remFavUrl.indexOf('#');
-                                if (x != -1)
-                                    remFavUrl = remFavUrl.substring(0, x);
-
-                                if (remFavUrl.contains("tracktopic"))
-                                    remFavUrl = remFavUrl.replace("tracktopic", "stoptrack");
-                                else if (remFavUrl.indexOf('?') != -1)
-                                    remFavUrl += "&action=stoptrack";
-                                else
-                                    remFavUrl += "?action=stoptrack";
-
-                                session.get(NetDesc.TOPIC, remFavUrl, null);
+                                rfData.put("action", Collections.singletonList("stoptrack"));
+                                session.post(NetDesc.TOPIC, rfPath, rfData);
                             }
                         });
                         break;
                 }
 
-                rfb.create().show();
+                rfb.show();
 
                 return true;
 
             case R.id.topicList:
-                session.get(NetDesc.BOARD, tlUrl, null);
+                session.get(NetDesc.BOARD, tlUrl);
                 return true;
 
             case R.id.pmInbox:
-                session.get(NetDesc.PM_INBOX, "/pm/", null);
+                session.get(NetDesc.PM_INBOX, "/pm/");
                 return true;
 
             case R.id.pmOutbox:
-                session.get(NetDesc.PM_OUTBOX, "/pm/sent", null);
+                session.get(NetDesc.PM_OUTBOX, "/pm/sent");
                 return true;
 
-            case R.id.post:
-                if (pMode == PostMode.ON_BOARD)
-                    postSetup(false);
-                else if (pMode == PostMode.ON_TOPIC)
-                    postSetup(true);
-                else if (pMode == PostMode.NEW_PM)
-                    pmSetup(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+            case R.id.sendUserPM:
+                pmSetup(userDetailData.getName(), null, null);
+                return true;
 
+            case R.id.tagUser:
+                AlertDialog.Builder b = new AlertDialog.Builder(this);
+                b.setTitle("Set " + userDetailData.getName() + "'s Tag");
+                b.setMessage("User tags can be up to 30 characters long and cannot contain any banned words.");
+
+                final EditText tagText = new EditText(this);
+                tagText.setHint(R.string.user_tag_hint);
+                tagText.setText(userDetailData.getTagText());
+                b.setView(tagText);
+
+                b.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        HashMap<String, List<String>> data = new HashMap<String, List<String>>();
+                        data.put("key", Arrays.asList(userDetailData.getTagKey()));
+                        assert tagText.getText() != null : "tagText.getText() is null";
+                        data.put("tag_text", Arrays.asList(tagText.getText().toString()));
+                        data.put("tag_submit", Arrays.asList("Tag this User"));
+
+                        hideSoftKeyboard(tagText);
+                        AllInOneV2.get().getSession().post(NetDesc.TAG_USER, userDetailData.getTagPath(), data);
+                    }
+                });
+                b.show();
                 return true;
 
             case R.id.reply:
@@ -914,10 +983,12 @@ public class AllInOneV2 extends Activity {
             case R.id.refresh:
                 if (session.getLastPath() == null) {
                     if (Session.isLoggedIn()) {
-                        wtl("starting new session from case R.id.refresh, logged in");
+                        if (BuildConfig.DEBUG)
+                            wtl("starting new session from case R.id.refresh, logged in");
                         session = new Session(this, Session.getUser(), AccountManager.getPassword(this, Session.getUser()));
                     } else {
-                        wtl("starting new session from R.id.refresh, no login");
+                        if (BuildConfig.DEBUG)
+                            wtl("starting new session from R.id.refresh, no login");
                         session = new Session(this);
                     }
                 } else
@@ -941,29 +1012,43 @@ public class AllInOneV2 extends Activity {
 
     private void setAllMenuItemsExceptRefreshVisibility(boolean visible) {
         setMenuItemVisibility(searchIcon, visible);
-        setMenuItemVisibility(postIcon, visible);
         setMenuItemVisibility(replyIcon, visible);
         setMenuItemVisibility(pmInboxIcon, visible);
         setMenuItemVisibility(pmOutboxIcon, visible);
+        setMenuItemVisibility(sendUserPMIcon, visible);
+        setMenuItemVisibility(tagUserIcon, visible);
         setMenuItemVisibility(addFavIcon, visible);
         setMenuItemVisibility(remFavIcon, visible);
         setMenuItemVisibility(topicListIcon, visible);
+
+        if (visible)
+            fab.setVisibility(View.VISIBLE);
+        else
+            fab.setVisibility(View.GONE);
     }
 
     private void setAllMenuItemsEnabled(boolean enabled) {
         setMenuItemEnabled(refreshIcon, enabled);
         setMenuItemEnabled(searchIcon, enabled);
-        setMenuItemEnabled(postIcon, enabled);
         setMenuItemEnabled(replyIcon, enabled);
         setMenuItemEnabled(pmInboxIcon, enabled);
         setMenuItemEnabled(pmOutboxIcon, enabled);
+        setMenuItemEnabled(sendUserPMIcon, enabled);
+        setMenuItemEnabled(tagUserIcon, enabled);
         setMenuItemEnabled(addFavIcon, enabled);
         setMenuItemEnabled(remFavIcon, enabled);
         setMenuItemEnabled(topicListIcon, enabled);
+
+        fab.setEnabled(enabled);
     }
 
     public void setLoginName(String name) {
         ((TextView) findViewById(R.id.dwrChangeAcc)).setText(name + " (Click to Change)");
+    }
+
+    private void hideSoftKeyboard(View inputView) {
+        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
+                hideSoftInputFromWindow(inputView.getWindowToken(), 0);
     }
 
     public void postError(String msg) {
@@ -971,33 +1056,30 @@ public class AllInOneV2 extends Activity {
         builder.setMessage(msg);
         builder.setTitle("There was a problem with your post...");
         builder.setPositiveButton("Ok", null);
-        builder.create().show();
+        builder.show();
 
-        uiCleanup();
+        ptrCleanup();
     }
 
-    public void genError(String errorTitle, String errorMsg) {
+    public void genError(String errorTitle, String errorMsg, String buttonText) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(errorMsg);
         builder.setTitle(errorTitle);
-        builder.setPositiveButton("Ok", null);
-        builder.create().show();
+        builder.setPositiveButton(buttonText, null);
+        builder.show();
 
-        uiCleanup();
+        ptrCleanup();
     }
 
     public void noNetworkConnection() {
-        AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setTitle("No Network Connection");
-        b.setMessage("Couldn't establish network connection. Check your network settings, then try again.");
-        b.setNegativeButton("Dismiss", null);
-        b.show();
+        genError("No Network Connection", "Couldn't establish network connection. Check your network settings, then try again.",
+                "Dismiss");
     }
 
     public void timeoutCleanup(NetDesc desc) {
-        String msg = "timeout msg unset";
-        String title = "timeout title unset";
-        String posButtonText = "pos button text not set";
+        String msg;
+        String title;
+        String posButtonText;
         boolean retrySub = false;
         switch (desc) {
             case LOGIN_S1:
@@ -1007,15 +1089,11 @@ public class AllInOneV2 extends Activity {
                 posButtonText = "Retry";
                 break;
             case POSTMSG_S1:
-            case POSTMSG_S2:
             case POSTMSG_S3:
             case POSTTPC_S1:
-            case POSTTPC_S2:
             case POSTTPC_S3:
-                title = "Post Timeout";
-                msg = "Post timed out. Press refresh to check if your post made it through.";
-                posButtonText = "Refresh";
-                break;
+                postTimeoutCleanup();
+                return;
             default:
                 retrySub = true;
                 title = "Timeout";
@@ -1033,7 +1111,7 @@ public class AllInOneV2 extends Activity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (retry)
-                    session.get(session.getLastAttemptedDesc(), session.getLastAttemptedPath(), null);
+                    session.get(session.getLastAttemptedDesc(), session.getLastAttemptedPath());
                 else
                     refreshClicked(new View(AllInOneV2.this));
             }
@@ -1041,44 +1119,64 @@ public class AllInOneV2 extends Activity {
         b.setNegativeButton("Dismiss", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-//				switch ((session.getLastDoc() == null) ? 1 : 0) {
-//				case 0:
-//					processContent(session.getLastDesc(), session.getLastDoc(), session.getLastPath());
-//				case 1:
                 postExecuteCleanup(session.getLastDesc());
-//					break;
-//				}
             }
         });
-        b.create().show();
+        b.show();
     }
 
-    private void uiCleanup() {
-        ptrLayout.setRefreshing(false);
-        setMenuItemVisibility(refreshIcon, true);
-        if (postWrapper.getVisibility() == View.VISIBLE) {
-            postButton.setEnabled(true);
-            cancelButton.setEnabled(true);
-            pollButton.setEnabled(true);
-            setMenuItemVisibility(postIcon, true);
-        }
-    }
+    private void postTimeoutCleanup() {
+        AlertDialog.Builder b = new AlertDialog.Builder(AllInOneV2.this);
+        b.setTitle("Post Timeout");
+        b.setMessage("Post timed out. Refresh the page to check if your post made it through. Dismissing " +
+                "and posting again without first checking if the post went through may result in the post " +
+                "being submitted twice.");
 
-    public void preExecuteSetup(NetDesc desc) {
-        wtl("GRAIO dPreES fired --NEL, desc: " + desc.name());
-        ptrLayout.setRefreshing(true);
-        setAllMenuItemsEnabled(false);
+        b.setPositiveButton("Refresh", new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                session.get(Session.determineNetDesc(postPostUrl), postPostUrl);
+            }
+        });
 
-        if (desc != NetDesc.POSTMSG_S1 && desc != NetDesc.POSTTPC_S1 && desc != NetDesc.EDIT_MSG)
-            postCleanup();
+        b.setNeutralButton("Copy Post", null);
+
+        b.setNegativeButton("Dismiss", new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                session.setLastPathAndDesc(postPostUrl, Session.determineNetDesc(postPostUrl));
+                ptrCleanup();
+            }
+        });
+
+        b.setCancelable(false);
+        final AlertDialog d = b.create();
+        d.setOnShowListener(new OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                d.getButton(DialogInterface.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        android.content.ClipboardManager clipboard =
+                                (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+
+                        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("simple text", savedPostBody));
+
+                        Crouton.showText(AllInOneV2.this,
+                                "Message body copied to clipboard.",
+                                Theming.croutonStyle(),
+                                (ViewGroup) v.getParent().getParent());
+                    }
+                });
+            }
+        });
+        d.show();
     }
 
     private boolean isRoR = false;
-
-    private void postCleanup() {
+    private void postInterfaceCleanup() {
         if (!isRoR && postWrapper.getVisibility() == View.VISIBLE) {
-            pageJumperWrapper.setVisibility(View.VISIBLE);
-            wtl("postCleanup fired --NEL");
+            if (BuildConfig.DEBUG) wtl("postInterfaceCleanup fired --NEL");
             postWrapper.setVisibility(View.GONE);
             pollButton.setVisibility(View.GONE);
             pollSep.setVisibility(View.GONE);
@@ -1086,10 +1184,24 @@ public class AllInOneV2 extends Activity {
             postTitle.setText(null);
             clearPoll();
             messageIDForEditing = null;
-            postPostUrl = null;
 
-            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
-                    hideSoftInputFromWindow(postBody.getWindowToken(), 0);
+            fab.setVisibility(View.VISIBLE);
+
+            hideSoftKeyboard(postBody);
+
+
+            if (!pageLabel.getText().toString().equals("~ 1 / 1 ~"))
+                pageJumperWrapper.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void ptrCleanup() {
+        swipeRefreshLayout.setRefreshing(false);
+        setAllMenuItemsEnabled(true);
+        if (postWrapper.getVisibility() == View.VISIBLE) {
+            postSubmitButton.setEnabled(true);
+            postCancelButton.setEnabled(true);
+            pollButton.setEnabled(true);
         }
     }
 
@@ -1100,7 +1212,17 @@ public class AllInOneV2 extends Activity {
             findViewById(R.id.dwrAMPWrapper).setVisibility(View.GONE);
     }
 
-    /**
+    public void preExecuteSetup(NetDesc desc) {
+        if (BuildConfig.DEBUG) wtl("GRAIO dPreES fired --NEL, desc: " + desc.name());
+
+        if (desc != NetDesc.POSTMSG_S1 && desc != NetDesc.POSTTPC_S1 && desc != NetDesc.EDIT_MSG)
+            postInterfaceCleanup();
+
+        swipeRefreshLayout.setRefreshing(true);
+        setAllMenuItemsEnabled(false);
+    }
+
+    /*
      * *****************************************
      * START HNR
      * *****************************************
@@ -1108,25 +1230,13 @@ public class AllInOneV2 extends Activity {
 
     ArrayList<BaseRowData> adapterRows = new ArrayList<BaseRowData>();
     ViewAdapter viewAdapter = new ViewAdapter(this, adapterRows);
-    boolean adapterSet = false;
-
-    WebView web;
-    String adBaseUrl;
-    StringBuilder adBuilder = new StringBuilder();
-    Runnable postProcessRunnable = new Runnable() {
-        @Override
-        public void run() {
-            web.loadDataWithBaseURL(adBaseUrl, adBuilder.toString(), null, "iso-8859-1", null);
-            setMarqueeSpeed(title, 4, false);
-        }
-    };
 
     @SuppressLint("SetJavaScriptEnabled")
     public void processContent(NetDesc desc, Document doc, String resUrl) {
 
-        wtl("GRAIO hNR fired, desc: " + desc.name());
+        if (BuildConfig.DEBUG) wtl("GRAIO hNR fired, desc: " + desc.name());
 
-        ptrLayout.setEnabled(false);
+        swipeRefreshLayout.setEnabled(false);
 
         if (searchIcon != null)
             searchIcon.collapseActionView();
@@ -1135,63 +1245,62 @@ public class AllInOneV2 extends Activity {
 
         adapterRows.clear();
 
-        boolean isDefaultAcc;
-        if (Session.getUser() != null &&
-                Session.getUser().equals(settings.getString("defaultAccount", SettingsMain.NO_DEFAULT_ACCOUNT)))
-            isDefaultAcc = true;
-        else
-            isDefaultAcc = false;
+        boolean isDefaultAcc = Session.getUser() != null &&
+                Session.getUser().equals(settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT));
 
-        wtl("setting board, topic, message id to null");
+        if (BuildConfig.DEBUG) wtl("setting board, topic, message id to null");
         boardID = null;
         topicID = null;
         messageIDForEditing = null;
 
         Element tbody;
-        Element pj = null;
+        Element pj;
         String headerTitle;
         String firstPage = null;
         String prevPage = null;
-        String currPage = "1";
-        String pageCount = "1";
+        int[] pagesInfo = new int[]{1, 1};
         String nextPage = null;
         String lastPage = null;
+        String pagePrefix = null;
 
-        wtl("setting bgcolor");
-        String bgcolor;
-        if (Theming.usingLightTheme())
-            bgcolor = "#ffffff";
-        else
-            bgcolor = "#000000";
+        if (BuildConfig.DEBUG) wtl("checking for board quick list");
+        Element boardsDropdown = null;
+        for (Element e : doc.select("ul.masthead_mygames_subnav")) {
+            if (e.previousElementSibling().ownText().equals("My Boards")) {
+                boardsDropdown = e;
+                break;
+            }
+        }
+        if (boardsDropdown != null) {
+            Elements dItems = boardsDropdown.getElementsByTag("a");
+            boardQuickListOptions = new String[dItems.size()];
+            boardQuickListLinks = new String[dItems.size()];
+            int x = 0;
+            for (Element e : dItems) {
+                boardQuickListOptions[x] = e.text();
+                boardQuickListLinks[x] = e.attr("href");
+                x++;
+            }
 
-        wtl("initial adbuilder appending");
-        adBuilder.setLength(0);
-        adBuilder.append("<html>");
-        adBuilder.append(doc.head().outerHtml());
-        adBuilder.append("<body bgcolor=\"" + bgcolor + "\">");
+            if (!boardListButton.isLongClickable()) {
+                boardListButton.setText(getResources().getString(R.string.board_jumper) +
+                        getResources().getString(R.string.board_jumper_quick_list));
 
-        wtl("appending ad elements to adbuilder");
-        for (Element e : doc.getElementsByClass("ad")) {
-            adBuilder.append(e.outerHtml());
-            e.remove();
+                boardListButton.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        showBoardQuickList();
+                        return true;
+                    }
+                });
+            }
+
+        } else if (boardListButton.isLongClickable()) {
+            boardListButton.setText(getResources().getString(R.string.board_jumper));
+            boardListButton.setLongClickable(false);
         }
 
-        wtl("appending script elements to adbuilder");
-        for (Element e : doc.getElementsByTag("script")) {
-            adBuilder.append(e.outerHtml());
-        }
-
-        wtl("appending closing tags to adbuilder");
-        adBuilder.append("</body></html>");
-
-        adBaseUrl = resUrl;
-
-        wtl("checking if webView is null, creating if so");
-        if (web == null)
-            web = new WebView(this);
-
-        wtl("enabling javascript");
-        web.getSettings().setJavaScriptEnabled(settings.getBoolean("enableJS", true));
+        contentList.setDividerHeight(Theming.convertDPtoPX(this, 1));
 
         switch (desc) {
             case BOARD_JUMPER:
@@ -1226,36 +1335,25 @@ public class AllInOneV2 extends Activity {
                     pj = doc.select("ul.paginate").first();
 
                     if (pj != null) {
-                        String pjText = pj.child(0).text();
-                        if (pjText.contains("Previous"))
-                            pjText = pj.child(1).text();
-                        //Page 1 of 5
-                        int currPageStart = 5;
-                        int ofIndex = pjText.indexOf(" of ");
-                        currPage = pjText.substring(currPageStart, ofIndex);
-                        int pageCountEnd = pjText.length();
-                        pageCount = pjText.substring(ofIndex + 4, pageCountEnd);
-                        int currPageNum = Integer.parseInt(currPage);
-                        int pageCountNum = Integer.parseInt(pageCount);
+                        pagesInfo = getPageJumperInfo(pj);
 
-                        String pmPagePrefix;
                         if (isInbox)
-                            pmPagePrefix = "/pm/";
+                            pagePrefix = "/pm/?page=";
                         else
-                            pmPagePrefix = "/pm/sent";
+                            pagePrefix = "/pm/sent?page=";
 
-                        if (currPageNum > 1) {
-                            firstPage = pmPagePrefix;
-                            prevPage = pmPagePrefix + "?page=" + (currPageNum - 2);
+                        if (pagesInfo[0] > 1) {
+                            firstPage = pagePrefix + 0;
+                            prevPage = pagePrefix + (pagesInfo[0] - 2);
                         }
-                        if (currPageNum != pageCountNum) {
-                            nextPage = pmPagePrefix + "?page=" + currPageNum;
-                            lastPage = pmPagePrefix + "?page=" + (pageCountNum - 1);
+                        if (pagesInfo[0] != pagesInfo[1]) {
+                            nextPage = pagePrefix + pagesInfo[0];
+                            lastPage = pagePrefix + (pagesInfo[1] - 1);
                         }
                     }
 
-                    updateHeader(headerTitle, firstPage, prevPage, currPage,
-                            pageCount, nextPage, lastPage, desc);
+                    updateHeader(headerTitle, firstPage, prevPage, pagesInfo[0],
+                            pagesInfo[1], nextPage, lastPage, pagePrefix, desc);
 
                     if (isDefaultAcc && isInbox)
                         NotifierService.dismissPMNotif(this);
@@ -1279,7 +1377,7 @@ public class AllInOneV2 extends Activity {
                     adapterRows.add(new HeaderRowData("There are no private messages here at this time."));
                 }
 
-                setMenuItemVisibility(postIcon, true);
+                fab.setVisibility(View.VISIBLE);
                 pMode = PostMode.NEW_PM;
 
                 if (isInbox)
@@ -1320,7 +1418,7 @@ public class AllInOneV2 extends Activity {
                 break;
 
             case AMP_LIST:
-                wtl("GRAIO hNR determined this is an amp response");
+                if (BuildConfig.DEBUG) wtl("GRAIO hNR determined this is an amp response");
 
                 tbody = doc.getElementsByTag("tbody").first();
 
@@ -1330,36 +1428,22 @@ public class AllInOneV2 extends Activity {
                     pj = doc.select("ul.paginate").get(1);
                     if (pj != null && !pj.hasClass("user")
                             && !pj.hasClass("tsort")) {
-                        int x = 0;
-                        String pjText = pj.child(x).text();
-                        while (pjText.contains("First")
-                                || pjText.contains("Previous")) {
-                            x++;
-                            pjText = pj.child(x).text();
-                        }
-                        // Page 2 of 3
-                        int currPageStart = 5;
-                        int ofIndex = pjText.indexOf(" of ");
-                        currPage = pjText.substring(currPageStart, ofIndex);
-                        int pageCountEnd = pjText.length();
-                        pageCount = pjText.substring(ofIndex + 4,
-                                pageCountEnd);
-                        int currPageNum = Integer.parseInt(currPage);
-                        int pageCountNum = Integer.parseInt(pageCount);
 
-                        String amp = buildAMPLink();
-                        if (currPageNum > 1) {
-                            firstPage = amp;
-                            prevPage = amp + "&page=" + (currPageNum - 2);
+                        pagesInfo = getPageJumperInfo(pj);
+
+                        pagePrefix = buildAMPLink() + "&page=";
+                        if (pagesInfo[0] > 1) {
+                            firstPage = pagePrefix + 0;
+                            prevPage = pagePrefix + (pagesInfo[0] - 2);
                         }
-                        if (currPageNum != pageCountNum) {
-                            nextPage = amp + "&page=" + currPageNum;
-                            lastPage = amp + "&page=" + (pageCountNum - 1);
+                        if (pagesInfo[0] != pagesInfo[1]) {
+                            nextPage = pagePrefix + pagesInfo[0];
+                            lastPage = pagePrefix + (pagesInfo[1] - 1);
                         }
                     }
                 }
-                updateHeader(headerTitle, firstPage, prevPage, currPage,
-                        pageCount, nextPage, lastPage, NetDesc.AMP_LIST);
+                updateHeader(headerTitle, firstPage, prevPage, pagesInfo[0],
+                        pagesInfo[1], nextPage, lastPage, pagePrefix, NetDesc.AMP_LIST);
 
                 if (isDefaultAcc)
                     NotifierService.dismissAMPNotif(this);
@@ -1379,7 +1463,7 @@ public class AllInOneV2 extends Activity {
                                 long newTime = newDate.getTime();
                                 long oldTime = settings.getLong("notifsLastPost", 0);
                                 if (newTime > oldTime) {
-                                    wtl("time is newer");
+                                    if (BuildConfig.DEBUG) wtl("time is newer");
                                     settings.edit().putLong("notifsLastPost", newTime).apply();
                                 }
                             } catch (Exception e) {
@@ -1389,26 +1473,34 @@ public class AllInOneV2 extends Activity {
                     }
 
                     for (Element row : tbody.children()) {
-                        // [board] [title] [msg] [last post] [your last post]
+                        // [board] [read status] [title] [msg] [last post] [your last post]
                         Elements cells = row.children();
                         String board = cells.get(0).text();
-                        Element titleLinkElem = cells.get(1).child(0);
+                        Element titleLinkElem = cells.get(2).child(0);
                         String title = titleLinkElem.text();
                         String link = titleLinkElem.attr("href");
-                        String mCount = cells.get(2).textNodes().get(0).text().trim();
-                        Element lPostLinkElem = cells.get(3).child(1);
+                        String mCount = cells.get(3).textNodes().get(0).text().trim();
+                        Element lPostLinkElem = cells.get(4).child(1);
                         String lPost = lPostLinkElem.text();
                         String lPostLink = lPostLinkElem.attr("href");
-                        String ylpLink = cells.get(4).child(1).attr("href");
+
+                        ReadStatus status = ReadStatus.UNREAD;
+                        String tImg = cells.get(1).child(0).className();
+                        if (tImg.endsWith("_read"))
+                            status = ReadStatus.READ;
+                        else if (tImg.endsWith("_unread")) {
+                            status = ReadStatus.NEW_POST;
+                            lPostLink = cells.get(1).child(0).attr("href");
+                        }
 
                         adapterRows.add(new AMPRowData(title, board, lPost, mCount, link,
-                                lPostLink, ylpLink));
+                                lPostLink, status));
                     }
                 } else {
                     adapterRows.add(new HeaderRowData("You have no active messages at this time."));
                 }
 
-                wtl("amp response block finished");
+                if (BuildConfig.DEBUG) wtl("amp response block finished");
                 break;
 
             case TRACKED_TOPICS:
@@ -1458,15 +1550,15 @@ public class AllInOneV2 extends Activity {
                 break;
 
             case BOARD:
-                wtl("GRAIO hNR determined this is a board response");
+                if (BuildConfig.DEBUG) wtl("GRAIO hNR determined this is a board response");
 
-                wtl("setting board id");
+                if (BuildConfig.DEBUG) wtl("setting board id");
                 boardID = parseBoardID(resUrl);
 
                 boolean isSplitList = false;
                 if (doc.getElementsByTag("th").first() != null) {
                     if (doc.getElementsByTag("th").first().text().equals("Board Title")) {
-                        wtl("is actually a split board list");
+                        if (BuildConfig.DEBUG) wtl("is actually a split board list");
 
                         updateHeaderNoJumper(doc.select("h1.page-title").first().text(), NetDesc.BOARD);
 
@@ -1477,18 +1569,22 @@ public class AllInOneV2 extends Activity {
                 }
 
                 if (!isSplitList) {
-                    String url = resUrl;
                     String searchQuery = EMPTY_STRING;
                     String searchPJAddition = EMPTY_STRING;
-                    if (url.contains("search=")) {
-                        wtl("board search url: " + url);
-                        searchQuery = url.substring(url.indexOf("search=") + 7);
+                    if (resUrl.contains("search=")) {
+                        if (BuildConfig.DEBUG) wtl("board search url: " + resUrl);
+                        searchQuery = resUrl.substring(resUrl.indexOf("search=") + 7);
                         int i = searchQuery.indexOf('&');
                         if (i != -1)
-                            searchQuery.replace(searchQuery.substring(i), EMPTY_STRING);
+                            searchQuery = searchQuery.replace(searchQuery.substring(i), EMPTY_STRING);
 
                         searchPJAddition = "&search=" + searchQuery;
-                        searchQuery = URLDecoder.decode(searchQuery);
+                        try {
+                            searchQuery = URLDecoder.decode(searchQuery, DocumentParser.CHARSET_NAME);
+                        } catch (UnsupportedEncodingException e) {
+                            throw new AssertionError(DocumentParser.CHARSET_NAME + " is unknown");
+                            // should never happen
+                        }
                     }
 
                     Element headerElem = doc.getElementsByClass("page-title").first();
@@ -1503,68 +1599,45 @@ public class AllInOneV2 extends Activity {
                     if (doc.select("ul.paginate").size() > 1) {
                         pj = doc.select("ul.paginate").get(1);
                         if (pj != null && !pj.hasClass("user")) {
-                            int x = 0;
-                            String pjText = pj.child(x).text();
-                            while (pjText.contains("First")
-                                    || pjText.contains("Previous")) {
-                                x++;
-                                pjText = pj.child(x).text();
+                            pagesInfo = getPageJumperInfo(pj);
+
+                            pagePrefix = "boards/" + boardID + "?page=";
+                            if (pagesInfo[0] > 1) {
+                                firstPage = pagePrefix + 0 + searchPJAddition;
+                                prevPage = pagePrefix + (pagesInfo[0] - 2) + searchPJAddition;
                             }
-                            // Page [dropdown] of 3
-                            // Page 1 of 3
-                            int ofIndex = pjText.indexOf(" of ");
-                            int currPageStart = 5;
-                            if (pj.getElementsByTag("select").isEmpty())
-                                currPage = pjText.substring(currPageStart,
-                                        ofIndex);
-                            else
-                                currPage = pj
-                                        .select("option[selected=selected]")
-                                        .first().text();
+                            if (pagesInfo[0] != pagesInfo[1]) {
+                                nextPage = pagePrefix + pagesInfo[0] + searchPJAddition;
+                                lastPage = pagePrefix + (pagesInfo[1] - 1) + searchPJAddition;
 
-                            int pageCountEnd = pjText.length();
-                            pageCount = pjText.substring(ofIndex + 4,
-                                    pageCountEnd);
-                            int currPageNum = Integer.parseInt(currPage);
-                            int pageCountNum = Integer.parseInt(pageCount);
-
-                            if (currPageNum > 1) {
-                                firstPage = "boards/" + boardID + "?page=0"
-                                        + searchPJAddition;
-                                prevPage = "boards/" + boardID + "?page="
-                                        + (currPageNum - 2)
-                                        + searchPJAddition;
-                            }
-                            if (currPageNum != pageCountNum) {
-                                nextPage = "boards/" + boardID + "?page="
-                                        + currPageNum + searchPJAddition;
-                                lastPage = "boards/" + boardID + "?page="
-                                        + (pageCountNum - 1)
-                                        + searchPJAddition;
-
-                                if (currPageNum > pageCountNum) {
+                                if (pagesInfo[0] > pagesInfo[1]) {
                                     session.forceNoHistoryAddition();
                                     session.forceSkipAIOCleanup();
                                     Crouton.showText(this, "Page count higher than page amount, going to last page...", Theming.croutonStyle());
-                                    session.get(NetDesc.BOARD, lastPage, null);
+                                    session.get(NetDesc.BOARD, lastPage);
                                     return;
                                 }
                             }
                         }
                     }
-                    updateHeader(headerTitle, firstPage, prevPage, currPage,
-                            pageCount, nextPage, lastPage, NetDesc.BOARD);
+                    updateHeader(headerTitle, firstPage, prevPage, pagesInfo[0], pagesInfo[1], nextPage,
+                            lastPage, pagePrefix + searchPJAddition, NetDesc.BOARD);
 
                     setMenuItemVisibility(searchIcon, true);
 
                     if (Session.isLoggedIn()) {
-                        String favtext = doc.getElementsByClass("user").first().text().toLowerCase(Locale.US);
-                        if (favtext.contains("add to favorites")) {
-                            setMenuItemVisibility(addFavIcon, true);
+                        Element favbtn = doc.getElementsByClass("user").first().getElementsByAttributeValueStarting("onclick", "post_click").first();
+                        if (favbtn != null) {
+                            String favtext = favbtn.text().toLowerCase();
+                            String onclick = favbtn.attr("onclick");
+                            int endPoint = onclick.lastIndexOf('\'');
+                            int startPoint = onclick.lastIndexOf('\'', endPoint - 1) + 1;
+                            favKey = onclick.substring(startPoint, endPoint);
                             fMode = FavMode.ON_BOARD;
-                        } else if (favtext.contains("remove favorite")) {
-                            setMenuItemVisibility(remFavIcon, true);
-                            fMode = FavMode.ON_BOARD;
+                            if (favtext.contains("add to favorites"))
+                                setMenuItemVisibility(addFavIcon, true);
+                            else if (favtext.contains("remove favorite"))
+                                setMenuItemVisibility(remFavIcon, true);
                         }
 
                         updatePostingRights(doc, false);
@@ -1578,14 +1651,14 @@ public class AllInOneV2 extends Activity {
                     }
 
                     Element table = doc.select("table.board").first();
-                    if (table != null) {
+                    if (table != null && !table.select("td").first().hasAttr("colspan")) {
 
                         table.getElementsByTag("col").get(2).remove();
                         table.getElementsByTag("th").get(2).remove();
                         table.getElementsByTag("col").get(0).remove();
                         table.getElementsByTag("th").get(0).remove();
 
-                        wtl("board row parsing start");
+                        if (BuildConfig.DEBUG) wtl("board row parsing start");
                         boolean skipFirst = true;
                         Set<String> hlUsers = hlDB.getHighlightedUsers().keySet();
                         for (Element row : table.getElementsByTag("tr")) {
@@ -1612,13 +1685,15 @@ public class AllInOneV2 extends Activity {
                                 else if (tImg.contains("archived"))
                                     type = TopicType.ARCHIVED;
 
-                                wtl(tImg + ", " + type.name());
+                                if (BuildConfig.DEBUG) wtl(tImg + ", " + type.name());
 
                                 ReadStatus status = ReadStatus.UNREAD;
                                 if (tImg.endsWith("_read"))
                                     status = ReadStatus.READ;
-                                else if (tImg.endsWith("_unread"))
+                                else if (tImg.endsWith("_unread")) {
                                     status = ReadStatus.NEW_POST;
+                                    lpUrl = cells.get(0).child(0).attr("href");
+                                }
 
                                 int hlColor = 0;
                                 if (hlUsers.contains(tc.toLowerCase(Locale.US))) {
@@ -1632,21 +1707,22 @@ public class AllInOneV2 extends Activity {
                             } else
                                 skipFirst = false;
                         }
-                        wtl("board row parsing end");
+                        if (BuildConfig.DEBUG) wtl("board row parsing end");
                     } else {
                         adapterRows.add(new HeaderRowData("There are no topics at this time."));
                     }
                 }
 
-                wtl("board response block finished");
+                if (BuildConfig.DEBUG) wtl("board response block finished");
                 break;
 
             case TOPIC:
+                contentList.setDividerHeight(0);
                 boardID = parseBoardID(resUrl);
                 topicID = parseTopicID(resUrl);
 
                 tlUrl = "boards/" + boardID;
-                wtl(tlUrl);
+                if (BuildConfig.DEBUG) wtl(tlUrl);
                 setMenuItemVisibility(topicListIcon, true);
 
                 Element headerElem = doc.getElementsByClass("title").first();
@@ -1664,63 +1740,43 @@ public class AllInOneV2 extends Activity {
                 if (doc.select("ul.paginate").size() > 1) {
                     pj = doc.select("ul.paginate").get(1);
                     if (pj != null && !pj.hasClass("user")) {
-                        int x = 0;
-                        String pjText = pj.child(x).text();
-                        while (pjText.contains("First")
-                                || pjText.contains("Previous")) {
-                            x++;
-                            pjText = pj.child(x).text();
+                        pagesInfo = getPageJumperInfo(pj);
+
+                        pagePrefix = "boards/" + boardID + "/" + topicID + "?page=";
+                        if (pagesInfo[0] > 1) {
+                            firstPage = pagePrefix + 0;
+                            prevPage = pagePrefix + (pagesInfo[0] - 2);
                         }
-                        // Page [dropdown] of 3
-                        // Page 1 of 3
-                        int ofIndex = pjText.indexOf(" of ");
-                        int currPageStart = 5;
-                        if (pj.getElementsByTag("select").isEmpty())
-                            currPage = pjText.substring(currPageStart,
-                                    ofIndex);
-                        else
-                            currPage = pj
-                                    .select("option[selected=selected]")
-                                    .first().text();
+                        if (pagesInfo[0] != pagesInfo[1]) {
+                            nextPage = pagePrefix + pagesInfo[0];
+                            lastPage = pagePrefix + (pagesInfo[1] - 1);
 
-                        int pageCountEnd = pjText.length();
-                        pageCount = pjText.substring(ofIndex + 4,
-                                pageCountEnd);
-                        int currPageNum = Integer.parseInt(currPage);
-                        int pageCountNum = Integer.parseInt(pageCount);
-
-                        if (currPageNum > 1) {
-                            firstPage = "boards/" + boardID + "/" + topicID;
-                            prevPage = "boards/" + boardID + "/" + topicID
-                                    + "?page=" + (currPageNum - 2);
-                        }
-                        if (currPageNum != pageCountNum) {
-                            nextPage = "boards/" + boardID + "/" + topicID
-                                    + "?page=" + currPageNum;
-                            lastPage = "boards/" + boardID + "/" + topicID
-                                    + "?page=" + (pageCountNum - 1);
-
-                            if (currPageNum > pageCountNum) {
+                            if (pagesInfo[0] > pagesInfo[1]) {
                                 session.forceNoHistoryAddition();
                                 session.forceSkipAIOCleanup();
                                 Crouton.showText(this, "Page count higher than page amount, going to last page...", Theming.croutonStyle());
-                                session.get(NetDesc.TOPIC, lastPage, null);
+                                session.get(NetDesc.TOPIC, lastPage);
                                 return;
                             }
                         }
                     }
                 }
-                updateHeader(headerTitle, firstPage, prevPage, currPage,
-                        pageCount, nextPage, lastPage, NetDesc.TOPIC);
+                updateHeader(headerTitle, firstPage, prevPage, pagesInfo[0],
+                        pagesInfo[1], nextPage, lastPage, pagePrefix, NetDesc.TOPIC);
 
                 if (Session.isLoggedIn()) {
-                    String favtext = doc.getElementsByClass("user").first().text().toLowerCase(Locale.US);
-                    if (favtext.contains("track topic")) {
-                        setMenuItemVisibility(addFavIcon, true);
+                    Element favbtn = doc.getElementsByClass("user").first().getElementsByAttributeValueStarting("onclick", "post_click").first();
+                    if (favbtn != null) {
+                        String favtext = favbtn.text().toLowerCase();
+                        String onclick = favbtn.attr("onclick");
+                        int endPoint = onclick.lastIndexOf('\'');
+                        int startPoint = onclick.lastIndexOf('\'', endPoint - 1) + 1;
+                        favKey = onclick.substring(startPoint, endPoint);
                         fMode = FavMode.ON_TOPIC;
-                    } else if (favtext.contains("stop tracking")) {
-                        setMenuItemVisibility(remFavIcon, true);
-                        fMode = FavMode.ON_TOPIC;
+                        if (favtext.contains("track topic"))
+                            setMenuItemVisibility(addFavIcon, true);
+                        else if (favtext.contains("stop tracking"))
+                            setMenuItemVisibility(remFavIcon, true);
                     }
 
                     updatePostingRights(doc, true);
@@ -1728,8 +1784,11 @@ public class AllInOneV2 extends Activity {
 
                 String goToThisPost = null;
                 if (goToUrlDefinedPost) {
-                    String url = resUrl;
-                    goToThisPost = url.substring(url.indexOf('#') + 1);
+                    if (resUrl.indexOf('#') != -1)
+                        goToThisPost = resUrl.substring(resUrl.indexOf('#'));
+                    else
+                        // goToUrlDefinedPost is true when there is no url defined post, oops
+                        goToUrlDefinedPost = false;
                 }
 
                 Elements rows = doc.select("table.board").first().getElementsByTag("tr");
@@ -1741,96 +1800,82 @@ public class AllInOneV2 extends Activity {
                 for (int x = 0; x < rowCount; x++) {
                     Element row = rows.get(x);
 
-                    String user = null;
-                    String postNum = null;
-                    String mID = null;
-                    String userTitles = EMPTY_STRING;
-                    String postTimeText = EMPTY_STRING;
-                    String postTime = EMPTY_STRING;
-                    Element msgBody = null;
+                    if (row.select("div.msg_deleted").isEmpty()) {
 
-                    if (row.hasClass("left")) {
-                        // message poster display set to left of message
+                        String user;
+                        String postNum;
+                        String postTime;
+                        String mID = null;
+                        String userTitles = EMPTY_STRING;
+                        Element msgBody;
 
-                        Elements authorData = row.getElementsByClass("author_data");
-                        user = row.getElementsByTag("b").first().text();
-                        postNum = row.getElementsByTag("a").first().attr("name");
+                        boolean canReport = false, canDelete = false, canEdit = false, canQuote = false;
 
-                        for (int i = 1; i < authorData.size(); i++) {
-                            Element e = authorData.get(i);
-                            String t = e.text();
-                            if (t.startsWith("("))
-                                userTitles += " " + t;
+                        Element infoBox = row.select("div.msg_infobox").first();
+                        user = infoBox.getElementsByTag("b").first().text();
 
-                            else if (e.hasClass("tag"))
-                                userTitles += " (tagged as " + t + ")";
+                        Element userInfo = infoBox.select("span.user_info").first();
+                        if (userInfo != null)
+                            userTitles = " " + userInfo.text();
 
-                            else if (t.startsWith("Posted"))
-                                postTime = t;
+                        Element userTag = infoBox.select("span.tag").first();
+                        if (userTag != null)
+                            userTitles += " (" + userTag.text() + ")";
 
-                            else if (t.equals("message detail"))
-                                mID = parseMessageID(e.child(0).attr("href"));
+                        postTime = infoBox.select("span.post_time").first().text();
+
+                        Element number = infoBox.select("span.message_num").first();
+                        postNum = number.text();
+                        if (!number.children().isEmpty()) {
+                            mID = parseMessageID(number.child(0).attr("href"));
                         }
 
-                        msgBody = row.child(1).child(0);
-                    } else {
-                        // message poster display set to above message
+                        msgBody = row.select("div.msg_body").first();
 
-                        List<TextNode> textNodes = row.child(0).child(0).textNodes();
-                        Elements elements = row.child(0).child(0).children();
-
-                        int textNodesSize = textNodes.size();
-                        for (int y = 0; y < textNodesSize; y++) {
-                            String text = textNodes.get(y).text();
-                            if (text.startsWith("Posted"))
-                                postTimeText = text;
-                            else if (text.contains("(")) {
-                                userTitles += " " + text.substring(text.indexOf('('), text.lastIndexOf(')') + 1);
-                            }
-                        }
-
-                        user = elements.get(0).text();
-                        int anchorCount = row.getElementsByTag("a").size();
-                        postNum = row.getElementsByTag("a").get((anchorCount > 1 ? 1 : 0)).attr("name");
-                        int elementsSize = elements.size();
-                        for (int y = 0; y < elementsSize; y++) {
-                            Element e = elements.get(y);
-                            if (e.hasClass("tag"))
-                                userTitles += " (tagged as " + e.text() + ")";
-
-                            else if (e.text().equals("message detail"))
-                                mID = parseMessageID(e.attr("href"));
-                        }
-                        //Posted 11/15/2012 11:20:27&nbsp;AM | (edited) [if archived]
-                        if (postTimeText.contains("(edited)"))
+                        Element msgBelow = row.select("div.msg_below").first();
+                        Element edited = msgBelow.select("span.edited").first();
+                        if (edited != null)
                             userTitles += " (edited)";
 
-                        int endPoint = postTimeText.indexOf('|') - 1;
-                        if (endPoint < 0)
-                            endPoint = postTimeText.length();
-                        postTime = postTimeText.substring(0, endPoint);
+                        Element belowOptions = msgBelow.select("span.options").first();
+                        if (belowOptions != null) {
+                            String options = belowOptions.text();
+                            if (options.contains("report"))
+                                canReport = true;
+                            if (options.contains("delete"))
+                                canDelete = true;
+                            if (options.contains("edit"))
+                                canEdit = true;
+                            if (options.contains("quote"))
+                                canQuote = true;
+                        }
 
-                        x++;
-                        msgBody = rows.get(x).child(0).child(0);
+                        int hlColor = 0;
+                        if (hlUsers.contains(user.toLowerCase(Locale.US))) {
+                            HighlightedUser hUser = hlDB
+                                    .getHighlightedUsers().get(
+                                            user.toLowerCase(Locale.US));
+                            hlColor = hUser.getColor();
+                            userTitles += " (" + hUser.getLabel() + ")";
+                        }
+
+                        if (goToUrlDefinedPost) {
+                            if (postNum.equals(goToThisPost))
+                                goToThisIndex = msgIndex;
+                        }
+
+                        if (BuildConfig.DEBUG) wtl("creating messagerowdata object");
+                        adapterRows.add(new MessageRowData(user, userTitles, postNum,
+                                postTime, msgBody, boardID, topicID, mID, hlColor, canReport, canDelete, canEdit, canQuote));
+                    } else {
+                        String postNum = row.select("span.message_num").first().text();
+                        if (goToUrlDefinedPost) {
+                            if (postNum.equals(goToThisPost))
+                                goToThisIndex = msgIndex;
+                        }
+
+                        adapterRows.add(new MessageRowData(true, postNum));
                     }
-
-                    int hlColor = 0;
-                    if (hlUsers.contains(user.toLowerCase(Locale.US))) {
-                        HighlightedUser hUser = hlDB
-                                .getHighlightedUsers().get(
-                                        user.toLowerCase(Locale.US));
-                        hlColor = hUser.getColor();
-                        userTitles += " (" + hUser.getLabel() + ")";
-                    }
-
-                    if (goToUrlDefinedPost) {
-                        if (postNum.equals(goToThisPost))
-                            goToThisIndex = msgIndex;
-                    }
-
-                    wtl("creating messagerowdata object");
-                    adapterRows.add(new MessageRowData(user, userTitles, postNum,
-                            postTime, msgBody, boardID, topicID, mID, hlColor));
 
                     msgIndex++;
                 }
@@ -1842,41 +1887,76 @@ public class AllInOneV2 extends Activity {
 
                 boardID = parseBoardID(resUrl);
                 topicID = parseTopicID(resUrl);
+                String mID = parseMessageID(resUrl);
 
-                Elements msgDRows = doc.getElementsByTag("tr");
-
-                String user = msgDRows.first().child(0).child(0).text();
-
+                Elements msgRows = doc.select("td.msg");
                 adapterRows.add(new HeaderRowData("Current Version"));
 
-                Element currRow, body;
                 MessageRowData msg;
-                String postTime;
-                String mID = parseMessageID(resUrl);
-                for (int x = 0; x < msgDRows.size(); x++) {
+
+                int msgRowCount = msgRows.size();
+                for (int x = 0; x < msgRowCount; x++) {
                     if (x == 1)
                         adapterRows.add(new HeaderRowData("Previous Version(s)"));
-                    else {
-                        currRow = msgDRows.get(x);
 
-                        if (currRow.child(0).textNodes().size() > 1)
-                            postTime = currRow.child(0).textNodes().get(1).text();
-                        else
-                            postTime = currRow.child(0).textNodes().get(0).text();
+                    Element currRow = msgRows.get(x);
+                    Element msgInfobox = currRow.select("div.msg_infobox").first();
+                    Element msgBody = currRow.select("div.msg_body").first();
 
-                        body = currRow.child(1);
-                        msg = new MessageRowData(user, null, null, postTime, body, boardID, topicID, mID, 0);
-                        msg.disableTopClick();
-                        adapterRows.add(msg);
-                    }
+                    String user = msgInfobox.getElementsByTag("b").first().text();
+                    String postTime = msgInfobox.select("span.post_time").first().text();
+
+                    msg = new MessageRowData(user, EMPTY_STRING, "#" + (msgRowCount - x), postTime,
+                            msgBody, boardID, topicID, mID, 0, false, false, false, false);
+                    msg.disableTopClick();
+                    adapterRows.add(msg);
                 }
+
+//                Elements msgDRows = doc.getElementsByTag("tr");
+//
+//                String user = msgDRows.first().child(0).child(0).text();
+//
+//                adapterRows.add(new HeaderRowData("Current Version"));
+//
+//                Element currRow, body;
+//                MessageRowData msg;
+//                String postTime;
+//                String mID = parseMessageID(resUrl);
+//                for (int x = 0; x < msgDRows.size(); x++) {
+//                    if (x == 1)
+//                        adapterRows.add(new HeaderRowData("Previous Version(s)"));
+//                    else {
+//                        currRow = msgDRows.get(x);
+//
+//                        if (currRow.child(0).textNodes().size() > 1)
+//                            postTime = currRow.child(0).textNodes().get(1).text();
+//                        else
+//                            postTime = currRow.child(0).textNodes().get(0).text();
+//
+//                        body = currRow.child(1);
+//                        msg = new MessageRowData(user, null, null, postTime, body, boardID, topicID, mID, 0, "");
+//                        msg.disableTopClick();
+//                        adapterRows.add(msg);
+//                    }
+//                }
 
                 break;
 
+            case TAG_USER:
+                if (BuildConfig.DEBUG) wtl("starting check for user tag success");
+                Element error = doc.getElementsByClass("error").first();
+                if (error == null) {
+                    Crouton.showText(this, "User tag updated successfully.", Theming.croutonStyle());
+                } else {
+                    AlertDialog.Builder b = new AlertDialog.Builder(this);
+                    b.setTitle("There was an error tagging the user...");
+                    b.setMessage("Error message from GameFAQs:\n\n" + error.text());
+                    b.setPositiveButton("OK", null);
+                    b.show();
+                }
             case USER_DETAIL:
-                wtl("starting user detail processing");
+                if (BuildConfig.DEBUG) wtl("starting user detail processing");
                 tbody = doc.select("table.board").first().getElementsByTag("tbody").first();
-                Log.d("udtb", tbody.outerHtml());
                 String name = null;
                 String ID = null;
                 String level = null;
@@ -1885,16 +1965,18 @@ public class AllInOneV2 extends Activity {
                 String sig = null;
                 String karma = null;
                 String AMP = null;
+                String tagKey = null;
+                String tagText = null;
                 for (Element row : tbody.children()) {
                     String label = row.child(0).text().toLowerCase(Locale.US);
-                    wtl("user detail row label: " + label);
+                    if (BuildConfig.DEBUG) wtl("user detail row label: " + label);
                     if (label.equals("user name"))
                         name = row.child(1).text();
                     else if (label.equals("user id"))
                         ID = row.child(1).text();
                     else if (label.equals("board user level")) {
                         level = row.child(1).html();
-                        wtl("set level: " + level);
+                        if (BuildConfig.DEBUG) wtl("set level: " + level);
                     } else if (label.equals("account created"))
                         creation = row.child(1).text();
                     else if (label.equals("last visit"))
@@ -1907,52 +1989,62 @@ public class AllInOneV2 extends Activity {
                         AMP = row.child(1).text();
                 }
 
+                if (Session.isLoggedIn()) {
+                    Element button = doc.select("input.btn").first();
+                    if (button != null && button.attr("value").startsWith("Send a PM to"))
+                        setMenuItemVisibility(sendUserPMIcon, true);
+
+                    setMenuItemVisibility(tagUserIcon, true);
+                    tagKey = doc.getElementsByAttributeValue("name", "key").attr("value");
+                    tagText = doc.getElementsByAttributeValue("name", "tag_text").attr("value");
+                    if (tagText == null) tagText = "";
+                }
+
                 updateHeaderNoJumper(name + "'s Details", NetDesc.USER_DETAIL);
 
-                adapterRows.add(new UserDetailRowData(name, ID, level, creation, lVisit, sig, karma, AMP));
+                userDetailData = new UserDetailRowData(name, ID, level, creation, lVisit, sig,
+                        karma, AMP, tagKey, tagText, resUrl);
+                adapterRows.add(userDetailData);
                 break;
 
             case GAME_SEARCH:
-                wtl("GRAIO hNR determined this is a game search response");
+                if (BuildConfig.DEBUG) wtl("GRAIO hNR determined this is a game search response");
 
-                String url = resUrl;
-                wtl("game search url: " + url);
+                if (BuildConfig.DEBUG) wtl("game search url: " + resUrl);
 
-                String searchQuery = url.substring(url.indexOf("game=") + 5);
+                String searchQuery = resUrl.substring(resUrl.indexOf("game=") + 5);
                 int i = searchQuery.indexOf("&");
                 if (i != -1)
                     searchQuery = searchQuery.replace(searchQuery.substring(i), EMPTY_STRING);
 
-                int pageIndex = url.indexOf("page=");
+                int pageIndex = resUrl.indexOf("page=");
                 if (pageIndex != -1) {
-                    currPage = url.substring(pageIndex + 5);
+                    String currPage = resUrl.substring(pageIndex + 5);
                     i = currPage.indexOf("&");
                     if (i != -1)
                         currPage = currPage.replace(currPage.substring(i), EMPTY_STRING);
+                    pagesInfo[0] = Integer.parseInt(currPage) + 1;
                 } else {
-                    currPage = "0";
+                    pagesInfo[0] = 1;
                 }
 
-                int currPageNum = Integer.parseInt(currPage);
-
-                Element nextPageElem = null;
-
-                if (!doc.getElementsContainingOwnText("Next Page").isEmpty())
-                    nextPageElem = doc.getElementsContainingOwnText("Next Page").first();
-
-                pageCount = "???";
-                if (nextPageElem != null) {
-                    nextPage = "/search/index.html?game=" + searchQuery + "&page=" + (currPageNum + 1);
-                }
-                if (currPageNum > 0) {
-                    prevPage = "/search/index.html?game=" + searchQuery + "&page=" + (currPageNum - 1);
+                if (pagesInfo[0] > 1) {
                     firstPage = "/search/index.html?game=" + searchQuery + "&page=0";
+                    prevPage = "/search/index.html?game=" + searchQuery + "&page=" + (pagesInfo[0] - 2);
+                }
+                if (!doc.getElementsByClass("icon-angle-right").isEmpty()) {
+                    nextPage = "/search/index.html?game=" + searchQuery + "&page=" + (pagesInfo[0]);
                 }
 
-                headerTitle = "Searching games: " + URLDecoder.decode(searchQuery) + EMPTY_STRING;
+                try {
+                    headerTitle = "Searching games: " + URLDecoder.decode(searchQuery, DocumentParser.CHARSET_NAME) + EMPTY_STRING;
+                } catch (UnsupportedEncodingException e) {
+                    throw new AssertionError(DocumentParser.CHARSET_NAME + " is unknown");
+                    // should never happen
+                }
 
-                updateHeader(headerTitle, firstPage, prevPage, Integer.toString(currPageNum + 1),
-                        pageCount, nextPage, lastPage, NetDesc.GAME_SEARCH);
+                updateHeader(headerTitle, firstPage, prevPage, pagesInfo[0],
+                        -1, nextPage, lastPage, pagePrefix, NetDesc.GAME_SEARCH);
 
                 setMenuItemVisibility(searchIcon, true);
 
@@ -1969,7 +2061,7 @@ public class AllInOneV2 extends Activity {
 
                         String prevPlatform = EMPTY_STRING;
 
-                        wtl("board row parsing start");
+                        if (BuildConfig.DEBUG) wtl("board row parsing start");
                         for (Element row : table.getElementsByTag("tr")) {
                             if (row.parent().tagName().equals("tbody")) {
                                 Elements cells = row.getElementsByTag("td");
@@ -1986,29 +2078,20 @@ public class AllInOneV2 extends Activity {
                             }
                         }
 
-                        wtl("board row parsing end");
+                        if (BuildConfig.DEBUG) wtl("board row parsing end");
                     }
                 } else {
                     adapterRows.add(new HeaderRowData("No results."));
                 }
 
-                wtl("game search response block finished");
+                if (BuildConfig.DEBUG) wtl("game search response block finished");
                 break;
 
             default:
-                wtl("GRAIO hNR determined response type is unhandled");
-                title.setText("Page unhandled - " + resUrl);
+                if (BuildConfig.DEBUG) wtl("GRAIO hNR determined response type is unhandled");
+                getSupportActionBar().setTitle("Page unhandled - " + resUrl);
                 break;
         }
-
-        try {
-            ((ViewGroup) web.getParent()).removeView(web);
-        } catch (Exception e1) {
-        }
-
-        adapterRows.add(new AdmobRowData());
-        adapterRows.add(new AdGFAQsRowData(web));
-        contentList.post(postProcessRunnable);
 
         Element pmInboxLink = doc.select("div.masthead_user").first().select("a[href=/pm/]").first();
         String pmButtonLabel = getResources().getString(R.string.pm_inbox);
@@ -2064,13 +2147,9 @@ public class AllInOneV2 extends Activity {
 
         ((Button) findViewById(R.id.dwrTrackedTopics)).setText(ttButtonLabel);
 
-        ptrLayout.setEnabled(settings.getBoolean("enablePTR", false));
+        swipeRefreshLayout.setEnabled(settings.getBoolean("enablePTR", false));
 
-        if (!adapterSet) {
-            contentList.setAdapter(viewAdapter);
-            adapterSet = true;
-        } else
-            viewAdapter.notifyDataSetChanged();
+        viewAdapter.notifyDataSetChanged();
 
         if (consumeGoToUrlDefinedPost() && !Session.applySavedScroll) {
             contentList.post(new Runnable() {
@@ -2098,13 +2177,13 @@ public class AllInOneV2 extends Activity {
             });
         }
 
-        if (ptrLayout.isRefreshing())
-            ptrLayout.setRefreshComplete();
+        if (swipeRefreshLayout.isRefreshing())
+            swipeRefreshLayout.setRefreshing(false);
 
-        wtl("GRAIO hNR finishing");
+        if (BuildConfig.DEBUG) wtl("GRAIO hNR finishing");
     }
 
-    /**
+    /*
      * ********************************
      * END HNR
      * ********************************
@@ -2124,12 +2203,10 @@ public class AllInOneV2 extends Activity {
                     Element titleCell = cells.get(0);
 
                     String lvlReq = EMPTY_STRING;
-                    String title = EMPTY_STRING;
-
                     if (!titleCell.textNodes().isEmpty())
                         lvlReq = titleCell.textNodes().get(0).toString();
 
-                    title = titleCell.child(0).text() + lvlReq;
+                    String title = titleCell.child(0).text() + lvlReq;
 
                     String boardDesc = null;
                     if (titleCell.children().size() > 2)
@@ -2180,32 +2257,61 @@ public class AllInOneV2 extends Activity {
         }
     }
 
+    private int[] getPageJumperInfo(Element pj) {
+        int[] i = new int[]{1, 1};
+        if (pj != null && !pj.hasClass("user") && !pj.hasClass("tsort")) {
+            String currPage, pageCount;
+
+            int x = 0;
+            String pjText = pj.child(x).text();
+            while (pjText.contains("First") || pjText.contains("Previous")) {
+                x++;
+                pjText = pj.child(x).text();
+            }
+            // Page [dropdown] of 4
+            // Page 1 of 3
+            if (pj.getElementsByTag("select").isEmpty()) {
+                int ofIndex = pjText.indexOf(" of ");
+                currPage = pjText.substring(5, ofIndex); // "Page ".length = 5
+
+                int pageCountEnd = pjText.length();
+                pageCount = pjText.substring(ofIndex + 4, pageCountEnd);
+            } else {
+                currPage = pj.select("option[selected=selected]").first().text();
+                pageCount = pj.getElementsByTag("option").last().text();
+            }
+
+            i[0] = Integer.parseInt(currPage);
+            i[1] = Integer.parseInt(pageCount);
+        }
+        return i;
+    }
+
     private void updatePostingRights(Document pRes, boolean onTopic) {
         if (onTopic) {
             if (pRes.getElementsByClass("user").first().text().contains("Post New Message")) {
-                setMenuItemVisibility(postIcon, true);
+                fab.setVisibility(View.VISIBLE);
                 pMode = PostMode.ON_TOPIC;
             }
         } else {
             if (pRes.getElementsByClass("user").first().text().contains("New Topic")) {
-                setMenuItemVisibility(postIcon, true);
+                fab.setVisibility(View.VISIBLE);
                 pMode = PostMode.ON_BOARD;
             }
         }
     }
 
     public void postExecuteCleanup(NetDesc desc) {
-        wtl("GRAIO dPostEC --NEL, desc: " + (desc == null ? "null" : desc.name()));
+        if (BuildConfig.DEBUG)
+            wtl("GRAIO dPostEC --NEL, desc: " + (desc == null ? "null" : desc.name()));
 
         if (needToSetNavList) {
             setNavList(Session.isLoggedIn());
-            needToSetNavList = false;
         }
 
-        setAllMenuItemsEnabled(true);
-        ptrLayout.setRefreshing(false);
+        ptrCleanup();
         if (desc == NetDesc.BOARD || desc == NetDesc.TOPIC)
-            postCleanup();
+            postInterfaceCleanup();
 
         if (isRoR)
             isRoR = false;
@@ -2226,17 +2332,23 @@ public class AllInOneV2 extends Activity {
         return temp;
     }
 
-    private void updateHeader(String titleIn, String firstPageIn, String prevPageIn, String currPage,
-                              String pageCount, String nextPageIn, String lastPageIn, NetDesc desc) {
+    private void updateHeader(String titleIn, String firstPageIn, String prevPageIn, int currPage,
+                              int pageCount, String nextPageIn, String lastPageIn,
+                              String jumperPageIn, NetDesc desc) {
 
-        title.setText(titleIn);
+        if (pageCount == 1) {
+            updateHeaderNoJumper(titleIn, desc);
+            return;
+        }
 
-        if (currPage.equals("-1")) {
+        getSupportActionBar().setTitle(titleIn);
+
+        if (currPage == -1) {
             pageJumperWrapper.setVisibility(View.GONE);
+            pageLabel.setText("~ 1 / 1 ~");
         } else {
             pageJumperWrapper.setVisibility(View.VISIBLE);
             pageJumperDesc = desc;
-            pageLabel.setText(currPage + " / " + pageCount);
 
             if (firstPageIn != null) {
                 firstPageUrl = firstPageIn;
@@ -2265,11 +2377,44 @@ public class AllInOneV2 extends Activity {
             } else {
                 lastPage.setEnabled(false);
             }
+
+            if (pageCount != -1) {
+                jumperPageUrl = jumperPageIn;
+
+                final String[] items = new String[pageCount];
+                for (int x = 0; x < pageCount; x++) {
+                    items[x] = String.valueOf(x + 1);
+                }
+
+                if (jumperDialogBuilder == null) {
+                    jumperDialogBuilder = new AlertDialog.Builder(this);
+                    jumperDialogBuilder.setTitle("Select a page...");
+                }
+
+                jumperDialogBuilder.setItems(items, new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int x = jumperPageUrl.indexOf("?page=") + 6;
+                        if (x == 5) // -1 + 6 = 5, when "?page=" is not found
+                            x = jumperPageUrl.indexOf("&page=") + 6;
+
+                        String go = jumperPageUrl.substring(0, x) + which + jumperPageUrl.substring(x);
+                        if (BuildConfig.DEBUG) wtl("jumper dialog url: " + go);
+                        session.get(pageJumperDesc, go);
+                    }
+                });
+
+                pageLabel.setEnabled(true);
+                pageLabel.setText("~ " + currPage + " / " + pageCount + " ~");
+            } else {
+                pageLabel.setEnabled(false);
+                pageLabel.setText(currPage + " / ???");
+            }
         }
     }
 
     private void updateHeaderNoJumper(String title, NetDesc desc) {
-        updateHeader(title, null, null, "-1", "-1", null, null, desc);
+        updateHeader(title, null, null, -1, -1, null, null, null, desc);
     }
 
     private MessageRowView clickedMsg;
@@ -2289,12 +2434,13 @@ public class AllInOneV2 extends Activity {
     }
 
     private void quoteSetup(String user, String msg) {
-        wtl("quoteSetup fired");
-        String quotedMsg = "<cite>" + user + " posted...</cite>\n" +
-                "<quote>" + msg + "</quote>\n\n";
+        if (BuildConfig.DEBUG) wtl("quoteSetup fired");
+        String quotedMsg = "<cite>" + user + " posted...</cite>\n" + "<quote>" + msg + "</quote>\n\n";
 
         int start = Math.max(postBody.getSelectionStart(), 0);
         int end = Math.max(postBody.getSelectionEnd(), 0);
+
+        assert postBody.getText() != null : "postBody.getText() is null";
         postBody.getText().replace(Math.min(start, end), Math.max(start, end), quotedMsg);
 
         if (postWrapper.getVisibility() != View.VISIBLE)
@@ -2302,18 +2448,20 @@ public class AllInOneV2 extends Activity {
         else
             postBody.setSelection(Math.min(start, end) + quotedMsg.length());
 
-        wtl("quoteSetup finishing");
+        if (BuildConfig.DEBUG) wtl("quoteSetup finishing");
     }
 
     private void postSetup(boolean postingOnTopic) {
-        ((ScrollView) findViewById(R.id.aioHTMLScroller)).scrollTo(0, 0);
+        findViewById(R.id.aioHTMLScroller).scrollTo(0, 0);
         pageJumperWrapper.setVisibility(View.GONE);
-        postButton.setEnabled(true);
-        cancelButton.setEnabled(true);
+        fab.setVisibility(View.GONE);
+        postSubmitButton.setEnabled(true);
+        postCancelButton.setEnabled(true);
 
         if (postingOnTopic) {
             titleWrapper.setVisibility(View.GONE);
             postBody.requestFocus();
+            assert postBody.getText() != null : "postBody.getText() is null";
             postBody.setSelection(postBody.getText().length());
         } else {
             titleWrapper.setVisibility(View.VISIBLE);
@@ -2332,20 +2480,20 @@ public class AllInOneV2 extends Activity {
     }
 
     public void postCancel(View view) {
-        wtl("postCancel fired --NEL");
+        if (BuildConfig.DEBUG) wtl("postCancel fired --NEL");
         if (settings.getBoolean("confirmPostCancel", false)) {
             AlertDialog.Builder b = new AlertDialog.Builder(this);
             b.setMessage("Cancel this post?");
             b.setPositiveButton("Yes", new OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    postCleanup();
+                    postInterfaceCleanup();
                 }
             });
             b.setNegativeButton("No", null);
-            b.create().show();
+            b.show();
         } else
-            postCleanup();
+            postInterfaceCleanup();
     }
 
     public void postPollOptions(View view) {
@@ -2353,7 +2501,7 @@ public class AllInOneV2 extends Activity {
     }
 
     public void postDo(View view) {
-        wtl("postDo fired");
+        if (BuildConfig.DEBUG) wtl("postDo fired");
         if (settings.getBoolean("confirmPostSubmit", false)) {
             AlertDialog.Builder b = new AlertDialog.Builder(this);
             b.setMessage("Submit this post?");
@@ -2364,48 +2512,51 @@ public class AllInOneV2 extends Activity {
                 }
             });
             b.setNegativeButton("No", null);
-            b.create().show();
+            b.show();
         } else
             postSubmit();
     }
 
     private void postSubmit() {
+        assert postBody.getText() != null : "postBody.getText() is null";
+        assert postTitle.getText() != null : "postTitle.getText() is null";
+
         if (titleWrapper.getVisibility() == View.VISIBLE) {
-            wtl("posting on a board");
+            if (BuildConfig.DEBUG) wtl("posting on a board");
             // posting on a board
-            String path = Session.ROOT + "/boards/post.php?board=" + boardID;
+            String path = Session.ROOT + "/boards/post?board=" + boardID;
             int i = path.indexOf('-');
             path = path.substring(0, i);
-            wtl("post path: " + path);
+            if (BuildConfig.DEBUG) wtl("post path: " + path);
             savedPostBody = postBody.getText().toString();
-            wtl("saved post body: " + savedPostBody);
+            if (BuildConfig.DEBUG) wtl("saved post body: " + savedPostBody);
             savedPostTitle = postTitle.getText().toString();
-            wtl("saved post title: " + savedPostTitle);
-            wtl("sending topic");
-            postButton.setEnabled(false);
+            if (BuildConfig.DEBUG) wtl("saved post title: " + savedPostTitle);
+            if (BuildConfig.DEBUG) wtl("sending topic");
+            postSubmitButton.setEnabled(false);
             pollButton.setEnabled(false);
-            cancelButton.setEnabled(false);
+            postCancelButton.setEnabled(false);
             if (pollUse)
                 path += "&poll=1";
 
-            session.get(NetDesc.POSTTPC_S1, path, null);
+            session.get(NetDesc.POSTTPC_S1, path);
         } else {
             // posting on a topic
-            wtl("posting on a topic");
-            String path = Session.ROOT + "/boards/post.php?board=" + boardID + "&topic=" + topicID;
+            if (BuildConfig.DEBUG) wtl("posting on a topic");
+            String path = Session.ROOT + "/boards/post?board=" + boardID + "&topic=" + topicID;
             if (messageIDForEditing != null)
                 path += "&message=" + messageIDForEditing;
 
-            wtl("post path: " + path);
+            if (BuildConfig.DEBUG) wtl("post path: " + path);
             savedPostBody = postBody.getText().toString();
-            wtl("saved post body: " + savedPostBody);
-            wtl("sending post");
-            postButton.setEnabled(false);
-            cancelButton.setEnabled(false);
+            if (BuildConfig.DEBUG) wtl("saved post body: " + savedPostBody);
+            if (BuildConfig.DEBUG) wtl("sending post");
+            postSubmitButton.setEnabled(false);
+            postCancelButton.setEnabled(false);
             if (messageIDForEditing != null)
-                session.get(NetDesc.EDIT_MSG, path, null);
+                session.get(NetDesc.EDIT_MSG, path);
             else
-                session.get(NetDesc.POSTMSG_S1, path, null);
+                session.get(NetDesc.POSTMSG_S1, path);
         }
     }
 
@@ -2453,12 +2604,15 @@ public class AllInOneV2 extends Activity {
 
         b.setTitle("Poll Options");
         LayoutInflater inflater = getLayoutInflater();
+
+        @SuppressLint("InflateParams")
         final View v = inflater.inflate(R.layout.polloptions, null);
         b.setView(v);
         b.setCancelable(false);
 
         final EditText[] options = new EditText[10];
 
+        assert v != null : "v is null";
         final CheckBox poUse = (CheckBox) v.findViewById(R.id.poUse);
         final EditText poTitle = (EditText) v.findViewById(R.id.poTitle);
         options[0] = (EditText) v.findViewById(R.id.po1);
@@ -2491,13 +2645,15 @@ public class AllInOneV2 extends Activity {
 
         b.setPositiveButton("Save", new OnClickListener() {
             @Override
+            @SuppressWarnings("ConstantConditions")
             public void onClick(DialogInterface dialog, int which) {
                 pollUse = poUse.isChecked();
                 pollTitle = poTitle.getText().toString();
                 pollMinLevel = minLevel.getSelectedItemPosition();
 
-                for (int x = 0; x < 10; x++)
-                    pollOptions[x] = (options[x].getText().toString());
+                for (int x = 0; x < 10; x++) {
+                    pollOptions[x] = options[x].getText().toString();
+                }
             }
         });
 
@@ -2532,12 +2688,43 @@ public class AllInOneV2 extends Activity {
         AlertDialog.Builder reportMsgBuilder = new AlertDialog.Builder(this);
         reportMsgBuilder.setTitle("Report Message");
 
-        final String[] reportOptions = getResources().getStringArray(R.array.msgReportReasons);
+        final String[] reportOptions;
+        if (clickedMsg.getPostNum().equals("1"))
+            reportOptions = getResources().getStringArray(R.array.msgReportReasonsWithOffTopic);
+        else
+            reportOptions = getResources().getStringArray(R.array.msgReportReasons);
+
         reportMsgBuilder.setItems(reportOptions, new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 reportCode = getResources().getStringArray(R.array.msgReportCodes)[which];
-                session.get(NetDesc.MARKMSG_S1, clickedMsg.getMessageDetailLink(), null);
+
+                /*
+                <form action="http://www.gamefaqs.com/features/board_mark/pick.php" method="post">
+                <input type="hidden" name="b" value="848">
+                <input type="hidden" name="t" value="71881473">
+                <input type="hidden" name="m" value="821951056">
+                <input type="hidden" name="r" value="8">
+                <input type="hidden" name="rt" value="Testing">
+                <input type="hidden" name="i" value="0">
+                <input type="hidden" name="key" value="[session key]">
+                <input type="submit">
+                </form>
+                 */
+
+                HashMap<String, List<String>> markData = new HashMap<>();
+                markData.put("b", Collections.singletonList(boardID));
+                markData.put("t", Collections.singletonList(topicID));
+                markData.put("m", Collections.singletonList(clickedMsg.getMessageID()));
+                markData.put("r", Collections.singletonList(reportCode));
+                markData.put("rt", Collections.singletonList(EMPTY_STRING));
+                markData.put("i", Collections.singletonList("0"));
+                markData.put("key", Collections.singletonList(session.getSessionKey()));
+
+                session.post(NetDesc.MARKMSG, "/features/board_mark/pick.php", markData);
+
+
+//                session.get(NetDesc.MARKMSG_S1, clickedMsg.getMessageDetailLink());
             }
         });
 
@@ -2556,31 +2743,36 @@ public class AllInOneV2 extends Activity {
         AlertDialog.Builder msgActionBuilder = new AlertDialog.Builder(this);
 
         LayoutInflater inflater = getLayoutInflater();
+
+        @SuppressLint("InflateParams")
         final View v = inflater.inflate(R.layout.msgaction, null);
+
         msgActionBuilder.setView(v);
 
         msgActionBuilder.setTitle("Message Actions");
 
         ArrayList<String> listBuilder = new ArrayList<String>();
 
-        if (clickedMsg.isEdited() && clickedMsg.getMessageID() != null)
-            listBuilder.add("View Previous Version(s)");
-
-        if (Session.isLoggedIn()) {
-            if (postIcon != null && postIcon.isVisible())
-                listBuilder.add("Quote");
-            if (Session.getUser().trim().toLowerCase(Locale.US).equals(clickedMsg.getUser().toLowerCase(Locale.US))) {
-                if (Session.userCanEditMsgs() && clickedMsg.isEditable())
-                    listBuilder.add("Edit");
-                if (Session.userCanDeleteClose() && clickedMsg.getMessageID() != null)
-                    listBuilder.add("Delete");
-            } else if (Session.userCanMarkMsgs())
-                listBuilder.add("Report");
+        if (clickedMsg.getMessageID() != null) {
+            if (clickedMsg.isEdited())
+                listBuilder.add("View Previous Version(s)");
+            else
+                listBuilder.add("Message Detail");
         }
+
+        if (clickedMsg.canQuote())
+            listBuilder.add("Quote");
+        if (clickedMsg.canEdit())
+            listBuilder.add("Edit");
+        if (clickedMsg.canDelete())
+            listBuilder.add("Delete");
+        if (clickedMsg.canReport())
+            listBuilder.add("Report");
 
         listBuilder.add("Highlight User");
         listBuilder.add("User Details");
 
+        assert v != null : "v is null";
         ListView lv = (ListView) v.findViewById(R.id.maList);
         final LinearLayout wrapper = (LinearLayout) v.findViewById(R.id.maWrapper);
 
@@ -2592,22 +2784,35 @@ public class AllInOneV2 extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selected = (String) parent.getItemAtPosition(position);
-                if (selected.equals("View Previous Version(s)")) {
-                    session.get(NetDesc.MESSAGE_DETAIL, clickedMsg.getMessageDetailLink(), null);
+                assert selected != null : "selected is null";
+                if (selected.equals("View Previous Version(s)") || selected.equals("Message Detail")) {
+                    session.get(NetDesc.MESSAGE_DETAIL, clickedMsg.getMessageDetailLink());
+
                 } else if (selected.equals("Quote")) {
                     String msg = (quoteSelection != null ? quoteSelection : clickedMsg.getMessageForQuoting());
                     quoteSetup(clickedMsg.getUser(), msg);
+
                 } else if (selected.equals("Edit")) {
                     editPostSetup(clickedMsg.getMessageForEditing(), clickedMsg.getMessageID());
+
                 } else if (selected.equals("Delete")) {
-                    session.get(NetDesc.DLTMSG_S1, clickedMsg.getMessageDetailLink(), null);
+                    HashMap<String, List<String>> delData = new HashMap<>();
+                    delData.put("action", Collections.singletonList("delete"));
+                    delData.put("key", Collections.singletonList(session.getSessionKey()));
+
+                    session.post(NetDesc.DELETEMSG,
+                            clickedMsg.getMessageDetailLink().replace("/boards/", "/boardaction/"), delData);
+
                 } else if (selected.equals("Report")) {
                     showDialog(REPORT_MESSAGE_DIALOG);
+
                 } else if (selected.equals("Highlight User")) {
                     HighlightedUser user = hlDB.getHighlightedUsers().get(clickedMsg.getUser().toLowerCase(Locale.US));
                     HighlightListDBHelper.showHighlightUserDialog(AllInOneV2.this, user, clickedMsg.getUser(), null);
+
                 } else if (selected.equals("User Details")) {
-                    session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink(), null);
+                    session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink());
+
                 } else {
                     Crouton.showText(AllInOneV2.this, "not recognized: " + selected, Theming.croutonStyle());
                 }
@@ -2641,11 +2846,15 @@ public class AllInOneV2 extends Activity {
     private Dialog createSendPMDialog() {
         AlertDialog.Builder b = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
+
+        @SuppressLint("InflateParams")
         final View v = inflater.inflate(R.layout.sendpm, null);
+
         b.setView(v);
         b.setTitle("Send Private Message");
         b.setCancelable(false);
 
+        assert v != null : "v is null";
         final EditText to = (EditText) v.findViewById(R.id.spTo);
         final EditText subject = (EditText) v.findViewById(R.id.spSubject);
         final EditText message = (EditText) v.findViewById(R.id.spMessage);
@@ -2661,6 +2870,7 @@ public class AllInOneV2 extends Activity {
         final AlertDialog d = b.create();
         d.setOnShowListener(new OnShowListener() {
             @Override
+            @SuppressWarnings("ConstantConditions")
             public void onShow(DialogInterface dialog) {
                 d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -2678,7 +2888,7 @@ public class AllInOneV2 extends Activity {
 
                                     pmSending.setVisibility(View.VISIBLE);
 
-                                    session.get(NetDesc.SEND_PM_S1, "/pm/new", null);
+                                    session.get(NetDesc.SEND_PM_S1, "/pm/new");
 
                                 } else
                                     Crouton.showText(AllInOneV2.this,
@@ -2692,7 +2902,7 @@ public class AllInOneV2 extends Activity {
                                         (ViewGroup) to.getParent());
                         } else
                             Crouton.showText(AllInOneV2.this,
-                                    "The recepient can't be empty.",
+                                    "The recipient can't be empty.",
                                     Theming.croutonStyle(),
                                     (ViewGroup) to.getParent());
                     }
@@ -2718,8 +2928,7 @@ public class AllInOneV2 extends Activity {
 
         final String[] usernames = new String[keys.length + 1];
         usernames[0] = LOG_OUT_LABEL;
-        for (int i = 1; i < usernames.length; i++)
-            usernames[i] = keys[i - 1].toString();
+        System.arraycopy(keys, 0, usernames, 1, keys.length);
 
         final String currUser = Session.getUser();
         int selected = 0;
@@ -2732,19 +2941,19 @@ public class AllInOneV2 extends Activity {
         accountChanger.setTitle("Pick an Account");
         accountChanger.setSingleChoiceItems(usernames, selected, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                String selUser = usernames[item].toString();
+                String selUser = usernames[item];
                 if (selUser.equals(LOG_OUT_LABEL) && currUser != null)
                     session = new Session(AllInOneV2.this);
 
                 else {
                     if (!selUser.equals(currUser) && !selUser.equals(LOG_OUT_LABEL))
-                        if (session.hasNetworkConnection()) {
+                        if (session.hasNetworkConnection())
                             session = new Session(AllInOneV2.this,
                                     selUser,
                                     AccountManager.getPassword(AllInOneV2.this, selUser),
                                     session.getLastPath(),
                                     session.getLastDesc());
-                        } else
+                        else
                             noNetworkConnection();
                 }
 
@@ -2763,31 +2972,30 @@ public class AllInOneV2 extends Activity {
 
 
         final AlertDialog d = accountChanger.create();
-        d.setOnShowListener(new OnShowListener() {
-
-            @Override
-            public void onShow(DialogInterface dialog) {
-                Button posButton = d.getButton(DialogInterface.BUTTON_POSITIVE);
-                Button negButton = d.getButton(DialogInterface.BUTTON_NEGATIVE);
-
-                LayoutParams posParams = (LayoutParams) posButton.getLayoutParams();
-                posParams.weight = 1;
-                posParams.width = LayoutParams.MATCH_PARENT;
-
-                LayoutParams negParams = (LayoutParams) negButton.getLayoutParams();
-                negParams.weight = 1;
-                negParams.width = LayoutParams.MATCH_PARENT;
-
-                posButton.setLayoutParams(posParams);
-                negButton.setLayoutParams(negParams);
-            }
-        });
         d.setOnDismissListener(new DialogInterface.OnDismissListener() {
             public void onDismiss(DialogInterface dialog) {
                 removeDialog(CHANGE_LOGGED_IN_DIALOG);
             }
         });
         return d;
+    }
+
+    private Button boardListButton;
+    private String[] boardQuickListOptions;
+    private String[] boardQuickListLinks;
+
+    private void showBoardQuickList() {
+        AlertDialog.Builder b = new AlertDialog.Builder(this);
+        b.setTitle("My Boards");
+        b.setNegativeButton("Cancel", null);
+        b.setItems(boardQuickListOptions, new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                session.get(NetDesc.BOARD, boardQuickListLinks[which]);
+            }
+        });
+        drawerLayout.closeDrawers();
+        b.show();
     }
 
     private String replyTo, replySubject;
@@ -2809,9 +3017,14 @@ public class AllInOneV2 extends Activity {
         else
             savedMessage = EMPTY_STRING;
 
-        savedTo = URLDecoder.decode(savedTo);
-        savedSubject = URLDecoder.decode(savedSubject);
-        savedMessage = URLDecoder.decode(savedMessage);
+        try {
+            savedTo = URLDecoder.decode(savedTo, DocumentParser.CHARSET_NAME);
+            savedSubject = URLDecoder.decode(savedSubject, DocumentParser.CHARSET_NAME);
+            savedMessage = URLDecoder.decode(savedMessage, DocumentParser.CHARSET_NAME);
+        } catch (UnsupportedEncodingException e) {
+            throw new AssertionError(DocumentParser.CHARSET_NAME + " is unknown");
+            // should never happen
+        }
 
         showDialog(SEND_PM_DIALOG);
     }
@@ -2831,16 +3044,16 @@ public class AllInOneV2 extends Activity {
 
 
     public void refreshClicked(View view) {
-        wtl("refreshClicked fired --NEL");
+        if (BuildConfig.DEBUG) wtl("refreshClicked fired --NEL");
         if (view != null)
             view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 
         if (session.getLastPath() == null) {
             if (Session.isLoggedIn()) {
-                wtl("starting new session from refreshClicked, logged in");
+                if (BuildConfig.DEBUG) wtl("starting new session from refreshClicked, logged in");
                 session = new Session(this, Session.getUser(), AccountManager.getPassword(this, Session.getUser()));
             } else {
-                wtl("starting new session from refreshClicked, no login");
+                if (BuildConfig.DEBUG) wtl("starting new session from refreshClicked, no login");
                 session = new Session(this);
             }
         } else
@@ -2861,14 +3074,7 @@ public class AllInOneV2 extends Activity {
         if (sig.length() == 0)
             sig = defaultSig;
 
-        try {
-            sig = sig.replace("*grver*", this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName);
-        } catch (NameNotFoundException e) {
-            sig = sig.replace("*grver*", EMPTY_STRING);
-            e.printStackTrace();
-        }
-
-        return sig;
+        return sig.replace("*grver*", BuildConfig.VERSION_NAME);
     }
 
     private static long lastNano = 0;
@@ -2898,21 +3104,26 @@ public class AllInOneV2 extends Activity {
     }
 
     public void tryCaught(String url, String desc, Throwable e, String source) {
-        ACRAConfiguration config = ACRA.getConfig();
-        config.setResToastText(R.string.bug_toast_text);
+        if (!BuildConfig.DEBUG) {
+            ACRAConfiguration config = ACRA.getConfig();
+            config.setResToastText(R.string.bug_toast_text);
 
-        ACRA.getErrorReporter().putCustomData("URL", url);
-        ACRA.getErrorReporter().putCustomData("NetDesc", desc);
-        ACRA.getErrorReporter().putCustomData("Page Source", StringEscapeUtils.escapeJava(source));
-        ACRA.getErrorReporter().putCustomData("Last Attempted Path", session.getLastAttemptedPath());
-        ACRA.getErrorReporter().putCustomData("Last Attempted Desc", session.getLastAttemptedDesc().toString());
-        ACRA.getErrorReporter().handleException(e);
+            ACRA.getErrorReporter().putCustomData("URL", url);
+            ACRA.getErrorReporter().putCustomData("NetDesc", desc);
+            ACRA.getErrorReporter().putCustomData("Page Source", StringEscapeUtils.escapeJava(source));
+            ACRA.getErrorReporter().putCustomData("Last Attempted Path", session.getLastAttemptedPath());
+            ACRA.getErrorReporter().putCustomData("Last Attempted Desc", session.getLastAttemptedDesc().toString());
+            ACRA.getErrorReporter().handleException(e);
 
-        config.setResToastText(R.string.crash_toast_text);
+            config.setResToastText(R.string.crash_toast_text);
+        }
+        else {
+            Log.e("tryCaught", "", e);
+        }
     }
 
     private String parseBoardID(String url) {
-        wtl("parseBoardID fired");
+        if (BuildConfig.DEBUG) wtl("parseBoardID fired");
         // board example: http://www.gamefaqs.com/boards/400-current-events
         String boardUrl = url.substring(Session.ROOT.length() + 8);
 
@@ -2933,12 +3144,12 @@ public class AllInOneV2 extends Activity {
             boardUrl = boardUrl.replace(replacer, EMPTY_STRING);
         }
 
-        wtl("boardID: " + boardUrl);
+        if (BuildConfig.DEBUG) wtl("boardID: " + boardUrl);
         return boardUrl;
     }
 
     private String parseTopicID(String url) {
-        wtl("parseTopicID fired");
+        if (BuildConfig.DEBUG) wtl("parseTopicID fired");
         // topic example: http://www.gamefaqs.com/boards/400-current-events/64300205
         String topicUrl = url.substring(url.indexOf('/', Session.ROOT.length() + 8) + 1);
         int i = topicUrl.indexOf('/');
@@ -2956,14 +3167,14 @@ public class AllInOneV2 extends Activity {
             String replacer = topicUrl.substring(i);
             topicUrl = topicUrl.replace(replacer, EMPTY_STRING);
         }
-        wtl("topicID: " + topicUrl);
+        if (BuildConfig.DEBUG) wtl("topicID: " + topicUrl);
         return topicUrl;
     }
 
     private String parseMessageID(String url) {
-        wtl("parseMessageID fired");
+        if (BuildConfig.DEBUG) wtl("parseMessageID fired");
         String msgID = url.substring(url.lastIndexOf('/') + 1);
-        wtl("messageIDForEditing: " + msgID);
+        if (BuildConfig.DEBUG) wtl("messageIDForEditing: " + msgID);
         return msgID;
     }
 
@@ -2972,10 +3183,10 @@ public class AllInOneV2 extends Activity {
     public void onBackPressed() {
         if (searchIcon != null && searchIcon.isActionViewExpanded()) {
             searchIcon.collapseActionView();
-        } else if (drawer.isMenuVisible()) {
-            drawer.closeMenu(true);
+        } else if (drawerLayout.isDrawerOpen(Gravity.LEFT)) {
+            drawerLayout.closeDrawers();
         } else if (postWrapper.getVisibility() == View.VISIBLE) {
-            postCleanup();
+            postCancel(postCancelButton);
         } else {
             goBack();
         }
@@ -2983,26 +3194,16 @@ public class AllInOneV2 extends Activity {
 
     private void goBack() {
         if (session != null && session.canGoBack()) {
-            wtl("back pressed, history exists, going back");
+            if (BuildConfig.DEBUG) wtl("back pressed, history exists, going back");
             session.goBack(false);
         } else {
-            wtl("back pressed, no history, exiting app");
-            session = null;
-            this.finish();
+            if (BuildConfig.DEBUG) wtl("back pressed, no history, exiting app");
+            finish();
         }
     }
 
     public static String buildAMPLink() {
         return "/boards/myposts.php?lp=" + settings.getString("ampSortOption", "-1");
-    }
-
-    private String autoCensor(String text) {
-        StringBuilder builder = new StringBuilder(text);
-        String textLower = text.toLowerCase(Locale.US);
-        for (String word : bannedList)
-            censorWord(builder, textLower, word.toLowerCase(Locale.US));
-
-        return builder.toString();
     }
 
     private void censorWord(StringBuilder builder, String textLower, String word) {
@@ -3020,6 +3221,7 @@ public class AllInOneV2 extends Activity {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void htmlButtonClicked(View view) {
         String open = ((TextView) view).getText().toString();
         String close = "</" + open.substring(1);
@@ -3035,86 +3237,4 @@ public class AllInOneV2 extends Activity {
 
         postBody.getText().replace(Math.min(start, end), Math.max(start, end), insert, 0, insert.length());
     }
-
-    private boolean marqueeSpeedSet = false;
-    private void setMarqueeSpeed(TextView tv, float speed, boolean speedIsMultiplier) {
-        if (!marqueeSpeedSet) {
-            try {
-                Field f = tv.getClass().getDeclaredField("mMarquee");
-                f.setAccessible(true);
-                Object marquee = f.get(tv);
-                if (marquee != null) {
-                    Field mf = marquee.getClass().getDeclaredField("mScrollUnit");
-                    mf.setAccessible(true);
-                    float newSpeed = speed;
-                    float curSpeed = mf.getFloat(marquee);
-                    if (speedIsMultiplier) {
-                        newSpeed = curSpeed * speed;
-                    }
-                    mf.setFloat(marquee, newSpeed);
-                    wtl("marquee speed set to " + newSpeed + ", from " + curSpeed);
-                    marqueeSpeedSet = true;
-                }
-            } catch (Exception e) {
-                // ignore, not implemented in current API level
-            }
-        }
-    }
-
-    private static final String[] bannedList = {
-            "***hole",
-            "68.13.103",
-            "Arse Hole",
-            "Arse-hole",
-            "Ass hole",
-            "Ass****",
-            "Ass-hole",
-            "Asshole",
-            "‹^›",
-            "Bitch",
-            "Bukkake",
-            "Cheat Code Central",
-            "CheatCC",
-            "Clit",
-            "Cunt",
-            "Dave Allison",
-            "David Allison",
-            "Dildo",
-            "Echo J",
-            "Fag",
-            "Format C:",
-            "FreeFlatScreens.com",
-            "FreeIPods.com",
-            "Fuck",
-            "GFNostalgia",
-            "Gook",
-            "Jism",
-            "Jizm",
-            "Jizz",
-            "KingOfChaos",
-            "Lesbo",
-            "LUE2.tk",
-            "Mod Files",
-            "Mod Pics",
-            "ModFiles",
-            "ModPics",
-            "Nigga",
-            "Nigger",
-            "Offiz.bei.t-online.de",
-            "OutPimp",
-            "OutWar.com",
-            "PornStarGuru",
-            "Pussies",
-            "Pussy",
-            "RavenBlack.net",
-            "Shit",
-            "Shiz",
-            "SuprNova",
-            "Tits",
-            "Titties",
-            "Titty",
-            "UrbanDictionary",
-            "Wigga",
-            "Wigger",
-            "YouDontKnowWhoIAm"};
 }

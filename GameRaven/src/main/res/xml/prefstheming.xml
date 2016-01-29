@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="themingCategory"
+        android:orderingFromXml="true"
+        android:persistent="false"
+        android:title="Theming Settings">
+
+        <Preference
+            android:key="manageHighlightedUsers"
+            android:persistent="false"
+            android:summary="Add, edit, and remove highlighted users."
+            android:title="Manage Highlighted Users" />
+
+        <Preference
+            android:defaultValue="Light Blue"
+            android:key="gfTheme"
+            android:persistent="true"
+            android:summary="Select the theme for the app. (Requires restart)"
+            android:title="Theme" />
+
+        <com.robobunny.SeekBarPreference xmlns:robobunny="http://robobunny.com"
+            android:defaultValue="100"
+            android:key="textScale"
+            android:max="120"
+            android:summary="Adjust the scale of various text elements. (Refresh to take complete effect)"
+            android:title="Text Scale"
+            robobunny:min="80"
+            robobunny:unitsLeft=""
+            robobunny:unitsRight="%" />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -1,8 +1,8 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,7 +53,6 @@ public class TopicRowView extends BaseRowView {
     @Override
     protected void init(Context context) {
         myType = RowType.TOPIC;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.topicview, this, true);
 
         title = (TextView) findViewById(R.id.tvTitle);
@@ -79,32 +78,24 @@ public class TopicRowView extends BaseRowView {
             @Override
             public void onClick(View v) {
                 AllInOneV2.get().enableGoToUrlDefinedPost();
-                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getLastPostUrl(), null);
+                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getLastPostUrl());
             }
         });
 
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getUrl(), null);
+                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getUrl());
             }
         });
-
-        retheme(Theming.accentColor(), Theming.textScale());
     }
 
     @Override
-    protected void retheme(int color, float scale) {
-        title.setTextSize(PX, titleTextSize * scale);
-        tc.setTextSize(PX, tcTextSize * scale);
-        msgLP.setTextSize(PX, msgLPTextSize * scale);
-        lpLink.setTextSize(PX, lpLinkTextSize * scale);
-
-        findViewById(R.id.tvSep).setBackgroundColor(color);
-        findViewById(R.id.tvLPSep).setBackgroundColor(color);
-
-        setBackgroundDrawable(getSelector());
-        lpLink.setBackgroundDrawable(getSelector());
+    protected void retheme() {
+        title.setTextSize(PX, titleTextSize * myScale);
+        tc.setTextSize(PX, tcTextSize * myScale);
+        msgLP.setTextSize(PX, msgLPTextSize * myScale);
+        lpLink.setTextSize(PX, lpLinkTextSize * myScale);
     }
 
     @Override
@@ -120,11 +111,10 @@ public class TopicRowView extends BaseRowView {
 
         int hlColor = myData.getHLColor();
         if (myData.getStatus() == ReadStatus.READ) {
-            int readColor = Theming.usingLightTheme() ? Color.LTGRAY : Color.DKGRAY;
-            tc.setTextColor(readColor);
-            title.setTextColor(readColor);
-            msgLP.setTextColor(readColor);
-            lpLink.setTextColor(readColor);
+            tc.setTextColor(Theming.colorReadTopic());
+            title.setTextColor(Theming.colorReadTopic());
+            msgLP.setTextColor(Theming.colorReadTopic());
+            lpLink.setTextColor(Theming.colorReadTopic());
         } else if (hlColor != 0) {
             tc.setTextColor(hlColor);
             title.setTextColor(hlColor);
@@ -142,12 +132,16 @@ public class TopicRowView extends BaseRowView {
             title.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
             msgLP.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
             lpLink.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
+
+            lpLink.setText(R.string.last_unread_post);
         } else {
 
             tc.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
             title.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
             msgLP.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
             lpLink.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+
+            lpLink.setText(R.string.last_post);
         }
 
         switch (myData.getType()) {
@@ -155,23 +149,22 @@ public class TopicRowView extends BaseRowView {
                 typeIndicator.setVisibility(View.GONE);
                 break;
             case POLL:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_poll_light : R.drawable.ic_poll);
+                setTypeIndicator(Theming.topicStatusIcons()[0]);
                 break;
             case LOCKED:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_locked_light : R.drawable.ic_locked);
+                setTypeIndicator(Theming.topicStatusIcons()[1]);
                 break;
             case ARCHIVED:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_archived_light : R.drawable.ic_archived);
+                setTypeIndicator(Theming.topicStatusIcons()[2]);
                 break;
             case PINNED:
-                setTypeIndicator(Theming.usingLightTheme() ? R.drawable.ic_pinned_light : R.drawable.ic_pinned);
+                setTypeIndicator(Theming.topicStatusIcons()[3]);
                 break;
         }
     }
 
-    private void setTypeIndicator(int resId) {
-        typeIndicator.setImageResource(resId);
+    private void setTypeIndicator(Drawable icon) {
+        typeIndicator.setImageDrawable(icon);
         typeIndicator.setVisibility(View.VISIBLE);
     }
-
 }

@@ -1,26 +1,16 @@
 package com.ioabsoftware.gameraven.views.rowdata;
 
-import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.TextPaint;
-import android.text.format.DateUtils;
-import android.text.format.Time;
-import android.text.style.BackgroundColorSpan;
 import android.text.style.CharacterStyle;
-import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
-import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 import android.text.util.Linkify;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -29,35 +19,31 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
+import com.ioabsoftware.gameraven.BuildConfig;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
-import com.ioabsoftware.gameraven.util.RichTextUtils;
+import com.ioabsoftware.gameraven.util.MyLinkifier;
 import com.ioabsoftware.gameraven.util.Theming;
-import com.ioabsoftware.gameraven.util.UrlSpanConverter;
 import com.ioabsoftware.gameraven.views.BaseRowData;
-import com.ioabsoftware.gameraven.views.ClickableLinksTextView;
 import com.ioabsoftware.gameraven.views.GRQuoteSpan;
 import com.ioabsoftware.gameraven.views.RowType;
-
-import net.margaritov.preference.colorpicker.ColorPickerPreference;
+import com.ioabsoftware.gameraven.views.SpoilerBackgroundSpan;
+import com.ioabsoftware.gameraven.views.SpoilerClickSpan;
+import com.ioabsoftware.gameraven.views.rowview.HeaderRowView;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.List;
 
 public class MessageRowData extends BaseRowData {
 
     private String username, userTitles, postNum, postTime, messageID, boardID, topicID;
-
-    private Element messageElem, messageElemNoPoll;
+    private final String unprocessedMessageText;
 
     private LinearLayout poll = null;
 
@@ -66,6 +52,24 @@ public class MessageRowData extends BaseRowData {
     private int hlColor;
 
     private boolean topClickable = true;
+    private boolean isDeleted = false;
+
+    private boolean canReport = false, canDelete = false, canEdit = false, canQuote = false;
+
+    @Override
+    public String toString() {
+        return "username: " + username +
+                "\nuserTitles: " + userTitles +
+                "\nhlColor: " + hlColor +
+                "\npostNum: " + postNum +
+                "\npostTime: " + postTime +
+                "\nmessageID: " + messageID +
+                "\nboardID: " + boardID +
+                "\ntopicID: " + topicID +
+                "\nhasPoll: " + hasPoll() +
+                "\nunprocessedMessageText: " + unprocessedMessageText +
+                "\nspannedMessage: " + spannedMessage;
+    }
 
     public void disableTopClick() {
         topClickable = false;
@@ -73,6 +77,10 @@ public class MessageRowData extends BaseRowData {
 
     public boolean topClickable() {
         return topClickable;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
     }
 
     public String getUser() {
@@ -111,12 +119,24 @@ public class MessageRowData extends BaseRowData {
         return boardID;
     }
 
-    public Element getMessage() {
-        return messageElem;
+    public boolean canReport() {
+        return canReport;
     }
 
-    public Element getMessageNoPoll() {
-        return messageElemNoPoll;
+    public boolean canDelete() {
+        return canDelete;
+    }
+
+    public boolean canEdit() {
+        return canEdit;
+    }
+
+    public boolean canQuote() {
+        return canQuote;
+    }
+
+    public String getUnprocessedMessageText() {
+        return unprocessedMessageText;
     }
 
     public LinearLayout getPoll() {
@@ -153,49 +173,58 @@ public class MessageRowData extends BaseRowData {
         return RowType.MESSAGE;
     }
 
-    public MessageRowData(String userIn, String userTitlesIn, String postNumIn, String postTimeIn,
-                          Element messageIn, String BID, String TID, String MID, int hlColorIn) {
+    public MessageRowData(boolean isDeletedIn, String postNumIn) {
+        isDeleted = isDeletedIn;
+        postNum = postNumIn;
+        unprocessedMessageText = "";
+    }
 
-        if (aio == null)
+    public MessageRowData(String userIn, String userTitlesIn, String postNumIn, String postTimeIn,
+                          Element messageIn, String BID, String TID, String MID, int hlColorIn,
+                          boolean cReport, boolean cDelete, boolean cEdit, boolean cQuote) {
+
+        if (aio == null || aio != AllInOneV2.get())
             aio = AllInOneV2.get();
 
-        aio.wtl("setting values");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("setting values");
         username = userIn;
         userTitles = userTitlesIn;
         postNum = postNumIn;
         postTime = postTimeIn.replace('\u00A0', ' ');
-        messageElem = messageIn;
         boardID = BID;
         topicID = TID;
         messageID = MID;
         hlColor = hlColorIn;
 
-        aio.wtl("checking for poll");
-        if (messageElem.getElementsByClass("board_poll").isEmpty())
-            messageElemNoPoll = messageElem.clone();
-        else {
-            aio.wtl("there is a poll");
+        canReport = cReport;
+        canDelete = cDelete;
+        canEdit = cEdit;
+        canQuote = cQuote;
 
-            messageElemNoPoll = messageElem.clone();
-            messageElemNoPoll.getElementsByClass("board_poll").first().remove();
+        if (!Session.isLoggedIn())
+            messageIn.select("div.message_mpu").remove();
 
-            Element pollElem = messageElem.getElementsByClass("board_poll").first();
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("checking for poll");
+        if (!messageIn.getElementsByClass("board_poll").isEmpty()) {
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("there is a poll");
 
-            poll = new LinearLayout(AllInOneV2.get());
+            Element pollElem = messageIn.getElementsByClass("board_poll").first();
+
+            poll = new LinearLayout(aio);
             poll.setOrientation(LinearLayout.VERTICAL);
 
-            LinearLayout pollInnerWrapper = new LinearLayout(AllInOneV2.get());
+            LinearLayout pollInnerWrapper = new LinearLayout(aio);
             pollInnerWrapper.setPadding(15, 0, 15, 15);
             pollInnerWrapper.setOrientation(LinearLayout.VERTICAL);
 
-            ShapeDrawable s = new ShapeDrawable();
-            Paint p = s.getPaint();
-            p.setStyle(Paint.Style.STROKE);
-            p.setStrokeWidth(10);
-            p.setColor(Color.parseColor(ColorPickerPreference.convertToARGB(Theming.accentColor())));
-
+            Drawable s = aio.getResources().getDrawable(R.drawable.item_background);
+            s.setColorFilter(Theming.colorPrimary(), PorterDuff.Mode.SRC_ATOP);
             poll.setBackgroundDrawable(s);
-            poll.addView(new HeaderView(AllInOneV2.get(), pollElem.getElementsByClass("poll_head").first().text()));
+
+            HeaderRowView h = new HeaderRowView(aio);
+            h.showView(new HeaderRowData(pollElem.getElementsByClass("poll_head").first().text()));
+            poll.addView(h);
+
             poll.addView(pollInnerWrapper);
 
             if (pollElem.getElementsByTag("form").isEmpty()) {
@@ -204,12 +233,12 @@ public class MessageRowData extends BaseRowData {
                 TextView t;
                 for (Element e : pollElem.select("div.row")) {
                     Elements c = e.children();
-                    t = new TextView(AllInOneV2.get());
+                    t = new TextView(aio);
                     String text = c.get(0).text() + ": " + c.get(1).text();
                     if (!c.get(0).children().isEmpty()) {
                         SpannableStringBuilder votedFor = new SpannableStringBuilder(text);
                         votedFor.setSpan(new StyleSpan(Typeface.BOLD), 0, text.length(), 0);
-                        votedFor.setSpan(new ForegroundColorSpan(Theming.accentColor()), 0, text.length(), 0);
+                        votedFor.setSpan(new ForegroundColorSpan(Theming.colorPrimary()), 0, text.length(), 0);
                         t.setText(votedFor);
                     } else
                         t.setText(text);
@@ -219,7 +248,7 @@ public class MessageRowData extends BaseRowData {
 
                 String foot = pollElem.getElementsByClass("poll_foot_left").text();
                 if (foot.length() > 0) {
-                    t = new TextView(AllInOneV2.get());
+                    t = new TextView(aio);
                     t.setText(foot);
                     pollInnerWrapper.addView(t);
                 }
@@ -229,64 +258,197 @@ public class MessageRowData extends BaseRowData {
                 final String action = "/boards/" + boardID + "/" + topicID;
                 String key = pollElem.getElementsByAttributeValue("name", "key").attr("value");
 
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, Theming.convertDPtoPX(aio, 1));
                 int x = 0;
                 for (Element e : pollElem.getElementsByAttributeValue("name", "poll_vote")) {
+                    if (x > 0) {
+                        View v = new View(aio);
+                        v.setLayoutParams(lp);
+                        v.setBackgroundColor(Theming.colorPrimary());
+                        pollInnerWrapper.addView(v);
+                    }
                     x++;
-                    Button b = new Button(AllInOneV2.get());
+                    Button b = new Button(aio);
+                    b.setBackgroundDrawable(Theming.selectableItemBackground());
                     b.setText(e.nextElementSibling().text());
-                    final HashMap<String, String> data = new HashMap<String, String>();
-                    data.put("key", key);
-                    data.put("poll_vote", Integer.toString(x));
-                    data.put("submit", "Vote");
+                    final HashMap<String, List<String>> data = new HashMap<String, List<String>>();
+                    data.put("key", Arrays.asList(key));
+                    data.put("poll_vote", Arrays.asList(Integer.toString(x)));
+                    data.put("submit", Arrays.asList("Vote"));
+
                     b.setOnClickListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            AllInOneV2.get().getSession().post(NetDesc.TOPIC, action, data);
+                            aio.getSession().post(NetDesc.TOPIC, action, data);
                         }
                     });
                     pollInnerWrapper.addView(b);
                 }
 
-                Button b = new Button(AllInOneV2.get());
+                View v = new View(aio);
+                v.setLayoutParams(lp);
+                v.setBackgroundColor(Theming.colorPrimary());
+                pollInnerWrapper.addView(v);
+
+                Button b = new Button(aio);
+                b.setBackgroundDrawable(Theming.selectableItemBackground());
                 b.setText("View Results");
                 b.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        AllInOneV2.get().getSession().get(NetDesc.TOPIC, action + "?results=1", null);
+                        aio.getSession().get(NetDesc.TOPIC, action + "?results=1");
                     }
                 });
                 pollInnerWrapper.addView(b);
             }
+
+            // remove the poll element so it doesn't get put in unprocessedMessageText
+            messageIn.getElementsByClass("board_poll").first().remove();
         }
 
-        aio.wtl("creating ssb");
+        unprocessedMessageText = messageIn.html();
+
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("creating ssb");
         SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false, true));
 
-        aio.wtl("adding <b> spans");
-        addSpan(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
-        aio.wtl("adding <i> spans");
-        addSpan(ssb, "<i>", "</i>", new StyleSpan(Typeface.ITALIC));
-        aio.wtl("adding <code> spans");
-        addSpan(ssb, "<code>", "</code>", new TypefaceSpan("monospace"));
-        aio.wtl("adding <cite> spans");
-        addSpan(ssb, "<cite>", "</cite>", new UnderlineSpan(), new StyleSpan(Typeface.ITALIC));
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding bold spans");
+        addGenericSpans(ssb, "<b>", "</b>", new StyleSpan(Typeface.BOLD));
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding italic spans");
+        addGenericSpans(ssb, "<i>", "</i>", new StyleSpan(Typeface.ITALIC));
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding code spans");
+        addGenericSpans(ssb, "<code>", "</code>", new TypefaceSpan("monospace"));
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding cite spans");
+        addGenericSpans(ssb, "<cite>", "</cite>", new UnderlineSpan(), new StyleSpan(Typeface.ITALIC));
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding quote spans");
+        addQuoteSpans(ssb);
 
-        aio.wtl("adding <quote> spans");
-        // quotes don't use CharacterStyles, so do it manually
-        while (ssb.toString().contains("<blockquote>")) {
-            int start = ssb.toString().indexOf("<blockquote>");
-            ssb.replace(start, start + "<blockquote>".length(), "\n");
-            start++;
+        ssb.append('\n');
+
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("linkifying");
+        MyLinkifier.addLinks(ssb, Linkify.WEB_URLS);
+
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("adding spoiler spans");
+        addSpoilerSpans(ssb);
+
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("replacing &lt; with <");
+        while (ssb.toString().contains("&lt;")) {
+            int start = ssb.toString().indexOf("&lt;");
+            ssb.replace(start, start + "&lt;".length(), "<");
+        }
+
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("replacing &gt; with >");
+        while (ssb.toString().contains("&gt;")) {
+            int start = ssb.toString().indexOf("&gt;");
+            ssb.replace(start, start + "&gt;".length(), ">");
+        }
+
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("setting spannedMessage");
+        spannedMessage = ssb;
+    }
+
+    public boolean isEdited() {
+        return userTitles != null && userTitles.contains("(edited)");
+    }
+
+    private static void addGenericSpans(SpannableStringBuilder ssb, String tag, String endTag, CharacterStyle... cs) {
+        // initialize array
+        int[] startEnd = spanStartAndEnd(ssb.toString(), tag, endTag);
+
+        // while start and end points are found...
+        while (!Arrays.equals(startEnd, noStartEndBase)) {
+            // remove the start tag
+            ssb.delete(startEnd[0], startEnd[0] + tag.length());
+
+            // adjust end point for removed start tag
+            startEnd[1] -= tag.length();
+
+            // remove end tag
+            ssb.delete(startEnd[1], startEnd[1] + endTag.length());
+
+            // apply styles
+            for (CharacterStyle c : cs)
+                ssb.setSpan(CharacterStyle.wrap(c), startEnd[0], startEnd[1], 0);
+
+            // get new start and end points
+            startEnd = spanStartAndEnd(ssb.toString(), tag, endTag);
+        }
+    }
+
+    public static final String QUOTE_START = "<blockquote>";
+    public static final String QUOTE_END = "</blockquote>";
+
+    private static void addQuoteSpans(SpannableStringBuilder ssb) {
+        // initialize array
+        int[] startEnd = spanStartAndEnd(ssb.toString(), QUOTE_START, QUOTE_END);
+
+        // while start and end points are found...
+        while (!Arrays.equals(startEnd, noStartEndBase)) {
+            // replace the start tag
+            ssb.replace(startEnd[0], startEnd[0] + QUOTE_START.length(), "\n");
+            startEnd[0]++;
+
+            // adjust end point for replaced start tag
+            startEnd[1] -= QUOTE_START.length() - 1;
+
+            // remove end tag
+            ssb.replace(startEnd[1], startEnd[1] + QUOTE_END.length(), "\n");
+
+            // apply style
+            ssb.setSpan(new GRQuoteSpan(), startEnd[0], startEnd[1], 0);
+
+            // get new start and end points
+            startEnd = spanStartAndEnd(ssb.toString(), QUOTE_START, QUOTE_END);
+        }
+    }
+
+    public static final String SPOILER_START = "<s>";
+    public static final String SPOILER_END = "</s>";
+
+    private void addSpoilerSpans(SpannableStringBuilder ssb) {
+        // initialize array
+        int[] startEnd = spanStartAndEnd(ssb.toString(), SPOILER_START, SPOILER_END);
+
+        // while start and end points are found...
+        while (!Arrays.equals(startEnd, noStartEndBase)) {
+            // remove the start tag
+            ssb.delete(startEnd[0], startEnd[0] + SPOILER_START.length());
+
+            // adjust end point for removed start tag
+            startEnd[1] -= SPOILER_START.length();
+
+            // remove end tag
+            ssb.delete(startEnd[1], startEnd[1] + SPOILER_END.length());
+
+            // apply styles
+            SpoilerBackgroundSpan spoiler = new SpoilerBackgroundSpan(Theming.colorHiddenSpoiler(), Theming.colorRevealedSpoiler());
+            SpoilerClickSpan spoilerClick = new SpoilerClickSpan(spoiler);
+            ssb.setSpan(spoiler, startEnd[0], startEnd[1], 0);
+            ssb.setSpan(spoilerClick, startEnd[0], startEnd[1], 0);
+
+            // get new start and end points
+            startEnd = spanStartAndEnd(ssb.toString(), SPOILER_START, SPOILER_END);
+        }
+    }
+
+    private static int[] noStartEndBase = {-1, -1};
+
+    private static int[] spanStartAndEnd(String text, String openTag, String closeTag) {
+        int start = -1;
+        int end = -1;
+        if (text.contains(openTag) && text.contains(closeTag)) {
+            start = text.indexOf(openTag);
+            end = text.indexOf(closeTag);
 
             int stackCount = 1;
             int closer;
             int opener;
             int innerStartPoint = start;
             do {
-                opener = ssb.toString().indexOf("<blockquote>", innerStartPoint + 1);
-                closer = ssb.toString().indexOf("</blockquote>", innerStartPoint + 1);
+                opener = text.indexOf(openTag, innerStartPoint + 1);
+                closer = text.indexOf(closeTag, innerStartPoint + 1);
                 if (opener != -1 && opener < closer) {
-                    // found a nested quote
+                    // found a nested tag
                     stackCount++;
                     innerStartPoint = opener;
                 } else {
@@ -296,114 +458,11 @@ public class MessageRowData extends BaseRowData {
                 }
             } while (stackCount > 0);
 
-
-            ssb.replace(closer, closer + "</blockquote>".length(), "\n");
-            ssb.setSpan(new GRQuoteSpan(), start, closer, 0);
-        }
-
-        aio.wtl("getting text colors for spoilers");
-        final int defTextColor;
-        final int color;
-        if (Theming.usingLightTheme()) {
-            color = Color.WHITE;
-            defTextColor = Color.BLACK;
-        } else {
-            color = Color.BLACK;
-            defTextColor = Color.WHITE;
-        }
-
-        ssb.append('\n');
-
-        aio.wtl("replacing &gameravenlt; with <");
-        while (ssb.toString().contains("&gameravenlt;")) {
-            int start = ssb.toString().indexOf("&gameravenlt;");
-            ssb.replace(start, start + "&gameravenlt;".length(), "<");
-        }
-
-        aio.wtl("replacing &gameravengt; with >");
-        while (ssb.toString().contains("&gameravengt;")) {
-            int start = ssb.toString().indexOf("&gameravengt;");
-            ssb.replace(start, start + "&gameravengt;".length(), ">");
-        }
-
-        aio.wtl("linkifying");
-        Linkify.addLinks(ssb, Linkify.WEB_URLS);
-
-        aio.wtl("adding <spoiler> spans");
-        // do spoiler tags manually instead of in the method, as the clickablespan needs
-        // to know the start and end points
-        while (ssb.toString().contains("<spoiler>")) {
-            final int start = ssb.toString().indexOf("<spoiler>");
-            ssb.delete(start, start + 9);
-            final int end = ssb.toString().indexOf("</spoiler>", start);
-            ssb.delete(end, end + 10);
-            ssb.setSpan(new BackgroundColorSpan(defTextColor), start, end, 0);
-            ssb.setSpan(new ClickableSpan() {
-                @Override
-                public void onClick(View widget) {
-                    ((Spannable) ((ClickableLinksTextView) widget).getText()).setSpan(new BackgroundColorSpan(color), start, end, 0);
-                }
-
-                @Override
-                public void updateDrawState(TextPaint ds) {
-                    ds.setColor(defTextColor);
-                    ds.setUnderlineText(false);
-                }
-            }, start, end, 0);
+            if (closer != -1)
+                end = closer;
 
         }
-
-        aio.wtl("setting spannedMessage");
-        spannedMessage = RichTextUtils.replaceAll(ssb, URLSpan.class, new UrlSpanConverter());
-    }
-
-    public boolean isEdited() {
-        if (userTitles != null && userTitles.contains("(edited)"))
-            return true;
-        else
-            return false;
-    }
-
-    public boolean isEditable() {
-        // Posted 8/1/2013 1:40:38 AM
-        // Posted 8/1/2013 1:02:05 AM
-        // Posted 3/18/2007 11:42:33 PM
-        try {
-            String id = AllInOneV2.getSettingsPref().getString("timezone", TimeZone.getDefault().getID());
-
-            SimpleDateFormat sdf = new SimpleDateFormat("'Posted 'M/d/yyyy h:mm:ss a", Locale.US);
-            sdf.setTimeZone(TimeZone.getTimeZone(id));
-            Date date = sdf.parse(postTime);
-
-            Time now = new Time(id);
-            Time then = new Time(id);
-
-            then.set(date.getTime());
-            then.normalize(true);
-
-            now.setToNow();
-            now.normalize(true);
-
-            if ((now.toMillis(false) - then.toMillis(false)) / ((float) DateUtils.HOUR_IN_MILLIS) < 1f)
-                return true;
-            else
-                return false;
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private static void addSpan(SpannableStringBuilder ssb, String tag, String endTag, CharacterStyle... cs) {
-        while (ssb.toString().contains(tag)) {
-            int start = ssb.toString().indexOf(tag);
-            ssb.delete(start, start + tag.length());
-            int end = ssb.toString().indexOf(endTag, start);
-            ssb.delete(end, end + endTag.length());
-            for (CharacterStyle c : cs)
-                ssb.setSpan(CharacterStyle.wrap(c), start, end, 0);
-        }
+        return new int[]{start, end};
     }
 
     public String getMessageForQuoting() {
@@ -411,17 +470,13 @@ public class MessageRowData extends BaseRowData {
     }
 
     public String getMessageForEditing() {
-        return processContent(false, false);
+        return processContent(true, false);
     }
 
     private String processContent(boolean removeSig, boolean ignoreLtGt) {
-        aio.wtl("getting messageElemNoPoll.html()");
-        String finalBody = messageElemNoPoll.html();
+        String finalBody = unprocessedMessageText;
 
-        aio.wtl("replacing spoiler spans with spoiler tags");
-        finalBody = finalBody.replace("<span class=\"fspoiler\">", "<spoiler>").replace("</span>", "</spoiler>");
-
-        aio.wtl("beginning opening anchor tag removal");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning opening anchor tag removal");
         while (finalBody.contains("<a href")) {
             int start = finalBody.indexOf("<a href");
             int end = finalBody.indexOf(">", start) + 1;
@@ -429,50 +484,38 @@ public class MessageRowData extends BaseRowData {
                     "");
         }
 
-        aio.wtl("removing closing anchor tags");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("removing closing anchor tags");
         finalBody = finalBody.replace("</a>", "");
 
-        aio.wtl("removing existing \\n, replacing linebreak tags with \\n");
+        if (BuildConfig.DEBUG)
+            AllInOneV2.wtl("removing existing \\n, replacing linebreak tags with \\n");
         if (finalBody.endsWith("<br />"))
             finalBody = finalBody.substring(0, finalBody.length() - 6);
         finalBody = finalBody.replace("\n", "");
         finalBody = finalBody.replace("<br />", "\n");
 
         if (removeSig) {
-            aio.wtl("removing sig");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("removing sig");
             int sigStart = finalBody.lastIndexOf("\n---\n");
             if (sigStart != -1)
                 finalBody = finalBody.substring(0, sigStart);
         }
 
         if (ignoreLtGt) {
-            aio.wtl("ignoring less than / greater than");
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("ignoring &lt; / &gt;, pre-unescape");
             finalBody = finalBody.replace("&lt;", "&gameravenlt;").replace("&gt;", "&gameravengt;");
         }
 
-        aio.wtl("unescaping finalbody html");
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("unescaping finalbody html");
         finalBody = StringEscapeUtils.unescapeHtml4(finalBody);
 
-        aio.wtl("returning finalbody");
-        return finalBody;
-    }
-
-    class HeaderView extends LinearLayout {
-
-        public HeaderView(Context context, String text) {
-            super(context);
-
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            inflater.inflate(R.layout.headerview, this);
-
-            setBackgroundColor(Theming.accentColor());
-
-            TextView tView = (TextView) findViewById(R.id.hdrText);
-            tView.setTextSize(TypedValue.COMPLEX_UNIT_PX, tView.getTextSize() * Theming.textScale());
-            tView.setTextColor(Theming.accentTextColor());
-            tView.setText(text);
+        if (ignoreLtGt) {
+            if (BuildConfig.DEBUG) AllInOneV2.wtl("ignoring &lt; / &gt;, post-unescape");
+            finalBody = finalBody.replace("&gameravenlt;", "&lt;").replace("&gameravengt;", "&gt;");
         }
 
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("returning finalbody");
+        return finalBody;
     }
 
 }

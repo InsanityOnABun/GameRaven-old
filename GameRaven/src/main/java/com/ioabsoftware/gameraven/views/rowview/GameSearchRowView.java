@@ -9,7 +9,6 @@ import android.widget.TextView;
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.NetDesc;
-import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
@@ -39,7 +38,6 @@ public class GameSearchRowView extends BaseRowView {
     @Override
     protected void init(Context context) {
         myType = RowType.GAME_SEARCH;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.gamesearchview, this, true);
 
         platform = (TextView) findViewById(R.id.gsPlatform);
@@ -50,24 +48,18 @@ public class GameSearchRowView extends BaseRowView {
             platformTextSize = platform.getTextSize();
         }
 
-        retheme(Theming.accentColor(), Theming.textScale());
-
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AllInOneV2.get().getSession().get(NetDesc.BOARD, myData.getUrl(), null);
+                AllInOneV2.get().getSession().get(NetDesc.BOARD, myData.getUrl());
             }
         });
     }
 
     @Override
-    protected void retheme(int color, float scale) {
-        name.setTextSize(PX, nameTextSize * scale);
-        platform.setTextSize(PX, platformTextSize * scale);
-
-        findViewById(R.id.gsSep).setBackgroundColor(color);
-
-        setBackgroundDrawable(getSelector());
+    protected void retheme() {
+        name.setTextSize(PX, nameTextSize * myScale);
+        platform.setTextSize(PX, platformTextSize * myScale);
     }
 
     @Override

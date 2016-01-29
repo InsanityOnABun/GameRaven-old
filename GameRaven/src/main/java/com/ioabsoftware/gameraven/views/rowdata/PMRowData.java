@@ -49,4 +49,14 @@ public class PMRowData extends BaseRowData {
         return RowType.PM;
     }
 
+    @Override
+    public String toString() {
+        return "subject: " + subject +
+                "\nsender: " + sender +
+                "\ntime: " + time +
+                "\nurl: " + url +
+                "\nisOld: " + String.valueOf(isOld) +
+                "\nisFromInbox: " + String.valueOf(isFromInbox);
+    }
+
 }

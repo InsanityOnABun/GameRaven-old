@@ -1,56 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/pmGlobalWrapper"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pmMainWrapper"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="2dp"
-    android:orientation="vertical" >
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:paddingBottom="@dimen/item_padding_vertical"
+    android:paddingLeft="@dimen/item_padding_horizontal"
+    android:paddingRight="@dimen/item_padding_horizontal"
+    android:paddingTop="@dimen/item_padding_vertical">
 
-    <RelativeLayout
-        android:id="@+id/pmRelativeWrapper"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/pmSender"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp" >
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="Topic CreatorTC"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="10sp" />
 
-        <TextView
-            android:id="@+id/pmSender"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:text="Topic CreatorTC"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="10sp" />
+    <TextView
+        android:id="@+id/pmTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="12/12 12:12PM"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="10sp" />
 
-        <TextView
-            android:id="@+id/pmTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:text="12/12 12:12PM"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="10sp" />
-
-        <TextView
-            android:id="@+id/pmSubject"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/pmSender"
-            android:gravity="center_vertical"
-            android:lines="2"
-            android:text="man fan died at the room shot up to 97 degrees"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-    </RelativeLayout>
-
-    <View
-        android:id="@+id/pmSep"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="2dp"
-        android:background="#33B5E5"
-        android:visibility="visible" />
-
-</LinearLayout>
+    <TextView
+        android:id="@+id/pmSubject"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/pmSender"
+        android:gravity="center_vertical"
+        android:lines="2"
+        android:text="man fan died at the room shot up to 97 degrees"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="13sp" />
+</RelativeLayout>

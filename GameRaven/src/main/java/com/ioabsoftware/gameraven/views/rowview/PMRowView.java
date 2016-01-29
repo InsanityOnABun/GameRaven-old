@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.NetDesc;
-import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
@@ -44,7 +43,6 @@ public class PMRowView extends BaseRowView {
     @Override
     protected void init(Context context) {
         myType = RowType.PM;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.pmview, this, true);
 
         subject = (TextView) findViewById(R.id.pmSubject);
@@ -64,24 +62,18 @@ public class PMRowView extends BaseRowView {
             @Override
             public void onClick(View v) {
                 if (myData.isFromInbox())
-                    AllInOneV2.get().getSession().get(NetDesc.PM_INBOX_DETAIL, myData.getUrl(), null);
+                    AllInOneV2.get().getSession().get(NetDesc.PM_INBOX_DETAIL, myData.getUrl());
                 else
-                    AllInOneV2.get().getSession().get(NetDesc.PM_OUTBOX_DETAIL, myData.getUrl(), null);
+                    AllInOneV2.get().getSession().get(NetDesc.PM_OUTBOX_DETAIL, myData.getUrl());
             }
         });
-
-        retheme(Theming.accentColor(), Theming.textScale());
     }
 
     @Override
-    protected void retheme(int color, float scale) {
-        subject.setTextSize(PX, subjectTextSize * scale);
-        sender.setTextSize(PX, senderTextSize * scale);
-        time.setTextSize(PX, timeTextSize * scale);
-
-        findViewById(R.id.pmSep).setBackgroundColor(color);
-
-        setBackgroundDrawable(getSelector());
+    protected void retheme() {
+        subject.setTextSize(PX, subjectTextSize * myScale);
+        sender.setTextSize(PX, senderTextSize * myScale);
+        time.setTextSize(PX, timeTextSize * myScale);
     }
 
     @Override

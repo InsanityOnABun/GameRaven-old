@@ -1,11 +1,11 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.AllInOneV2;
@@ -52,14 +52,19 @@ public class TrackedTopicRowView extends BaseRowView {
     @Override
     protected void init(Context context) {
         myType = RowType.TRACKED_TOPIC;
-        setOrientation(VERTICAL);
-        LayoutInflater.from(context).inflate(R.layout.trackedtopicview, this, true);
+        LayoutInflater.from(context).inflate(R.layout.topicview, this, true);
 
-        board = (TextView) findViewById(R.id.ttBoardName);
-        title = (TextView) findViewById(R.id.ttTitle);
-        msgLP = (TextView) findViewById(R.id.ttMessageCountLastPost);
-        lpLink = (TextView) findViewById(R.id.ttLastPostLink);
-        removeLink = (TextView) findViewById(R.id.ttStopTracking);
+        board = (TextView) findViewById(R.id.tvTC);
+        title = (TextView) findViewById(R.id.tvTitle);
+        msgLP = (TextView) findViewById(R.id.tvMsgCountLastPost);
+        lpLink = (TextView) findViewById(R.id.tvLastPostLink);
+        removeLink = (TextView) findViewById(R.id.tvStopTracking);
+
+        // always display the "pinned" type indicator for tracked topics, mainly for layout
+        ((ImageView) findViewById(R.id.tvTypeIndicator)).setImageDrawable(Theming.topicStatusIcons()[3]);
+
+        removeLink.setVisibility(View.VISIBLE);
+        findViewById(R.id.tvSTSep).setVisibility(View.VISIBLE);
 
         defaultBoardColor = board.getCurrentTextColor();
         defaultTitleColor = title.getCurrentTextColor();
@@ -78,7 +83,7 @@ public class TrackedTopicRowView extends BaseRowView {
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getUrl(), null);
+                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getUrl());
             }
         });
 
@@ -86,7 +91,7 @@ public class TrackedTopicRowView extends BaseRowView {
             @Override
             public boolean onLongClick(View v) {
                 String url = myData.getUrl().substring(0, myData.getUrl().lastIndexOf('/'));
-                AllInOneV2.get().getSession().get(NetDesc.BOARD, url, null);
+                AllInOneV2.get().getSession().get(NetDesc.BOARD, url);
                 return true;
             }
         });
@@ -95,35 +100,25 @@ public class TrackedTopicRowView extends BaseRowView {
             @Override
             public void onClick(View v) {
                 AllInOneV2.get().enableGoToUrlDefinedPost();
-                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getLastPostUrl(), null);
+                AllInOneV2.get().getSession().get(NetDesc.TOPIC, myData.getLastPostUrl());
             }
         });
 
         removeLink.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AllInOneV2.get().getSession().get(NetDesc.TRACKED_TOPICS, myData.getRemoveUrl(), null);
+                AllInOneV2.get().getSession().get(NetDesc.TRACKED_TOPICS, myData.getRemoveUrl());
             }
         });
-
-        retheme(Theming.accentColor(), Theming.textScale());
     }
 
     @Override
-    protected void retheme(int color, float scale) {
-        board.setTextSize(PX, boardTextSize * scale);
-        title.setTextSize(PX, titleTextSize * scale);
-        msgLP.setTextSize(PX, msgLPTextSize * scale);
-        lpLink.setTextSize(PX, lpLinkTextSize * scale);
-        removeLink.setTextSize(PX, removeLinkTextSize * scale);
-
-        findViewById(R.id.ttSep).setBackgroundColor(color);
-        findViewById(R.id.ttSTSep).setBackgroundColor(color);
-        findViewById(R.id.ttLPSep).setBackgroundColor(color);
-
-        setBackgroundDrawable(getSelector());
-        lpLink.setBackgroundDrawable(getSelector());
-        removeLink.setBackgroundDrawable(getSelector());
+    protected void retheme() {
+        board.setTextSize(PX, boardTextSize * myScale);
+        title.setTextSize(PX, titleTextSize * myScale);
+        msgLP.setTextSize(PX, msgLPTextSize * myScale);
+        lpLink.setTextSize(PX, lpLinkTextSize * myScale);
+        removeLink.setTextSize(PX, removeLinkTextSize * myScale);
     }
 
     @Override
@@ -134,12 +129,11 @@ public class TrackedTopicRowView extends BaseRowView {
         myData = (TrackedTopicRowData) data;
 
         if (myData.getStatus() == ReadStatus.READ) {
-            int readColor = Theming.usingLightTheme() ? Color.LTGRAY : Color.DKGRAY;
-            board.setTextColor(readColor);
-            title.setTextColor(readColor);
-            msgLP.setTextColor(readColor);
-            lpLink.setTextColor(readColor);
-            removeLink.setTextColor(readColor);
+            board.setTextColor(Theming.colorReadTopic());
+            title.setTextColor(Theming.colorReadTopic());
+            msgLP.setTextColor(Theming.colorReadTopic());
+            lpLink.setTextColor(Theming.colorReadTopic());
+            removeLink.setTextColor(Theming.colorReadTopic());
         } else {
             board.setTextColor(defaultBoardColor);
             title.setTextColor(defaultTitleColor);
@@ -166,6 +160,14 @@ public class TrackedTopicRowView extends BaseRowView {
         board.setText(myData.getBoard());
         title.setText(myData.getTitle());
         msgLP.setText(myData.getMsgs() + " Msgs, Last: " + myData.getLastPost());
+    }
+
+    @Override
+    protected void drawableStateChanged() {
+        int[] state = this.getDrawableState();
+        lpLink.getBackground().setState(state);
+        removeLink.getBackground().setState(state);
+        super.drawableStateChanged();
     }
 
 }

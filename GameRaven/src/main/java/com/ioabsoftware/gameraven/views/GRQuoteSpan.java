@@ -1,6 +1,7 @@
 package com.ioabsoftware.gameraven.views;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Parcel;
 import android.text.Layout;
@@ -11,8 +12,8 @@ import com.ioabsoftware.gameraven.util.Theming;
 public class GRQuoteSpan extends QuoteSpan {
 
     private static final int WIDTH = 4;
-    private static final int GAP = 4;
-    private final int COLOR = Theming.accentColor();
+    private static final int GAP = 6;
+    private final int COLOR = Theming.colorPrimary();
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(COLOR);
@@ -31,12 +32,15 @@ public class GRQuoteSpan extends QuoteSpan {
                                   int top, int baseline, int bottom,
                                   CharSequence text, int start, int end,
                                   boolean first, Layout layout) {
+
         Paint.Style style = p.getStyle();
         int color = p.getColor();
 
         p.setStyle(Paint.Style.FILL);
-        p.setColor(COLOR);
+        p.setColor(Color.parseColor("#33646464"));
+        c.drawRect(x, top, c.getWidth(), bottom, p);
 
+        p.setColor(COLOR);
         c.drawRect(x, top, x + dir * WIDTH, bottom, p);
 
         p.setStyle(style);

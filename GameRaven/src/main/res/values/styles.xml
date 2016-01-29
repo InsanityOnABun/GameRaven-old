@@ -1,48 +1,107 @@
 <resources>
 
-    <style name="MyThemes.DarkTheme" parent="android:Theme.Holo">
-        <item name="android:actionBarStyle">@style/MyThemes.DarkTheme.ActionBar.FullyTransparent</item>
-        <item name="themedSearchIcon">@drawable/ic_search</item>
-        <item name="themedAddFavIcon">@drawable/ic_addfav</item>
-        <item name="themedRemFavIcon">@drawable/ic_remfav</item>
-        <item name="themedTopicListIcon">@drawable/ic_topiclist</item>
-        <item name="themedPMInboxIcon">@drawable/ic_inbox</item>
-        <item name="themedPMOutboxIcon">@drawable/ic_outbox</item>
-        <item name="themedPostIcon">@drawable/ic_newpost</item>
-        <item name="themedReplyIcon">@drawable/ic_reply</item>
-        <item name="themedRefreshIcon">@drawable/ic_refresh</item>
-        <item name="themedTextColor">@color/white</item>
-        <item name="themedPageJumperColor">@color/buttoncolors</item>
-        <item name="themedPostInfoIcon">@drawable/ic_info</item>
-        <item name="themedPostBackground">@color/black</item>
-        <item name="themedDrawerHeaderColor">@color/drawerHeader</item>
+    <style name="MyThemes.DarkBase" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorBackground">@color/gf_background_dark</item>
+        <item name="colorBackgroundInverse">@color/gf_background_light</item>
+        <item name="colorDrawerHeader">@color/drawer_header</item>
+
+        <item name="readTopic">@color/read_topic</item>
+        <item name="hiddenSpoilerColor">@color/white</item>
+        <item name="revealedSpoilerColor">@color/black</item>
+
+        <item name="themedPollTopicIcon">@drawable/ic_poll_white_18dp</item>
+        <item name="themedLockedTopicIcon">@drawable/ic_lock_white_18dp</item>
+        <item name="themedArchivedTopicIcon">@drawable/ic_save_white_18dp</item>
+        <item name="themedPinnedTopicIcon">@drawable/ic_whatshot_white_18dp</item>
+
+        <item name="windowActionModeOverlay">true</item>
     </style>
 
-    <style name="MyThemes.LightTheme" parent="android:Theme.Holo.Light">
-        <item name="android:actionBarStyle">@style/MyThemes.LightTheme.ActionBar.FullyTransparent</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="themedSearchIcon">@drawable/ic_search_light</item>
-        <item name="themedAddFavIcon">@drawable/ic_addfav_light</item>
-        <item name="themedRemFavIcon">@drawable/ic_remfav_light</item>
-        <item name="themedTopicListIcon">@drawable/ic_topiclist_light</item>
-        <item name="themedPMInboxIcon">@drawable/ic_inbox_light</item>
-        <item name="themedPMOutboxIcon">@drawable/ic_outbox_light</item>
-        <item name="themedPostIcon">@drawable/ic_newpost_light</item>
-        <item name="themedReplyIcon">@drawable/ic_reply_light</item>
-        <item name="themedRefreshIcon">@drawable/ic_refresh_light</item>
-        <item name="themedTextColor">@color/black</item>
-        <item name="themedPageJumperColor">@color/buttoncolors_light</item>
-        <item name="themedPostInfoIcon">@drawable/ic_info_light</item>
-        <item name="themedPostBackground">@color/white</item>
-        <item name="themedDrawerHeaderColor">@color/drawerHeaderLight</item>
+    <style name="MyThemes.LightBase" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorBackground">@color/gf_background_light</item>
+        <item name="colorBackgroundInverse">@color/gf_background_dark</item>
+        <item name="colorDrawerHeader">@color/drawer_header_light</item>
+
+        <item name="readTopic">@color/read_topic_light</item>
+        <item name="hiddenSpoilerColor">@color/black</item>
+        <item name="revealedSpoilerColor">@color/white</item>
+
+        <item name="themedPollTopicIcon">@drawable/ic_poll_grey600_18dp</item>
+        <item name="themedLockedTopicIcon">@drawable/ic_lock_grey600_18dp</item>
+        <item name="themedArchivedTopicIcon">@drawable/ic_save_grey600_18dp</item>
+        <item name="themedPinnedTopicIcon">@drawable/ic_whatshot_grey600_18dp</item>
+
+        <item name="windowActionModeOverlay">true</item>
     </style>
 
-    <style name="MyThemes.DarkTheme.ActionBar.FullyTransparent" parent="android:Widget.Holo.ActionBar">
-        <item name="android:background">@color/transparent</item>
+    <style name="MyThemes.DarkBlue" parent="MyThemes.DarkBase">
+        <item name="colorPrimary">@color/gf_blue_dark</item>
+        <item name="colorPrimaryDark">@color/gf_blue_dark_secondary</item>
+        <item name="colorAccent">@color/gf_blue_dark_accent</item>
+        <item name="colorControlHighlight">@color/gf_blue_dark</item>
     </style>
 
-    <style name="MyThemes.LightTheme.ActionBar.FullyTransparent" parent="android:Widget.Holo.Light.ActionBar">
-        <item name="android:background">@color/transparent</item>
+    <style name="MyThemes.DarkRed" parent="MyThemes.DarkBase">
+        <item name="colorPrimary">@color/gf_red_dark</item>
+        <item name="colorPrimaryDark">@color/gf_red_dark_secondary</item>
+        <item name="colorAccent">@color/gf_red_dark_accent</item>
+        <item name="colorControlHighlight">@color/gf_red_dark</item>
+    </style>
+
+    <style name="MyThemes.DarkGreen" parent="MyThemes.DarkBase">
+        <item name="colorPrimary">@color/gf_green_dark</item>
+        <item name="colorPrimaryDark">@color/gf_green_dark_secondary</item>
+        <item name="colorAccent">@color/gf_green_dark_accent</item>
+        <item name="colorControlHighlight">@color/gf_green_dark</item>
+    </style>
+
+    <style name="MyThemes.DarkOrange" parent="MyThemes.DarkBase">
+        <item name="colorPrimary">@color/gf_orange_dark</item>
+        <item name="colorPrimaryDark">@color/gf_orange_dark_secondary</item>
+        <item name="colorAccent">@color/gf_orange_dark_accent</item>
+        <item name="colorControlHighlight">@color/gf_orange_dark</item>
+    </style>
+
+    <style name="MyThemes.DarkPurple" parent="MyThemes.DarkBase">
+        <item name="colorPrimary">@color/gf_purple_dark</item>
+        <item name="colorPrimaryDark">@color/gf_purple_dark_secondary</item>
+        <item name="colorAccent">@color/gf_purple_dark_accent</item>
+        <item name="colorControlHighlight">@color/gf_purple_dark</item>
+    </style>
+
+    <style name="MyThemes.LightBlue" parent="MyThemes.LightBase">
+        <item name="colorPrimary">@color/gf_blue_light</item>
+        <item name="colorPrimaryDark">@color/gf_blue_light_secondary</item>
+        <item name="colorAccent">@color/gf_blue_light_accent</item>
+        <item name="colorControlHighlight">@color/gf_blue_light</item>
+    </style>
+
+    <style name="MyThemes.LightRed" parent="MyThemes.LightBase">
+        <item name="colorPrimary">@color/gf_red_light</item>
+        <item name="colorPrimaryDark">@color/gf_red_light_secondary</item>
+        <item name="colorAccent">@color/gf_red_light_accent</item>
+        <item name="colorControlHighlight">@color/gf_red_light</item>
+    </style>
+
+    <style name="MyThemes.LightGreen" parent="MyThemes.LightBase">
+        <item name="colorPrimary">@color/gf_green_light</item>
+        <item name="colorPrimaryDark">@color/gf_green_light_secondary</item>
+        <item name="colorAccent">@color/gf_green_light_accent</item>
+        <item name="colorControlHighlight">@color/gf_green_light</item>
+    </style>
+
+    <style name="MyThemes.LightOrange" parent="MyThemes.LightBase">
+        <item name="colorPrimary">@color/gf_orange_light</item>
+        <item name="colorPrimaryDark">@color/gf_orange_light_secondary</item>
+        <item name="colorAccent">@color/gf_orange_light_accent</item>
+        <item name="colorControlHighlight">@color/gf_orange_light</item>
+    </style>
+
+    <style name="MyThemes.LightPurple" parent="MyThemes.LightBase">
+        <item name="colorPrimary">@color/gf_purple_light</item>
+        <item name="colorPrimaryDark">@color/gf_purple_light_secondary</item>
+        <item name="colorAccent">@color/gf_purple_light_accent</item>
+        <item name="colorControlHighlight">@color/gf_purple_light</item>
     </style>
 
 </resources>

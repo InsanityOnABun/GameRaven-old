@@ -23,7 +23,7 @@ public class MessageLinkSpan extends ClickableSpan {
     public void onClick(View arg0) {
         NetDesc desc = Session.determineNetDesc(url);
         if (desc != NetDesc.UNSPECIFIED)
-            aio.getSession().get(desc, url, null);
+            aio.getSession().get(desc, url);
         else
             aio.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
     }

@@ -14,15 +14,17 @@
             android:id="@+id/modaccDefaultAccount"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
+            android:layout_margin="3dp"
             android:layout_weight="1"
             android:text="Default Account" />
 
-        <Button
-            android:id="@+id/modaccDeleteAcc"
-            android:layout_width="wrap_content"
+        <CheckBox
+            android:id="@+id/modaccUseGfaqsSig"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Remove Acc." />
+            android:layout_margin="3dp"
+            android:layout_weight="1"
+            android:text="Use GFAQs Sig" />
     </LinearLayout>
 
     <EditText
@@ -46,5 +48,11 @@
         android:text="Small Text"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textSize="10sp" />
+
+    <Button
+        android:id="@+id/modaccDeleteAcc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Remove Account" />
 
 </LinearLayout>

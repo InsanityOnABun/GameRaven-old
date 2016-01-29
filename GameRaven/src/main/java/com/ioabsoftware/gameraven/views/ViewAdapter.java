@@ -6,8 +6,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.ioabsoftware.gameraven.views.rowview.AMPRowView;
-import com.ioabsoftware.gameraven.views.rowview.AdGFAQsRowView;
-import com.ioabsoftware.gameraven.views.rowview.AdmobRowView;
 import com.ioabsoftware.gameraven.views.rowview.BoardRowView;
 import com.ioabsoftware.gameraven.views.rowview.GameSearchRowView;
 import com.ioabsoftware.gameraven.views.rowview.HeaderRowView;
@@ -18,6 +16,10 @@ import com.ioabsoftware.gameraven.views.rowview.TopicRowView;
 import com.ioabsoftware.gameraven.views.rowview.TrackedTopicRowView;
 import com.ioabsoftware.gameraven.views.rowview.UserDetailRowView;
 
+import org.acra.ACRA;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 public class ViewAdapter extends BaseAdapter {
@@ -61,7 +63,31 @@ public class ViewAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         BaseRowView view;
-        BaseRowData data = rows.get(position);
+        BaseRowData data;
+
+        try {
+            data = rows.get(position);
+        }
+        catch (IndexOutOfBoundsException e) {
+            ACRA.getErrorReporter().putCustomData("rows size", String.valueOf(rows.size()));
+            ACRA.getErrorReporter().putCustomData("position", String.valueOf(position));
+
+            int x = 0;
+            for (BaseRowData dat : rows) {
+                String index = String.valueOf(x++);
+                if (index.length() < 2) index = "0" + index;
+
+                ACRA.getErrorReporter().putCustomData("[" + index + "] " + dat.getRowType().name(), dat.toString());
+            }
+
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            ACRA.getErrorReporter().putCustomData("original stack trace", sw.toString());
+
+            ACRA.getErrorReporter().handleException(new IndexOutOfBoundsException("rows.get(position) was out of bounds"), true);
+            return new HeaderRowView(context);
+        }
 
         if (convertView != null) {
             view = (BaseRowView) convertView;
@@ -96,12 +122,6 @@ public class ViewAdapter extends BaseAdapter {
                     break;
                 case USER_DETAIL:
                     view = new UserDetailRowView(context);
-                    break;
-                case GFAQS_AD:
-                    view = new AdGFAQsRowView(context, data);
-                    break;
-                case ADMOB_AD:
-                    view = new AdmobRowView(context);
                     break;
                 default:
                     throw new IllegalArgumentException("row type not handled in ViewAdapter: " + data.getRowType().toString());

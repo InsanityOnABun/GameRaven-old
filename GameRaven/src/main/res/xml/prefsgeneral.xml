@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="genSettingsCategory"
+        android:orderingFromXml="true"
+        android:persistent="false"
+        android:title="General Settings">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="usingAvatars"
+            android:persistent="true"
+            android:summary="Currently only supports displaying, no upload."
+            android:title="Avatars" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="startAtAMP"
+            android:persistent="true"
+            android:summary="Start new sessions on the AMP List."
+            android:title="Start on AMP List" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="reloadOnBack"
+            android:persistent="true"
+            android:summary="Reload page when navigating back."
+            android:title="Reload On Back" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="reloadOnResume"
+            android:persistent="true"
+            android:summary="Reload page when resuming app."
+            android:title="Reload On Resume" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="enablePTR"
+            android:persistent="true"
+            android:summary="Pull past the top of the page to refresh."
+            android:title="Pull-To-Refresh" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="enableFastScroll"
+            android:persistent="true"
+            android:summary="Show the fast-scroll tab on the scroll indicator."
+            android:title="Fast Scroll" />
+
+        <ListPreference
+            android:defaultValue="-1"
+            android:entries="@array/ampOptionKeys"
+            android:entryValues="@array/ampOptionValues"
+            android:key="ampSortOption"
+            android:persistent="true"
+            android:summary="Select your preferred sorting style for your Active Messages list."
+            android:title="AMP Sort Options" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="confirmPostCancel"
+            android:persistent="true"
+            android:summary="A confirmation dialog will show when cancelling a post."
+            android:title="Confirm Post Cancel" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="confirmPostSubmit"
+            android:persistent="true"
+            android:summary="A confirmation dialog will show when submitting a post."
+            android:title="Confirm Post Submission" />
+        <Preference
+            android:key="backupSettings"
+            android:summary="Passwords are stored as plain text! Back up settings to sdcard/gameraven/gameraven_settings"
+            android:title="Back Up Settings" />
+        <Preference
+            android:key="restoreSettings"
+            android:summary="This will remove any previously added accounts! Restore settings from sdcard/gameraven/gameraven_settings"
+            android:title="Restore Settings" />
+        <Preference
+            android:key="aboutFeedback"
+            android:title="About &amp; Feedback" />
+    </PreferenceCategory>
+</PreferenceScreen>

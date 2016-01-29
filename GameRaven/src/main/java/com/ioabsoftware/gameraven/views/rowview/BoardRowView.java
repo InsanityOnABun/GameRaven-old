@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.NetDesc;
-import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
@@ -41,7 +40,6 @@ public class BoardRowView extends BaseRowView {
     @Override
     protected void init(Context context) {
         myType = RowType.BOARD;
-        setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.boardview, this, true);
 
         desc = (TextView) findViewById(R.id.bvDesc);
@@ -56,8 +54,6 @@ public class BoardRowView extends BaseRowView {
             descTextSize = desc.getTextSize();
         }
 
-        retheme(Theming.accentColor(), Theming.textScale());
-
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,9 +66,9 @@ public class BoardRowView extends BaseRowView {
                     b.create().show();
                 } else {
                     if (myData.getBoardType() == BoardType.LIST) {
-                        AllInOneV2.get().getSession().get(NetDesc.BOARD_LIST, myData.getUrl(), null);
+                        AllInOneV2.get().getSession().get(NetDesc.BOARD_LIST, myData.getUrl());
                     } else {
-                        AllInOneV2.get().getSession().get(NetDesc.BOARD, myData.getUrl(), null);
+                        AllInOneV2.get().getSession().get(NetDesc.BOARD, myData.getUrl());
                     }
                 }
             }
@@ -80,15 +76,11 @@ public class BoardRowView extends BaseRowView {
     }
 
     @Override
-    protected void retheme(int color, float scale) {
-        desc.setTextSize(PX, descTextSize * scale);
-        lastPost.setTextSize(PX, lpTextSize * scale);
-        tpcMsgDetails.setTextSize(PX, detailsTextSize * scale);
-        name.setTextSize(PX, nameTextSize * scale);
-
-        findViewById(R.id.bvSep).setBackgroundColor(color);
-
-        setBackgroundDrawable(getSelector());
+    protected void retheme() {
+        desc.setTextSize(PX, descTextSize * myScale);
+        lastPost.setTextSize(PX, lpTextSize * myScale);
+        tpcMsgDetails.setTextSize(PX, detailsTextSize * myScale);
+        name.setTextSize(PX, nameTextSize * myScale);
     }
 
     @Override
