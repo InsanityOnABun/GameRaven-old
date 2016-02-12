@@ -37,8 +37,8 @@ import static org.acra.ReportField.USER_EMAIL;
         formUri = "https://ioabsoftware.cloudant.com/acra-gameraven/_design/acra-storage/_update/report",
         reportType = org.acra.sender.HttpSender.Type.JSON,
         httpMethod = org.acra.sender.HttpSender.Method.PUT,
-        formUriBasicAuthLogin = "leyedwastorwhastoldamigh",
-        formUriBasicAuthPassword = "S3wytv8XJsOMY8tnUchU1m72",
+        formUriBasicAuthLogin = "foreagarvencensigrormese",
+        formUriBasicAuthPassword = "ac784d49717b77ea927b89ff36a2850d8cb1435b",
 
         customReportContent = {
                 REPORT_ID,
