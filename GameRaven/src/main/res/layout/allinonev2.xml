@@ -405,7 +405,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <com.melnykov.fab.FloatingActionButton xmlns:fab="http://schemas.android.com/apk/res-auto"
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -415,9 +415,7 @@
             android:layout_margin="16dp"
             android:src="@drawable/ic_add_white_24dp"
             android:visibility="visible"
-            fab:fab_colorNormal="?attr/colorPrimary"
-            fab:fab_colorPressed="?attr/colorPrimaryDark"
-            fab:fab_colorRipple="?attr/colorAccent" />
+            app:elevation="4dp"/>
 
     </RelativeLayout>
 

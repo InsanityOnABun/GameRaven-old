@@ -11,11 +11,13 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -83,10 +85,9 @@ import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
-import com.melnykov.fab.FloatingActionButton;
 
 import org.acra.ACRA;
-import org.acra.ACRAConfiguration;
+import org.acra.config.ACRAConfiguration;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.codechimp.apprater.AppRater;
@@ -515,6 +516,10 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         contentList.setAdapter(viewAdapter);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setBackgroundTintList(new ColorStateList(
+                new int[][] {new int[]{}},
+                new int[] {Theming.colorPrimary()}));
+        fab.setRippleColor(Theming.colorAccent());
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
