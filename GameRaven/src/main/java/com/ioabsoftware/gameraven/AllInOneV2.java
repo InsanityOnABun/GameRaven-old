@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -52,9 +53,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
@@ -235,8 +236,10 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     private DrawerLayout drawerLayout;
-    private ScrollView drawerPullout;
     private ActionBarDrawerToggle drawerToggle;
+
+    private Menu drawerMenu;
+    private MenuItem dwrChangeAccItem, dwrNavHeadItem, dwrPMInbox;
 
     private FloatingActionButton fab;
 
@@ -289,94 +292,56 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         aBar.setDisplayShowTitleEnabled(true);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.aioDrawerLayout);
-        drawerPullout = (ScrollView) findViewById(R.id.dwrScroller);
-
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close) {
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-                drawerPullout.scrollTo(0, 0);
-            }
-        };
+        NavigationView navigationView = (NavigationView) findViewById(R.id.aioNavigationDrawer);
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
 
         drawerLayout.setDrawerListener(drawerToggle);
 
-
-        findViewById(R.id.dwrChangeAcc).setOnClickListener(new View.OnClickListener() {
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onNavigationItemSelected(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.dwrChangeAcc:
+                        showDialog(CHANGE_LOGGED_IN_DIALOG);
+                        break;
+                    case R.id.dwrBoardJumper:
+                        showBoardQuickList();
+                        break;
+                    case R.id.dwrAMPList:
+                        session.get(NetDesc.AMP_LIST, buildAMPLink());
+                        break;
+                    case R.id.dwrTrackedTopics:
+                        session.get(NetDesc.TRACKED_TOPICS, "/boards/tracked");
+                        break;
+                    case R.id.dwrPMInbox:
+                        session.get(NetDesc.PM_INBOX, "/pm/");
+                        break;
+                    case R.id.dwrCopyCurrURL:
+                        android.content.ClipboardManager clipboard =
+                                (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("simple text", session.getLastPath()));
+                        Crouton.showText(AllInOneV2.this, "URL copied to clipboard.", Theming.croutonStyle());
+                        break;
+                    case R.id.dwrHighlightList:
+                        startActivity(new Intent(AllInOneV2.this, SettingsHighlightedUsers.class));
+                        break;
+                    case R.id.dwrSettings:
+                        startActivity(new Intent(AllInOneV2.this, HeaderSettings.class));
+                        break;
+                    case R.id.dwrExit:
+                        AllInOneV2.this.finish();
+                        break;
+                }
                 drawerLayout.closeDrawers();
-                showDialog(CHANGE_LOGGED_IN_DIALOG);
+
+                return false;
             }
         });
 
-        boardListButton = (Button) findViewById(R.id.dwrBoardJumper);
-        boardListButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.closeDrawers();
-                session.get(NetDesc.BOARD_JUMPER, "/boards");
-            }
-        });
-
-        findViewById(R.id.dwrAMPList).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.closeDrawers();
-                session.get(NetDesc.AMP_LIST, buildAMPLink());
-            }
-        });
-
-        findViewById(R.id.dwrTrackedTopics).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.closeDrawers();
-                session.get(NetDesc.TRACKED_TOPICS, "/boards/tracked");
-            }
-        });
-
-        findViewById(R.id.dwrPMInbox).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.closeDrawers();
-                session.get(NetDesc.PM_INBOX, "/pm/");
-            }
-        });
-
-        findViewById(R.id.dwrCopyCurrURL).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                android.content.ClipboardManager clipboard =
-                        (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-
-                clipboard.setPrimaryClip(android.content.ClipData.newPlainText("simple text", session.getLastPath()));
-                drawerLayout.closeDrawers();
-                Crouton.showText(AllInOneV2.this, "URL copied to clipboard.", Theming.croutonStyle());
-            }
-        });
-
-        findViewById(R.id.dwrHighlightList).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.closeDrawers();
-                startActivity(new Intent(AllInOneV2.this, SettingsHighlightedUsers.class));
-            }
-        });
-
-        findViewById(R.id.dwrSettings).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.closeDrawers();
-                startActivity(new Intent(AllInOneV2.this, HeaderSettings.class));
-            }
-        });
-
-        findViewById(R.id.dwrExit).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AllInOneV2.this.finish();
-            }
-        });
+        drawerMenu = navigationView.getMenu();
+        dwrNavHeadItem = drawerMenu.findItem(R.id.dwrNavHeader);
+        dwrChangeAccItem = drawerMenu.findItem(R.id.dwrChangeAcc);
+        dwrPMInbox = drawerMenu.findItem(R.id.dwrPMInbox);
 
         aBar.setDisplayHomeAsUpEnabled(true);
         aBar.setHomeButtonEnabled(true);
@@ -443,10 +408,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             }
         });
 
-        Theming.setTextSizeBases(((TextView) findViewById(R.id.dwrChangeAccHeader)).getTextSize(),
-                ((TextView) findViewById(R.id.dwrChangeAcc)).getTextSize(),
-                firstPage.getTextSize(),
-                pageLabel.getTextSize());
+        Theming.setTextSizeBases(firstPage.getTextSize(), pageLabel.getTextSize());
 
         postTitle.addTextChangedListener(new TextWatcher() {
             @Override
@@ -517,8 +479,8 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setBackgroundTintList(new ColorStateList(
-                new int[][] {new int[]{}},
-                new int[] {Theming.colorPrimary()}));
+                new int[][]{new int[]{}},
+                new int[]{Theming.colorPrimary()}));
         fab.setRippleColor(Theming.colorAccent());
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -622,19 +584,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             nextPage.setTextSize(px, Theming.getScaledPJButtonTextSize());
             lastPage.setTextSize(px, Theming.getScaledPJButtonTextSize());
             pageLabel.setTextSize(px, Theming.getScaledPJLabelTextSize());
-
-            ((TextView) findViewById(R.id.dwrChangeAccHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
-            ((TextView) findViewById(R.id.dwrChangeAcc)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) findViewById(R.id.dwrNavHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
-            boardListButton.setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) findViewById(R.id.dwrAMPList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) findViewById(R.id.dwrTrackedTopics)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) findViewById(R.id.dwrPMInbox)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) findViewById(R.id.dwrFuncHeader)).setTextSize(px, Theming.getScaledDwrHeaderTextSize());
-            ((TextView) findViewById(R.id.dwrCopyCurrURL)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) findViewById(R.id.dwrHighlightList)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) findViewById(R.id.dwrSettings)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
-            ((TextView) findViewById(R.id.dwrExit)).setTextSize(px, Theming.getScaledDwrButtonTextSize());
         }
 
         MessageRowView.setUsingAvatars(settings.getBoolean("usingAvatars", false));
@@ -667,11 +616,11 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             }
         } else {
             if (settings.getBoolean("reloadOnResume", false)) {
-                    if (BuildConfig.DEBUG)
-                            wtl("session exists, reload on resume is true, refreshing page");
-                    isRoR = true;
-                    session.refresh();
-                }
+                if (BuildConfig.DEBUG)
+                    wtl("session exists, reload on resume is true, refreshing page");
+                isRoR = true;
+                session.refresh();
+            }
         }
 
         if (!settings.contains("beenWelcomed")) {
@@ -695,7 +644,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     @Override
-    protected void onStop () {
+    protected void onStop() {
         Editor e = settings.edit();
         e.putBoolean("resumeSession", true);
         session.addHistoryBeforeStop();
@@ -710,7 +659,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     @Override
-    protected void onRestart () {
+    protected void onRestart() {
         super.onRestart();
         session.openHistoryDB();
         session.popHistory();
@@ -728,6 +677,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     private AlertDialog loginDialog;
+
     public void showLoggingInDialog(String user) {
         if (loginDialog == null) {
             AlertDialog.Builder b = new AlertDialog.Builder(this);
@@ -748,16 +698,14 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     private boolean needToSetNavList = true;
 
     public void disableNavList() {
-        findViewById(R.id.dwrNavWrapper).setVisibility(View.GONE);
+        dwrNavHeadItem.setVisible(false);
         needToSetNavList = true;
     }
 
     public void setNavList(boolean isLoggedIn) {
-        findViewById(R.id.dwrNavWrapper).setVisibility(View.VISIBLE);
-        if (isLoggedIn)
-            findViewById(R.id.dwrLoggedInNav).setVisibility(View.VISIBLE);
-        else
-            findViewById(R.id.dwrLoggedInNav).setVisibility(View.GONE);
+        dwrNavHeadItem.setVisible(true);
+        dwrNavHeadItem.getSubMenu().setGroupVisible(R.id.dwrLoggedInNav, isLoggedIn);
+        Toast.makeText(this, Boolean.toString(isLoggedIn), Toast.LENGTH_SHORT).show();
 
         needToSetNavList = false;
     }
@@ -1048,7 +996,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     public void setLoginName(String name) {
-        ((TextView) findViewById(R.id.dwrChangeAcc)).setText(name + " (Click to Change)");
+        dwrChangeAccItem.setTitle(name + " " +  getString(R.string.click_to_change));
     }
 
     private void hideSoftKeyboard(View inputView) {
@@ -1179,6 +1127,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     private boolean isRoR = false;
+
     private void postInterfaceCleanup() {
         if (!isRoR && postWrapper.getVisibility() == View.VISIBLE) {
             if (BuildConfig.DEBUG) wtl("postInterfaceCleanup fired --NEL");
@@ -1211,10 +1160,10 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     public void setAMPLinkVisible(boolean visible) {
-        if (visible)
-            findViewById(R.id.dwrAMPWrapper).setVisibility(View.VISIBLE);
-        else
-            findViewById(R.id.dwrAMPWrapper).setVisibility(View.GONE);
+//        if (visible)
+//            findViewById(R.id.dwrAMPWrapper).setVisibility(View.VISIBLE);
+//        else
+//            findViewById(R.id.dwrAMPWrapper).setVisibility(View.GONE);
     }
 
     public void preExecuteSetup(NetDesc desc) {
@@ -1276,33 +1225,19 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 break;
             }
         }
+
+
         if (boardsDropdown != null) {
             Elements dItems = boardsDropdown.getElementsByTag("a");
-            boardQuickListOptions = new String[dItems.size()];
-            boardQuickListLinks = new String[dItems.size()];
-            int x = 0;
+            boardQuickListOptions = new String[dItems.size() + 1];
+            boardQuickListLinks = new String[dItems.size() + 1];
+            boardQuickListOptions[0] = "Go to Boards Page...";
+            int x = 1;
             for (Element e : dItems) {
                 boardQuickListOptions[x] = e.text();
                 boardQuickListLinks[x] = e.attr("href");
                 x++;
             }
-
-            if (!boardListButton.isLongClickable()) {
-                boardListButton.setText(getResources().getString(R.string.board_jumper) +
-                        getResources().getString(R.string.board_jumper_quick_list));
-
-                boardListButton.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        showBoardQuickList();
-                        return true;
-                    }
-                });
-            }
-
-        } else if (boardListButton.isLongClickable()) {
-            boardListButton.setText(getResources().getString(R.string.board_jumper));
-            boardListButton.setLongClickable(false);
         }
 
         contentList.setDividerHeight(Theming.convertDPtoPX(this, 1));
@@ -2098,59 +2033,13 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 break;
         }
 
-        Element pmInboxLink = doc.select("div.masthead_user").first().select("a[href=/pm/]").first();
-        String pmButtonLabel = getResources().getString(R.string.pm_inbox);
+        Element pmInboxLink = doc.select("div.masthead_user").select("a[href=/pm]").first();
+        String pmButtonLabel = getString(R.string.pm_inbox);
         if (pmInboxLink != null) {
-            String text = pmInboxLink.text();
-            int count = 0;
-
-            if (text.contains("(")) {
-                count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
-                int prevCount = settings.getInt("unreadPMCount", 0);
-
-                if (count > prevCount) {
-                    if (count > 1)
-                        Crouton.showText(this, "You have " + count + " unread PMs", Theming.croutonStyle());
-                    else
-                        Crouton.showText(this, "You have 1 unread PM", Theming.croutonStyle());
-                }
-
-                pmButtonLabel += " (" + count + ")";
-            }
-
-            settings.edit().putInt("unreadPMCount", count).apply();
-            if (isDefaultAcc)
-                settings.edit().putInt("notifsUnreadPMCount", count).apply();
+            pmButtonLabel += " " + pmInboxLink.text();
         }
 
-        ((Button) findViewById(R.id.dwrPMInbox)).setText(pmButtonLabel);
-
-        Element trackedLink = doc.select("div.masthead_user").first().select("a[href=/boards/tracked]").first();
-        String ttButtonLabel = getResources().getString(R.string.tracked_topics);
-        if (trackedLink != null) {
-            String text = trackedLink.text();
-            int count = 0;
-
-            if (text.contains("(")) {
-                count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
-                int prevCount = settings.getInt("unreadTTCount", 0);
-
-                if (count > prevCount) {
-                    if (count > 1)
-                        Crouton.showText(this, "You have " + count + " unread tracked topics", Theming.croutonStyle());
-                    else
-                        Crouton.showText(this, "You have 1 unread tracked topic", Theming.croutonStyle());
-                }
-
-                ttButtonLabel += " (" + count + ")";
-            }
-
-            settings.edit().putInt("unreadTTCount", count).apply();
-            if (isDefaultAcc)
-                settings.edit().putInt("notifsUnreadTTCount", count).apply();
-        }
-
-        ((Button) findViewById(R.id.dwrTrackedTopics)).setText(ttButtonLabel);
+        dwrPMInbox.setTitle(pmButtonLabel);
 
         swipeRefreshLayout.setEnabled(settings.getBoolean("enablePTR", false));
 
@@ -2985,22 +2874,25 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         return d;
     }
 
-    private Button boardListButton;
     private String[] boardQuickListOptions;
     private String[] boardQuickListLinks;
 
     private void showBoardQuickList() {
-        AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setTitle("My Boards");
-        b.setNegativeButton("Cancel", null);
-        b.setItems(boardQuickListOptions, new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                session.get(NetDesc.BOARD, boardQuickListLinks[which]);
-            }
-        });
-        drawerLayout.closeDrawers();
-        b.show();
+        if (boardQuickListOptions != null && boardQuickListOptions.length > 1) {
+            AlertDialog.Builder b = new AlertDialog.Builder(this);
+            b.setTitle("My Boards");
+            b.setNegativeButton("Cancel", null);
+            b.setItems(boardQuickListOptions, new OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (which == 0) {
+                        session.get(NetDesc.BOARD_JUMPER, "/boards");
+                    } else session.get(NetDesc.BOARD, boardQuickListLinks[which]);
+                }
+            });
+            drawerLayout.closeDrawers();
+            b.show();
+        } else session.get(NetDesc.BOARD_JUMPER, "/boards");
     }
 
     private String replyTo, replySubject;
@@ -3121,8 +3013,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             ACRA.getErrorReporter().handleException(e);
 
             config.setResToastText(R.string.crash_toast_text);
-        }
-        else {
+        } else {
             Log.e("tryCaught", "", e);
         }
     }

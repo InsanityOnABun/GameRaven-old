@@ -48,6 +48,7 @@
     <string name="refresh">Refresh</string>
     <string name="last_post">Last\nPost</string>
     <string name="last_unread_post">First\nUnread</string>
+    <string name="click_to_change"> (Click to Change)</string>
     <string name="bug_toast_text">Bug encountered, collecting debug info…</string>
     <string name="crash_toast_text">GameRaven has crashed, collecting crash info…</string>
     <string name="crash_dialog_title">GameRaven has encountered an error</string>
