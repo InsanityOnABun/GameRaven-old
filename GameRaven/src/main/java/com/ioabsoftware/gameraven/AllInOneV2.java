@@ -88,7 +88,6 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
 import org.acra.ACRA;
-import org.acra.config.ACRAConfiguration;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.codechimp.apprater.AppRater;
@@ -103,7 +102,6 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -238,8 +236,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
 
-    private Menu drawerMenu;
-    private MenuItem dwrChangeAccItem, dwrNavHeadItem, dwrPMInbox;
+    private MenuItem dwrChangeAccItem, dwrNavHeadItem, dwrPMInboxItem, dwrAMPItem;
 
     private FloatingActionButton fab;
 
@@ -302,6 +299,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.dwrChangeAcc:
+                        //noinspection deprecation
                         showDialog(CHANGE_LOGGED_IN_DIALOG);
                         break;
                     case R.id.dwrBoardJumper:
@@ -338,10 +336,11 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             }
         });
 
-        drawerMenu = navigationView.getMenu();
+        Menu drawerMenu = navigationView.getMenu();
         dwrNavHeadItem = drawerMenu.findItem(R.id.dwrNavHeader);
         dwrChangeAccItem = drawerMenu.findItem(R.id.dwrChangeAcc);
-        dwrPMInbox = drawerMenu.findItem(R.id.dwrPMInbox);
+        dwrPMInboxItem = drawerMenu.findItem(R.id.dwrPMInbox);
+        dwrAMPItem = drawerMenu.findItem(R.id.dwrAMPList);
 
         aBar.setDisplayHomeAsUpEnabled(true);
         aBar.setHomeButtonEnabled(true);
@@ -413,7 +412,8 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         postTitle.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                titleCounter.setText(StringEscapeUtils.escapeHtml4(s.toString()).length() + "/80");
+                String t = StringEscapeUtils.escapeHtml4(s.toString()).length() + "/80";
+                titleCounter.setText(t);
             }
 
             @Override
@@ -433,7 +433,8 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             public void afterTextChanged(Editable s) {
                 // GFAQs adds 13(!) characters onto bodies when they have a sig, apparently.
                 int length = StringEscapeUtils.escapeHtml4(s.toString()).length() + getSig().length() + 13;
-                bodyCounter.setText(length + "/4096");
+                String t = length + "/4096";
+                bodyCounter.setText(t);
             }
 
             @Override
@@ -531,7 +532,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
         int lastUpdateYear = settings.getInt("lastUpdateYear", 0);
         int lastUpdateYearDay = settings.getInt("lastUpdateYearDay", 0);
-        Time now = new Time();
+        @SuppressWarnings("deprecation") Time now = new Time();
         now.setToNow();
         if (lastUpdateYear != now.year || lastUpdateYearDay != now.yearDay) {
             if (BuildConfig.DEBUG) wtl("checking for update");
@@ -916,11 +917,11 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 b.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        HashMap<String, List<String>> data = new HashMap<String, List<String>>();
-                        data.put("key", Arrays.asList(userDetailData.getTagKey()));
+                        HashMap<String, List<String>> data = new HashMap<>();
+                        data.put("key", Collections.singletonList(userDetailData.getTagKey()));
                         assert tagText.getText() != null : "tagText.getText() is null";
-                        data.put("tag_text", Arrays.asList(tagText.getText().toString()));
-                        data.put("tag_submit", Arrays.asList("Tag this User"));
+                        data.put("tag_text", Collections.singletonList(tagText.getText().toString()));
+                        data.put("tag_submit", Collections.singletonList("Tag this User"));
 
                         hideSoftKeyboard(tagText);
                         AllInOneV2.get().getSession().post(NetDesc.TAG_USER, userDetailData.getTagPath(), data);
@@ -996,7 +997,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     public void setLoginName(String name) {
-        dwrChangeAccItem.setTitle(name + " " +  getString(R.string.click_to_change));
+        dwrChangeAccItem.setTitle(name + " " + getString(R.string.click_to_change));
     }
 
     private void hideSoftKeyboard(View inputView) {
@@ -1160,10 +1161,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     public void setAMPLinkVisible(boolean visible) {
-//        if (visible)
-//            findViewById(R.id.dwrAMPWrapper).setVisibility(View.VISIBLE);
-//        else
-//            findViewById(R.id.dwrAMPWrapper).setVisibility(View.GONE);
+        dwrAMPItem.setVisible(visible);
     }
 
     public void preExecuteSetup(NetDesc desc) {
@@ -1182,7 +1180,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
      * *****************************************
      */
 
-    ArrayList<BaseRowData> adapterRows = new ArrayList<BaseRowData>();
+    ArrayList<BaseRowData> adapterRows = new ArrayList<>();
     ViewAdapter viewAdapter = new ViewAdapter(this, adapterRows);
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -1910,23 +1908,33 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 for (Element row : tbody.children()) {
                     String label = row.child(0).text().toLowerCase(Locale.US);
                     if (BuildConfig.DEBUG) wtl("user detail row label: " + label);
-                    if (label.equals("user name"))
-                        name = row.child(1).text();
-                    else if (label.equals("user id"))
-                        ID = row.child(1).text();
-                    else if (label.equals("board user level")) {
-                        level = row.child(1).html();
-                        if (BuildConfig.DEBUG) wtl("set level: " + level);
-                    } else if (label.equals("account created"))
-                        creation = row.child(1).text();
-                    else if (label.equals("last visit"))
-                        lVisit = row.child(1).text();
-                    else if (label.equals("signature"))
-                        sig = row.child(1).html();
-                    else if (label.equals("karma"))
-                        karma = row.child(1).text();
-                    else if (label.equals("active messages posted"))
-                        AMP = row.child(1).text();
+                    switch (label) {
+                        case "user name":
+                            name = row.child(1).text();
+                            break;
+                        case "user id":
+                            ID = row.child(1).text();
+                            break;
+                        case "board user level":
+                            level = row.child(1).html();
+                            if (BuildConfig.DEBUG) wtl("set level: " + level);
+                            break;
+                        case "account created":
+                            creation = row.child(1).text();
+                            break;
+                        case "last visit":
+                            lVisit = row.child(1).text();
+                            break;
+                        case "signature":
+                            sig = row.child(1).html();
+                            break;
+                        case "karma":
+                            karma = row.child(1).text();
+                            break;
+                        case "active messages posted":
+                            AMP = row.child(1).text();
+                            break;
+                    }
                 }
 
                 if (Session.isLoggedIn()) {
@@ -2039,7 +2047,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             pmButtonLabel += " " + pmInboxLink.text();
         }
 
-        dwrPMInbox.setTitle(pmButtonLabel);
+        dwrPMInboxItem.setTitle(pmButtonLabel);
 
         swipeRefreshLayout.setEnabled(settings.getBoolean("enablePTR", false));
 
@@ -2235,6 +2243,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             return;
         }
 
+        assert getSupportActionBar() != null;
         getSupportActionBar().setTitle(titleIn);
 
         if (currPage == -1) {
@@ -2299,10 +2308,12 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 });
 
                 pageLabel.setEnabled(true);
-                pageLabel.setText("~ " + currPage + " / " + pageCount + " ~");
+                String t = "~ " + currPage + " / " + pageCount + " ~";
+                pageLabel.setText(t);
             } else {
                 pageLabel.setEnabled(false);
-                pageLabel.setText(currPage + " / ???");
+                String t = currPage + " / ???";
+                pageLabel.setText(t);
             }
         }
     }
@@ -2318,6 +2329,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         clickedMsg = msg;
         quoteSelection = clickedMsg.getSelection();
 
+        //noinspection deprecation
         showDialog(MESSAGE_ACTION_DIALOG);
     }
 
@@ -2391,6 +2403,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     public void postPollOptions(View view) {
+        //noinspection deprecation
         showDialog(POLL_OPTIONS_DIALOG);
     }
 
@@ -2454,15 +2467,10 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         }
     }
 
-    private String reportCode;
-
-    public String getReportCode() {
-        return reportCode;
-    }
-
     /**
      * creates dialogs
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected Dialog onCreateDialog(int id) {
         Dialog dialog = null;
@@ -2563,6 +2571,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         Dialog dialog = b.create();
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             public void onDismiss(DialogInterface dialog) {
+                //noinspection deprecation
                 removeDialog(POLL_OPTIONS_DIALOG);
             }
         });
@@ -2577,6 +2586,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         pollMinLevel = -1;
     }
 
+    private String reportCode;
 
     private Dialog createReportMessageDialog() {
         AlertDialog.Builder reportMsgBuilder = new AlertDialog.Builder(this);
@@ -2627,6 +2637,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         Dialog dialog = reportMsgBuilder.create();
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             public void onDismiss(DialogInterface dialog) {
+                //noinspection deprecation
                 removeDialog(REPORT_MESSAGE_DIALOG);
             }
         });
@@ -2645,7 +2656,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
         msgActionBuilder.setTitle("Message Actions");
 
-        ArrayList<String> listBuilder = new ArrayList<String>();
+        ArrayList<String> listBuilder = new ArrayList<>();
 
         if (clickedMsg.getMessageID() != null) {
             if (clickedMsg.isEdited())
@@ -2670,7 +2681,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         ListView lv = (ListView) v.findViewById(R.id.maList);
         final LinearLayout wrapper = (LinearLayout) v.findViewById(R.id.maWrapper);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
         adapter.addAll(listBuilder);
 
         lv.setAdapter(adapter);
@@ -2679,38 +2690,43 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selected = (String) parent.getItemAtPosition(position);
                 assert selected != null : "selected is null";
-                if (selected.equals("View Previous Version(s)") || selected.equals("Message Detail")) {
-                    session.get(NetDesc.MESSAGE_DETAIL, clickedMsg.getMessageDetailLink());
+                switch (selected) {
+                    case "View Previous Version(s)":
+                    case "Message Detail":
+                        session.get(NetDesc.MESSAGE_DETAIL, clickedMsg.getMessageDetailLink());
+                        break;
+                    case "Quote":
+                        String msg = (quoteSelection != null ? quoteSelection : clickedMsg.getMessageForQuoting());
+                        quoteSetup(clickedMsg.getUser(), msg);
+                        break;
+                    case "Edit":
+                        editPostSetup(clickedMsg.getMessageForEditing(), clickedMsg.getMessageID());
+                        break;
+                    case "Delete":
+                        HashMap<String, List<String>> delData = new HashMap<>();
+                        delData.put("action", Collections.singletonList("delete"));
+                        delData.put("key", Collections.singletonList(session.getSessionKey()));
 
-                } else if (selected.equals("Quote")) {
-                    String msg = (quoteSelection != null ? quoteSelection : clickedMsg.getMessageForQuoting());
-                    quoteSetup(clickedMsg.getUser(), msg);
-
-                } else if (selected.equals("Edit")) {
-                    editPostSetup(clickedMsg.getMessageForEditing(), clickedMsg.getMessageID());
-
-                } else if (selected.equals("Delete")) {
-                    HashMap<String, List<String>> delData = new HashMap<>();
-                    delData.put("action", Collections.singletonList("delete"));
-                    delData.put("key", Collections.singletonList(session.getSessionKey()));
-
-                    session.post(NetDesc.DELETEMSG,
-                            clickedMsg.getMessageDetailLink().replace("/boards/", "/boardaction/"), delData);
-
-                } else if (selected.equals("Report")) {
-                    showDialog(REPORT_MESSAGE_DIALOG);
-
-                } else if (selected.equals("Highlight User")) {
-                    HighlightedUser user = hlDB.getHighlightedUsers().get(clickedMsg.getUser().toLowerCase(Locale.US));
-                    HighlightListDBHelper.showHighlightUserDialog(AllInOneV2.this, user, clickedMsg.getUser(), null);
-
-                } else if (selected.equals("User Details")) {
-                    session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink());
-
-                } else {
-                    Crouton.showText(AllInOneV2.this, "not recognized: " + selected, Theming.croutonStyle());
+                        session.post(NetDesc.DELETEMSG,
+                                clickedMsg.getMessageDetailLink().replace("/boards/", "/boardaction/"), delData);
+                        break;
+                    case "Report":
+                        //noinspection deprecation
+                        showDialog(REPORT_MESSAGE_DIALOG);
+                        break;
+                    case "Highlight User":
+                        HighlightedUser user = hlDB.getHighlightedUsers().get(clickedMsg.getUser().toLowerCase(Locale.US));
+                        HighlightListDBHelper.showHighlightUserDialog(AllInOneV2.this, user, clickedMsg.getUser(), null);
+                        break;
+                    case "User Details":
+                        session.get(NetDesc.USER_DETAIL, clickedMsg.getUserDetailLink());
+                        break;
+                    default:
+                        Crouton.showText(AllInOneV2.this, "not recognized: " + selected, Theming.croutonStyle());
+                        break;
                 }
 
+                //noinspection deprecation
                 dismissDialog(MESSAGE_ACTION_DIALOG);
             }
         });
@@ -2720,6 +2736,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         Dialog dialog = msgActionBuilder.create();
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             public void onDismiss(DialogInterface dialog) {
+                //noinspection deprecation
                 removeDialog(MESSAGE_ACTION_DIALOG);
             }
         });
@@ -2807,6 +2824,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         d.setOnDismissListener(new DialogInterface.OnDismissListener() {
             public void onDismiss(DialogInterface dialog) {
                 pmSending = null;
+                //noinspection deprecation
                 removeDialog(SEND_PM_DIALOG);
             }
         });
@@ -2851,6 +2869,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                             noNetworkConnection();
                 }
 
+                //noinspection deprecation
                 dismissDialog(CHANGE_LOGGED_IN_DIALOG);
             }
         });
@@ -2868,6 +2887,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         final AlertDialog d = accountChanger.create();
         d.setOnDismissListener(new DialogInterface.OnDismissListener() {
             public void onDismiss(DialogInterface dialog) {
+                //noinspection deprecation
                 removeDialog(CHANGE_LOGGED_IN_DIALOG);
             }
         });
@@ -2923,6 +2943,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             // should never happen
         }
 
+        //noinspection deprecation
         showDialog(SEND_PM_DIALOG);
     }
 
@@ -2932,6 +2953,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
                     hideSoftInputFromWindow(pmSending.getWindowToken(), 0);
 
+            //noinspection deprecation
             dismissDialog(SEND_PM_DIALOG);
         } else {
             Crouton.showText(this, error, Theming.croutonStyle(), (ViewGroup) pmSending.getParent());
@@ -3002,17 +3024,12 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
     public void tryCaught(String url, String desc, Throwable e, String source) {
         if (!BuildConfig.DEBUG) {
-            ACRAConfiguration config = ACRA.getConfig();
-            config.setResToastText(R.string.bug_toast_text);
-
             ACRA.getErrorReporter().putCustomData("URL", url);
             ACRA.getErrorReporter().putCustomData("NetDesc", desc);
             ACRA.getErrorReporter().putCustomData("Page Source", StringEscapeUtils.escapeJava(source));
             ACRA.getErrorReporter().putCustomData("Last Attempted Path", session.getLastAttemptedPath());
             ACRA.getErrorReporter().putCustomData("Last Attempted Desc", session.getLastAttemptedDesc().toString());
             ACRA.getErrorReporter().handleException(e);
-
-            config.setResToastText(R.string.crash_toast_text);
         } else {
             Log.e("tryCaught", "", e);
         }
@@ -3100,21 +3117,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
     public static String buildAMPLink() {
         return "/boards/myposts.php?lp=" + settings.getString("ampSortOption", "-1");
-    }
-
-    private void censorWord(StringBuilder builder, String textLower, String word) {
-        int length = word.length();
-        String replacement = "";
-
-        for (int x = 0; x < length - 1; x++)
-            replacement += '*';
-
-        while (textLower.contains(word)) {
-            int start = textLower.indexOf(word);
-            int end = start + length;
-            builder.replace(start + 1, end, replacement);
-            textLower = textLower.replaceFirst(word, replacement + '*');
-        }
     }
 
     @SuppressWarnings("ConstantConditions")
