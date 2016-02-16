@@ -7,6 +7,9 @@
             <item
                 android:id="@+id/dwrChangeAcc"
                 android:title="@string/change_acc_default"/>
+            <item
+                android:id="@+id/dwrNotifications"
+                android:title="@string/notification"/>
         </menu>
     </item>
 

@@ -24,6 +24,8 @@
     <string name="post">Post</string>
     <string name="logged_in_as">Logged In As…</string>
     <string name="change_acc_default">Logged Out (click to change)</string>
+    <string name="notification">Notification</string>
+    <string name="notifications">Notifications</string>
     <string name="navigation">Navigation</string>
     <string name="board_jumper">Board Jumper</string>
     <string name="board_jumper_quick_list">\n(Long Click for Quick List)</string>

@@ -55,7 +55,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ioabsoftware.gameraven.db.HighlightListDBHelper;
 import com.ioabsoftware.gameraven.db.HighlightedUser;
@@ -236,7 +235,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
 
-    private MenuItem dwrChangeAccItem, dwrNavHeadItem, dwrPMInboxItem, dwrAMPItem;
+    private MenuItem dwrChangeAccItem, dwrNotifItem, dwrNavHeadItem, dwrPMInboxItem, dwrAMPItem;
 
     private FloatingActionButton fab;
 
@@ -338,6 +337,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
         Menu drawerMenu = navigationView.getMenu();
         dwrNavHeadItem = drawerMenu.findItem(R.id.dwrNavHeader);
+        dwrNotifItem = drawerMenu.findItem(R.id.dwrNotifications);
         dwrChangeAccItem = drawerMenu.findItem(R.id.dwrChangeAcc);
         dwrPMInboxItem = drawerMenu.findItem(R.id.dwrPMInbox);
         dwrAMPItem = drawerMenu.findItem(R.id.dwrAMPList);
@@ -698,15 +698,17 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
     private boolean needToSetNavList = true;
 
-    public void disableNavList() {
-        dwrNavHeadItem.setVisible(false);
+    public void navDrawerReset() {
+        setMenuItemVisibility(dwrNavHeadItem, false);
+        setMenuItemVisibility(dwrNotifItem, false);
+        setMenuItemEnabled(dwrNotifItem, false);
         needToSetNavList = true;
     }
 
-    public void setNavList(boolean isLoggedIn) {
-        dwrNavHeadItem.setVisible(true);
+    public void setNavDrawerVisibility(boolean isLoggedIn) {
+        setMenuItemVisibility(dwrNavHeadItem, true);
+        setMenuItemVisibility(dwrNotifItem, true);
         dwrNavHeadItem.getSubMenu().setGroupVisible(R.id.dwrLoggedInNav, isLoggedIn);
-        Toast.makeText(this, Boolean.toString(isLoggedIn), Toast.LENGTH_SHORT).show();
 
         needToSetNavList = false;
     }
@@ -2049,6 +2051,22 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
         dwrPMInboxItem.setTitle(pmButtonLabel);
 
+        Element notifsLink = doc.select("span.notifications").first();
+        String count = "0 ";
+        if (notifsLink != null) {
+            count = notifsLink.child(0).text();
+            if (count.equals("1"))
+                count = count + " " + getString(R.string.notification);
+            else
+                count = count + " " + getString(R.string.notifications);
+
+            dwrNotifItem.setTitle(count);
+            setMenuItemEnabled(dwrNotifItem, true);
+        } else {
+            dwrNotifItem.setTitle(count + getString(R.string.notifications));
+            setMenuItemEnabled(dwrNotifItem, false);
+        }
+
         swipeRefreshLayout.setEnabled(settings.getBoolean("enablePTR", false));
 
         viewAdapter.notifyDataSetChanged();
@@ -2208,7 +2226,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             wtl("GRAIO dPostEC --NEL, desc: " + (desc == null ? "null" : desc.name()));
 
         if (needToSetNavList) {
-            setNavList(Session.isLoggedIn());
+            setNavDrawerVisibility(Session.isLoggedIn());
         }
 
         ptrCleanup();
