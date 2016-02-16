@@ -93,6 +93,7 @@ import org.codechimp.apprater.AppRater;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.io.File;
@@ -2043,10 +2044,10 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 break;
         }
 
-        Element pmInboxLink = doc.select("div.masthead_user").select("a[href=/pm]").first();
+        Element pmInboxLink = doc.select("i.icon-envelope-alt").first();
         String pmButtonLabel = getString(R.string.pm_inbox);
         if (pmInboxLink != null) {
-            pmButtonLabel += " " + pmInboxLink.text();
+            pmButtonLabel += " " + ((TextNode) pmInboxLink.nextSibling()).text();
         }
 
         dwrPMInboxItem.setTitle(pmButtonLabel);
