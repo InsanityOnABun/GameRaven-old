@@ -12,4 +12,4 @@ GameRaven is an Android app that aims to enhance the GameFAQs experience on Andr
 
 ##Installation
 You can install GameRaven from the Google Play Store.  
-[![Google Play Store Listing](http://developer.android.com/images/brand/en_generic_rgb_wo_60.png)](https://play.google.com/store/apps/details?id=com.ioabsoftware.gameraven)
+[![Google Play Store Listing](https://play.google.com/intl/en_us/badges/images/apps/en-play-badge.png)](https://play.google.com/store/apps/details?id=com.ioabsoftware.gameraven)
