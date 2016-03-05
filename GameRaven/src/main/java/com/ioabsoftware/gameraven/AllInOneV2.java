@@ -706,7 +706,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     public void setNavList(boolean isLoggedIn) {
         dwrNavHeadItem.setVisible(true);
         dwrNavHeadItem.getSubMenu().setGroupVisible(R.id.dwrLoggedInNav, isLoggedIn);
-        Toast.makeText(this, Boolean.toString(isLoggedIn), Toast.LENGTH_SHORT).show();
 
         needToSetNavList = false;
     }
