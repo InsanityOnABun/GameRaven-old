@@ -61,7 +61,6 @@ import com.ioabsoftware.gameraven.db.HighlightedUser;
 import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.prefs.HeaderSettings;
-import com.ioabsoftware.gameraven.prefs.SettingsAccount;
 import com.ioabsoftware.gameraven.prefs.SettingsHighlightedUsers;
 import com.ioabsoftware.gameraven.util.AccountManager;
 import com.ioabsoftware.gameraven.util.DocumentParser;
@@ -119,7 +118,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     public static final int MESSAGE_ACTION_DIALOG = 103;
     public static final int REPORT_MESSAGE_DIALOG = 104;
     public static final int POLL_OPTIONS_DIALOG = 105;
-    public static final int CHANGE_LOGGED_IN_DIALOG = 106;
 
     public static final String EMPTY_STRING = "";
 
@@ -236,7 +234,9 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
 
-    private MenuItem dwrChangeAccItem, dwrNotifItem, dwrNavHeadItem, dwrPMInboxItem, dwrAMPItem;
+    private Spinner accountsSpinner, notifsSpinner;
+    private ArrayAdapter<String> accountsAdapter, notifsAdapter;
+    private MenuItem dwrNavHeadItem, dwrPMInboxItem, dwrAMPItem;
 
     private FloatingActionButton fab;
 
@@ -294,14 +294,11 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
         drawerLayout.setDrawerListener(drawerToggle);
 
+        assert navigationView != null;
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.dwrChangeAcc:
-                        //noinspection deprecation
-                        showDialog(CHANGE_LOGGED_IN_DIALOG);
-                        break;
                     case R.id.dwrBoardJumper:
                         showBoardQuickList();
                         break;
@@ -336,10 +333,21 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             }
         });
 
+
+        View headerView = navigationView.getHeaderView(0);
+        accountsSpinner = (Spinner) headerView.findViewById(R.id.dwrHdrAccounts);
+        notifsSpinner = (Spinner) headerView.findViewById(R.id.dwrHdrNotifications);
+        accountsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+        notifsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+        accountsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        notifsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        accountsAdapter.add("No Accounts");
+        notifsAdapter.add("0 " + getString(R.string.notifications));
+        accountsSpinner.setAdapter(accountsAdapter);
+        notifsSpinner.setAdapter(notifsAdapter);
+
         Menu drawerMenu = navigationView.getMenu();
         dwrNavHeadItem = drawerMenu.findItem(R.id.dwrNavHeader);
-        dwrNotifItem = drawerMenu.findItem(R.id.dwrNotifications);
-        dwrChangeAccItem = drawerMenu.findItem(R.id.dwrChangeAcc);
         dwrPMInboxItem = drawerMenu.findItem(R.id.dwrPMInbox);
         dwrAMPItem = drawerMenu.findItem(R.id.dwrAMPList);
 
@@ -359,9 +367,11 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         }
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.ptr_layout);
-        swipeRefreshLayout.setEnabled(false);
-        swipeRefreshLayout.setColorSchemeColors(Theming.colorPrimary(), Theming.colorPrimaryDark());
-        swipeRefreshLayout.setOnRefreshListener(this);
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setEnabled(false);
+            swipeRefreshLayout.setColorSchemeColors(Theming.colorPrimary(), Theming.colorPrimaryDark());
+            swipeRefreshLayout.setOnRefreshListener(this);
+        }
 
         contentList = (ListView) findViewById(R.id.aioMainList);
 
@@ -590,6 +600,14 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
         MessageRowView.setUsingAvatars(settings.getBoolean("usingAvatars", false));
 
+        accountsAdapter.clear();
+        accountsAdapter.addAll(AccountManager.getUsernames(this));
+        accountsAdapter.add(getString(R.string.log_out));
+
+        if (firstResume) {
+            accountsSpinner.setOnItemSelectedListener(accountsListener);
+        }
+
         if (session == null) {
             String initUrl = null;
             NetDesc initDesc = null;
@@ -701,14 +719,11 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
     public void navDrawerReset() {
         setMenuItemVisibility(dwrNavHeadItem, false);
-        setMenuItemVisibility(dwrNotifItem, false);
-        setMenuItemEnabled(dwrNotifItem, false);
         needToSetNavList = true;
     }
 
     public void setNavDrawerVisibility(boolean isLoggedIn) {
         setMenuItemVisibility(dwrNavHeadItem, true);
-        setMenuItemVisibility(dwrNotifItem, true);
         dwrNavHeadItem.getSubMenu().setGroupVisible(R.id.dwrLoggedInNav, isLoggedIn);
 
         needToSetNavList = false;
@@ -1000,7 +1015,9 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     public void setLoginName(String name) {
-        dwrChangeAccItem.setTitle(name + " " + getString(R.string.click_to_change));
+        if (name == null)
+            name = getString(R.string.log_out);
+        accountsSpinner.setSelection(accountsAdapter.getPosition(name), false);
     }
 
     private void hideSoftKeyboard(View inputView) {
@@ -2053,20 +2070,27 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         dwrPMInboxItem.setTitle(pmButtonLabel);
 
         Element notifsLink = doc.select("span.notifications").first();
-        String count = "0 ";
+        notifsAdapter.clear();
+        String count = "0";
         if (notifsLink != null) {
             count = notifsLink.child(0).text();
             if (count.equals("1"))
                 count = count + " " + getString(R.string.notification);
             else
                 count = count + " " + getString(R.string.notifications);
-
-            dwrNotifItem.setTitle(count);
-            setMenuItemEnabled(dwrNotifItem, true);
+            notifsAdapter.add(count);
+            for (Element e : notifsLink.getElementsByTag("li")) {
+                notifsAdapter.add(e.text());
+            }
+            notifsAdapter.remove(notifsAdapter.getItem(notifsAdapter.getCount() - 1));
+            notifsAdapter.add("View All");
+            notifsAdapter.add("Clear All");
+            notifsSpinner.setEnabled(true);
         } else {
-            dwrNotifItem.setTitle(count + getString(R.string.notifications));
-            setMenuItemEnabled(dwrNotifItem, false);
+            notifsAdapter.add(count + " " + getString(R.string.notifications));
+            notifsSpinner.setEnabled(false);
         }
+        notifsAdapter.notifyDataSetChanged();
 
         swipeRefreshLayout.setEnabled(settings.getBoolean("enablePTR", false));
 
@@ -2237,6 +2261,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         if (isRoR)
             isRoR = false;
 
+        setLoginName(Session.getUser());
         System.gc();
     }
 
@@ -2510,10 +2535,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
             case POLL_OPTIONS_DIALOG:
                 dialog = createPollOptionsDialog();
-                break;
-
-            case CHANGE_LOGGED_IN_DIALOG:
-                dialog = createChangeLoggedInDialog();
                 break;
         }
 
@@ -2850,69 +2871,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         return d;
     }
 
-    private static final String LOG_OUT_LABEL = "*Log Out*";
-
-    private Dialog createChangeLoggedInDialog() {
-        AlertDialog.Builder accountChanger = new AlertDialog.Builder(this);
-
-        String[] keys = AccountManager.getUsernames(this);
-
-        final String[] usernames = new String[keys.length + 1];
-        usernames[0] = LOG_OUT_LABEL;
-        System.arraycopy(keys, 0, usernames, 1, keys.length);
-
-        final String currUser = Session.getUser();
-        int selected = 0;
-
-        for (int x = 1; x < usernames.length; x++) {
-            if (usernames[x].equals(currUser))
-                selected = x;
-        }
-
-        accountChanger.setTitle("Pick an Account");
-        accountChanger.setSingleChoiceItems(usernames, selected, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-                String selUser = usernames[item];
-                if (selUser.equals(LOG_OUT_LABEL) && currUser != null)
-                    session = new Session(AllInOneV2.this);
-
-                else {
-                    if (!selUser.equals(currUser) && !selUser.equals(LOG_OUT_LABEL))
-                        if (session.hasNetworkConnection())
-                            session = new Session(AllInOneV2.this,
-                                    selUser,
-                                    AccountManager.getPassword(AllInOneV2.this, selUser),
-                                    session.getLastPath(),
-                                    session.getLastDesc());
-                        else
-                            noNetworkConnection();
-                }
-
-                //noinspection deprecation
-                dismissDialog(CHANGE_LOGGED_IN_DIALOG);
-            }
-        });
-
-        accountChanger.setNegativeButton("Cancel", null);
-
-        accountChanger.setPositiveButton("Manage Accounts", new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                startActivity(new Intent(AllInOneV2.this, SettingsAccount.class));
-            }
-        });
-
-
-        final AlertDialog d = accountChanger.create();
-        d.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            public void onDismiss(DialogInterface dialog) {
-                //noinspection deprecation
-                removeDialog(CHANGE_LOGGED_IN_DIALOG);
-            }
-        });
-        return d;
-    }
-
     private String[] boardQuickListOptions;
     private String[] boardQuickListLinks;
 
@@ -3154,4 +3112,40 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
         postBody.getText().replace(Math.min(start, end), Math.max(start, end), insert, 0, insert.length());
     }
+
+    private AdapterView.OnItemSelectedListener accountsListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            final String currUser = Session.getUser();
+            String selUser = accountsAdapter.getItem(position);
+            if (selUser.equals(getString(R.string.log_out)) && currUser != null)
+                if (session.hasNetworkConnection())
+                    session = new Session(AllInOneV2.this);
+                else {
+                    noNetworkConnection();
+                    setLoginName(currUser);
+                }
+
+            else {
+                if (!selUser.equals(currUser) && !selUser.equals(getString(R.string.log_out)))
+                    if (session.hasNetworkConnection())
+                        session = new Session(AllInOneV2.this,
+                                selUser,
+                                AccountManager.getPassword(AllInOneV2.this, selUser),
+                                session.getLastPath(),
+                                session.getLastDesc());
+                    else {
+                        noNetworkConnection();
+                        setLoginName(currUser);
+                    }
+            }
+
+            drawerLayout.closeDrawers();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            // do nothing
+        }
+    };
 }

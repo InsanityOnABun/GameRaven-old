@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/dwrChangeAccHeader"
-        android:title="@string/logged_in_as">
-        <menu>
-            <item
-                android:id="@+id/dwrChangeAcc"
-                android:title="@string/change_acc_default"/>
-            <item
-                android:id="@+id/dwrNotifications"
-                android:title="@string/notification"/>
-        </menu>
-    </item>
-
-    <item
         android:id="@+id/dwrNavHeader"
         android:title="@string/navigation">
         <menu>

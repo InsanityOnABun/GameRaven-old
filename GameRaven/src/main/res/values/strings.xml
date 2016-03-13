@@ -24,6 +24,7 @@
     <string name="post">Post</string>
     <string name="logged_in_as">Logged In As…</string>
     <string name="change_acc_default">Logged Out (click to change)</string>
+    <string name="log_out">*Logout*</string>
     <string name="notification">Notification</string>
     <string name="notifications">Notifications</string>
     <string name="navigation">Navigation</string>
