@@ -201,6 +201,13 @@ public class MessageRowData extends BaseRowData {
         canEdit = cEdit;
         canQuote = cQuote;
 
+        String sigHtml = null;
+        Element sig = messageIn.select("div.sig_text").first();
+        if (sig != null) {
+            sigHtml = "<br />---<br />" + sig.html();
+            messageIn.select("div.signature").remove();
+        }
+
         if (!Session.isLoggedIn())
             messageIn.select("div.message_mpu").remove();
 
@@ -307,7 +314,7 @@ public class MessageRowData extends BaseRowData {
             messageIn.getElementsByClass("board_poll").first().remove();
         }
 
-        unprocessedMessageText = messageIn.html();
+        unprocessedMessageText = messageIn.html() + sigHtml;
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("creating ssb");
         SpannableStringBuilder ssb = new SpannableStringBuilder(processContent(false, true));
