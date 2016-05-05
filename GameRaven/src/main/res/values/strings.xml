@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Start Color Picker Strings -->
+    <string name="dialog_color_picker">Color Picker</string>
+    <string name="press_color_to_apply">Press on Color to apply</string>
+    <string name="user_tag_hint">User Tag</string>
+    <!-- End Color Picker Strings -->
 
     <string name="app_name">GameRaven</string>
     <string name="gameraven">GameRaven</string>
@@ -57,11 +62,5 @@
     <string name="crash_dialog_text">An unexpected error has occurred. Sorry about that. Please help us fix this by sending in the debug data to the developer. All you have to do is click OK below.</string>
     <string name="crash_dialog_comment_prompt">You can also add your comments about the problem in the text box below:</string>
     <string name="crash_dialog_ok_toast">Thank you!</string>
-
-    <!-- Start Color Picker Strings -->
-    <string name="dialog_color_picker">Color Picker</string>
-    <string name="press_color_to_apply">Press on Color to apply</string>
-    <string name="user_tag_hint">User Tag</string>
-    <!-- End Color Picker Strings -->
-
+    <string name="view_results">View Results</string>
 </resources>

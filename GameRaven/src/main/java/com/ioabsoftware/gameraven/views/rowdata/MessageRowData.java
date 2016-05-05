@@ -37,6 +37,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -280,9 +281,9 @@ public class MessageRowData extends BaseRowData {
                     b.setBackgroundDrawable(Theming.selectableItemBackground());
                     b.setText(e.nextElementSibling().text());
                     final HashMap<String, List<String>> data = new HashMap<String, List<String>>();
-                    data.put("key", Arrays.asList(key));
-                    data.put("poll_vote", Arrays.asList(Integer.toString(x)));
-                    data.put("submit", Arrays.asList("Vote"));
+                    data.put("key", Collections.singletonList(key));
+                    data.put("poll_vote", Collections.singletonList(Integer.toString(x)));
+                    data.put("submit", Collections.singletonList("Vote"));
 
                     b.setOnClickListener(new OnClickListener() {
                         @Override
@@ -300,7 +301,7 @@ public class MessageRowData extends BaseRowData {
 
                 Button b = new Button(aio);
                 b.setBackgroundDrawable(Theming.selectableItemBackground());
-                b.setText("View Results");
+                b.setText(R.string.view_results);
                 b.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
