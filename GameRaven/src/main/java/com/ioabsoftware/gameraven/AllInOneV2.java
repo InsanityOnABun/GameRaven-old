@@ -2385,7 +2385,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
     private void quoteSetup(String user, String msg) {
         if (BuildConfig.DEBUG) wtl("quoteSetup fired");
-        String quotedMsg = "<cite>" + user + " posted...</cite>\n" + "<quote>" + msg + "</quote>\n\n";
+        String quotedMsg = "<cite>" + user + " posted...</cite>\n" + "<quote>" + msg + "</quote>\n";
 
         int start = Math.max(postBody.getSelectionStart(), 0);
         int end = Math.max(postBody.getSelectionEnd(), 0);
