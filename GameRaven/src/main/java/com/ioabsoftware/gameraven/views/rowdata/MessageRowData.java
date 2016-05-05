@@ -201,7 +201,7 @@ public class MessageRowData extends BaseRowData {
         canEdit = cEdit;
         canQuote = cQuote;
 
-        String sigHtml = null;
+        String sigHtml = "";
         Element sig = messageIn.select("div.sig_text").first();
         if (sig != null) {
             sigHtml = "<br />---<br />" + sig.html();
