@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Start Color Picker Strings -->
+    <string name="dialog_color_picker">Color Picker</string>
+    <string name="press_color_to_apply">Press on Color to apply</string>
+    <string name="user_tag_hint">User Tag</string>
+    <!-- End Color Picker Strings -->
 
     <string name="app_name">GameRaven</string>
     <string name="gameraven">GameRaven</string>
@@ -24,6 +29,9 @@
     <string name="post">Post</string>
     <string name="logged_in_as">Logged In As…</string>
     <string name="change_acc_default">Logged Out (click to change)</string>
+    <string name="log_out">*Logout*</string>
+    <string name="notification">Notification</string>
+    <string name="notifications">Notifications</string>
     <string name="navigation">Navigation</string>
     <string name="board_jumper">Board Jumper</string>
     <string name="board_jumper_quick_list">\n(Long Click for Quick List)</string>
@@ -48,17 +56,11 @@
     <string name="refresh">Refresh</string>
     <string name="last_post">Last\nPost</string>
     <string name="last_unread_post">First\nUnread</string>
-    <string name="bug_toast_text">Bug encountered, collecting debug info…</string>
+    <string name="click_to_change"> (Click to Change)</string>
     <string name="crash_toast_text">GameRaven has crashed, collecting crash info…</string>
     <string name="crash_dialog_title">GameRaven has encountered an error</string>
     <string name="crash_dialog_text">An unexpected error has occurred. Sorry about that. Please help us fix this by sending in the debug data to the developer. All you have to do is click OK below.</string>
     <string name="crash_dialog_comment_prompt">You can also add your comments about the problem in the text box below:</string>
     <string name="crash_dialog_ok_toast">Thank you!</string>
-
-    <!-- Start Color Picker Strings -->
-    <string name="dialog_color_picker">Color Picker</string>
-    <string name="press_color_to_apply">Press on Color to apply</string>
-    <string name="user_tag_hint">User Tag</string>
-    <!-- End Color Picker Strings -->
-
+    <string name="view_results">View Results</string>
 </resources>

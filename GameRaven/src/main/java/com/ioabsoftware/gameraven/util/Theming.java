@@ -16,9 +16,7 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 
 public final class Theming {
 
-    private static float dwrHeaderTextBaseSize,
-            dwrButtonTextBaseSize,
-            pjButtonTextBaseSize,
+    private static float pjButtonTextBaseSize,
             pjLabelTextBaseSize;
 
     private static int theme;
@@ -184,19 +182,9 @@ public final class Theming {
                 .build();
     }
 
-    public static void setTextSizeBases(float dwrHeader, float dwrButton, float pjButton, float pjLabel) {
-        dwrHeaderTextBaseSize = dwrHeader;
-        dwrButtonTextBaseSize = dwrButton;
+    public static void setTextSizeBases(float pjButton, float pjLabel) {
         pjButtonTextBaseSize = pjButton;
         pjLabelTextBaseSize = pjLabel;
-    }
-
-    public static float getScaledDwrHeaderTextSize() {
-        return dwrHeaderTextBaseSize * textScale;
-    }
-
-    public static float getScaledDwrButtonTextSize() {
-        return dwrButtonTextBaseSize * textScale;
     }
 
     public static float getScaledPJButtonTextSize() {

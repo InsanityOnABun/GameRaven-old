@@ -228,7 +228,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
     private void finalConstructor(AllInOneV2 aioIn, String userIn, String passwordIn) {
         aio = aioIn;
         if (BuildConfig.DEBUG) AllInOneV2.wtl("NEW SESSION");
-        aio.disableNavList();
+        aio.navDrawerReset();
 
         netManager = (ConnectivityManager) aio.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -251,7 +251,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         if (user == null) {
             if (BuildConfig.DEBUG) AllInOneV2.wtl("session constructor, user is null, starting logged out session");
             get(NetDesc.BOARD_JUMPER, ROOT + "/boards/");
-            aio.setLoginName("Logged Out");
+            aio.setLoginName(user);
         } else {
             if (BuildConfig.DEBUG) AllInOneV2.wtl("session constructor, user is not null, starting logged in session");
             get(NetDesc.LOGIN_S1, ROOT + "/boards/");
@@ -702,7 +702,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             if (initUrl.equals(RESUME_INIT_URL) && canGoBack()) {
                                 aio.dismissLoginDialog();
                                 goBack(true);
-                                aio.setNavList(isLoggedIn());
+                                aio.setNavDrawerVisibility(isLoggedIn());
                             }
                             else
                                 get(initDesc, initUrl);
