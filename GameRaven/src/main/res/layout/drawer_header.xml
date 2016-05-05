@@ -14,5 +14,6 @@
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:id="@+id/dwrHdrNotifications" />
+        android:id="@+id/dwrHdrNotifications"
+        android:visibility="gone" />
 </LinearLayout>
