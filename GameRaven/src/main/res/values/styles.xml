@@ -8,11 +8,7 @@
         <item name="readTopic">@color/read_topic</item>
         <item name="hiddenSpoilerColor">@color/white</item>
         <item name="revealedSpoilerColor">@color/black</item>
-
-        <item name="themedPollTopicIcon">@drawable/ic_poll_white_18dp</item>
-        <item name="themedLockedTopicIcon">@drawable/ic_lock_white_18dp</item>
-        <item name="themedArchivedTopicIcon">@drawable/ic_save_white_18dp</item>
-        <item name="themedPinnedTopicIcon">@drawable/ic_whatshot_white_18dp</item>
+        <item name="themedTopicStatusIconColor">@color/white</item>
 
         <item name="windowActionModeOverlay">true</item>
     </style>
@@ -25,11 +21,7 @@
         <item name="readTopic">@color/read_topic_light</item>
         <item name="hiddenSpoilerColor">@color/black</item>
         <item name="revealedSpoilerColor">@color/white</item>
-
-        <item name="themedPollTopicIcon">@drawable/ic_poll_grey600_18dp</item>
-        <item name="themedLockedTopicIcon">@drawable/ic_lock_grey600_18dp</item>
-        <item name="themedArchivedTopicIcon">@drawable/ic_save_grey600_18dp</item>
-        <item name="themedPinnedTopicIcon">@drawable/ic_whatshot_grey600_18dp</item>
+        <item name="themedTopicStatusIconColor">@color/dark_topic_status_icon</item>
 
         <item name="windowActionModeOverlay">true</item>
     </style>

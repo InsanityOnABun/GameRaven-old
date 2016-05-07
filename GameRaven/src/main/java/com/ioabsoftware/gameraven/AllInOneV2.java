@@ -82,6 +82,10 @@ import com.ioabsoftware.gameraven.views.rowdata.TopicRowData.TopicType;
 import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
+import com.joanzapata.iconify.fonts.MaterialCommunityIcons;
+import com.joanzapata.iconify.fonts.MaterialIcons;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
@@ -499,6 +503,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         contentList.setAdapter(viewAdapter);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setImageDrawable(new IconDrawable(this, MaterialIcons.md_add).colorRes(R.color.white).sizeDp(24));
         fab.setBackgroundTintList(new ColorStateList(
                 new int[][]{new int[]{}},
                 new int[]{Theming.colorPrimary()}));
@@ -778,16 +783,26 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
-        searchIcon = menu.findItem(R.id.search);
-        topicListIcon = menu.findItem(R.id.topicList);
-        addFavIcon = menu.findItem(R.id.addFav);
-        remFavIcon = menu.findItem(R.id.remFav);
-        pmInboxIcon = menu.findItem(R.id.pmInbox);
-        pmOutboxIcon = menu.findItem(R.id.pmOutbox);
-        sendUserPMIcon = menu.findItem(R.id.sendUserPM);
-        tagUserIcon = menu.findItem(R.id.tagUser);
-        replyIcon = menu.findItem(R.id.reply);
-        refreshIcon = menu.findItem(R.id.refresh);
+        searchIcon = menu.findItem(R.id.search).setIcon(new IconDrawable(
+                this, MaterialIcons.md_search).colorRes(R.color.white).actionBarSize());
+        topicListIcon = menu.findItem(R.id.topicList).setIcon(new IconDrawable(
+                this, MaterialIcons.md_view_list).colorRes(R.color.white).actionBarSize());
+        addFavIcon = menu.findItem(R.id.addFav).setIcon(new IconDrawable(
+                this, MaterialIcons.md_favorite_border).colorRes(R.color.white).actionBarSize());
+        remFavIcon = menu.findItem(R.id.remFav).setIcon(new IconDrawable(
+                this, MaterialIcons.md_favorite).colorRes(R.color.white).actionBarSize());
+        pmInboxIcon = menu.findItem(R.id.pmInbox).setIcon(new IconDrawable(
+                this, MaterialIcons.md_inbox).colorRes(R.color.white).actionBarSize());
+        pmOutboxIcon = menu.findItem(R.id.pmOutbox).setIcon(new IconDrawable(
+                this, MaterialCommunityIcons.mdi_outbox).colorRes(R.color.white).actionBarSize());
+        sendUserPMIcon = menu.findItem(R.id.sendUserPM).setIcon(new IconDrawable(
+                this, MaterialIcons.md_mail).colorRes(R.color.white).actionBarSize());
+        tagUserIcon = menu.findItem(R.id.tagUser).setIcon(new IconDrawable(
+                this, MaterialCommunityIcons.mdi_tag_text_outline).colorRes(R.color.white).actionBarSize());
+        replyIcon = menu.findItem(R.id.reply).setIcon(new IconDrawable(
+                this, MaterialIcons.md_reply).colorRes(R.color.white).actionBarSize());
+        refreshIcon = menu.findItem(R.id.refresh).setIcon(new IconDrawable(
+                this, MaterialIcons.md_refresh).colorRes(R.color.white).actionBarSize());
 
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchIcon);
         if (searchView != null) {

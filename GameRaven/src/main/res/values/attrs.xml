@@ -9,11 +9,7 @@
         <attr name="readTopic" format="color" />
         <attr name="hiddenSpoilerColor" format="color" />
         <attr name="revealedSpoilerColor" format="color" />
-
-        <attr name="themedPollTopicIcon" format="reference" />
-        <attr name="themedLockedTopicIcon" format="reference" />
-        <attr name="themedArchivedTopicIcon" format="reference" />
-        <attr name="themedPinnedTopicIcon" format="reference" />
+        <attr name="themedTopicStatusIconColor" format="color" />
     </declare-styleable>
 
 </resources>

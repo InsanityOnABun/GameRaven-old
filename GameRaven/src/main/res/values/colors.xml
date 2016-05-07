@@ -46,6 +46,8 @@
 
 
 
+    <color name="dark_topic_status_icon">#757575</color>
+
     <color name="holo_blue">#33B5E5</color>
     <color name="holo_blue_dark">#0099CC</color>
 

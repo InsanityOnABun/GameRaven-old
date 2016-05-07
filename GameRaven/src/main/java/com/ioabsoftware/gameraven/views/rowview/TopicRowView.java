@@ -26,7 +26,7 @@ public class TopicRowView extends BaseRowView {
     TextView msgLP;
     TextView lpLink;
 
-    ImageView typeIndicator;
+    TextView typeIndicator;
 
     TopicRowData myData;
 
@@ -60,7 +60,7 @@ public class TopicRowView extends BaseRowView {
         msgLP = (TextView) findViewById(R.id.tvMsgCountLastPost);
         lpLink = (TextView) findViewById(R.id.tvLastPostLink);
 
-        typeIndicator = (ImageView) findViewById(R.id.tvTypeIndicator);
+        typeIndicator = (TextView) findViewById(R.id.tvTypeIndicator);
 
         defaultTitleColor = title.getCurrentTextColor();
         defaultTCColor = tc.getCurrentTextColor();
@@ -164,7 +164,7 @@ public class TopicRowView extends BaseRowView {
     }
 
     private void setTypeIndicator(Drawable icon) {
-        typeIndicator.setImageDrawable(icon);
+        typeIndicator.setBackgroundDrawable(icon);
         typeIndicator.setVisibility(View.VISIBLE);
     }
 }

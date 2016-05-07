@@ -417,7 +417,6 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_margin="16dp"
-            android:src="@drawable/ic_add_white_24dp"
             android:visibility="visible"
             app:elevation="4dp" />
 

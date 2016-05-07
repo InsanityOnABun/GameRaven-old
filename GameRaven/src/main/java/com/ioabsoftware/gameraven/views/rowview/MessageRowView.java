@@ -28,7 +28,8 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
 
     View topWrapper;
 
-    ImageView avatar, overflowIcon;
+    ImageView avatar;
+    TextView overflowIcon;
 
     TextView user;
     TextView post;
@@ -69,7 +70,7 @@ public class MessageRowView extends BaseRowView implements View.OnClickListener 
         topWrapper = findViewById(R.id.mvTopWrapper);
 
         avatar = (ImageView) findViewById(R.id.mvAvatar);
-        overflowIcon = (ImageView) findViewById(R.id.mvMessageMenuIcon);
+        overflowIcon = (TextView) findViewById(R.id.mvMessageMenuIcon);
 
         user = (TextView) findViewById(R.id.mvUser);
         post = (TextView) findViewById(R.id.mvPostNumber);

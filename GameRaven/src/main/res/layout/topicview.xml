@@ -112,12 +112,11 @@
         android:textSize="12sp"
         android:visibility="gone" />
 
-    <ImageView
+    <com.joanzapata.iconify.widget.IconTextView
         android:id="@+id/tvTypeIndicator"
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:layout_alignLeft="@id/tvTitle"
         android:layout_alignWithParentIfMissing="true"
-        android:scaleType="fitStart"
-        android:src="@drawable/ic_save_white_18dp" />
+        android:scaleType="fitStart" />
 </RelativeLayout>

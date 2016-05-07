@@ -53,14 +53,14 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <ImageView
+        <com.joanzapata.iconify.widget.IconTextView
             android:id="@+id/mvMessageMenuIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="@dimen/item_padding_horizontal"
-            android:src="@drawable/ic_more_horiz_white_36dp" />
+            android:text="{md-more-horiz 36dp}" />
     </RelativeLayout>
 
     <LinearLayout
