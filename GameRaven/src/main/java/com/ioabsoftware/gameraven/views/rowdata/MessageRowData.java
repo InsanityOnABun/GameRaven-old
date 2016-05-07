@@ -43,7 +43,7 @@ import java.util.List;
 
 public class MessageRowData extends BaseRowData {
 
-    private String username, userTitles, postNum, postTime, messageID, boardID, topicID;
+    private String username, userTitles, avatarUrl, postNum, postTime, messageID, boardID, topicID;
     private final String unprocessedMessageText;
 
     private LinearLayout poll = null;
@@ -94,6 +94,10 @@ public class MessageRowData extends BaseRowData {
 
     public boolean hasTitles() {
         return userTitles != null;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 
     public String getPostNum() {
@@ -180,9 +184,9 @@ public class MessageRowData extends BaseRowData {
         unprocessedMessageText = "";
     }
 
-    public MessageRowData(String userIn, String userTitlesIn, String postNumIn, String postTimeIn,
-                          Element messageIn, String BID, String TID, String MID, int hlColorIn,
-                          boolean cReport, boolean cDelete, boolean cEdit, boolean cQuote) {
+    public MessageRowData(String userIn, String userTitlesIn, String avatarUrlIn, String postNumIn,
+                          String postTimeIn, Element messageIn, String BID, String TID, String MID,
+                          int hlColorIn, boolean cReport, boolean cDelete, boolean cEdit, boolean cQuote) {
 
         if (aio == null || aio != AllInOneV2.get())
             aio = AllInOneV2.get();
@@ -190,6 +194,7 @@ public class MessageRowData extends BaseRowData {
         if (BuildConfig.DEBUG) AllInOneV2.wtl("setting values");
         username = userIn;
         userTitles = userTitlesIn;
+        avatarUrl = avatarUrlIn;
         postNum = postNumIn;
         postTime = postTimeIn.replace('\u00A0', ' ');
         boardID = BID;

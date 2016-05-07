@@ -1822,8 +1822,10 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                                 goToThisIndex = msgIndex;
                         }
 
+                        String avatarUrl = row.getElementsByAttribute("data-img").first().attr("data-img");
+
                         if (BuildConfig.DEBUG) wtl("creating messagerowdata object");
-                        adapterRows.add(new MessageRowData(user, userTitles, postNum,
+                        adapterRows.add(new MessageRowData(user, userTitles, avatarUrl, postNum,
                                 postTime, msgBody, boardID, topicID, mID, hlColor, canReport, canDelete, canEdit, canQuote));
                     } else {
                         String postNum = row.select("span.message_num").first().text();
@@ -1864,8 +1866,9 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                     String user = msgInfobox.getElementsByTag("b").first().text();
                     String postTime = msgInfobox.select("span.post_time").first().text();
 
-                    msg = new MessageRowData(user, EMPTY_STRING, "#" + (msgRowCount - x), postTime,
-                            msgBody, boardID, topicID, mID, 0, false, false, false, false);
+                    msg = new MessageRowData(user, EMPTY_STRING, EMPTY_STRING,
+                            "#" + (msgRowCount - x), postTime, msgBody, boardID, topicID,
+                            mID, 0, false, false, false, false);
                     msg.disableTopClick();
                     adapterRows.add(msg);
                 }
