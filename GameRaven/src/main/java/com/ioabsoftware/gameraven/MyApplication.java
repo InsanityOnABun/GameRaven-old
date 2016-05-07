@@ -2,6 +2,11 @@ package com.ioabsoftware.gameraven;
 
 import android.app.Application;
 
+import com.joanzapata.iconify.Iconify;
+import com.joanzapata.iconify.fonts.FontAwesomeModule;
+import com.joanzapata.iconify.fonts.MaterialCommunityModule;
+import com.joanzapata.iconify.fonts.MaterialModule;
+
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -86,5 +91,10 @@ public class MyApplication extends Application {
         // trigger the initialization of ACRA, but only for release builds
         if (!BuildConfig.DEBUG)
             ACRA.init(this);
+
+        Iconify
+                .with(new FontAwesomeModule())
+                .with(new MaterialModule())
+                .with(new MaterialCommunityModule());
     }
 }

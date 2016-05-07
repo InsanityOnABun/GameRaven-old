@@ -174,7 +174,8 @@
                         android:paddingRight="2dp"
                         android:text="@string/titlecounter"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textSize="12sp" />
+                        android:textSize="12sp"
+                        android:visibility="gone" />
                 </LinearLayout>
 
                 <View
@@ -213,19 +214,19 @@
 
                 <LinearLayout
                     android:id="@+id/aioHTMLOuterWrapper"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginBottom="3dp"
-                    android:layout_weight="1"
                     android:orientation="vertical">
 
                     <ScrollView
                         android:id="@+id/aioHTMLScroller"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:fadeScrollbars="false"
-                        android:scrollbarStyle="outsideOverlay">
+                        android:scrollbarStyle="outsideOverlay"
+                        tools:ignore="HardcodedText">
 
                         <LinearLayout
                             android:id="@+id/aioHTMLWrapper"
@@ -233,15 +234,15 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
 
-                            <Button
+                            <com.joanzapata.iconify.widget.IconButton
                                 android:id="@+id/aioBold"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
                                 android:background="?attr/selectableItemBackground"
                                 android:onClick="htmlButtonClicked"
-                                android:text="@string/boldtag"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
+                                android:tag="b"
+                                android:text="{fa-bold}"
+                                android:textSize="14sp" />
 
                             <View
                                 android:id="@+id/aioBoldSep"
@@ -250,15 +251,15 @@
                                 android:background="?attr/colorPrimary"
                                 android:visibility="visible" />
 
-                            <Button
+                            <com.joanzapata.iconify.widget.IconButton
                                 android:id="@+id/aioItalic"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
                                 android:background="?attr/selectableItemBackground"
                                 android:onClick="htmlButtonClicked"
-                                android:text="@string/italictag"
-                                android:textSize="14sp"
-                                android:textStyle="italic" />
+                                android:tag="i"
+                                android:text="{fa-italic}"
+                                android:textSize="14sp" />
 
                             <View
                                 android:id="@+id/aioItalicSep"
@@ -267,15 +268,15 @@
                                 android:background="?attr/colorPrimary"
                                 android:visibility="visible" />
 
-                            <Button
+                            <com.joanzapata.iconify.widget.IconButton
                                 android:id="@+id/aioCode"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
                                 android:background="?attr/selectableItemBackground"
                                 android:onClick="htmlButtonClicked"
-                                android:text="@string/codetag"
-                                android:textSize="14sp"
-                                android:typeface="monospace" />
+                                android:tag="code"
+                                android:text="{fa-code}"
+                                android:textSize="14sp" />
 
                             <View
                                 android:id="@+id/aioCodeSep"
@@ -284,13 +285,14 @@
                                 android:background="?attr/colorPrimary"
                                 android:visibility="visible" />
 
-                            <Button
+                            <com.joanzapata.iconify.widget.IconButton
                                 android:id="@+id/aioSpoiler"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
                                 android:background="?attr/selectableItemBackground"
                                 android:onClick="htmlButtonClicked"
-                                android:text="@string/spoilertag"
+                                android:tag="spoiler"
+                                android:text="{fa-user-secret}"
                                 android:textSize="14sp" />
 
                             <View
@@ -300,13 +302,14 @@
                                 android:background="?attr/colorPrimary"
                                 android:visibility="visible" />
 
-                            <Button
+                            <com.joanzapata.iconify.widget.IconButton
                                 android:id="@+id/aioCite"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
                                 android:background="?attr/selectableItemBackground"
                                 android:onClick="htmlButtonClicked"
-                                android:text="@string/citetag"
+                                android:tag="cite"
+                                android:text="{fa-underline}"
                                 android:textSize="14sp" />
 
                             <View
@@ -316,13 +319,14 @@
                                 android:background="?attr/colorPrimary"
                                 android:visibility="visible" />
 
-                            <Button
+                            <com.joanzapata.iconify.widget.IconButton
                                 android:id="@+id/aioQuote"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
                                 android:background="?attr/selectableItemBackground"
                                 android:onClick="htmlButtonClicked"
-                                android:text="@string/quotetag"
+                                android:tag="quote"
+                                android:text="{fa-quote-right}"
                                 android:textSize="14sp" />
                         </LinearLayout>
                     </ScrollView>
@@ -339,12 +343,12 @@
                         android:id="@+id/aioPostBodyCounter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="right"
                         android:paddingLeft="2dp"
                         android:paddingRight="2dp"
                         android:text="@string/bodycounter"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textSize="12sp" />
+                        android:textSize="12sp"
+                        android:visibility="gone" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -415,7 +419,7 @@
             android:layout_margin="16dp"
             android:src="@drawable/ic_add_white_24dp"
             android:visibility="visible"
-            app:elevation="4dp"/>
+            app:elevation="4dp" />
 
     </RelativeLayout>
 
@@ -425,7 +429,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/drawer_header"
-        app:menu="@menu/drawer"/>
+        app:menu="@menu/drawer" />
 
 </android.support.v4.widget.DrawerLayout>
 

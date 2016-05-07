@@ -423,8 +423,13 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         postTitle.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                String t = StringEscapeUtils.escapeHtml4(s.toString()).length() + "/80";
-                titleCounter.setText(t);
+                int length = StringEscapeUtils.escapeHtml4(s.toString()).length();
+                if (length > 70) {
+                    String t = length + "/80";
+                    titleCounter.setText(t);
+                    titleCounter.setVisibility(View.VISIBLE);
+                } else
+                    titleCounter.setVisibility(View.GONE);
             }
 
             @Override
@@ -444,8 +449,12 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             public void afterTextChanged(Editable s) {
                 // GFAQs adds 13(!) characters onto bodies when they have a sig, apparently.
                 int length = StringEscapeUtils.escapeHtml4(s.toString()).length() + getSig().length() + 13;
-                String t = length + "/4096";
-                bodyCounter.setText(t);
+                if (length > 4000) {
+                    String t = length + "\n/4096";
+                    bodyCounter.setText(t);
+                    bodyCounter.setVisibility(View.VISIBLE);
+                } else
+                    bodyCounter.setVisibility(View.GONE);
             }
 
             @Override
@@ -3099,10 +3108,10 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         return "/boards/myposts.php?lp=" + settings.getString("ampSortOption", "-1");
     }
 
-    @SuppressWarnings("ConstantConditions")
     public void htmlButtonClicked(View view) {
-        String open = ((TextView) view).getText().toString();
-        String close = "</" + open.substring(1);
+        String tag = (String) view.getTag();
+        String open = "<" + tag + ">";
+        String close = "</" + tag + ">";
 
         int start = Math.max(postBody.getSelectionStart(), 0);
         int end = Math.max(postBody.getSelectionEnd(), 0);
