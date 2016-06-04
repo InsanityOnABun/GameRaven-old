@@ -1288,16 +1288,15 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             case BOARD_JUMPER:
             case LOGIN_S2:
                 updateHeaderNoJumper("Board Jumper", NetDesc.BOARD_JUMPER);
-                adapterRows.add(new HeaderRowData("Announcements"));
 
                 setMenuItemVisibility(searchIcon, true);
 
-                processBoards(doc, true);
+                processBoards(doc);
                 break;
 
             case BOARD_LIST:
                 updateHeaderNoJumper(doc.getElementsByTag("th").get(4).text(), NetDesc.BOARD_LIST);
-                processBoards(doc, true);
+                processBoards(doc);
                 break;
 
             case PM_INBOX:
@@ -1544,7 +1543,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
                         updateHeaderNoJumper(doc.select("h1.page-title").first().text(), NetDesc.BOARD);
 
-                        processBoards(doc, false);
+                        processBoards(doc);
 
                         isSplitList = true;
                     }
@@ -2161,7 +2160,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
      * ********************************
      */
 
-    private void processBoards(Document pRes, boolean includeBoardCategories) {
+    private void processBoards(Document pRes) {
         Elements homeTables = pRes.select("table.board");
 
         boolean skippedFirst = false;
@@ -2184,7 +2183,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                     if (titleCell.children().size() > 2)
                         boardDesc = titleCell.child(2).text();
 
-                    String link = titleCell.children().first().attr("href");
+                    String link = titleCell.select("a").first().attr("href");
                     if (link.isEmpty())
                         link = null;
 
@@ -2207,24 +2206,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 }
             } else {
                 skippedFirst = true;
-            }
-        }
-
-        if (includeBoardCategories && homeTables.size() > 1) {
-            int rowX = 0;
-            for (Element row : homeTables.get(1).getElementsByTag("tr")) {
-                rowX++;
-                if (rowX > 2) {
-                    Element cell = row.child(0);
-                    String title = cell.child(0).text();
-                    String link = cell.child(0).attr("href");
-                    String boardDesc = cell.child(2).text();
-                    adapterRows.add(new BoardRowData(title, boardDesc, null, null, null, link, BoardType.LIST));
-                } else {
-                    if (rowX == 1) {
-                        adapterRows.add(new HeaderRowData("Message Board Categories"));
-                    }
-                }
             }
         }
     }
