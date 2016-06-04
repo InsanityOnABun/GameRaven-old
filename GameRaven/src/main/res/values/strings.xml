@@ -10,10 +10,6 @@
     <string name="gameraven">GameRaven</string>
     <string name="drawer_open">open drawer</string>
     <string name="drawer_close">close drawer</string>
-    <string name="firstpage">&lt;&lt;</string>
-    <string name="prevpage">&lt;</string>
-    <string name="lastpage">>></string>
-    <string name="nextpage">></string>
     <string name="title">Title</string>
     <string name="titlecounter">80/80</string>
     <string name="body">Body</string>
