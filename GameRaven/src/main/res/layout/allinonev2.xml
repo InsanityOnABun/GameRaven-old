@@ -32,7 +32,7 @@
             android:background="?attr/colorPrimaryDark"
             android:orientation="vertical">
 
-            <Button
+            <com.joanzapata.iconify.widget.IconButton
                 android:id="@+id/aioFirstPage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -43,10 +43,10 @@
                 android:minWidth="54dp"
                 android:paddingBottom="@dimen/item_padding_vertical"
                 android:paddingTop="@dimen/item_padding_vertical"
-                android:text="@string/firstpage"
+                android:text="{fa-angle-double-left}"
                 android:textColor="@color/page_jumper_button_colors" />
 
-            <Button
+            <com.joanzapata.iconify.widget.IconButton
                 android:id="@+id/aioPreviousPage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -56,10 +56,10 @@
                 android:background="?attr/selectableItemBackground"
                 android:enabled="false"
                 android:minWidth="54dp"
-                android:text="@string/prevpage"
+                android:text="{fa-angle-left}"
                 android:textColor="@color/page_jumper_button_colors" />
 
-            <Button
+            <com.joanzapata.iconify.widget.IconButton
                 android:id="@+id/aioLastPage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -69,10 +69,10 @@
                 android:background="?attr/selectableItemBackground"
                 android:enabled="false"
                 android:minWidth="54dp"
-                android:text="@string/lastpage"
+                android:text="{fa-angle-double-right}"
                 android:textColor="@color/page_jumper_button_colors" />
 
-            <Button
+            <com.joanzapata.iconify.widget.IconButton
                 android:id="@+id/aioNextPage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
                 android:background="?attr/selectableItemBackground"
                 android:enabled="false"
                 android:minWidth="54dp"
-                android:text="@string/nextpage"
+                android:text="{fa-angle-right}"
                 android:textColor="@color/page_jumper_button_colors" />
 
             <Button
