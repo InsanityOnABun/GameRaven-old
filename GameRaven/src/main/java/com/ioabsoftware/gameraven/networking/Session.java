@@ -675,6 +675,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                 // reset history flag
                 addToHistory = true;
 
+                Element keyElem = doc.getElementsByAttributeValue("name", "key").first();
+                if (keyElem != null)
+                    sessionKey = doc.getElementsByAttributeValue("name", "key").first().attr("value");
+
                 switch (desc) {
                     case LOGIN_S1:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is login step 1");
@@ -694,8 +698,6 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case LOGIN_S2:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is login step 2");
                         aio.setAMPLinkVisible(userCanViewAMP());
-
-                        sessionKey = doc.getElementsByAttributeValue("name", "key").first().attr("value");
 
                         if (initUrl != null) {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("loading previous page");

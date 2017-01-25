@@ -1845,7 +1845,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                                 goToThisIndex = msgIndex;
                         }
 
-                        String avatarUrl = row.getElementsByAttribute("data-img").first().attr("data-img");
+                        String avatarUrl = row.getElementsByClass("imgboxart").first().attr("src");
 
                         if (BuildConfig.DEBUG) wtl("creating messagerowdata object");
                         adapterRows.add(new MessageRowData(user, userTitles, avatarUrl, postNum,

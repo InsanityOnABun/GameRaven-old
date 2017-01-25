@@ -139,6 +139,7 @@ public final class Theming {
         }
     }
 
+    @SuppressWarnings("ResourceType")
     public static void init(Context c, SharedPreferences settings) {
         Resources resources = c.getResources();
         textScale = settings.getInt("textScale", 100) / 100f;
