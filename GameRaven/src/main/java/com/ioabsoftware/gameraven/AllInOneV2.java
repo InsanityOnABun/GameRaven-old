@@ -949,7 +949,8 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             case R.id.tagUser:
                 AlertDialog.Builder b = new AlertDialog.Builder(this);
                 b.setTitle("Set " + userDetailData.getName() + "'s Tag");
-                b.setMessage("User tags can be up to 30 characters long and cannot contain any banned words.");
+                b.setMessage("User tags can be up to 30 characters long and cannot contain any banned words." +
+                        "If a banned word is detected, the tag will be discarded.");
 
                 final EditText tagText = new EditText(this);
                 tagText.setHint(R.string.user_tag_hint);
@@ -962,11 +963,11 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                         HashMap<String, List<String>> data = new HashMap<>();
                         data.put("key", Collections.singletonList(userDetailData.getTagKey()));
                         assert tagText.getText() != null : "tagText.getText() is null";
-                        data.put("tag_text", Collections.singletonList(tagText.getText().toString()));
-                        data.put("tag_submit", Collections.singletonList("Tag this User"));
+                        data.put("t", Collections.singletonList(tagText.getText().toString()));
+                        data.put("user", Collections.singletonList(userDetailData.getID()));
 
                         hideSoftKeyboard(tagText);
-                        AllInOneV2.get().getSession().post(NetDesc.TAG_USER, userDetailData.getTagPath(), data);
+                        AllInOneV2.get().getSession().post(NetDesc.TAG_USER, Session.ROOT + "/ajax/user_tag", data);
                     }
                 });
                 b.show();

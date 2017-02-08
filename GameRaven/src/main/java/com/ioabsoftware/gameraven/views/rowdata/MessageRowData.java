@@ -168,7 +168,7 @@ public class MessageRowData extends BaseRowData {
     }
 
     public String getUserDetailLink() {
-        return Session.ROOT + "/users/" + username.replace(' ', '+') + "/boards";
+        return Session.ROOT + "/community/" + username.replace(' ', '+') + "/boards";
     }
 
     private static AllInOneV2 aio = null;

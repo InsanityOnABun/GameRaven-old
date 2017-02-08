@@ -844,6 +844,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         goBack(true);
                         break;
 
+                    case TAG_USER:
+                        refresh();
+                        break;
+
                     case SEND_PM_S1:
                         HashMap<String, List<String>> pmData = new HashMap<>();
                         pmData.put("key", Collections.singletonList(sessionKey));
@@ -882,7 +886,6 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case BOARD_JUMPER:
                     case UNSPECIFIED:
                     case USER_DETAIL:
-                    case TAG_USER:
                     case MODHIST:
                     case PM_INBOX:
                     case PM_INBOX_DETAIL:
