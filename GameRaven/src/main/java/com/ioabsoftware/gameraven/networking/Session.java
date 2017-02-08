@@ -273,6 +273,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         if (!path.contains("www.gamefaqs.com") && path.contains("gamefaqs.com"))
             path = path.replace("gamefaqs.com", "www.gamefaqs.com");
 
+        if (path.contains("http://www.gamefaqs.com")) {
+            path = path.replace("http://www.gamefaqs.com", "https://www.gamefaqs.com");
+        }
+
         if (desc == NetDesc.BOARD && path.matches(".*\\d$")) {
             path += "-";
         }
