@@ -53,7 +53,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
     /**
      * The root of GFAQs.
      */
-    public static final String ROOT = "http://www.gamefaqs.com";
+    public static final String ROOT = "https://www.gamefaqs.com";
 
     private String lastAttemptedPath = "not set";
 
@@ -437,7 +437,9 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     b.setTitle("Redirected");
                     b.setMessage("The request was redirected somewhere away from GameFAQs. " +
                             "This usually happens if you're connected to a network that requires a login, " +
-                            "such as a  paid-for wifi service. Click below to open the page in your browser.");
+                            "such as a paid-for wifi service. Click below to open the page in your browser.\n" +
+                            "\n" +
+                            "Redirect: " + resUrl);
 
                     final String path = resUrl;
                     b.setPositiveButton("Open Page In Browser", new OnClickListener() {
@@ -1171,9 +1173,13 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     return NetDesc.PM_INBOX;
                 }
             }
-            // check if AMP
-            else if (url.contains("myposts.php")) {
-                return NetDesc.AMP_LIST;
+            // check if AMP or tracked topic
+            else if (url.contains("/user/")) {
+                if (url.contains("/messages")) {
+                    return NetDesc.AMP_LIST;
+                } else if (url.contains("/tracked")) {
+                    return NetDesc.TRACKED_TOPICS;
+                }
             }
             // check if this is a board or topic url
             else if (url.contains("/boards")) {

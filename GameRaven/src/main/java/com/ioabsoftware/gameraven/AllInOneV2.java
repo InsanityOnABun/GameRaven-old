@@ -310,7 +310,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                         session.get(NetDesc.AMP_LIST, buildAMPLink());
                         break;
                     case R.id.dwrTrackedTopics:
-                        session.get(NetDesc.TRACKED_TOPICS, "/boards/tracked");
+                        session.get(NetDesc.TRACKED_TOPICS, "/user/tracked");
                         break;
                     case R.id.dwrPMInbox:
                         session.get(NetDesc.PM_INBOX, "/pm/");
@@ -2652,7 +2652,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 reportCode = getResources().getStringArray(R.array.msgReportCodes)[which];
 
                 /*
-                <form action="http://www.gamefaqs.com/features/board_mark/pick.php" method="post">
+                <form action="https://www.gamefaqs.com/features/board_mark/pick.php" method="post">
                 <input type="hidden" name="b" value="848">
                 <input type="hidden" name="t" value="71881473">
                 <input type="hidden" name="m" value="821951056">
@@ -3022,7 +3022,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
     private String parseBoardID(String url) {
         if (BuildConfig.DEBUG) wtl("parseBoardID fired");
-        // board example: http://www.gamefaqs.com/boards/400-current-events
+        // board example: https://www.gamefaqs.com/boards/400-current-events
         String boardUrl = url.substring(Session.ROOT.length() + 8);
 
         int i = boardUrl.indexOf('/');
@@ -3048,7 +3048,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
     private String parseTopicID(String url) {
         if (BuildConfig.DEBUG) wtl("parseTopicID fired");
-        // topic example: http://www.gamefaqs.com/boards/400-current-events/64300205
+        // topic example: https://www.gamefaqs.com/boards/400-current-events/64300205
         String topicUrl = url.substring(url.indexOf('/', Session.ROOT.length() + 8) + 1);
         int i = topicUrl.indexOf('/');
         if (i != -1) {
@@ -3101,7 +3101,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     public static String buildAMPLink() {
-        return "/boards/myposts.php?lp=" + settings.getString("ampSortOption", "-1");
+        return "/user/messages?lp=" + settings.getString("ampSortOption", "-1");
     }
 
     public void htmlButtonClicked(View view) {
