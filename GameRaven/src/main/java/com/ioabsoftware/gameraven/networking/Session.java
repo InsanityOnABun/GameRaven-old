@@ -987,12 +987,20 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
     }
 
     private void processTopicsAndMessages(Document doc, String resUrl, NetDesc successDesc) {
+        boolean processAsBoard = false;
         if (!doc.select("p:contains(no longer available for viewing)").isEmpty()) {
             if (successDesc == NetDesc.TOPIC)
                 Crouton.showText(aio, "The topic you selected is no longer available for viewing.", Theming.croutonStyle());
             else if (successDesc == NetDesc.MESSAGE_DETAIL)
                 Crouton.showText(aio, "The message you selected is no longer available for viewing.", Theming.croutonStyle());
 
+            processAsBoard = true;
+        } else if (!doc.select("p:contains(Your topic has been deleted)").isEmpty()) {
+            Crouton.showText(aio, "Your topic has been deleted.", Theming.croutonStyle());
+            processAsBoard = true;
+        }
+
+        if (processAsBoard) {
             if (BuildConfig.DEBUG) AllInOneV2.wtl("topic or message is no longer available, treat response as a board");
             aio.processContent(NetDesc.BOARD, doc, resUrl);
         } else {

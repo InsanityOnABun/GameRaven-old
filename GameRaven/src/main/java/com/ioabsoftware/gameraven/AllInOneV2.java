@@ -83,7 +83,6 @@ import com.ioabsoftware.gameraven.views.rowdata.TrackedTopicRowData;
 import com.ioabsoftware.gameraven.views.rowdata.UserDetailRowData;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 import com.joanzapata.iconify.IconDrawable;
-import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 import com.joanzapata.iconify.fonts.MaterialCommunityIcons;
 import com.joanzapata.iconify.fonts.MaterialIcons;
 import com.koushikdutta.async.future.FutureCallback;
@@ -240,6 +239,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
     private Spinner accountsSpinner, notifsSpinner;
     private ArrayAdapter<String> accountsAdapter, notifsAdapter;
+    private ArrayList<String> notifsLinks = new ArrayList<>();
     private MenuItem dwrNavHeadItem, dwrPMInboxItem, dwrAMPItem;
 
     private FloatingActionButton fab;
@@ -620,6 +620,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
         if (firstResume) {
             accountsSpinner.setOnItemSelectedListener(accountsListener);
+            notifsSpinner.setOnItemSelectedListener(notifsListener);
         }
 
         if (session == null) {
@@ -1344,7 +1345,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                         Elements cells = row.children();
                         // [icon] [sender] [subject] [time] [check]
                         boolean isOld = true;
-                        if (cells.get(0).children().first().hasClass("icon-circle"))
+                        if (cells.get(0).children().first().hasClass("fa-circle"))
                             isOld = false;
                         String sender = cells.get(1).text();
                         Element subjectLinkElem = cells.get(2).children().first();
@@ -2088,7 +2089,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 break;
         }
 
-        Element pmInboxLink = doc.select("i.icon-envelope-alt").first();
+        Element pmInboxLink = doc.select("i.fa-envelope").first();
         String pmButtonLabel = getString(R.string.pm_inbox);
         if (pmInboxLink != null) {
             pmButtonLabel += " " + ((TextNode) pmInboxLink.nextSibling()).text();
@@ -2096,22 +2097,27 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
         dwrPMInboxItem.setTitle(pmButtonLabel);
 
-        Element notifsLink = doc.select("span.notifications").first();
+        Element notifsObject = doc.select("span.notifications").first();
         notifsAdapter.clear();
+        notifsLinks.clear();
         String count = "0";
-        if (notifsLink != null) {
-            count = notifsLink.child(0).text();
+        if (notifsObject != null) {
+            count = notifsObject.child(0).text();
             if (count.equals("1"))
                 count = count + " " + getString(R.string.notification);
             else
                 count = count + " " + getString(R.string.notifications);
             notifsAdapter.add(count);
-            for (Element e : notifsLink.getElementsByTag("li")) {
+            Elements notifsLines = notifsObject.getElementsByTag("li");
+            notifsLines.remove(notifsLines.size() - 1);
+            for (Element e : notifsObject.getElementsByTag("li")) {
                 notifsAdapter.add(e.text());
+                notifsLinks.add(e.child(0).attr("href"));
             }
-            notifsAdapter.remove(notifsAdapter.getItem(notifsAdapter.getCount() - 1));
             notifsAdapter.add("View All");
+            notifsLinks.add("/user/notifications");
             notifsAdapter.add("Clear All");
+            notifsLinks.add("/ajax/notification_clear_all");
             notifsSpinner.setEnabled(true);
         } else {
             notifsAdapter.add(count + " " + getString(R.string.notifications));
@@ -3154,6 +3160,21 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
+            // do nothing
+        }
+    };
+
+    private AdapterView.OnItemSelectedListener notifsListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            if (position > 0) {
+                String url = notifsLinks.get(position);
+                session.get(Session.determineNetDesc(url), url);
+            }
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
             // do nothing
         }
     };

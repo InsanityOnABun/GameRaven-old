@@ -39,27 +39,25 @@ public class NotifierService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.d("notif", "starting onhandleintent");
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         String username = prefs.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT);
 
         // service does nothing if there is no default account set or there is no generated salt
-        if (!username.equals(HeaderSettings.NO_DEFAULT_ACCOUNT) && prefs.getString("secureSalt", null) != null) {
+        //neuter the service, for now...
+        if (true || !username.equals(HeaderSettings.NO_DEFAULT_ACCOUNT) && prefs.getString("secureSalt", null) != null) {
             HashMap<String, String> cookies = new HashMap<String, String>();
             String password = AccountManager.getPassword(getApplicationContext(), username);
 
-            Log.d("notif", username);
             String basePath = Session.ROOT + "/boards";
-            String loginPath = Session.ROOT + "/user/login.html";
+            String loginPath = Session.ROOT + "/user/login";
             try {
-                Response r = Jsoup.connect(basePath).method(Method.GET)
+                Response r = Jsoup.connect(loginPath).method(Method.GET)
                         .cookies(cookies).timeout(10000).execute();
 
                 cookies.putAll(r.cookies());
 
-                Log.d("notif", "first connection finished");
+                // first connection finished
                 Document pRes = r.parse();
 
                 String loginKey = pRes.getElementsByAttributeValue("name",
@@ -72,16 +70,13 @@ public class NotifierService extends IntentService {
                 loginData.put("path", basePath);
                 loginData.put("key", loginKey);
 
-                Log.d("notif", username + ", " + loginPath
-                        + ", " + loginKey);
-
                 r = Jsoup.connect(loginPath).method(Method.POST)
                         .cookies(cookies).data(loginData).timeout(10000)
                         .execute();
 
                 cookies.putAll(r.cookies());
 
-                Log.d("notif", "second connection finished");
+                // second connection finished
 
                 r = Jsoup.connect(Session.ROOT + "/boards/myposts.php?lp=-1")
                         .method(Method.GET).cookies(cookies).timeout(10000)

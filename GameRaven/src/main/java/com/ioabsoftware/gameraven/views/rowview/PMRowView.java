@@ -1,7 +1,7 @@
 package com.ioabsoftware.gameraven.views.rowview;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.R;
 import com.ioabsoftware.gameraven.networking.NetDesc;
+import com.ioabsoftware.gameraven.util.Theming;
 import com.ioabsoftware.gameraven.views.BaseRowData;
 import com.ioabsoftware.gameraven.views.BaseRowView;
 import com.ioabsoftware.gameraven.views.RowType;
@@ -17,16 +18,13 @@ import com.ioabsoftware.gameraven.views.rowdata.PMRowData;
 
 public class PMRowView extends BaseRowView {
 
+    private static float subjectTextSize = 0;
+    private static float senderTextSize, timeTextSize;
     TextView subject;
     TextView sender;
     TextView time;
-
     PMRowData myData;
-
-    private static int baseSubjectColor = 0;
-
-    private static float subjectTextSize = 0;
-    private static float senderTextSize, timeTextSize;
+    private int defaultSubjectColor, defaultSenderColor, defaultTimeColor;
 
     public PMRowView(Context context) {
         super(context);
@@ -49,8 +47,9 @@ public class PMRowView extends BaseRowView {
         sender = (TextView) findViewById(R.id.pmSender);
         time = (TextView) findViewById(R.id.pmTime);
 
-        if (baseSubjectColor == 0)
-            baseSubjectColor = subject.getCurrentTextColor();
+        defaultSubjectColor = subject.getCurrentTextColor();
+        defaultSenderColor = sender.getCurrentTextColor();
+        defaultTimeColor = time.getCurrentTextColor();
 
         if (subjectTextSize == 0) {
             subjectTextSize = subject.getTextSize();
@@ -87,10 +86,22 @@ public class PMRowView extends BaseRowView {
         sender.setText(myData.getSender());
         time.setText(myData.getTime());
 
-        if (myData.isOld())
-            subject.setTextColor(Color.GRAY);
-        else
-            subject.setTextColor(baseSubjectColor);
+        if (myData.isOld()) {
+            subject.setTextColor(Theming.colorReadTopic());
+            sender.setTextColor(Theming.colorReadTopic());
+            time.setTextColor(Theming.colorReadTopic());
+            subject.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+            sender.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+            time.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+        } else {
+            subject.setTextColor(defaultSubjectColor);
+            sender.setTextColor(defaultSenderColor);
+            time.setTextColor(defaultTimeColor);
+            subject.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            sender.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            time.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        }
     }
+
 
 }

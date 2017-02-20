@@ -30,10 +30,7 @@ public class TopicRowView extends BaseRowView {
 
     TopicRowData myData;
 
-    private int defaultTitleColor;
-    private int defaultTCColor;
-    private int defaultMsgLPColor;
-    private int defaultLPLinkColor;
+    private int defaultTitleColor, defaultTCColor, defaultMsgLPColor, defaultLPLinkColor;
 
     private static float titleTextSize = 0;
     private static float tcTextSize, msgLPTextSize, lpLinkTextSize;
@@ -135,7 +132,6 @@ public class TopicRowView extends BaseRowView {
 
             lpLink.setText(R.string.last_unread_post);
         } else {
-
             tc.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
             title.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
             msgLP.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
