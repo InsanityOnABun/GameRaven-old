@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.MenuItemCompat;
@@ -75,6 +76,7 @@ import com.ioabsoftware.gameraven.views.rowdata.BoardRowData.BoardType;
 import com.ioabsoftware.gameraven.views.rowdata.GameSearchRowData;
 import com.ioabsoftware.gameraven.views.rowdata.HeaderRowData;
 import com.ioabsoftware.gameraven.views.rowdata.MessageRowData;
+import com.ioabsoftware.gameraven.views.rowdata.NotifRowData;
 import com.ioabsoftware.gameraven.views.rowdata.PMDetailRowData;
 import com.ioabsoftware.gameraven.views.rowdata.PMRowData;
 import com.ioabsoftware.gameraven.views.rowdata.TopicRowData;
@@ -244,6 +246,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
     private FloatingActionButton fab;
 
+    @SuppressLint("StaticFieldLeak")
     private static AllInOneV2 me;
 
     public static AllInOneV2 get() {
@@ -296,12 +299,12 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         NavigationView navigationView = (NavigationView) findViewById(R.id.aioNavigationDrawer);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
 
-        drawerLayout.setDrawerListener(drawerToggle);
+        drawerLayout.addDrawerListener(drawerToggle);
 
         assert navigationView != null;
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.dwrBoardJumper:
                         showBoardQuickList();
@@ -774,8 +777,8 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         refreshClicked(null);
     }
 
-    private MenuItem refreshIcon, replyIcon, pmInboxIcon, pmOutboxIcon,
-            addFavIcon, remFavIcon, searchIcon, topicListIcon, sendUserPMIcon, tagUserIcon;
+    private MenuItem refreshIcon, replyIcon, pmInboxIcon, pmOutboxIcon, addFavIcon, remFavIcon,
+            searchIcon, topicListIcon, sendUserPMIcon, tagUserIcon, unreadNotifsIcon, clearUnreadNotifsIcon;
 
     /**
      * Adds menu items
@@ -786,6 +789,10 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         inflater.inflate(R.menu.main, menu);
         searchIcon = menu.findItem(R.id.search).setIcon(new IconDrawable(
                 this, MaterialIcons.md_search).colorRes(R.color.white).actionBarSize());
+        unreadNotifsIcon = menu.findItem(R.id.unreadNotifs).setIcon(new IconDrawable(
+                this, MaterialCommunityIcons.mdi_comment_alert).colorRes(R.color.white).actionBarSize());
+        clearUnreadNotifsIcon = menu.findItem(R.id.clearUnreadNotifs).setIcon(new IconDrawable(
+                this, MaterialCommunityIcons.mdi_notification_clear_all).colorRes(R.color.white).actionBarSize());
         topicListIcon = menu.findItem(R.id.topicList).setIcon(new IconDrawable(
                 this, MaterialIcons.md_view_list).colorRes(R.color.white).actionBarSize());
         addFavIcon = menu.findItem(R.id.addFav).setIcon(new IconDrawable(
@@ -931,6 +938,14 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
                 return true;
 
+            case R.id.unreadNotifs:
+                session.get(NetDesc.NOTIFS_PAGE, NOTIFS_PAGE_LINK);
+                return true;
+
+            case R.id.clearUnreadNotifs:
+                session.get(NetDesc.NOTIFS_CLEAR, NOTIFS_CLEAR_LINK);
+                return true;
+
             case R.id.topicList:
                 session.get(NetDesc.BOARD, tlUrl);
                 return true;
@@ -968,7 +983,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                         data.put("user", Collections.singletonList(userDetailData.getID()));
 
                         hideSoftKeyboard(tagText);
-                        AllInOneV2.get().getSession().post(NetDesc.TAG_USER, Session.ROOT + "/ajax/user_tag", data);
+                        AllInOneV2.get().getSession().post(NetDesc.USER_TAG, Session.ROOT + "/ajax/user_tag", data);
                     }
                 });
                 b.show();
@@ -1018,6 +1033,8 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         setMenuItemVisibility(addFavIcon, visible);
         setMenuItemVisibility(remFavIcon, visible);
         setMenuItemVisibility(topicListIcon, visible);
+        setMenuItemVisibility(unreadNotifsIcon, visible);
+        setMenuItemVisibility(clearUnreadNotifsIcon, visible);
 
         if (visible)
             fab.setVisibility(View.VISIBLE);
@@ -1036,6 +1053,8 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         setMenuItemEnabled(addFavIcon, enabled);
         setMenuItemEnabled(remFavIcon, enabled);
         setMenuItemEnabled(topicListIcon, enabled);
+        setMenuItemEnabled(unreadNotifsIcon, enabled);
+        setMenuItemEnabled(clearUnreadNotifsIcon, enabled);
 
         fab.setEnabled(enabled);
     }
@@ -1081,6 +1100,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         String title;
         String posButtonText;
         boolean retrySub = false;
+        //noinspection EnumSwitchStatementWhichMissesCases
         switch (desc) {
             case LOGIN_S1:
             case LOGIN_S2:
@@ -1088,10 +1108,10 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 msg = "Login timed out, press retry to try again.";
                 posButtonText = "Retry";
                 break;
-            case POSTMSG_S1:
-            case POSTMSG_S3:
-            case POSTTPC_S1:
-            case POSTTPC_S3:
+            case MSG_POST_S1:
+            case MSG_POST_S3:
+            case TOPIC_POST_S1:
+            case TOPIC_POST_S3:
                 postTimeoutCleanup();
                 return;
             default:
@@ -1213,7 +1233,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     public void preExecuteSetup(NetDesc desc) {
         if (BuildConfig.DEBUG) wtl("GRAIO dPreES fired --NEL, desc: " + desc.name());
 
-        if (desc != NetDesc.POSTMSG_S1 && desc != NetDesc.POSTTPC_S1 && desc != NetDesc.EDIT_MSG)
+        if (desc != NetDesc.MSG_POST_S1 && desc != NetDesc.TOPIC_POST_S1 && desc != NetDesc.EDIT_MSG)
             postInterfaceCleanup();
 
         swipeRefreshLayout.setRefreshing(true);
@@ -1301,6 +1321,32 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 processBoards(doc);
                 break;
 
+            case NOTIFS_PAGE:
+                tbody = doc.getElementsByTag("tbody").first();
+
+                headerTitle = Session.getUser() + "'s Notifications";
+                updateHeaderNoJumper(headerTitle, desc);
+
+                if (tbody != null) {
+                    for (Element row : tbody.getElementsByTag("tr")) {
+                        Elements cells = row.children();
+                        // [title, url] [time] [read]
+                        Element titleLinkElem = cells.get(0).children().first();
+                        String title = titleLinkElem.text();
+                        String link = titleLinkElem.attr("href");
+                        String time = cells.get(1).text();
+                        boolean isOld = false;
+                        if (cells.get(2).text().equals("Read"))
+                            isOld = true;
+
+                        adapterRows.add(new NotifRowData(title, time, link, isOld));
+                    }
+                } else {
+                    adapterRows.add(new HeaderRowData("There are no notifications here at this time."));
+                }
+                setMenuItemVisibility(clearUnreadNotifsIcon, true);
+                break;
+
             case PM_INBOX:
             case PM_OUTBOX:
                 tbody = doc.getElementsByTag("tbody").first();
@@ -1337,9 +1383,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
                     updateHeader(headerTitle, firstPage, prevPage, pagesInfo[0],
                             pagesInfo[1], nextPage, lastPage, pagePrefix, desc);
-
-                    if (isDefaultAcc && isInbox)
-                        NotifierService.dismissPMNotif(this);
 
                     for (Element row : tbody.getElementsByTag("tr")) {
                         Elements cells = row.children();
@@ -1428,9 +1471,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 updateHeader(headerTitle, firstPage, prevPage, pagesInfo[0],
                         pagesInfo[1], nextPage, lastPage, pagePrefix, NetDesc.AMP_LIST);
 
-                if (isDefaultAcc)
-                    NotifierService.dismissAMPNotif(this);
-
                 if (!tbody.children().isEmpty()) {
                     if (settings.getBoolean("notifsEnable", false) && isDefaultAcc) {
                         Element lPost = doc.select("td.lastpost").first();
@@ -1489,9 +1529,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             case TRACKED_TOPICS:
                 headerTitle = Session.getUser() + "'s Tracked Topics";
                 updateHeaderNoJumper(headerTitle, desc);
-
-                if (isDefaultAcc)
-                    NotifierService.dismissTTNotif(this);
 
                 tbody = doc.getElementsByTag("tbody").first();
 
@@ -1897,38 +1934,9 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                     msg.disableTopClick();
                     adapterRows.add(msg);
                 }
-
-//                Elements msgDRows = doc.getElementsByTag("tr");
-//
-//                String user = msgDRows.first().child(0).child(0).text();
-//
-//                adapterRows.add(new HeaderRowData("Current Version"));
-//
-//                Element currRow, body;
-//                MessageRowData msg;
-//                String postTime;
-//                String mID = parseMessageID(resUrl);
-//                for (int x = 0; x < msgDRows.size(); x++) {
-//                    if (x == 1)
-//                        adapterRows.add(new HeaderRowData("Previous Version(s)"));
-//                    else {
-//                        currRow = msgDRows.get(x);
-//
-//                        if (currRow.child(0).textNodes().size() > 1)
-//                            postTime = currRow.child(0).textNodes().get(1).text();
-//                        else
-//                            postTime = currRow.child(0).textNodes().get(0).text();
-//
-//                        body = currRow.child(1);
-//                        msg = new MessageRowData(user, null, null, postTime, body, boardID, topicID, mID, 0, "");
-//                        msg.disableTopClick();
-//                        adapterRows.add(msg);
-//                    }
-//                }
-
                 break;
 
-            case TAG_USER:
+            case USER_TAG:
                 if (BuildConfig.DEBUG) wtl("starting check for user tag success");
                 Element error = doc.getElementsByClass("error").first();
                 if (error == null) {
@@ -2100,6 +2108,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         Element notifsObject = doc.select("span.notifications").first();
         notifsAdapter.clear();
         notifsLinks.clear();
+        notifsLinks.add("filler");
         String count = "0";
         if (notifsObject != null) {
             count = notifsObject.child(0).text();
@@ -2110,18 +2119,20 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             notifsAdapter.add(count);
             Elements notifsLines = notifsObject.getElementsByTag("li");
             notifsLines.remove(notifsLines.size() - 1);
-            for (Element e : notifsObject.getElementsByTag("li")) {
+            for (Element e : notifsLines) {
                 notifsAdapter.add(e.text());
-                notifsLinks.add(e.child(0).attr("href"));
+                notifsLinks.add(e.select("a").first().attr("href"));
             }
             notifsAdapter.add("View All");
-            notifsLinks.add("/user/notifications");
+            notifsLinks.add(NOTIFS_PAGE_LINK);
             notifsAdapter.add("Clear All");
-            notifsLinks.add("/ajax/notification_clear_all");
-            notifsSpinner.setEnabled(true);
+            notifsLinks.add(NOTIFS_CLEAR_LINK);
+            setMenuItemVisibility(unreadNotifsIcon, true);
         } else {
             notifsAdapter.add(count + " " + getString(R.string.notifications));
-            notifsSpinner.setEnabled(false);
+            notifsAdapter.add("View All");
+            notifsLinks.add(NOTIFS_PAGE_LINK);
+            setMenuItemVisibility(unreadNotifsIcon, false);
         }
         notifsAdapter.notifyDataSetChanged();
 
@@ -2505,7 +2516,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             if (pollUse)
                 path += "&poll=1";
 
-            session.get(NetDesc.POSTTPC_S1, path);
+            session.get(NetDesc.TOPIC_POST_S1, path);
         } else {
             // posting on a topic
             if (BuildConfig.DEBUG) wtl("posting on a topic");
@@ -2522,7 +2533,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             if (messageIDForEditing != null)
                 session.get(NetDesc.EDIT_MSG, path);
             else
-                session.get(NetDesc.POSTMSG_S1, path);
+                session.get(NetDesc.MSG_POST_S1, path);
         }
     }
 
@@ -2680,7 +2691,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 markData.put("i", Collections.singletonList("0"));
                 markData.put("key", Collections.singletonList(session.getSessionKey()));
 
-                session.post(NetDesc.MARKMSG, "/features/board_mark/pick.php", markData);
+                session.post(NetDesc.MSG_MARK, "/features/board_mark/pick.php", markData);
 
 
 //                session.get(NetDesc.MARKMSG_S1, clickedMsg.getMessageDetailLink());
@@ -2762,7 +2773,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                         delData.put("action", Collections.singletonList("delete"));
                         delData.put("key", Collections.singletonList(session.getSessionKey()));
 
-                        session.post(NetDesc.DELETEMSG,
+                        session.post(NetDesc.MSG_DELETE,
                                 clickedMsg.getMessageDetailLink().replace("/boards/", "/boardaction/"), delData);
                         break;
                     case "Report":
@@ -2854,7 +2865,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
                                     pmSending.setVisibility(View.VISIBLE);
 
-                                    session.get(NetDesc.SEND_PM_S1, "/pm/new");
+                                    session.get(NetDesc.PM_SEND_S1, "/pm/new");
 
                                 } else
                                     Crouton.showText(AllInOneV2.this,
@@ -3093,17 +3104,13 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         } else if (postWrapper.getVisibility() == View.VISIBLE) {
             postCancel(postCancelButton);
         } else {
-            goBack();
-        }
-    }
-
-    private void goBack() {
-        if (session != null && session.canGoBack()) {
-            if (BuildConfig.DEBUG) wtl("back pressed, history exists, going back");
-            session.goBack(false);
-        } else {
-            if (BuildConfig.DEBUG) wtl("back pressed, no history, exiting app");
-            finish();
+            if (session != null && session.canGoBack()) {
+                if (BuildConfig.DEBUG) wtl("back pressed, history exists, going back");
+                session.goBack(false);
+            } else {
+                if (BuildConfig.DEBUG) wtl("back pressed, no history, exiting app");
+                finish();
+            }
         }
     }
 
@@ -3126,6 +3133,35 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             insert = open + close;
 
         postBody.getText().replace(Math.min(start, end), Math.max(start, end), insert, 0, insert.length());
+    }
+
+    public void processNotif(String text, String url) {
+        if (url.equals(NOTIFS_CLEAR_LINK)) {
+            session.get(NetDesc.NOTIFS_CLEAR, url);
+        }
+        else if (Session.determineNetDesc(url) == NetDesc.UNSPECIFIED) {
+            final String deets = "Notif Text: " + text + "\n" +
+                    "Notif Link: " + url;
+            AlertDialog.Builder b = new AlertDialog.Builder(this);
+            b.setMessage("You found a notification that is currently unsupported. Good job! " +
+                    "The details of the notification are below. Press OK to copy the details " +
+                    "to the clipboard and be taken to correct topic to report this.\n" +
+                    "\n" +
+                    deets);
+            b.setPositiveButton("OK", new OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    android.content.ClipboardManager clipboard =
+                            (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    clipboard.setPrimaryClip(android.content.ClipData.newPlainText("simple text", deets));
+                    session.get(NetDesc.TOPIC, "/boards/1177-gameraven-development-and-discussion/75010049");
+                }
+            });
+            b.setNegativeButton("Dismiss", null);
+            b.show();
+        } else {
+            session.get(Session.determineNetDesc(url), url);
+        }
     }
 
     private AdapterView.OnItemSelectedListener accountsListener = new AdapterView.OnItemSelectedListener() {
@@ -3164,12 +3200,15 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         }
     };
 
+    private static final String NOTIFS_CLEAR_LINK = "/ajax/notification_clear_all";
+    private static final String NOTIFS_PAGE_LINK = "/user/notifications";
     private AdapterView.OnItemSelectedListener notifsListener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             if (position > 0) {
-                String url = notifsLinks.get(position);
-                session.get(Session.determineNetDesc(url), url);
+                toggleMenu();
+                notifsSpinner.setSelection(0);
+                processNotif((String) parent.getItemAtPosition(position), notifsLinks.get(position));
             }
         }
 

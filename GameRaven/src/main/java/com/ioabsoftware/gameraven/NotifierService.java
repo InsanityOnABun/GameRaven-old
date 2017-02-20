@@ -49,7 +49,7 @@ public class NotifierService extends IntentService {
             HashMap<String, String> cookies = new HashMap<String, String>();
             String password = AccountManager.getPassword(getApplicationContext(), username);
 
-            String basePath = Session.ROOT + "/boards";
+            String basePath = Session.ROOT + "/notifications";
             String loginPath = Session.ROOT + "/user/login";
             try {
                 Response r = Jsoup.connect(loginPath).method(Method.GET)
@@ -77,12 +77,6 @@ public class NotifierService extends IntentService {
                 cookies.putAll(r.cookies());
 
                 // second connection finished
-
-                r = Jsoup.connect(Session.ROOT + "/boards/myposts.php?lp=-1")
-                        .method(Method.GET).cookies(cookies).timeout(10000)
-                        .execute();
-
-                Log.d("notif", "third connection finished");
 
                 if (r.statusCode() != 401) {
                     Log.d("notif", "status is good");

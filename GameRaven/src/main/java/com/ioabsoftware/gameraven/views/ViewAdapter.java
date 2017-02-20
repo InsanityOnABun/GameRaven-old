@@ -5,11 +5,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.ioabsoftware.gameraven.AllInOneV2;
 import com.ioabsoftware.gameraven.views.rowview.AMPRowView;
 import com.ioabsoftware.gameraven.views.rowview.BoardRowView;
 import com.ioabsoftware.gameraven.views.rowview.GameSearchRowView;
 import com.ioabsoftware.gameraven.views.rowview.HeaderRowView;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
+import com.ioabsoftware.gameraven.views.rowview.NotifRowView;
 import com.ioabsoftware.gameraven.views.rowview.PMDetailRowView;
 import com.ioabsoftware.gameraven.views.rowview.PMRowView;
 import com.ioabsoftware.gameraven.views.rowview.TopicRowView;
@@ -24,8 +26,8 @@ import java.util.ArrayList;
 
 public class ViewAdapter extends BaseAdapter {
 
-    ArrayList<BaseRowData> rows;
-    Context context;
+    private ArrayList<BaseRowData> rows;
+    private Context context;
 
     public ViewAdapter(Context contextIn, ArrayList<BaseRowData> rowsIn) {
         context = contextIn;
@@ -95,6 +97,9 @@ public class ViewAdapter extends BaseAdapter {
             switch (data.getRowType()) {
                 case HEADER:
                     view = new HeaderRowView(context);
+                    break;
+                case NOTIF:
+                    view = new NotifRowView(context);
                     break;
                 case BOARD:
                     view = new BoardRowView(context);

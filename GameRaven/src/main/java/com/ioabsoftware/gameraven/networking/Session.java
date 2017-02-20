@@ -301,7 +301,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
     }
 
 
-    Future currentNetworkTask;
+    private Future currentNetworkTask;
     /**
      * Sends a GET request to a specified page.
      *
@@ -377,7 +377,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
         postExecuteCleanup(thisDesc);
     }
 
-    public void preExecuteSetup(NetDesc desc) {
+    private void preExecuteSetup(NetDesc desc) {
         currentDesc = desc;
         switch (desc) {
             case AMP_LIST:
@@ -389,35 +389,37 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             case BOARD_LIST:
             case MESSAGE_DETAIL:
             case USER_DETAIL:
-            case TAG_USER:
+            case USER_TAG:
             case MODHIST:
             case PM_INBOX:
             case PM_INBOX_DETAIL:
             case PM_OUTBOX:
             case PM_OUTBOX_DETAIL:
-            case MARKMSG:
-            case CLOSE_TOPIC:
-            case DELETEMSG:
+            case MSG_MARK:
+            case TOPIC_CLOSE:
+            case MSG_DELETE:
             case LOGIN_S1:
             case EDIT_MSG:
-            case POSTMSG_S1:
-            case POSTTPC_S1:
+            case MSG_POST_S1:
+            case TOPIC_POST_S1:
+            case NOTIFS_PAGE:
+            case NOTIFS_CLEAR:
             case UNSPECIFIED:
                 aio.preExecuteSetup(desc);
                 break;
 
             case LOGIN_S2:
-            case POSTMSG_S3:
-            case POSTTPC_S3:
+            case MSG_POST_S3:
+            case TOPIC_POST_S3:
             case VERIFY_ACCOUNT_S1:
             case VERIFY_ACCOUNT_S2:
-            case SEND_PM_S1:
-            case SEND_PM_S2:
+            case PM_SEND_S1:
+            case PM_SEND_S2:
                 break;
         }
     }
 
-    public void handleNetworkResult(Exception e, NetDesc desc, Response<FinalDoc> result) {
+    private void handleNetworkResult(Exception e, NetDesc desc, Response<FinalDoc> result) {
         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR fired, desc: " + desc.name());
         try {
             if (e != null)
@@ -603,22 +605,24 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case UNSPECIFIED:
                     case LOGIN_S1:
                     case LOGIN_S2:
-                    case DELETEMSG:
+                    case MSG_DELETE:
                     case EDIT_MSG:
-                    case POSTMSG_S1:
-                    case POSTMSG_S3:
-                    case POSTTPC_S1:
-                    case POSTTPC_S3:
+                    case MSG_POST_S1:
+                    case MSG_POST_S3:
+                    case TOPIC_POST_S1:
+                    case TOPIC_POST_S3:
                     case VERIFY_ACCOUNT_S1:
                     case VERIFY_ACCOUNT_S2:
+                    case NOTIFS_PAGE:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("addToHistory unchanged: " + addToHistory);
                         break;
 
-                    case TAG_USER:
-                    case MARKMSG:
-                    case CLOSE_TOPIC:
-                    case SEND_PM_S1:
-                    case SEND_PM_S2:
+                    case USER_TAG:
+                    case MSG_MARK:
+                    case TOPIC_CLOSE:
+                    case PM_SEND_S1:
+                    case PM_SEND_S2:
+                    case NOTIFS_CLEAR:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("setting addToHistory to false based on current NetDesc");
                         addToHistory = false;
                         break;
@@ -643,17 +647,18 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case PM_INBOX_DETAIL:
                     case PM_OUTBOX:
                     case PM_OUTBOX_DETAIL:
-                    case DELETEMSG:
+                    case MSG_DELETE:
                     case UNSPECIFIED:
                     case LOGIN_S1:
                     case LOGIN_S2:
                     case EDIT_MSG:
-                    case POSTMSG_S1:
-                    case POSTMSG_S3:
-                    case POSTTPC_S1:
-                    case POSTTPC_S3:
+                    case MSG_POST_S1:
+                    case MSG_POST_S3:
+                    case TOPIC_POST_S1:
+                    case TOPIC_POST_S3:
                     case VERIFY_ACCOUNT_S1:
                     case VERIFY_ACCOUNT_S2:
+                    case NOTIFS_PAGE:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning lastDesc, lastRes, etc. setting");
 
                         lastDesc = desc;
@@ -668,11 +673,12 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         break;
 
 
-                    case TAG_USER:
-                    case MARKMSG:
-                    case CLOSE_TOPIC:
-                    case SEND_PM_S1:
-                    case SEND_PM_S2:
+                    case USER_TAG:
+                    case MSG_MARK:
+                    case TOPIC_CLOSE:
+                    case PM_SEND_S1:
+                    case PM_SEND_S2:
+                    case NOTIFS_CLEAR:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("not setting lastDesc, lastRes, etc.");
                         break;
 
@@ -724,7 +730,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
                         break;
 
-                    case POSTMSG_S1:
+                    case MSG_POST_S1:
                     case EDIT_MSG:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post message step 1");
 
@@ -735,10 +741,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
                             msg1Data.put("custom_sig", Collections.singletonList(aio.getSig()));
 
-                        post(NetDesc.POSTMSG_S3, lastPath, msg1Data);
+                        post(NetDesc.MSG_POST_S3, lastPath, msg1Data);
                         break;
 
-                    case POSTMSG_S3:
+                    case MSG_POST_S3:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post message step 3 (if jumping from 1 to 3, then app is quick posting)");
 
                         Elements msg3AutoFlag = doc.select("b:contains(There are one or more potential issues with your message)");
@@ -759,7 +765,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
                                 msg3Data.put("custom_sig", Collections.singletonList(aio.getSig()));
 
-                            showAutoFlagWarning(lastPath, msg3Data, NetDesc.POSTMSG_S3, msg);
+                            showAutoFlagWarning(lastPath, msg3Data, NetDesc.MSG_POST_S3, msg);
                             postErrorDetected = true;
                         } else {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing post message step 3, refreshing topic");
@@ -770,7 +776,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         }
                         break;
 
-                    case POSTTPC_S1:
+                    case TOPIC_POST_S1:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post topic step 1");
 
                         HashMap<String, List<String>> tpc1Data = new HashMap<>();
@@ -792,10 +798,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             tpc1Data.put("min_level", Collections.singletonList(aio.getPollMinLevel()));
                         }
 
-                        post(NetDesc.POSTTPC_S3, lastPath, tpc1Data);
+                        post(NetDesc.TOPIC_POST_S3, lastPath, tpc1Data);
                         break;
 
-                    case POSTTPC_S3:
+                    case TOPIC_POST_S3:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this is post topic step 3 (if jumping from 1 to 3, then app is quick posting)");
 
                         Elements tpc3AutoFlag = doc.select("b:contains(There are one or more potential issues with your message)");
@@ -817,7 +823,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                             if (!AllInOneV2.getSettingsPref().getBoolean("useGFAQsSig" + user, false))
                                 tpc3Data.put("custom_sig", Collections.singletonList(aio.getSig()));
 
-                            showAutoFlagWarning(lastPath, tpc3Data, NetDesc.POSTTPC_S3, msg);
+                            showAutoFlagWarning(lastPath, tpc3Data, NetDesc.TOPIC_POST_S3, msg);
                             postErrorDetected = true;
                         } else {
                             if (BuildConfig.DEBUG) AllInOneV2.wtl("finishing post topic step 3, processing new topic");
@@ -827,7 +833,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         }
                         break;
 
-                    case MARKMSG:
+                    case MSG_MARK:
                         String response = doc.text();
                         int start = response.indexOf("\":\"") + 3;
                         int end = response.indexOf("\",\"");
@@ -835,7 +841,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         Crouton.showText(aio, markMessage, Theming.croutonStyle());
                         break;
 
-                    case DELETEMSG:
+                    case MSG_DELETE:
                         Crouton.showText(aio, "Message deleted.", Theming.croutonStyle());
                         applySavedScroll = true;
                         savedScrollVal = aio.getScrollerVertLoc();
@@ -843,16 +849,17 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         processTopicsAndMessages(doc, resUrl, NetDesc.TOPIC);
                         break;
 
-                    case CLOSE_TOPIC:
+                    case TOPIC_CLOSE:
                         Crouton.showText(aio, "Topic closed successfully.", Theming.croutonStyle());
                         goBack(true);
                         break;
 
-                    case TAG_USER:
+                    case USER_TAG:
+                    case NOTIFS_CLEAR:
                         refresh();
                         break;
 
-                    case SEND_PM_S1:
+                    case PM_SEND_S1:
                         HashMap<String, List<String>> pmData = new HashMap<>();
                         pmData.put("key", Collections.singletonList(sessionKey));
                         pmData.put("to", Collections.singletonList(aio.savedTo));
@@ -860,10 +867,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         pmData.put("message", Collections.singletonList(aio.savedMessage));
                         pmData.put("submit", Collections.singletonList("Send Message"));
 
-                        post(NetDesc.SEND_PM_S2, "/pm/new", pmData);
+                        post(NetDesc.PM_SEND_S2, "/pm/new", pmData);
                         break;
 
-                    case SEND_PM_S2:
+                    case PM_SEND_S2:
                         if (doc.select("input[name=subject]").isEmpty()) {
                             aio.pmCleanup(true, null);
                         } else {
@@ -897,6 +904,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case PM_OUTBOX_DETAIL:
                     case VERIFY_ACCOUNT_S1:
                     case VERIFY_ACCOUNT_S2:
+                    case NOTIFS_PAGE:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this should be handled by AIO");
                         aio.processContent(desc, doc, resUrl);
                         break;
@@ -957,7 +965,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                 case PM_INBOX_DETAIL:
                 case PM_OUTBOX:
                 case PM_OUTBOX_DETAIL:
-                case DELETEMSG:
+                case MSG_DELETE:
+                case NOTIFS_PAGE:
                 case UNSPECIFIED:
                     if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning history addition");
                     int[] vLoc = aio.getScrollerVertLoc();
@@ -965,20 +974,21 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     if (BuildConfig.DEBUG) AllInOneV2.wtl("finished history addition");
                     break;
 
-                case TAG_USER:
-                case MARKMSG:
-                case CLOSE_TOPIC:
+                case USER_TAG:
+                case MSG_MARK:
+                case TOPIC_CLOSE:
                 case LOGIN_S1:
                 case LOGIN_S2:
                 case EDIT_MSG:
-                case POSTMSG_S1:
-                case POSTMSG_S3:
-                case POSTTPC_S1:
-                case POSTTPC_S3:
+                case MSG_POST_S1:
+                case MSG_POST_S3:
+                case TOPIC_POST_S1:
+                case TOPIC_POST_S3:
                 case VERIFY_ACCOUNT_S1:
                 case VERIFY_ACCOUNT_S2:
-                case SEND_PM_S1:
-                case SEND_PM_S2:
+                case PM_SEND_S1:
+                case PM_SEND_S2:
+                case NOTIFS_CLEAR:
                     if (BuildConfig.DEBUG) AllInOneV2.wtl("not adding to history");
                     break;
 
@@ -1018,7 +1028,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
     private boolean postErrorDetected = false;
 
-    public void postExecuteCleanup(NetDesc desc) {
+    private void postExecuteCleanup(NetDesc desc) {
         switch (desc) {
             case AMP_LIST:
             case TRACKED_TOPICS:
@@ -1027,39 +1037,41 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             case TOPIC:
             case MESSAGE_DETAIL:
             case USER_DETAIL:
-            case TAG_USER:
+            case USER_TAG:
             case MODHIST:
             case PM_INBOX:
             case PM_INBOX_DETAIL:
             case PM_OUTBOX:
             case PM_OUTBOX_DETAIL:
-            case MARKMSG:
-            case DELETEMSG:
-            case CLOSE_TOPIC:
+            case MSG_MARK:
+            case MSG_DELETE:
+            case TOPIC_CLOSE:
             case GAME_SEARCH:
             case BOARD_LIST:
+            case NOTIFS_PAGE:
             case UNSPECIFIED:
                 if (!skipAIOCleanup)
                     aio.postExecuteCleanup(desc);
 
                 break;
 
-            case POSTMSG_S3:
-            case POSTTPC_S3:
+            case MSG_POST_S3:
+            case TOPIC_POST_S3:
                 if (!postErrorDetected)
-                    aio.postExecuteCleanup((desc == NetDesc.POSTMSG_S3 ? NetDesc.TOPIC : NetDesc.BOARD));
+                    aio.postExecuteCleanup((desc == NetDesc.MSG_POST_S3 ? NetDesc.TOPIC : NetDesc.BOARD));
 
                 break;
 
             case LOGIN_S1:
             case LOGIN_S2:
             case EDIT_MSG:
-            case POSTMSG_S1:
-            case POSTTPC_S1:
+            case MSG_POST_S1:
+            case TOPIC_POST_S1:
             case VERIFY_ACCOUNT_S1:
             case VERIFY_ACCOUNT_S2:
-            case SEND_PM_S1:
-            case SEND_PM_S2:
+            case PM_SEND_S1:
+            case PM_SEND_S2:
+            case NOTIFS_CLEAR:
                 break;
         }
 
@@ -1192,8 +1204,12 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             else if (url.contains("/user/")) {
                 if (url.contains("/messages")) {
                     return NetDesc.AMP_LIST;
+                } else if (url.contains("/notifications")) {
+                    return NetDesc.NOTIFS_PAGE;
                 } else if (url.contains("/tracked")) {
                     return NetDesc.TRACKED_TOPICS;
+                } else if (url.contains("/moderated")) {
+                    return NetDesc.MODHIST;
                 }
             }
             // check if this is a board or topic url
@@ -1202,8 +1218,6 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     return NetDesc.USER_DETAIL;
                 } else if (url.contains("boardlist.php")) {
                     return NetDesc.BOARD_LIST;
-                } else if (url.contains("modhist.php")) {
-                    return NetDesc.MODHIST;
                 } else {
                     String boardUrl = url.substring(url.indexOf("boards"));
                     if (boardUrl.contains("/")) {

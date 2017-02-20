@@ -36,6 +36,8 @@
     <string name="bug_report">Bug Report</string>
     <string name="exit_gameraven">Exit GameRaven</string>
     <string name="search">Search</string>
+    <string name="unread_notifs">Unread Notifications</string>
+    <string name="clear_unread_notifs">Clear Unread Notifications</string>
     <string name="return_to_topic_list">Return to Topic List</string>
     <string name="add_to_favorites">Add to Favorites</string>
     <string name="remove_from_favorites">Remove from Favorites</string>

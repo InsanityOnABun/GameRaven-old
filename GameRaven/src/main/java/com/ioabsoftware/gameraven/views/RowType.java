@@ -2,6 +2,7 @@ package com.ioabsoftware.gameraven.views;
 
 public enum RowType {
     HEADER,
+    NOTIF,
     BOARD,
     GAME_SEARCH,
     MESSAGE,

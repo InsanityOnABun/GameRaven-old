@@ -10,6 +10,16 @@
         android:title="@string/search"
         android:visible="false" />
     <item
+        android:id="@+id/unreadNotifs"
+        app:showAsAction="always"
+        android:title="@string/return_to_topic_list"
+        android:visible="false" />
+    <item
+        android:id="@+id/clearUnreadNotifs"
+        app:showAsAction="always"
+        android:title="@string/return_to_topic_list"
+        android:visible="false" />
+    <item
         android:id="@+id/topicList"
         app:showAsAction="always"
         android:title="@string/return_to_topic_list"
