@@ -1994,8 +1994,8 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 }
 
                 if (Session.isLoggedIn()) {
-                    Element button = doc.select("input.btn").first();
-                    if (button != null && button.attr("value").startsWith("Send a PM to"))
+                    Element pmIcon = doc.select("i.fa-envelope").last();
+                    if (pmIcon != null && pmIcon.attr("title").startsWith("Send a PM to"))
                         setMenuItemVisibility(sendUserPMIcon, true);
 
                     setMenuItemVisibility(tagUserIcon, true);
