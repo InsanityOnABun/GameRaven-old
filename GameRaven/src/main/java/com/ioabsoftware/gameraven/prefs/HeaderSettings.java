@@ -160,7 +160,6 @@ public class HeaderSettings extends PreferenceActivity {
                 } else {
                     Toast.makeText(this, "You denied permission to read from storage.", Toast.LENGTH_SHORT).show();
                 }
-                return;
             }
         }
     }
@@ -169,12 +168,12 @@ public class HeaderSettings extends PreferenceActivity {
         long millis = 60000 * Integer.parseInt(freq);
         long firstAlarm = SystemClock.elapsedRealtime() + millis;
         ((AlarmManager) this.getSystemService(Context.ALARM_SERVICE))
-                .setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstAlarm, millis, ((HeaderSettings)this).getNotifPendingIntent());
-        AllInOneV2.getSettingsPref().edit().putLong("notifsLastPost", 0).commit();
+                .setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstAlarm, millis, this.getNotifPendingIntent());
+        AllInOneV2.getSettingsPref().edit().putLong("notifsLastPost", 0).apply();
     }
 
     public void disableNotifs() {
-        ((AlarmManager) this.getSystemService(Context.ALARM_SERVICE)).cancel(((HeaderSettings)this).getNotifPendingIntent());
+        ((AlarmManager) this.getSystemService(Context.ALARM_SERVICE)).cancel(this.getNotifPendingIntent());
     }
 
     private void backupSettings() {
