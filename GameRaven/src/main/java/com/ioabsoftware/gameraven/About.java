@@ -1,5 +1,6 @@
 package com.ioabsoftware.gameraven;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
@@ -12,6 +13,10 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.ioabsoftware.gameraven.util.Theming;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class About extends ActionBarActivity {
 
@@ -80,7 +85,23 @@ public class About extends ActionBarActivity {
     }
 
     public void viewPrivacyPolicy(View view) {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.privacychoice.org/policy/mobile?policy=11f27c93a595b37228367eeafb872d7c"));
-        startActivity(browserIntent);
+        try {
+            StringBuilder text = new StringBuilder();
+            BufferedReader br = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.privacypolicy)));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                text.append(line).append('\n');
+            }
+            br.close();
+
+            AlertDialog.Builder b = new AlertDialog.Builder(this);
+            b.setTitle("Privacy Policy");
+            b.setMessage(text.toString());
+            b.setPositiveButton("OK", null);
+            b.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -1,0 +1,5 @@
+GameRaven's privacy policy is simple. We only store usernames and passwords for GameFAQs. These are stored in an encrypted format, unique to each device, with the exception of setting backups. Backups are stored in an unencrypted format, which is made clear in the backup creation, so that they can be restored on any device, not just the device the backup was made on.
+
+Information that can be used to identify a device may be included in bug reports that users choose to send to us.
+
+Anything posted to GameFAQs message boards is stored, managed, and under the policies of GameFAQs Privacy Policy.
