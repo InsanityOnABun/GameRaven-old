@@ -310,7 +310,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
      */
     public void get(NetDesc desc, String path) {
         if (hasNetworkConnection()) {
-            if (desc != NetDesc.MODHIST) {
+            if (desc != NetDesc.MODHIST && desc != NetDesc.FRIENDS && desc != NetDesc.FOLLOWERS && desc != NetDesc.FOLLOWING) {
                 if (currentNetworkTask != null && !currentNetworkTask.isDone())
                     currentNetworkTask.cancel(true);
 
@@ -325,8 +325,10 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                         .withResponse()
                         .setCallback(this);
 
-            } else
+            } else if (desc == NetDesc.MODHIST)
                 aio.genError("Page Unsupported", "The moderation history page is currently unsupported in-app. Sorry.", "Ok");
+            else if (desc == NetDesc.FRIENDS || desc == NetDesc.FOLLOWERS || desc == NetDesc.FOLLOWING)
+                aio.genError("Page Unsupported", "The friends and followers system is currently unsupported in-app. Sorry.", "Ok");
 
         } else
             aio.noNetworkConnection();
