@@ -75,6 +75,7 @@ import com.ioabsoftware.gameraven.views.rowdata.BoardRowData;
 import com.ioabsoftware.gameraven.views.rowdata.BoardRowData.BoardType;
 import com.ioabsoftware.gameraven.views.rowdata.GameSearchRowData;
 import com.ioabsoftware.gameraven.views.rowdata.HeaderRowData;
+import com.ioabsoftware.gameraven.views.rowdata.MentionRowData;
 import com.ioabsoftware.gameraven.views.rowdata.MessageRowData;
 import com.ioabsoftware.gameraven.views.rowdata.NotifRowData;
 import com.ioabsoftware.gameraven.views.rowdata.PMDetailRowData;
@@ -1342,9 +1343,33 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                         adapterRows.add(new NotifRowData(title, time, link, isOld));
                     }
                 } else {
-                    adapterRows.add(new HeaderRowData("There are no notifications here at this time."));
+                    adapterRows.add(new HeaderRowData("You have no notifications at this time."));
                 }
                 setMenuItemVisibility(clearUnreadNotifsIcon, true);
+                break;
+
+            case MENTIONS_PAGE:
+                tbody = doc.getElementsByTag("tbody").first();
+
+                headerTitle = Session.getUser() + "'s Mentions";
+                updateHeaderNoJumper(headerTitle, desc);
+
+                if (tbody != null) {
+                    for (Element row : tbody.getElementsByTag("tr")) {
+                        Elements cells = row.children();
+                        // [topic] [board] [user] [time]
+                        Element topicLinkElem = cells.get(0).children().first();
+                        String topic = topicLinkElem.text();
+                        String link = topicLinkElem.attr("href");
+                        String board = cells.get(1).text();
+                        String user = cells.get(2).text();
+                        String time = cells.get(3).text();
+
+                        adapterRows.add(new MentionRowData(topic, board, user, time, link));
+                    }
+                } else {
+                    adapterRows.add(new HeaderRowData("You have no mentions at this time."));
+                }
                 break;
 
             case PM_INBOX:
@@ -1804,11 +1829,12 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
                 String goToThisPost = null;
                 if (goToUrlDefinedPost) {
-                    if (resUrl.indexOf('#') != -1)
+                    if (resUrl.indexOf('#') != -1) {
                         goToThisPost = resUrl.substring(resUrl.indexOf('#'));
-                    else
+                    } else {
                         // goToUrlDefinedPost is true when there is no url defined post, oops
                         goToUrlDefinedPost = false;
+                    }
                 }
 
                 Elements rows = doc.select("table.board").first().getElementsByTag("tr");

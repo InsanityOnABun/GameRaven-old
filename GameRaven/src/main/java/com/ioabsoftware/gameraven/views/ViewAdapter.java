@@ -10,6 +10,8 @@ import com.ioabsoftware.gameraven.views.rowview.AMPRowView;
 import com.ioabsoftware.gameraven.views.rowview.BoardRowView;
 import com.ioabsoftware.gameraven.views.rowview.GameSearchRowView;
 import com.ioabsoftware.gameraven.views.rowview.HeaderRowView;
+import com.ioabsoftware.gameraven.views.rowview.HighlightedUserView;
+import com.ioabsoftware.gameraven.views.rowview.MentionRowView;
 import com.ioabsoftware.gameraven.views.rowview.MessageRowView;
 import com.ioabsoftware.gameraven.views.rowview.NotifRowView;
 import com.ioabsoftware.gameraven.views.rowview.PMDetailRowView;
@@ -101,6 +103,9 @@ public class ViewAdapter extends BaseAdapter {
                 case NOTIF:
                     view = new NotifRowView(context);
                     break;
+                case MENTION:
+                    view = new MentionRowView(context);
+                    break;
                 case BOARD:
                     view = new BoardRowView(context);
                     break;
@@ -127,6 +132,9 @@ public class ViewAdapter extends BaseAdapter {
                     break;
                 case USER_DETAIL:
                     view = new UserDetailRowView(context);
+                    break;
+                case HIGHLIGHTED_USER:
+                    view = new HighlightedUserView(context);
                     break;
                 default:
                     throw new IllegalArgumentException("row type not handled in ViewAdapter: " + data.getRowType().toString());

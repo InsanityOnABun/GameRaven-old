@@ -404,6 +404,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             case TOPIC_POST_S1:
             case NOTIFS_PAGE:
             case NOTIFS_CLEAR:
+            case MENTIONS_PAGE:
             case UNSPECIFIED:
                 aio.preExecuteSetup(desc);
                 break;
@@ -614,6 +615,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case VERIFY_ACCOUNT_S1:
                     case VERIFY_ACCOUNT_S2:
                     case NOTIFS_PAGE:
+                    case MENTIONS_PAGE:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("addToHistory unchanged: " + addToHistory);
                         break;
 
@@ -659,6 +661,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case VERIFY_ACCOUNT_S1:
                     case VERIFY_ACCOUNT_S2:
                     case NOTIFS_PAGE:
+                    case MENTIONS_PAGE:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning lastDesc, lastRes, etc. setting");
 
                         lastDesc = desc;
@@ -905,6 +908,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     case VERIFY_ACCOUNT_S1:
                     case VERIFY_ACCOUNT_S2:
                     case NOTIFS_PAGE:
+                    case MENTIONS_PAGE:
                         if (BuildConfig.DEBUG) AllInOneV2.wtl("session hNR determined this should be handled by AIO");
                         aio.processContent(desc, doc, resUrl);
                         break;
@@ -967,6 +971,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                 case PM_OUTBOX_DETAIL:
                 case MSG_DELETE:
                 case NOTIFS_PAGE:
+                case MENTIONS_PAGE:
                 case UNSPECIFIED:
                     if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning history addition");
                     int[] vLoc = aio.getScrollerVertLoc();
@@ -1049,6 +1054,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
             case GAME_SEARCH:
             case BOARD_LIST:
             case NOTIFS_PAGE:
+            case MENTIONS_PAGE:
             case UNSPECIFIED:
                 if (!skipAIOCleanup)
                     aio.postExecuteCleanup(desc);
@@ -1206,6 +1212,8 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     return NetDesc.AMP_LIST;
                 } else if (url.contains("/notifications")) {
                     return NetDesc.NOTIFS_PAGE;
+                } else if (url.contains("/mentions")) {
+                    return NetDesc.MENTIONS_PAGE;
                 } else if (url.contains("/tracked")) {
                     return NetDesc.TRACKED_TOPICS;
                 } else if (url.contains("/moderated")) {

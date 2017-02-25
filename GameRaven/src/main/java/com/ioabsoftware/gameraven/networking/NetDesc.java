@@ -11,5 +11,6 @@ public enum NetDesc {
     MSG_POST_S1, MSG_POST_S3, // no step 2 as all are quick-posted now
     TOPIC_POST_S1, TOPIC_POST_S3, // no step 2 as all are quick-posted now
     EDIT_MSG,
-    NOTIFS_PAGE, NOTIFS_CLEAR
+    NOTIFS_PAGE, NOTIFS_CLEAR,
+    MENTIONS_PAGE
 }
