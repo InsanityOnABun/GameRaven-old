@@ -1,6 +1,7 @@
 package com.ioabsoftware.gameraven.prefs;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -85,9 +86,9 @@ public class HeaderSettings extends PreferenceActivity {
 
         ACCEPTED_KEYS.add("timezone");
         ACCEPTED_KEYS.add("notifsEnable");
-        ACCEPTED_KEYS.add("notifsAMPEnable");
-        ACCEPTED_KEYS.add("notifsTTEnable");
-        ACCEPTED_KEYS.add("notifsPMEnable");
+        ACCEPTED_KEYS.add("notifsAMPEnable"); // for backwards compatibility, no effect now
+        ACCEPTED_KEYS.add("notifsTTEnable"); // for backwards compatibility, no effect now
+        ACCEPTED_KEYS.add("notifsPMEnable"); // for backwards compatibility, no effect now
         ACCEPTED_KEYS.add("notifsFrequency");
         ACCEPTED_KEYS.add("reloadOnBack");
         ACCEPTED_KEYS.add("reloadOnResume");
@@ -226,21 +227,6 @@ public class HeaderSettings extends PreferenceActivity {
                     buf.append("notifsEnable=true\n");
                 else
                     buf.append("notifsEnable=false\n");
-
-                if (AllInOneV2.getSettingsPref().getBoolean("notifsAMPEnable", false))
-                    buf.append("notifsAMPEnable=true\n");
-                else
-                    buf.append("notifsAMPEnable=false\n");
-
-                if (AllInOneV2.getSettingsPref().getBoolean("notifsTTEnable", false))
-                    buf.append("notifsTTEnable=true\n");
-                else
-                    buf.append("notifsTTEnable=false\n");
-
-                if (AllInOneV2.getSettingsPref().getBoolean("notifsPMEnable", false))
-                    buf.append("notifsPMEnable=true\n");
-                else
-                    buf.append("notifsPMEnable=false\n");
 
                 buf.append("notifsFrequency=").append(AllInOneV2.getSettingsPref().getString("notifsFrequency", "60")).append('\n');
 
@@ -627,6 +613,7 @@ public class HeaderSettings extends PreferenceActivity {
                 });
                 findPreference("gfTheme").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     @Override
+                    @SuppressLint("SetTextI18n")
                     public boolean onPreferenceClick(Preference preference) {
                         AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
                         LayoutInflater inflater = getActivity().getLayoutInflater();

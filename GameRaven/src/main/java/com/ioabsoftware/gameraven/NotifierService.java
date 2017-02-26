@@ -28,9 +28,7 @@ import java.util.Locale;
 public class NotifierService extends IntentService {
 
     public static final String NOTIF_TAG = "GR_NOTIF";
-    public static final int AMP_NOTIF_ID = 1;
-    public static final int PM_NOTIF_ID = 2;
-    public static final int TT_NOTIF_ID = 3;
+    public static final int NOTIF_ID = 1;
 
 
     public NotifierService() {
@@ -43,15 +41,16 @@ public class NotifierService extends IntentService {
 
         String username = prefs.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT);
 
+        // double check notifications are enabled
         // service does nothing if there is no default account set or there is no generated salt
-        //neuter the service, for now...
-        if (true || !username.equals(HeaderSettings.NO_DEFAULT_ACCOUNT) && prefs.getString("secureSalt", null) != null) {
-            HashMap<String, String> cookies = new HashMap<String, String>();
-            String password = AccountManager.getPassword(getApplicationContext(), username);
-
-            String basePath = Session.ROOT + "/notifications";
-            String loginPath = Session.ROOT + "/user/login";
+        if (prefs.getBoolean("notifsEnable", false) && !username.equals(HeaderSettings.NO_DEFAULT_ACCOUNT) && prefs.getString("secureSalt", null) != null) {
             try {
+                HashMap<String, String> cookies = new HashMap<String, String>();
+                String password = AccountManager.getPassword(getApplicationContext(), username);
+
+                String basePath = Session.ROOT + "/notifications";
+                String loginPath = Session.ROOT + "/user/login";
+
                 Response r = Jsoup.connect(loginPath).method(Method.GET)
                         .cookies(cookies).timeout(10000).execute();
 
@@ -85,83 +84,73 @@ public class NotifierService extends IntentService {
 
                     NotificationManager notifManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-                    if (prefs.getBoolean("notifsAMPEnable", false)) {
-                        Element lPost = pRes.select("td.lastpost").first();
-                        if (lPost != null) {
-                            // 4/25 8:23PM
-                            // 1/24/2012
-                            String lTime = lPost.text();
-                            lTime = lTime.replace("Last:", "");
-                            Log.d("notif", "time is " + lTime);
-                            Date newDate;
-                            if (lTime.contains("AM") || lTime.contains("PM"))
-                                newDate = new SimpleDateFormat(
-                                        "MM'/'dd hh':'mmaa", Locale.US)
-                                        .parse(lTime);
-                            else
-                                newDate = new SimpleDateFormat(
-                                        "MM'/'dd'/'yyyy", Locale.US)
-                                        .parse(lTime);
+                    // NOTIF PAGE PROCESS START
 
-                            long newTime = newDate.getTime();
-                            long oldTime = prefs.getLong("notifsLastPost", 0);
-                            if (newTime > oldTime) {
-                                showNotif("New posts in AMP list found for " + username, AMP_NOTIF_ID, notifManager);
+                    Element tbody = pRes.getElementsByTag("tbody").first();
 
-                                Log.d("notif", "time is newer");
-                                prefs.edit().putLong("notifsLastPost", newTime)
-                                        .apply();
-                            }
+                    if (tbody != null) {
+                        long millis = 0;
+                        int multiplier = 1000;
+                        String fuzzyTimestamp = tbody.getElementsByTag("tr").first().child(1).text();
+                        if (fuzzyTimestamp.contains("second")) {
+                            multiplier *= 1;
+                        } else if (fuzzyTimestamp.contains("minute")) {
+                            multiplier *= 1 * 60;
+                        } else if (fuzzyTimestamp.contains("hour")) {
+                            multiplier *= 1 * 60 * 60;
+                        } else if (fuzzyTimestamp.contains("day")) {
+                            multiplier *= 1 * 60 * 60 * 24;
+                        } else if (fuzzyTimestamp.contains("week")) {
+                            multiplier *= 1 * 60 * 60 * 24 * 7;
                         }
+
+                        int firstSpace = fuzzyTimestamp.indexOf(' ');
+                        millis = Long.valueOf(fuzzyTimestamp.substring(0, firstSpace)) * multiplier;
+
+                        long notifTime = System.currentTimeMillis() - millis;
+                        long lastCheck = prefs.getLong("notifsLastCheck", 0);
+                    } else {
+                        // no notifications
                     }
 
-                    if (prefs.getBoolean("notifsPMEnable", false)) {
-                        Element pmInboxLink = pRes.select("div.masthead_user").first().select("a[href=/pm/]").first();
-                        if (pmInboxLink != null) {
-                            String text = pmInboxLink.text();
-                            int count = 0;
+                    Element lPost = pRes.select("td.lastpost").first();
+                    if (lPost != null) {
+                        // 4/25 8:23PM
+                        // 1/24/2012
+                        String lTime = lPost.text();
+                        lTime = lTime.replace("Last:", "");
+                        Log.d("notif", "time is " + lTime);
+                        Date newDate;
+                        if (lTime.contains("AM") || lTime.contains("PM"))
+                            newDate = new SimpleDateFormat(
+                                    "MM'/'dd hh':'mmaa", Locale.US)
+                                    .parse(lTime);
+                        else
+                            newDate = new SimpleDateFormat(
+                                    "MM'/'dd'/'yyyy", Locale.US)
+                                    .parse(lTime);
 
-                            if (text.contains("(")) {
-                                count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
-                                int prevCount = prefs.getInt("notifsUnreadPMCount", 0);
-                                if (count > prevCount) {
-                                    String msg;
-                                    if (count > 1)
-                                        msg = count + " new PMs found for " + username;
-                                    else
-                                        msg = "1 new PM found for " + username;
+                        long newTime = newDate.getTime();
+                        long oldTime = prefs.getLong("notifsLastPost", 0);
+                        if (newTime > oldTime) {
+                            Notification.Builder notifBuilder = new Notification.Builder(this)
+                                    .setSmallIcon(R.drawable.ic_notif_small)
+                                    .setContentTitle("GameRaven")
+                                    .setContentText("You have new notification(s)");
+                            Intent notifIntent = new Intent(this, AllInOneV2.class);
+                            PendingIntent pendingNotif = PendingIntent.getActivity(this, 0, notifIntent, PendingIntent.FLAG_ONE_SHOT);
+                            notifBuilder.setContentIntent(pendingNotif);
+                            notifBuilder.setAutoCancel(true);
+                            notifBuilder.setDefaults(Notification.DEFAULT_ALL);
 
-                                    showNotif(msg, PM_NOTIF_ID, notifManager);
-                                }
-                            }
+                            notifManager.notify(NOTIF_TAG, NOTIF_ID, notifBuilder.getNotification());
 
-                            prefs.edit().putInt("notifsUnreadPMCount", count).apply();
+                            Log.d("notif", "time is newer");
+                            prefs.edit().putLong("notifsLastPost", newTime)
+                                    .apply();
                         }
                     }
-
-                    if (prefs.getBoolean("notifsTTEnable", false)) {
-                        Element trackedLink = pRes.select("div.masthead_user").first().select("a[href=/boards/tracked]").first();
-                        if (trackedLink != null) {
-                            String text = trackedLink.text();
-                            int count = 0;
-
-                            if (text.contains("(")) {
-                                count = Integer.parseInt(text.substring(text.indexOf('(') + 1, text.indexOf(')')));
-                                int prevCount = prefs.getInt("notifsUnreadTTCount", 0);
-                                if (count > prevCount) {
-                                    String msg;
-                                    if (count > 1)
-                                        msg = count + " unread tracked topic found for " + username;
-                                    else
-                                        msg = "1 unread tracked topic found for " + username;
-
-                                    showNotif(msg, TT_NOTIF_ID, notifManager);
-                                }
-                            }
-
-                            prefs.edit().putInt("notifsUnreadTTCount", count).apply();
-                        }
-                    }
+                    // NOTIF PAGE PROCESS END
                 }
 
             } catch (Exception e) {
@@ -171,37 +160,7 @@ public class NotifierService extends IntentService {
         }
     }
 
-    private void showNotif(String msg, int id, NotificationManager notifManager) {
-        Notification.Builder ampNotifBuilder = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.ic_notif_small)
-                .setContentTitle("GameRaven")
-                .setContentText(msg);
-        Intent notifIntent = new Intent(this, AllInOneV2.class);
-        PendingIntent pendingNotif = PendingIntent.getActivity(this, 0, notifIntent, PendingIntent.FLAG_ONE_SHOT);
-        ampNotifBuilder.setContentIntent(pendingNotif);
-        ampNotifBuilder.setAutoCancel(true);
-        ampNotifBuilder.setDefaults(Notification.DEFAULT_ALL);
-
-        notifManager.notify(NOTIF_TAG, id, ampNotifBuilder.getNotification());
+    public static void notifDismiss(Context c) {
+        ((NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(NOTIF_TAG, NOTIF_ID);
     }
-
-    public static void dismissAMPNotif(Context c) {
-        ((NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(NOTIF_TAG, AMP_NOTIF_ID);
-    }
-
-    public static void dismissPMNotif(Context c) {
-        ((NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(NOTIF_TAG, PM_NOTIF_ID);
-    }
-
-    public static void dismissTTNotif(Context c) {
-        ((NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(NOTIF_TAG, TT_NOTIF_ID);
-    }
-
-    public static void dismissAllNotifs(Context c) {
-        NotificationManager notifManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
-        notifManager.cancel(NOTIF_TAG, AMP_NOTIF_ID);
-        notifManager.cancel(NOTIF_TAG, PM_NOTIF_ID);
-        notifManager.cancel(NOTIF_TAG, TT_NOTIF_ID);
-    }
-
 }
