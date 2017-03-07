@@ -35,8 +35,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 328
-        versionName "3.2 Beta Build 328"
+        versionCode 329
+        versionName "3.2 Beta Build 329"
     }
     signingConfigs {
         release {
