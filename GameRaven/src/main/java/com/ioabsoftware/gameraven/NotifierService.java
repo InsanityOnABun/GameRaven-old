@@ -37,6 +37,7 @@ public class NotifierService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        Log.d("notif", "notif service starting");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         String username = prefs.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT);
@@ -44,11 +45,14 @@ public class NotifierService extends IntentService {
         // double check notifications are enabled
         // service does nothing if there is no default account set or there is no generated salt
         if (prefs.getBoolean("notifsEnable", false) && !username.equals(HeaderSettings.NO_DEFAULT_ACCOUNT) && prefs.getString("secureSalt", null) != null) {
+            Log.d("notif", "doing the thing");
             try {
+                long rightNow = System.currentTimeMillis();
+
                 HashMap<String, String> cookies = new HashMap<String, String>();
                 String password = AccountManager.getPassword(getApplicationContext(), username);
 
-                String basePath = Session.ROOT + "/notifications";
+                String basePath = Session.ROOT + "/user/notifications";
                 String loginPath = Session.ROOT + "/user/login";
 
                 Response r = Jsoup.connect(loginPath).method(Method.GET)
@@ -77,10 +81,16 @@ public class NotifierService extends IntentService {
 
                 // second connection finished
 
+                r = Jsoup.connect(basePath).method(Method.GET)
+                        .cookies(cookies).data(loginData).timeout(10000)
+                        .execute();
+
+                // third connection finished
+
+                cookies.putAll(r.cookies());
+
                 if (r.statusCode() != 401) {
-                    Log.d("notif", "status is good");
                     pRes = r.parse();
-                    Log.d("notif", pRes.title());
 
                     NotificationManager notifManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -95,44 +105,22 @@ public class NotifierService extends IntentService {
                         if (fuzzyTimestamp.contains("second")) {
                             multiplier *= 1;
                         } else if (fuzzyTimestamp.contains("minute")) {
-                            multiplier *= 1 * 60;
+                            multiplier *= 60; // 1* 60
                         } else if (fuzzyTimestamp.contains("hour")) {
-                            multiplier *= 1 * 60 * 60;
+                            multiplier *= 3600; // 1 * 60 * 60
                         } else if (fuzzyTimestamp.contains("day")) {
-                            multiplier *= 1 * 60 * 60 * 24;
+                            multiplier *= 86400; // 1 * 60 * 60 * 24
                         } else if (fuzzyTimestamp.contains("week")) {
-                            multiplier *= 1 * 60 * 60 * 24 * 7;
+                            multiplier *= 604800; //1 * 60 * 60 * 24 * 7
                         }
 
                         int firstSpace = fuzzyTimestamp.indexOf(' ');
                         millis = Long.valueOf(fuzzyTimestamp.substring(0, firstSpace)) * multiplier;
 
-                        long notifTime = System.currentTimeMillis() - millis;
+                        long notifTime = rightNow - millis;
                         long lastCheck = prefs.getLong("notifsLastCheck", 0);
-                    } else {
-                        // no notifications
-                    }
 
-                    Element lPost = pRes.select("td.lastpost").first();
-                    if (lPost != null) {
-                        // 4/25 8:23PM
-                        // 1/24/2012
-                        String lTime = lPost.text();
-                        lTime = lTime.replace("Last:", "");
-                        Log.d("notif", "time is " + lTime);
-                        Date newDate;
-                        if (lTime.contains("AM") || lTime.contains("PM"))
-                            newDate = new SimpleDateFormat(
-                                    "MM'/'dd hh':'mmaa", Locale.US)
-                                    .parse(lTime);
-                        else
-                            newDate = new SimpleDateFormat(
-                                    "MM'/'dd'/'yyyy", Locale.US)
-                                    .parse(lTime);
-
-                        long newTime = newDate.getTime();
-                        long oldTime = prefs.getLong("notifsLastPost", 0);
-                        if (newTime > oldTime) {
+                        if (notifTime > lastCheck) {
                             Notification.Builder notifBuilder = new Notification.Builder(this)
                                     .setSmallIcon(R.drawable.ic_notif_small)
                                     .setContentTitle("GameRaven")
@@ -144,12 +132,10 @@ public class NotifierService extends IntentService {
                             notifBuilder.setDefaults(Notification.DEFAULT_ALL);
 
                             notifManager.notify(NOTIF_TAG, NOTIF_ID, notifBuilder.getNotification());
-
-                            Log.d("notif", "time is newer");
-                            prefs.edit().putLong("notifsLastPost", newTime)
-                                    .apply();
                         }
                     }
+
+                    prefs.edit().putLong("notifsLastCheck", rightNow).apply();
                     // NOTIF PAGE PROCESS END
                 }
 

@@ -1323,6 +1323,8 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 break;
 
             case NOTIFS_PAGE:
+
+                settings.edit().putLong("notifsLastCheck", System.currentTimeMillis()).apply();
                 tbody = doc.getElementsByTag("tbody").first();
 
                 headerTitle = Session.getUser() + "'s Notifications";
@@ -1346,6 +1348,8 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                     adapterRows.add(new HeaderRowData("You have no notifications at this time."));
                 }
                 setMenuItemVisibility(clearUnreadNotifsIcon, true);
+
+                NotifierService.notifDismiss(this);
                 break;
 
             case MENTIONS_PAGE:
@@ -1497,29 +1501,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                         pagesInfo[1], nextPage, lastPage, pagePrefix, NetDesc.AMP_LIST);
 
                 if (!tbody.children().isEmpty()) {
-                    if (settings.getBoolean("notifsEnable", false) && isDefaultAcc) {
-                        Element lPost = doc.select("td.lastpost").first();
-                        if (lPost != null) {
-                            try {
-                                String lTime = lPost.text();
-                                Date newDate;
-                                lTime = lTime.replace("Last:", EMPTY_STRING);
-                                if (lTime.contains("AM") || lTime.contains("PM"))
-                                    newDate = new SimpleDateFormat("MM'/'dd hh':'mmaa", Locale.US).parse(lTime);
-                                else
-                                    newDate = new SimpleDateFormat("MM'/'dd'/'yyyy", Locale.US).parse(lTime);
-                                long newTime = newDate.getTime();
-                                long oldTime = settings.getLong("notifsLastPost", 0);
-                                if (newTime > oldTime) {
-                                    if (BuildConfig.DEBUG) wtl("time is newer");
-                                    settings.edit().putLong("notifsLastPost", newTime).apply();
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-
                     for (Element row : tbody.children()) {
                         // [board] [read status] [title] [msg] [last post] [your last post]
                         Elements cells = row.children();

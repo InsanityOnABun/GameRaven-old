@@ -167,7 +167,7 @@ public class HeaderSettings extends PreferenceActivity {
 
     public void enableNotifs(String freq) {
         long millis = 60000 * Integer.parseInt(freq);
-        long firstAlarm = SystemClock.elapsedRealtime() + millis;
+        long firstAlarm = SystemClock.elapsedRealtime() + 1000; // first notifier run should be in one second
         ((AlarmManager) this.getSystemService(Context.ALARM_SERVICE))
                 .setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstAlarm, millis, this.getNotifPendingIntent());
         AllInOneV2.getSettingsPref().edit().putLong("notifsLastPost", 0).apply();
