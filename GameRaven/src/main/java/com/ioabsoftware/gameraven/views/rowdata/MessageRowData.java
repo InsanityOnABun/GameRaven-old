@@ -320,6 +320,26 @@ public class MessageRowData extends BaseRowData {
             messageIn.getElementsByClass("board_poll").first().remove();
         }
 
+        Elements images = messageIn.select("a.img_container");
+        for (Element i : images) {
+            i.html(i.attr("href"));
+        }
+
+        Elements videos = messageIn.select("div.vid_container");
+        for (Element v : videos) {
+            String type = v.child(0).attr("class");
+            String data = v.child(0).attr("data-id");
+            String url;
+            switch (type) {
+                case "yt_player":
+                    url = "https://www.youtube.com/watch?v=" + data;
+                    break;
+                default:
+                    url = "GameRaven error: Video source not recognized. Source: " + type + ", Data: " + data;
+            }
+            v.html(url);
+        }
+
         unprocessedMessageText = messageIn.html() + sigHtml;
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("creating ssb");
@@ -490,9 +510,22 @@ public class MessageRowData extends BaseRowData {
         String finalBody = unprocessedMessageText;
 
         if (BuildConfig.DEBUG) AllInOneV2.wtl("beginning opening anchor tag removal");
-        while (finalBody.contains("<a href")) {
-            int start = finalBody.indexOf("<a href");
+        while (finalBody.contains("<a ")) {
+            int start = finalBody.indexOf("<a ");
             int end = finalBody.indexOf(">", start) + 1;
+            finalBody = finalBody.replace(finalBody.substring(start, end),
+                    "");
+        }
+
+        if (BuildConfig.DEBUG) AllInOneV2.wtl("removing vid container divs");
+        while (finalBody.contains("<div class=\"vid_container\">")) {
+            int start = finalBody.indexOf("<div class=\"vid_container\">");
+            int end = finalBody.indexOf(">", start) + 1;
+            finalBody = finalBody.replace(finalBody.substring(start, end),
+                    "");
+
+            start = finalBody.indexOf("</div>", end) + 1;
+            end = start + 6;
             finalBody = finalBody.replace(finalBody.substring(start, end),
                     "");
         }
