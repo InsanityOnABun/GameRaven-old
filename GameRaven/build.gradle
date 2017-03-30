@@ -5,10 +5,10 @@ repositories {
 }
 
 dependencies {
-    compile 'com.google.android.gms:play-services-gcm:10.0.1'
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:support-v13:25.1.0'
-    compile 'com.android.support:design:25.1.0'
+    compile 'com.google.android.gms:play-services-gcm:10.2.0'
+    compile 'com.android.support:appcompat-v7:25.3.0'
+    compile 'com.android.support:support-v13:25.3.0'
+    compile 'com.android.support:design:25.3.0'
     compile 'com.joanzapata.iconify:android-iconify-fontawesome:2.2.2'
     compile 'com.joanzapata.iconify:android-iconify-material:2.2.2'
     compile 'com.joanzapata.iconify:android-iconify-material-community:2.2.2'
@@ -35,8 +35,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 329
-        versionName "3.2 Beta Build 329"
+        versionCode 335
+        versionName "3.2 Beta Build 335"
     }
     signingConfigs {
         release {
