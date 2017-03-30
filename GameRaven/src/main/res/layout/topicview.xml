@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/tvTypeIndicator"
         android:layout_below="@+id/tvTopSpacer"
+        android:layout_alignWithParentIfMissing="true"
         android:layout_marginLeft="@dimen/item_padding_horizontal"
         android:layout_toLeftOf="@+id/tvMsgCountLastPost"
         android:layout_toRightOf="@+id/tvTypeIndicator"
