@@ -61,7 +61,7 @@ public class TrackedTopicRowView extends BaseRowView {
         removeLink = (TextView) findViewById(R.id.tvStopTracking);
 
         // always display the "pinned" type indicator for tracked topics, mainly for layout
-        ((ImageView) findViewById(R.id.tvTypeIndicator)).setImageDrawable(Theming.topicStatusIcons()[3]);
+        findViewById(R.id.tvTypeIndicator).setBackgroundDrawable(Theming.topicStatusIcons()[3]);
 
         removeLink.setVisibility(View.VISIBLE);
         findViewById(R.id.tvSTSep).setVisibility(View.VISIBLE);
