@@ -24,7 +24,10 @@
         android:layout_alignBaseline="@+id/tvTypeIndicator"
         android:layout_below="@+id/tvTopSpacer"
         android:layout_marginLeft="@dimen/item_padding_horizontal"
+        android:layout_toLeftOf="@+id/tvMsgCountLastPost"
         android:layout_toRightOf="@+id/tvTypeIndicator"
+        android:ellipsize="end"
+        android:lines="1"
         android:text="Topic CreatorTC"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textSize="10sp" />
