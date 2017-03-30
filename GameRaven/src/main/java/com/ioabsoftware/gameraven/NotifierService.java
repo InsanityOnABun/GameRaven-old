@@ -99,39 +99,42 @@ public class NotifierService extends IntentService {
                     Element tbody = pRes.getElementsByTag("tbody").first();
 
                     if (tbody != null) {
-                        long millis = 0;
-                        int multiplier = 1000;
-                        String fuzzyTimestamp = tbody.getElementsByTag("tr").first().child(1).text();
-                        if (fuzzyTimestamp.contains("second")) {
-                            multiplier *= 1;
-                        } else if (fuzzyTimestamp.contains("minute")) {
-                            multiplier *= 60; // 1* 60
-                        } else if (fuzzyTimestamp.contains("hour")) {
-                            multiplier *= 3600; // 1 * 60 * 60
-                        } else if (fuzzyTimestamp.contains("day")) {
-                            multiplier *= 86400; // 1 * 60 * 60 * 24
-                        } else if (fuzzyTimestamp.contains("week")) {
-                            multiplier *= 604800; //1 * 60 * 60 * 24 * 7
-                        }
+                        Element latest = tbody.getElementsByTag("tr").first();
+                        if (!latest.child(2).text().equals("Read")) {
+                            long millis = 0;
+                            int multiplier = 1000;
+                            String fuzzyTimestamp = latest.child(1).text();
+                            if (fuzzyTimestamp.contains("second")) {
+                                multiplier *= 1;
+                            } else if (fuzzyTimestamp.contains("minute")) {
+                                multiplier *= 60; // 1* 60
+                            } else if (fuzzyTimestamp.contains("hour")) {
+                                multiplier *= 3600; // 1 * 60 * 60
+                            } else if (fuzzyTimestamp.contains("day")) {
+                                multiplier *= 86400; // 1 * 60 * 60 * 24
+                            } else if (fuzzyTimestamp.contains("week")) {
+                                multiplier *= 604800; //1 * 60 * 60 * 24 * 7
+                            }
 
-                        int firstSpace = fuzzyTimestamp.indexOf(' ');
-                        millis = Long.valueOf(fuzzyTimestamp.substring(0, firstSpace)) * multiplier;
+                            int firstSpace = fuzzyTimestamp.indexOf(' ');
+                            millis = Long.valueOf(fuzzyTimestamp.substring(0, firstSpace)) * multiplier;
 
-                        long notifTime = rightNow - millis;
-                        long lastCheck = prefs.getLong("notifsLastCheck", 0);
+                            long notifTime = rightNow - millis;
+                            long lastCheck = prefs.getLong("notifsLastCheck", 0);
 
-                        if (notifTime > lastCheck) {
-                            Notification.Builder notifBuilder = new Notification.Builder(this)
-                                    .setSmallIcon(R.drawable.ic_notif_small)
-                                    .setContentTitle("GameRaven")
-                                    .setContentText("You have new notification(s)");
-                            Intent notifIntent = new Intent(this, AllInOneV2.class);
-                            PendingIntent pendingNotif = PendingIntent.getActivity(this, 0, notifIntent, PendingIntent.FLAG_ONE_SHOT);
-                            notifBuilder.setContentIntent(pendingNotif);
-                            notifBuilder.setAutoCancel(true);
-                            notifBuilder.setDefaults(Notification.DEFAULT_ALL);
+                            if (notifTime > lastCheck) {
+                                Notification.Builder notifBuilder = new Notification.Builder(this)
+                                        .setSmallIcon(R.drawable.ic_notif_small)
+                                        .setContentTitle("GameRaven")
+                                        .setContentText("You have new notification(s)");
+                                Intent notifIntent = new Intent(this, AllInOneV2.class);
+                                PendingIntent pendingNotif = PendingIntent.getActivity(this, 0, notifIntent, PendingIntent.FLAG_ONE_SHOT);
+                                notifBuilder.setContentIntent(pendingNotif);
+                                notifBuilder.setAutoCancel(true);
+                                notifBuilder.setDefaults(Notification.DEFAULT_ALL);
 
-                            notifManager.notify(NOTIF_TAG, NOTIF_ID, notifBuilder.getNotification());
+                                notifManager.notify(NOTIF_TAG, NOTIF_ID, notifBuilder.getNotification());
+                            }
                         }
                     }
 
