@@ -32,6 +32,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
+                <!-- non-https links-->
                 <data
                     android:host="gamefaqs.com"
                     android:pathPrefix="/boards"
@@ -56,6 +57,32 @@
                     android:host="www.gamefaqs.com"
                     android:pathPrefix="/pm"
                     android:scheme="http" />
+
+                <!--https links-->
+                <data
+                    android:host="gamefaqs.com"
+                    android:pathPrefix="/boards"
+                    android:scheme="https" />
+                <data
+                    android:host="www.gamefaqs.com"
+                    android:pathPrefix="/boards"
+                    android:scheme="https" />
+                <data
+                    android:host="gamefaqs.com"
+                    android:pathPattern="/users/.*/boards"
+                    android:scheme="https" />
+                <data
+                    android:host="www.gamefaqs.com"
+                    android:pathPattern="/users/.*/boards"
+                    android:scheme="https" />
+                <data
+                    android:host="gamefaqs.com"
+                    android:pathPrefix="/pm"
+                    android:scheme="https" />
+                <data
+                    android:host="www.gamefaqs.com"
+                    android:pathPrefix="/pm"
+                    android:scheme="https" />
 
                 <action android:name="android.intent.action.VIEW" />
 
