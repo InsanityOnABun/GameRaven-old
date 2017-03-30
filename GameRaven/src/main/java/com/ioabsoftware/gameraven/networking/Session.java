@@ -1194,7 +1194,6 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
 
         if (url.startsWith(Session.ROOT)) {
 
-            // check if PM
             if (url.equals(Session.ROOT + "/pm"))
                 url += "/";
             if (url.contains("/pm/")) {
@@ -1208,7 +1207,7 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     return NetDesc.PM_INBOX;
                 }
             }
-            // check if AMP or tracked topic
+
             else if (url.contains("/user/")) {
                 if (url.contains("/messages")) {
                     return NetDesc.AMP_LIST;
@@ -1220,9 +1219,15 @@ public class Session implements FutureCallback<Response<FinalDoc>> {
                     return NetDesc.TRACKED_TOPICS;
                 } else if (url.contains("/moderated")) {
                     return NetDesc.MODHIST;
+                } else if (url.contains("/friends")) {
+                    return NetDesc.FRIENDS;
+                } else if (url.contains("/following")) {
+                    return NetDesc.FOLLOWING;
+                } else if (url.contains("/followers")) {
+                    return NetDesc.FOLLOWERS;
                 }
             }
-            // check if this is a board or topic url
+
             else if (url.contains("/boards")) {
                 if (url.contains("/users/")) {
                     return NetDesc.USER_DETAIL;
