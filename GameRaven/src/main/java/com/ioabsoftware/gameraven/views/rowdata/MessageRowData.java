@@ -524,7 +524,7 @@ public class MessageRowData extends BaseRowData {
             finalBody = finalBody.replace(finalBody.substring(start, end),
                     "");
 
-            start = finalBody.indexOf("</div>", end) + 1;
+            start = finalBody.indexOf("</div>", end);
             end = start + 6;
             finalBody = finalBody.replace(finalBody.substring(start, end),
                     "");
