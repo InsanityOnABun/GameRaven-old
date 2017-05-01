@@ -1250,7 +1250,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     ArrayList<BaseRowData> adapterRows = new ArrayList<>();
     ViewAdapter viewAdapter = new ViewAdapter(this, adapterRows);
 
-    @SuppressLint("SetJavaScriptEnabled")
     public void processContent(NetDesc desc, Document doc, String resUrl) {
 
         if (BuildConfig.DEBUG) wtl("GRAIO hNR fired, desc: " + desc.name());
