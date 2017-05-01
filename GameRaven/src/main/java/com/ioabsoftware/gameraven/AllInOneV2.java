@@ -3143,7 +3143,13 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     public void processNotif(String text, String url) {
-        if (url.equals(NOTIFS_CLEAR_LINK)) {
+        if (text.startsWith("Your user level has changed to")) {
+            AlertDialog.Builder b = new AlertDialog.Builder(this);
+            b.setMessage("Congrats on the new user level!");
+            b.setPositiveButton("Thanks!", null);
+            b.show();
+        }
+        else if (url.equals(NOTIFS_CLEAR_LINK)) {
             session.get(NetDesc.NOTIFS_CLEAR, url);
         }
         else if (Session.determineNetDesc(url) == NetDesc.UNSPECIFIED) {
