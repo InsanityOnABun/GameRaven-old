@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 dependencies {
-    compile 'com.google.android.gms:play-services-gcm:10.2.0'
-    compile 'com.android.support:appcompat-v7:25.3.0'
-    compile 'com.android.support:support-v13:25.3.0'
-    compile 'com.android.support:design:25.3.0'
+    compile 'com.google.android.gms:play-services-gcm:10.2.4'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:support-v13:25.3.1'
+    compile 'com.android.support:design:25.3.1'
     compile 'com.joanzapata.iconify:android-iconify-fontawesome:2.2.2'
     compile 'com.joanzapata.iconify:android-iconify-material:2.2.2'
     compile 'com.joanzapata.iconify:android-iconify-material-community:2.2.2'
@@ -26,7 +26,7 @@ dependencies {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
@@ -38,14 +38,14 @@ android {
         versionCode 338
         versionName "3.2"
     }
-    signingConfigs {
+    /*signingConfigs {
         release {
             storeFile file(RELEASE_STORE_FILE)
             storePassword RELEASE_STORE_PASSWORD
             keyAlias RELEASE_KEY_ALIAS
             keyPassword RELEASE_KEY_PASSWORD
         }
-    }
+    }*/
     buildTypes {
         debug {
             applicationIdSuffix '.debug'
@@ -53,7 +53,7 @@ android {
 
         }
         release {
-            signingConfig signingConfigs.release
+            //signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
