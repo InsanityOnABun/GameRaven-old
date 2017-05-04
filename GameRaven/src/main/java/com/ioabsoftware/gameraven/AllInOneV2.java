@@ -31,6 +31,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Time;
 import android.util.Log;
+import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
@@ -63,6 +64,7 @@ import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.prefs.HeaderSettings;
 import com.ioabsoftware.gameraven.prefs.SettingsHighlightedUsers;
+import com.ioabsoftware.gameraven.prefs.gfaqs.GFAQsSetting;
 import com.ioabsoftware.gameraven.util.AccountManager;
 import com.ioabsoftware.gameraven.util.DocumentParser;
 import com.ioabsoftware.gameraven.util.Theming;
@@ -105,10 +107,8 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -1314,6 +1314,39 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 setMenuItemVisibility(searchIcon, true);
 
                 processBoards(doc);
+                break;
+
+            case GFAQS_SETTINGS:
+                Elements gsForms = doc.getElementsByTag("form");
+                Element settingsForm = null;
+                for (Element e : gsForms) {
+                    if (!e.hasClass("search")) {
+                        settingsForm = e;
+                        break;
+                    }
+                }
+
+                // settingsForm should never be null
+                Elements gsRows = settingsForm.select("div.row");
+                GFAQsSetting[] gfaqsSettings = new GFAQsSetting[gsRows.size()];
+                int gsX = 0;
+                for (Element gsRow : gsRows) {
+                    Element title = gsRow.child(0);
+                    Element spinner = gsRow.getElementsByTag("select").first();
+
+                    // option name, title, hint
+                    String[] optionAttrs = {spinner.attr("name"), title.text(),
+                            title.select("i.fa-question-circle").first().attr("title")};
+
+                    // option value, label
+                    SparseArray<String> optionPairs = new SparseArray<>();
+                    Elements options = spinner.getElementsByTag("option");
+                    for (Element option : options) {
+                        optionPairs.append(Integer.valueOf(option.attr("value")), option.attr("label"));
+                    }
+                    gfaqsSettings[gsX] = new GFAQsSetting(spinner.attr("name"), title.text(),
+                            title.select("i.fa-question-circle").first().attr("title"), optionPairs);
+                }
                 break;
 
             case BOARD_LIST:
