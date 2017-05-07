@@ -20,10 +20,10 @@ public class GFAQsSetting {
 
     public String getCurrentValueLabel(int key) {return values.get(key);}
 
-    public GFAQsSetting(String nameOfSetting, String label, String hint, SparseArray<String> values, int currentValue) {
-        this.nameOfSetting = nameOfSetting;
-        this.label = label;
-        this.hint = hint;
+    public GFAQsSetting(String[] attrs, SparseArray<String> values, int currentValue) {
+        nameOfSetting = attrs[0];
+        label = attrs[1];
+        hint = attrs[2];
         this.values = values;
         this.currentValue = currentValue;
     }

@@ -1322,7 +1322,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 for (Element e : gsForms) {
                     if (!e.hasClass("search")) {
                         settingsForm = e;
-                        break;
                     }
                 }
 
@@ -1341,11 +1340,13 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                     // option value, label
                     SparseArray<String> optionPairs = new SparseArray<>();
                     Elements options = spinner.getElementsByTag("option");
+                    int currentSelected = 0;
                     for (Element option : options) {
                         optionPairs.append(Integer.valueOf(option.attr("value")), option.attr("label"));
+                        if (option.hasAttr("selected"))
+                            currentSelected = Integer.valueOf(option.attr("value"));
                     }
-                    gfaqsSettings[gsX] = new GFAQsSetting(spinner.attr("name"), title.text(),
-                            title.select("i.fa-question-circle").first().attr("title"), optionPairs);
+                    gfaqsSettings[gsX] = new GFAQsSetting(optionAttrs, optionPairs, currentSelected);
                 }
                 break;
 
