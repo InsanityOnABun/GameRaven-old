@@ -38,14 +38,14 @@ android {
         versionCode 338
         versionName "3.2"
     }
-    /*signingConfigs {
+    signingConfigs {
         release {
             storeFile file(RELEASE_STORE_FILE)
             storePassword RELEASE_STORE_PASSWORD
             keyAlias RELEASE_KEY_ALIAS
             keyPassword RELEASE_KEY_PASSWORD
         }
-    }*/
+    }
     buildTypes {
         debug {
             applicationIdSuffix '.debug'
@@ -53,7 +53,7 @@ android {
 
         }
         release {
-            //signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
