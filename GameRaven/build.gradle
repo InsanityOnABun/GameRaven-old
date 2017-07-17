@@ -15,7 +15,7 @@ dependencies {
     compile 'com.intellij:annotations:12.0@jar'
     compile 'com.github.codechimp-org.apprater:library:1.0.30'
     compile 'com.koushikdutta.ion:ion:2.+'
-    compile 'org.jsoup:jsoup:1.10.2'
+    compile 'org.jsoup:jsoup:1.10.3'
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'ch.acra:acra:4.8.1@aar'
     compile('de.keyboardsurfer.android.widget:crouton:1.8.5@aar') {
@@ -35,8 +35,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 338
-        versionName "3.2"
+        versionCode 339
+        versionName "3.2.1"
     }
     signingConfigs {
         release {
