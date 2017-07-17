@@ -1316,38 +1316,38 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 processBoards(doc);
                 break;
 
-            case GFAQS_SETTINGS:
-                Elements gsForms = doc.getElementsByTag("form");
-                Element settingsForm = null;
-                for (Element e : gsForms) {
-                    if (!e.hasClass("search")) {
-                        settingsForm = e;
-                        break;
-                    }
-                }
-
-                // settingsForm should never be null
-                Elements gsRows = settingsForm.select("div.row");
-                GFAQsSetting[] gfaqsSettings = new GFAQsSetting[gsRows.size()];
-                int gsX = 0;
-                for (Element gsRow : gsRows) {
-                    Element title = gsRow.child(0);
-                    Element spinner = gsRow.getElementsByTag("select").first();
-
-                    // option name, title, hint
-                    String[] optionAttrs = {spinner.attr("name"), title.text(),
-                            title.select("i.fa-question-circle").first().attr("title")};
-
-                    // option value, label
-                    SparseArray<String> optionPairs = new SparseArray<>();
-                    Elements options = spinner.getElementsByTag("option");
-                    for (Element option : options) {
-                        optionPairs.append(Integer.valueOf(option.attr("value")), option.attr("label"));
-                    }
-                    gfaqsSettings[gsX] = new GFAQsSetting(spinner.attr("name"), title.text(),
-                            title.select("i.fa-question-circle").first().attr("title"), optionPairs);
-                }
-                break;
+//            case GFAQS_SETTINGS:
+//                Elements gsForms = doc.getElementsByTag("form");
+//                Element settingsForm = null;
+//                for (Element e : gsForms) {
+//                    if (!e.hasClass("search")) {
+//                        settingsForm = e;
+//                        break;
+//                    }
+//                }
+//
+//                // settingsForm should never be null
+//                Elements gsRows = settingsForm.select("div.row");
+//                GFAQsSetting[] gfaqsSettings = new GFAQsSetting[gsRows.size()];
+//                int gsX = 0;
+//                for (Element gsRow : gsRows) {
+//                    Element title = gsRow.child(0);
+//                    Element spinner = gsRow.getElementsByTag("select").first();
+//
+//                    // option name, title, hint
+//                    String[] optionAttrs = {spinner.attr("name"), title.text(),
+//                            title.select("i.fa-question-circle").first().attr("title")};
+//
+//                    // option value, label
+//                    SparseArray<String> optionPairs = new SparseArray<>();
+//                    Elements options = spinner.getElementsByTag("option");
+//                    for (Element option : options) {
+//                        optionPairs.append(Integer.valueOf(option.attr("value")), option.attr("label"));
+//                    }
+//                    gfaqsSettings[gsX] = new GFAQsSetting(spinner.attr("name"), title.text(),
+//                            title.select("i.fa-question-circle").first().attr("title"), optionPairs);
+//                }
+//                break;
 
             case BOARD_LIST:
                 updateHeaderNoJumper(doc.getElementsByTag("th").get(4).text(), NetDesc.BOARD_LIST);
