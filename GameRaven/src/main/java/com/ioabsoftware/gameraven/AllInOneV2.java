@@ -781,6 +781,8 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     private MenuItem refreshIcon, replyIcon, pmInboxIcon, pmOutboxIcon, addFavIcon, remFavIcon,
             searchIcon, topicListIcon, sendUserPMIcon, tagUserIcon, unreadNotifsIcon, clearUnreadNotifsIcon;
 
+    private final String GAME_SEARCH_URL = "/search_advanced/index.html?game=";
+
     /**
      * Adds menu items
      */
@@ -832,7 +834,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                             session.get(NetDesc.BOARD, session.getLastPathWithoutData() + "?search=" + encodedQuery);
                         } else if (session.getLastDesc() == NetDesc.BOARD_JUMPER || session.getLastDesc() == NetDesc.GAME_SEARCH) {
                             if (BuildConfig.DEBUG) wtl("searching for games");
-                            session.get(NetDesc.GAME_SEARCH, "/search/index.html?game=" + encodedQuery);
+                            session.get(NetDesc.GAME_SEARCH, GAME_SEARCH_URL + encodedQuery);
                         }
                     } catch (UnsupportedEncodingException e) {
                         throw new AssertionError(DocumentParser.CHARSET_NAME + " is unknown");
@@ -2072,11 +2074,11 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 }
 
                 if (pagesInfo[0] > 1) {
-                    firstPage = "/search/index.html?game=" + searchQuery + "&page=0";
-                    prevPage = "/search/index.html?game=" + searchQuery + "&page=" + (pagesInfo[0] - 2);
+                    firstPage = GAME_SEARCH_URL + searchQuery + "&page=0";
+                    prevPage = GAME_SEARCH_URL + searchQuery + "&page=" + (pagesInfo[0] - 2);
                 }
-                if (!doc.getElementsByClass("icon-angle-right").isEmpty()) {
-                    nextPage = "/search/index.html?game=" + searchQuery + "&page=" + (pagesInfo[0]);
+                if (!doc.getElementsByClass("fa-angle-right").isEmpty()) {
+                    nextPage = GAME_SEARCH_URL + searchQuery + "&page=" + (pagesInfo[0]);
                 }
 
                 try {
@@ -2091,38 +2093,19 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
                 setMenuItemVisibility(searchIcon, true);
 
-                Elements gameSearchTables = doc.select("table.results");
-                int tCount = gameSearchTables.size();
-                int tCounter = 0;
-                if (!gameSearchTables.isEmpty()) {
-                    for (Element table : gameSearchTables) {
-                        tCounter++;
-                        if (tCounter < tCount)
-                            adapterRows.add(new HeaderRowData("Best Matches"));
-                        else
-                            adapterRows.add(new HeaderRowData("Good Matches"));
+                Element gameSearchResults = doc.select("div.search_results_product").first();
+                if (gameSearchResults != null) {
+                    if (BuildConfig.DEBUG) wtl("board row parsing start");
+                    for (Element row : gameSearchResults.select("div.sr_row")) {
+                        String platform = row.select("div.sr_platform").text();
+                        String bName = row.select("div.sr_title").text();
+                        String bUrl = row.select("div.sr_links").select("a:containsOwn(Board)").attr("href");
 
-                        String prevPlatform = EMPTY_STRING;
-
-                        if (BuildConfig.DEBUG) wtl("board row parsing start");
-                        for (Element row : table.getElementsByTag("tr")) {
-                            if (row.parent().tagName().equals("tbody")) {
-                                Elements cells = row.getElementsByTag("td");
-                                // cells = [platform] [title] [faqs] [codes] [saves] [revs] [mygames] [q&a] [pics] [vids] [board]
-                                String platform = cells.get(0).text();
-                                String bName = cells.get(1).text();
-                                String bUrl = cells.get(9).child(0).attr("href");
-                                if (platform.codePointAt(0) == ('\u00A0')) {
-                                    platform = prevPlatform;
-                                } else {
-                                    prevPlatform = platform;
-                                }
-                                adapterRows.add(new GameSearchRowData(bName, platform, bUrl));
-                            }
-                        }
-
-                        if (BuildConfig.DEBUG) wtl("board row parsing end");
+                        if (!bUrl.equals(EMPTY_STRING))
+                            adapterRows.add(new GameSearchRowData(bName, platform, bUrl));
                     }
+                    if (BuildConfig.DEBUG) wtl("board row parsing end");
+
                 } else {
                     adapterRows.add(new HeaderRowData("No results."));
                 }
