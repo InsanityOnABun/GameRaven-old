@@ -5,7 +5,7 @@ import com.ioabsoftware.gameraven.views.RowType;
 
 public class GameSearchRowData extends BaseRowData {
 
-    private String name, platform, url;
+    private String name, platform, year, url;
 
     public String getName() {
         return name;
@@ -15,13 +15,18 @@ public class GameSearchRowData extends BaseRowData {
         return platform;
     }
 
+    public String getYear() {
+        return year;
+    }
+
     public String getUrl() {
         return url;
     }
 
-    public GameSearchRowData(String nameIn, String platformIn, String urlIn) {
+    public GameSearchRowData(String nameIn, String platformIn, String yearIn, String urlIn) {
         name = nameIn;
         platform = platformIn;
+        year = yearIn;
         url = urlIn;
     }
 
@@ -34,6 +39,7 @@ public class GameSearchRowData extends BaseRowData {
     public String toString() {
         return "name: " + name +
                 "\nplatform: " + platform +
+                "\nyear: " + year +
                 "\nurl: " + url;
     }
 }

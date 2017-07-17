@@ -16,10 +16,10 @@ import com.ioabsoftware.gameraven.views.rowdata.GameSearchRowData;
 
 public class GameSearchRowView extends BaseRowView {
 
-    TextView platform, name;
+    TextView platform, year, name;
 
     private static float nameTextSize = 0;
-    private static float platformTextSize;
+    private static float platformTextSize, yearTextSize;
 
     GameSearchRowData myData;
 
@@ -41,10 +41,12 @@ public class GameSearchRowView extends BaseRowView {
         LayoutInflater.from(context).inflate(R.layout.gamesearchview, this, true);
 
         platform = (TextView) findViewById(R.id.gsPlatform);
+        year = (TextView) findViewById(R.id.gsYear);
         name = (TextView) findViewById(R.id.gsName);
 
         if (nameTextSize == 0) {
             nameTextSize = name.getTextSize();
+            yearTextSize = year.getTextSize();
             platformTextSize = platform.getTextSize();
         }
 
@@ -59,6 +61,7 @@ public class GameSearchRowView extends BaseRowView {
     @Override
     protected void retheme() {
         name.setTextSize(PX, nameTextSize * myScale);
+        year.setTextSize(PX, yearTextSize * myScale);
         platform.setTextSize(PX, platformTextSize * myScale);
     }
 
@@ -70,6 +73,7 @@ public class GameSearchRowView extends BaseRowView {
         myData = (GameSearchRowData) data;
 
         name.setText(myData.getName());
+        year.setText(myData.getYear());
         platform.setText(myData.getPlatform());
     }
 

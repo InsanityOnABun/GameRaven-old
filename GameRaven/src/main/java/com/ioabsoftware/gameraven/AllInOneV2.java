@@ -2100,10 +2100,11 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                     for (Element row : gameSearchResults.select("div.sr_row")) {
                         String platform = row.select("div.sr_platform").text();
                         String bName = row.select("div.sr_title").text();
+                        String bYear = row.select("div.sr_release").text();
                         String bUrl = row.select("div.sr_links").select("a:containsOwn(Board)").attr("href");
 
                         if (!bUrl.equals(EMPTY_STRING))
-                            adapterRows.add(new GameSearchRowData(bName, platform, bUrl));
+                            adapterRows.add(new GameSearchRowData(bName, platform, bYear, bUrl));
                     }
                     if (BuildConfig.DEBUG) wtl("board row parsing end");
 

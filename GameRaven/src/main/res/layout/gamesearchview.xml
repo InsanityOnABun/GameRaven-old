@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
+        android:layout_toLeftOf="@+id/gsYear"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="@dimen/item_padding_horizontal"
         android:layout_marginRight="@dimen/item_padding_horizontal"
@@ -20,13 +20,28 @@
         android:textSize="10sp" />
 
     <TextView
+        android:id="@+id/gsYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/item_padding_horizontal"
+        android:layout_marginRight="@dimen/item_padding_horizontal"
+        android:layout_marginTop="@dimen/item_padding_vertical"
+        android:text="1991"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="10sp" />
+
+    <TextView
         android:id="@+id/gsName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/gsPlatform"
-        android:layout_alignRight="@+id/gsPlatform"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
         android:layout_below="@+id/gsPlatform"
         android:layout_marginBottom="@dimen/item_padding_vertical"
+        android:layout_marginLeft="@dimen/item_padding_horizontal"
+        android:layout_marginRight="@dimen/item_padding_horizontal"
         android:gravity="center_vertical"
         android:maxLines="2"
         android:text="Android"
