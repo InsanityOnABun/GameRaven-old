@@ -1281,18 +1281,12 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         String lastPage = null;
         String pagePrefix = null;
 
-        if (BuildConfig.DEBUG) wtl("checking for board quick list");
-        Element boardsDropdown = null;
-        for (Element e : doc.select("ul.masthead_mygames_subnav")) {
-            if (e.previousElementSibling().ownText().equals("My Boards")) {
-                boardsDropdown = e;
-                break;
-            }
-        }
-
-
+        Element boardsDropdown = doc.select("ul#bdrop").first();
         if (boardsDropdown != null) {
             Elements dItems = boardsDropdown.getElementsByTag("a");
+            if (dItems.last().parent().hasClass("list_foot")) {
+                dItems.remove(dItems.size() - 1);
+            }
             boardQuickListOptions = new String[dItems.size() + 1];
             boardQuickListLinks = new String[dItems.size() + 1];
             boardQuickListOptions[0] = "Go to Boards Page...";
