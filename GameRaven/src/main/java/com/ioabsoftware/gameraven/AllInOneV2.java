@@ -777,7 +777,8 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     private MenuItem refreshIcon, replyIcon, pmInboxIcon, pmOutboxIcon, addFavIcon, remFavIcon,
-            searchIcon, topicListIcon, sendUserPMIcon, tagUserIcon, unreadNotifsIcon, clearUnreadNotifsIcon;
+            searchIcon, topicListIcon, sendUserPMIcon, tagUserIcon, unreadPMsIcon,
+            unreadNotifsIcon, clearUnreadNotifsIcon;
 
     private final String GAME_SEARCH_URL = "/search_advanced/index.html?game=";
 
@@ -792,6 +793,8 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 this, MaterialIcons.md_search).colorRes(R.color.white).actionBarSize());
         unreadNotifsIcon = menu.findItem(R.id.unreadNotifs).setIcon(new IconDrawable(
                 this, MaterialCommunityIcons.mdi_comment_alert).colorRes(R.color.white).actionBarSize());
+        unreadPMsIcon = menu.findItem(R.id.unreadPMs).setIcon(new IconDrawable(
+                this, MaterialIcons.md_markunread_mailbox).colorRes(R.color.white).actionBarSize());
         clearUnreadNotifsIcon = menu.findItem(R.id.clearUnreadNotifs).setIcon(new IconDrawable(
                 this, MaterialCommunityIcons.mdi_notification_clear_all).colorRes(R.color.white).actionBarSize());
         topicListIcon = menu.findItem(R.id.topicList).setIcon(new IconDrawable(
@@ -951,6 +954,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 session.get(NetDesc.BOARD, tlUrl);
                 return true;
 
+            case R.id.unreadPMs:
             case R.id.pmInbox:
                 session.get(NetDesc.PM_INBOX, "/pm/");
                 return true;
@@ -1035,6 +1039,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         setMenuItemVisibility(remFavIcon, visible);
         setMenuItemVisibility(topicListIcon, visible);
         setMenuItemVisibility(unreadNotifsIcon, visible);
+        setMenuItemVisibility(unreadPMsIcon, visible);
         setMenuItemVisibility(clearUnreadNotifsIcon, visible);
 
         if (visible)
@@ -1055,6 +1060,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         setMenuItemEnabled(remFavIcon, enabled);
         setMenuItemEnabled(topicListIcon, enabled);
         setMenuItemEnabled(unreadNotifsIcon, enabled);
+        setMenuItemEnabled(unreadPMsIcon, enabled);
         setMenuItemEnabled(clearUnreadNotifsIcon, enabled);
 
         fab.setEnabled(enabled);
@@ -2118,6 +2124,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         if (pmInboxLink != null) {
             pmButtonLabel += " " + ((TextNode) pmInboxLink.nextSibling()).text();
         }
+        setMenuItemVisibility(unreadPMsIcon, pmInboxLink != null && desc != NetDesc.PM_INBOX);
 
         dwrPMInboxItem.setTitle(pmButtonLabel);
 
@@ -2139,13 +2146,12 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             notifsLinks.add(NOTIFS_PAGE_LINK);
             notifsAdapter.add("Clear All");
             notifsLinks.add(NOTIFS_CLEAR_LINK);
-            setMenuItemVisibility(unreadNotifsIcon, true);
         } else {
             notifsAdapter.add("0 " + getString(R.string.notifications));
             notifsAdapter.add("View All");
             notifsLinks.add(NOTIFS_PAGE_LINK);
-            setMenuItemVisibility(unreadNotifsIcon, false);
         }
+        setMenuItemVisibility(unreadNotifsIcon, notifsObject != null && desc != NetDesc.NOTIFS_PAGE);
         notifsAdapter.notifyDataSetChanged();
 
         swipeRefreshLayout.setEnabled(settings.getBoolean("enablePTR", false));

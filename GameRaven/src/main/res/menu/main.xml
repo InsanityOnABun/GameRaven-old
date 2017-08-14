@@ -12,7 +12,12 @@
     <item
         android:id="@+id/unreadNotifs"
         app:showAsAction="always"
-        android:title="@string/return_to_topic_list"
+        android:title="@string/unread_notifs"
+        android:visible="false" />
+    <item
+        android:id="@+id/unreadPMs"
+        app:showAsAction="always"
+        android:title="@string/unread_pms"
         android:visible="false" />
     <item
         android:id="@+id/clearUnreadNotifs"
