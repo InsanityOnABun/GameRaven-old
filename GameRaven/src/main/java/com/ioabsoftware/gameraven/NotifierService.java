@@ -45,7 +45,6 @@ public class NotifierService extends IntentService {
         // double check notifications are enabled
         // service does nothing if there is no default account set or there is no generated salt
         if (prefs.getBoolean("notifsEnable", false) && !username.equals(HeaderSettings.NO_DEFAULT_ACCOUNT) && prefs.getString("secureSalt", null) != null) {
-            Log.d("notif", "doing the thing");
             try {
                 long rightNow = System.currentTimeMillis();
 

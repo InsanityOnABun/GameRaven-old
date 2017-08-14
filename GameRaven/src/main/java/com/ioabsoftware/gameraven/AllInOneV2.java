@@ -31,7 +31,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Time;
 import android.util.Log;
-import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
@@ -64,7 +63,6 @@ import com.ioabsoftware.gameraven.networking.NetDesc;
 import com.ioabsoftware.gameraven.networking.Session;
 import com.ioabsoftware.gameraven.prefs.HeaderSettings;
 import com.ioabsoftware.gameraven.prefs.SettingsHighlightedUsers;
-import com.ioabsoftware.gameraven.prefs.gfaqs.GFAQsSetting;
 import com.ioabsoftware.gameraven.util.AccountManager;
 import com.ioabsoftware.gameraven.util.DocumentParser;
 import com.ioabsoftware.gameraven.util.Theming;
@@ -2129,20 +2127,16 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
         dwrPMInboxItem.setTitle(pmButtonLabel);
 
-        Element notifsObject = doc.select("span.notifications").first();
+        Element notifsObject = doc.select("div#ndrop").first();
         notifsAdapter.clear();
         notifsLinks.clear();
         notifsLinks.add("filler");
-        String count = "0";
         if (notifsObject != null) {
-            count = notifsObject.child(0).text();
-            if (count.equals("1"))
-                count = count + " " + getString(R.string.notification);
-            else
-                count = count + " " + getString(R.string.notifications);
-            notifsAdapter.add(count);
             Elements notifsLines = notifsObject.getElementsByTag("li");
-            notifsLines.remove(notifsLines.size() - 1);
+            notifsLines.remove(notifsLines.size() - 1); // remove footer
+            notifsLines.remove(0); // remove header
+            notifsAdapter.add(notifsLines.size() + " " +
+                    (notifsLines.size() == 1 ? getString(R.string.notification) : getString(R.string.notifications)));
             for (Element e : notifsLines) {
                 notifsAdapter.add(e.text());
                 notifsLinks.add(e.select("a").first().attr("href"));
@@ -2153,7 +2147,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
             notifsLinks.add(NOTIFS_CLEAR_LINK);
             setMenuItemVisibility(unreadNotifsIcon, true);
         } else {
-            notifsAdapter.add(count + " " + getString(R.string.notifications));
+            notifsAdapter.add("0 " + getString(R.string.notifications));
             notifsAdapter.add("View All");
             notifsLinks.add(NOTIFS_PAGE_LINK);
             setMenuItemVisibility(unreadNotifsIcon, false);
