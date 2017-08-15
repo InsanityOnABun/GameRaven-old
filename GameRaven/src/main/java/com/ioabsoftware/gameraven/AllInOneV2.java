@@ -301,6 +301,23 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         drawerLayout.addDrawerListener(drawerToggle);
 
         assert navigationView != null;
+        Menu navMenu = navigationView.getMenu();
+        navMenu.findItem(R.id.dwrBoardJumper).setIcon(new IconDrawable(
+                this, MaterialCommunityIcons.mdi_bulletin_board).color(Theming.colorPrimary()));
+        navMenu.findItem(R.id.dwrAMPList).setIcon(new IconDrawable(
+                this, MaterialIcons.md_edit).color(Theming.colorPrimary()));
+        navMenu.findItem(R.id.dwrTrackedTopics).setIcon(new IconDrawable(
+                this, MaterialCommunityIcons.mdi_pin).color(Theming.colorPrimary()));
+        navMenu.findItem(R.id.dwrPMInbox).setIcon(new IconDrawable(
+                this, MaterialIcons.md_markunread_mailbox).color(Theming.colorPrimary()));
+        navMenu.findItem(R.id.dwrCopyCurrURL).setIcon(new IconDrawable(
+                this, MaterialIcons.md_content_cut).color(Theming.colorPrimary()));
+        navMenu.findItem(R.id.dwrHighlightList).setIcon(new IconDrawable(
+                this, MaterialCommunityIcons.mdi_lightbulb).color(Theming.colorPrimary()));
+        navMenu.findItem(R.id.dwrSettings).setIcon(new IconDrawable(
+                this, MaterialIcons.md_settings).color(Theming.colorPrimary()));
+        navMenu.findItem(R.id.dwrExit).setIcon(new IconDrawable(
+                this, MaterialCommunityIcons.mdi_close_circle).color(Theming.colorPrimary()));
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -1269,9 +1286,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
         adapterRows.clear();
 
-        boolean isDefaultAcc = Session.getUser() != null &&
-                Session.getUser().equals(settings.getString("defaultAccount", HeaderSettings.NO_DEFAULT_ACCOUNT));
-
         if (BuildConfig.DEBUG) wtl("setting board, topic, message id to null");
         boardID = null;
         topicID = null;
@@ -1287,7 +1301,9 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         String lastPage = null;
         String pagePrefix = null;
 
-        Element boardsDropdown = doc.select("ul#bdrop").first();
+        Element masthead = doc.select("div.masthead").first();
+
+        Element boardsDropdown = masthead.getElementById("bdrop");
         if (boardsDropdown != null) {
             Elements dItems = boardsDropdown.getElementsByTag("a");
             if (dItems.last().parent().hasClass("list_foot")) {
@@ -1356,7 +1372,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 break;
 
             case NOTIFS_PAGE:
-
                 settings.edit().putLong("notifsLastCheck", System.currentTimeMillis()).apply();
                 tbody = doc.getElementsByTag("tbody").first();
 
@@ -2119,7 +2134,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                 break;
         }
 
-        Element pmInboxLink = doc.select("i.fa-envelope").first();
+        Element pmInboxLink = masthead.select("i.fa-envelope").first();
         String pmButtonLabel = getString(R.string.pm_inbox);
         if (pmInboxLink != null) {
             pmButtonLabel += " " + ((TextNode) pmInboxLink.nextSibling()).text();
@@ -2128,7 +2143,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
 
         dwrPMInboxItem.setTitle(pmButtonLabel);
 
-        Element notifsObject = doc.select("div#ndrop").first();
+        Element notifsObject = masthead.select("div#ndrop").first();
         notifsAdapter.clear();
         notifsLinks.clear();
         notifsLinks.add("filler");
