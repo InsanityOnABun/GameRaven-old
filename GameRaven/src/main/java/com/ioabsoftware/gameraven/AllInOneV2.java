@@ -1209,7 +1209,7 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                         Crouton.showText(AllInOneV2.this,
                                 "Message body copied to clipboard.",
                                 Theming.croutonStyle(),
-                                (ViewGroup) v.getParent().getParent());
+                                (ViewGroup) v.getParent().getParent().getParent());
                     }
                 });
             }
