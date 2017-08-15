@@ -33,7 +33,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 340
         versionName "3.2.1"
