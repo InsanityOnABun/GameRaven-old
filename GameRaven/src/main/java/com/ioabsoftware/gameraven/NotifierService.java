@@ -20,7 +20,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class NotifierService extends IntentService {
 
@@ -48,16 +51,17 @@ public class NotifierService extends IntentService {
                 HashMap<String, String> cookies = new HashMap<String, String>();
                 String password = AccountManager.getPassword(getApplicationContext(), username);
 
-                String basePath = Session.ROOT + "/user/notifications";
+                String notifPath = Session.ROOT + "/user/notifications";
+                String pmPath = Session.ROOT + "/pm";
                 String loginPath = Session.ROOT + "/user/login";
 
-                Response r = Jsoup.connect(loginPath).method(Method.GET)
+                Response notifResponse = Jsoup.connect(loginPath).method(Method.GET)
                         .cookies(cookies).timeout(10000).execute();
 
-                cookies.putAll(r.cookies());
+                cookies.putAll(notifResponse.cookies());
 
-                // first connection finished
-                Document pRes = r.parse();
+                // first connection finished (getting form key)
+                Document pRes = notifResponse.parse();
 
                 String loginKey = pRes.getElementsByAttributeValue("name",
                         "key").attr("value");
@@ -66,36 +70,40 @@ public class NotifierService extends IntentService {
                 // "EMAILADDR", user, "PASSWORD", password, "path", lastPath, "key", key
                 loginData.put("EMAILADDR", username);
                 loginData.put("PASSWORD", password);
-                loginData.put("path", basePath);
+                loginData.put("path", notifPath);
                 loginData.put("key", loginKey);
 
-                r = Jsoup.connect(loginPath).method(Method.POST)
+                notifResponse = Jsoup.connect(loginPath).method(Method.POST)
                         .cookies(cookies).data(loginData).timeout(10000)
                         .execute();
 
-                cookies.putAll(r.cookies());
+                cookies.putAll(notifResponse.cookies());
 
-                // second connection finished
+                // second connection finished (logging in)
 
-                r = Jsoup.connect(basePath).method(Method.GET)
-                        .cookies(cookies).data(loginData).timeout(10000)
-                        .execute();
+                notifResponse = Jsoup.connect(notifPath).method(Method.GET)
+                        .cookies(cookies).timeout(10000).execute();
 
-                // third connection finished
+                // third connection finished (notifs page)
 
-                cookies.putAll(r.cookies());
+                cookies.putAll(notifResponse.cookies());
 
-                if (r.statusCode() != 401) {
-                    pRes = r.parse();
+                Response pmResponse = Jsoup.connect(pmPath).method(Method.GET)
+                        .cookies(cookies).timeout(10000).execute();
 
+                // fourth connection finished (pm page)
+
+                if (notifResponse.statusCode() != 401 && pmResponse.statusCode() != 401) {
                     NotificationManager notifManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-                    // NOTIF PAGE PROCESS START
+                    boolean triggerNotif = false;
+                    String notifMsg = "";
+                    long lastCheck = prefs.getLong("notifsLastCheck", 0);
 
-                    Element tbody = pRes.getElementsByTag("tbody").first();
-
-                    if (tbody != null) {
-                        Element latest = tbody.getElementsByTag("tr").first();
+                    // NOTIF PAGE PROCESSING START
+                    Element notifTbody = notifResponse.parse().getElementsByTag("tbody").first();
+                    if (notifTbody != null) {
+                        Element latest = notifTbody.getElementsByTag("tr").first();
                         if (!latest.child(2).text().equals("Read")) {
                             long millis = 0;
                             int multiplier = 1000;
@@ -116,26 +124,52 @@ public class NotifierService extends IntentService {
                             millis = Long.valueOf(fuzzyTimestamp.substring(0, firstSpace)) * multiplier;
 
                             long notifTime = rightNow - millis;
-                            long lastCheck = prefs.getLong("notifsLastCheck", 0);
 
                             if (notifTime > lastCheck) {
-                                Notification.Builder notifBuilder = new Notification.Builder(this)
-                                        .setSmallIcon(R.drawable.ic_notif_small)
-                                        .setContentTitle("GameRaven")
-                                        .setContentText("You have new notification(s)");
-                                Intent notifIntent = new Intent(this, AllInOneV2.class);
-                                PendingIntent pendingNotif = PendingIntent.getActivity(this, 0, notifIntent, PendingIntent.FLAG_ONE_SHOT);
-                                notifBuilder.setContentIntent(pendingNotif);
-                                notifBuilder.setAutoCancel(true);
-                                notifBuilder.setDefaults(Notification.DEFAULT_ALL);
-
-                                notifManager.notify(NOTIF_TAG, NOTIF_ID, notifBuilder.getNotification());
+                                triggerNotif = true;
+                                notifMsg = "You have new notification(s)";
                             }
                         }
                     }
 
+                    // PM PAGE PROCESSING START
+                    Element pmTbody = pmResponse.parse().getElementsByTag("tbody").first();
+                    if (pmTbody != null) {
+                        Element latest = pmTbody.getElementsByTag("tr").first();
+                        if (latest.child(0).child(0).hasClass("fa-circle")) {
+                            String timeString = latest.child(3).text();
+                            String timeFormat = (timeString.contains(" ") ? "M/d h:mmaa " : "M/d/yyyy");
+                            String tzString = prefs.getString("timezone", TimeZone.getDefault().getID());
+
+                            SimpleDateFormat sdf = new SimpleDateFormat(timeFormat, Locale.US);
+                            sdf.setTimeZone(TimeZone.getTimeZone(tzString));
+                            long pmTime = sdf.parse(timeFormat).getTime();
+                            if (pmTime > lastCheck) {
+                                if (triggerNotif) {
+                                    notifMsg += " and new PM(s)";
+                                } else {
+                                    notifMsg = "You have new PM(s)";
+                                }
+                                triggerNotif = true;
+                            }
+                        }
+                    }
+
+                    if (triggerNotif) {
+                        Notification.Builder notifBuilder = new Notification.Builder(this)
+                                .setSmallIcon(R.drawable.ic_notif_small)
+                                .setContentTitle("GameRaven")
+                                .setContentText(notifMsg);
+                        Intent notifIntent = new Intent(this, AllInOneV2.class);
+                        PendingIntent pendingNotif = PendingIntent.getActivity(this, 0, notifIntent, PendingIntent.FLAG_ONE_SHOT);
+                        notifBuilder.setContentIntent(pendingNotif);
+                        notifBuilder.setAutoCancel(true);
+                        notifBuilder.setDefaults(Notification.DEFAULT_ALL);
+
+                        notifManager.notify(NOTIF_TAG, NOTIF_ID, notifBuilder.getNotification());
+                    }
+
                     prefs.edit().putLong("notifsLastCheck", rightNow).apply();
-                    // NOTIF PAGE PROCESS END
                 }
 
             } catch (Exception e) {

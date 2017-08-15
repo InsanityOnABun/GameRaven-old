@@ -1396,8 +1396,6 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
                     adapterRows.add(new HeaderRowData("You have no notifications at this time."));
                 }
                 setMenuItemVisibility(clearUnreadNotifsIcon, true);
-
-                NotifierService.notifDismiss(this);
                 break;
 
             case MENTIONS_PAGE:
