@@ -45,7 +45,6 @@ import com.koushikdutta.ion.Response;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.nodes.Document;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -425,21 +424,20 @@ public class SettingsAccount extends PreferenceActivity implements FutureCallbac
 
                 currentDesc = NetDesc.VERIFY_ACCOUNT_S2;
                 accountVerifier.build(this)
-                        .load("POST", Session.ROOT + "/user/login.html")
+                        .load("POST", Session.ROOT + "/user/login")
                         .setBodyParameters(loginData)
                         .as(new DocumentParser())
                         .withResponse()
                         .setCallback(SettingsAccount.this);
             }
             else if (currentDesc == NetDesc.VERIFY_ACCOUNT_S2) {
-                if (!result.getRequest().getUri().toString().endsWith("/user/login.html")) {
+                if (!result.getRequest().getUri().toString().endsWith("/user/login")) {
                     AccountManager.addUser(SettingsAccount.this, verifyUser, verifyPass);
                     dismissDialog(VERIFY_ACCOUNT_DIALOG);
                     removeDialog(ADD_ACCOUNT_DIALOG);
                     Crouton.showText(this, "Verification succeeded.", Theming.croutonStyle());
                     updateAccountList();
-                }
-                else {
+                } else {
                     dismissDialog(VERIFY_ACCOUNT_DIALOG);
                     Crouton.showText(this,
                             "Verification failed. Check your username and password and try again.",
