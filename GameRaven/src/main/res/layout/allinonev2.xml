@@ -235,6 +235,23 @@
                             android:orientation="vertical">
 
                             <com.joanzapata.iconify.widget.IconButton
+                                android:id="@+id/aioUploadImage"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:background="?attr/selectableItemBackground"
+                                android:onClick="uploadImage"
+                                android:tag="b"
+                                android:text="{fa-picture-o}"
+                                android:textSize="14sp" />
+
+                            <View
+                                android:id="@+id/aioUploadImageSep"
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="?attr/colorPrimary"
+                                android:visibility="visible" />
+
+                            <com.joanzapata.iconify.widget.IconButton
                                 android:id="@+id/aioBold"
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"

@@ -3149,6 +3149,10 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
         return "/user/messages?lp=" + settings.getString("ampSortOption", "-1");
     }
 
+    public void uploadImage(View view) {
+        startActivity(new Intent("com.ioabsoftware.imgtcuploader.INVOKE_FROM_APP"));
+    }
+
     public void htmlButtonClicked(View view) {
         String tag = (String) view.getTag();
         String open = "<" + tag + ">";
