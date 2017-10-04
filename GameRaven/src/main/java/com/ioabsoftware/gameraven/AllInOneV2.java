@@ -3151,11 +3151,26 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     public void uploadImage(View view) {
-        try {
-            getPackageManager().getPackageInfo("com.ioabsoftware.imgtcuploader", 0);
+        PackageManager pm = getPackageManager();
+        if (isPackageInstalled("com.ioabsoftware.imgtcuploader", pm)) {
             startActivity(new Intent("com.ioabsoftware.imgtcuploader.INVOKE_FROM_APP"));
-        } catch (PackageManager.NameNotFoundException ex) {
+        } else if (isPackageInstalled("com.android.vending", pm)) {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.ioabsoftware.imgtcuploader")));
+        } else {
+            AlertDialog.Builder noAppStore = new AlertDialog.Builder(this);
+            noAppStore.setTitle("Share to ImgTC");
+            noAppStore.setMessage("There is no app store installed to download Share to ImgTC.");
+            noAppStore.setPositiveButton("OK", null);
+            noAppStore.show();
+        }
+    }
+
+    private boolean isPackageInstalled(String packagename, PackageManager packageManager) {
+        try {
+            packageManager.getPackageInfo(packagename, 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
         }
     }
 
