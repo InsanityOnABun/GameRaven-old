@@ -11,6 +11,7 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Build;
@@ -3150,7 +3151,12 @@ public class AllInOneV2 extends AppCompatActivity implements SwipeRefreshLayout.
     }
 
     public void uploadImage(View view) {
-        startActivity(new Intent("com.ioabsoftware.imgtcuploader.INVOKE_FROM_APP"));
+        try {
+            getPackageManager().getPackageInfo("com.ioabsoftware.imgtcuploader", 0);
+            startActivity(new Intent("com.ioabsoftware.imgtcuploader.INVOKE_FROM_APP"));
+        } catch (PackageManager.NameNotFoundException ex) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.ioabsoftware.imgtcuploader")));
+        }
     }
 
     public void htmlButtonClicked(View view) {
