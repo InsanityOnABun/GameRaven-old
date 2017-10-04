@@ -16,7 +16,7 @@ import java.nio.charset.Charset;
 
 public class DocumentParser implements AsyncParser<FinalDoc> {
 
-    public static final String CHARSET_NAME = "ISO-8859-1";
+    public static final String CHARSET_NAME = "UTF-8";
     public static final Charset CHARSET = Charset.forName(CHARSET_NAME);
 
     @Override
